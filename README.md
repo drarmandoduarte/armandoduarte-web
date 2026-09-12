@@ -6,7 +6,7 @@
 
 # armandoduarte.com · v1.1 · 12/9/2026
 
-Dos páginas estáticas, sin backend: `index.html` (la web de Armando) y `taller.html` (la landing del taller). Comparten `estilo.css`, `fuentes/` (Montserrat, Open Sans y Great Vibes, de Google, servidas locales) e `img/`. Se publican tal cual en Vercel (proyecto estático, carpeta raíz). Las versiones `preview_*.html` llevan todo adentro y son solo para mirar.
+Dos páginas estáticas, sin backend: `index.html` (la web de Armando) y `taller.html` (la landing del taller). Comparten `estilo.css`, `fuentes/` (Montserrat, Open Sans y Great Vibes, de Google, servidas locales) e `img/`. Se publican tal cual en Vercel (proyecto estático, carpeta raíz): el HTML es la fuente, no hay generador ni paso de build.
 
 ## Qué cambió de la v1 a la v1.1 (revisión de Germán)
 
