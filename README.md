@@ -1,6 +1,12 @@
+> **Qué es esto.** El sitio público de `armandoduarte.com`: dos páginas estáticas, sin build y sin `package.json`.
+> **Cómo se publica.** Push a `main` → Vercel publica la raíz del repo tal cual. Rutas limpias y cabeceras salen de `vercel.json`.
+> **El HTML es la fuente.** `build.py` (el generador que sobrescribía las dos páginas) ya no existe en el repo: quedó en `_historico/` del proyecto. No volver a meterlo.
+> **Nada a `main` sin PR.** `main` está protegida en GitHub: solo entra por PR (el repo es público desde el 12/9/2026). Antes de cada commit se corre `sh check/enlaces.sh`.
+> **Las órdenes viven fuera del repo**, en `03 Producto/web/ordenes/` del proyecto. Los pendientes abiertos, en `docs/tareas.md`.
+
 # armandoduarte.com · v1.1 · 12/9/2026
 
-Dos páginas estáticas, sin backend: `index.html` (la web de Armando) y `taller.html` (la landing del taller). Comparten `estilo.css`, `fuentes/` (Montserrat, Open Sans y Great Vibes, de Google, servidas locales) e `img/`. Se publican tal cual en Vercel (proyecto estático, carpeta raíz). Las versiones `preview_*.html` llevan todo adentro y son solo para mirar.
+Dos páginas estáticas, sin backend: `index.html` (la web de Armando) y `taller.html` (la landing del taller). Comparten `estilo.css`, `fuentes/` (Montserrat, Open Sans y Great Vibes, de Google, servidas locales) e `img/`. Se publican tal cual en Vercel (proyecto estático, carpeta raíz): el HTML es la fuente, no hay generador ni paso de build.
 
 ## Qué cambió de la v1 a la v1.1 (revisión de Germán)
 
