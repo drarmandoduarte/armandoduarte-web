@@ -31,7 +31,9 @@ URLs del Divi viejo que Google conoce, todas a `/` con 301 (`"permanent": true`)
 - `/biografia` — ya está en `vercel.json`
 - `/conferencias` — ya está en `vercel.json`
 
-Para agregar una: una línea más en el array `redirects` de `vercel.json`, con el mismo formato, y una línea más en esta lista.
+Para agregar una: una línea más en el array `redirects` de `vercel.json`, con el mismo formato, y una línea más en esta lista. No hace falta agregar la variante con barra final: `"trailingSlash": false` la normaliza (308) antes de aplicar el redirect.
+
+Dos cosas que se verificaron sobre el preview y conviene no volver a descubrir: `"permanent": true` en Vercel devuelve **308**, no 301 (301 exigiría `statusCode`, que el esquema marca privado); y `cleanUrls` por sí solo **no** normaliza la barra final — sin `trailingSlash` explícito, `/biografia/` daba 404.
 
 Falta que Germán abra Search Console del dominio y pase las URLs que aparezcan ahí o en el sitio viejo.
 
