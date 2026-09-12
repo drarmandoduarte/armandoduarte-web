@@ -1,7 +1,7 @@
 > **Qué es esto.** El sitio público de `armandoduarte.com`: dos páginas estáticas, sin build y sin `package.json`.
 > **Cómo se publica.** Push a `main` → Vercel publica la raíz del repo tal cual. Rutas limpias y cabeceras salen de `vercel.json`.
 > **El HTML es la fuente.** `build.py` (el generador que sobrescribía las dos páginas) ya no existe en el repo: quedó en `_historico/` del proyecto. No volver a meterlo.
-> **Nada a `main` sin PR.** GitHub no aplica protección de ramas acá (cuenta personal gratuita con repo privado), así que es regla de la casa, no del sistema. Antes de cada commit se corre `sh check/enlaces.sh`.
+> **Nada a `main` sin PR.** `main` está protegida en GitHub: solo entra por PR (el repo es público desde el 12/9/2026). Antes de cada commit se corre `sh check/enlaces.sh`.
 > **Las órdenes viven fuera del repo**, en `03 Producto/web/ordenes/` del proyecto. Los pendientes abiertos, en `docs/tareas.md`.
 
 # armandoduarte.com · v1.1 · 12/9/2026
