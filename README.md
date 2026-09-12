@@ -4,6 +4,13 @@
 > **Nada a `main` sin PR.** GitHub no aplica protección de ramas acá (cuenta personal gratuita con repo privado), así que es regla de la casa, no del sistema. Antes de cada commit se corre `sh check/enlaces.sh`.
 > **Las órdenes viven fuera del repo**, en `03 Producto/web/ordenes/` del proyecto. Los pendientes abiertos, en `docs/tareas.md`.
 
+## Cortina
+
+Mientras la web no está abierta, todo el tráfico sin código ve `cortina.html`: lo hace `middleware.js`, que falla cerrado (sin variable de entorno, cortina).
+El código de acceso **no vive en el repo**: es la variable `CODIGO_ACCESO` en Vercel y la carga dirección. Nunca se escribe en un archivo, un commit ni un PR.
+Para entrar: `/entrar?codigo=…` deja una cookie `acceso` por 30 días y redirige a `/`. Con el código incorrecto se ve la cortina, igual que en cualquier otra ruta.
+La cortina se retira con la orden #06: se borra `middleware.js`, se borra `cortina.html` y se quita la regla `.cortina` del final de `estilo.css`.
+
 # armandoduarte.com · v1.1 · 12/9/2026
 
 Dos páginas estáticas, sin backend: `index.html` (la web de Armando) y `taller.html` (la landing del taller). Comparten `estilo.css`, `fuentes/` (Montserrat, Open Sans y Great Vibes, de Google, servidas locales) e `img/`. Se publican tal cual en Vercel (proyecto estático, carpeta raíz). Las versiones `preview_*.html` llevan todo adentro y son solo para mirar.

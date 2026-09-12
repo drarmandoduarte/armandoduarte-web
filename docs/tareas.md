@@ -6,8 +6,8 @@ Las órdenes viven fuera del repo, en `03 Producto/web/ordenes/` del proyecto. A
 
 | # | Qué | Estado |
 |---|---|---|
-| #01 | El repo nace limpio, y `vercel.json` | en curso (rama `infra/01-vercel-json`) |
-| #05 | Cortina | pendiente |
+| #01 | El repo nace limpio, y `vercel.json` | PASA de dirección; PR abierto, espera los `curl` del preview |
+| #05 | Cortina | en curso (rama `web/05-cortina`, apilada sobre `infra/01-vercel-json`) |
 | #02 | Completar la web (los `<span class="dato">` punteados) | pendiente |
 | #03 | Verificación | pendiente |
 | #04 | Tokens web | pendiente |
