@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* El CSS de la web pública se porta entero acá en la Fase B, desde
+   `armandoduarte-web/estilo.css`, con las mismas clases y los mismos valores.
+   Los colores salen de `@codice/ui/styles.css`, que se importa antes. */

@@ -1,0 +1,366 @@
+{
+  "comun": {
+    "marca": {
+      "nombre": "Armando Duarte",
+      "tagline": "Construyendo familias fuertes",
+      "sitio": "armandoduarte.com",
+      "ariaInicio": "Armando Duarte · Inicio",
+      "aria": "Armando Duarte"
+    },
+    "nav": {
+      "quien": "Quién soy",
+      "hago": "Qué hago",
+      "taller": "El taller · Mérida",
+      "libros": "Libros",
+      "programa": "Construyendo Familias Fuertes",
+      "contacto": "Contacto"
+    },
+    "cabecera": {
+      "abrirMenu": "Abrir menú",
+      "menu": "Menú",
+      "whatsapp": "WhatsApp",
+      "whatsappAria": "Escribir por WhatsApp"
+    },
+    "menu": {
+      "aria": "Menú principal",
+      "secciones": "Secciones",
+      "cerrar": "Cerrar",
+      "escribir": "Escribir por WhatsApp →"
+    },
+    "pie": {
+      "explorar": "Explorar",
+      "legal": "Legal",
+      "canales": "Canales",
+      "privacidad": "Aviso de privacidad",
+      "terminos": "Términos",
+      "youtube": "YouTube",
+      "spotify": "Podcast en Spotify",
+      "facebook": "Facebook",
+      "whatsapp": "WhatsApp · +52 55 5501 5641",
+      "copyright": "© 2026 · Armando Duarte",
+      "contacto": "Contacto",
+      "privacidadCorta": "Privacidad",
+      "aria": "Armando Duarte"
+    },
+    "mensajes": {
+      "general": "Hola, Armando. Te escribo desde tu página web.",
+      "reservar": "Hola, quiero reservar mi lugar en el taller El arte de amar a tu adolescente.",
+      "programa": "Hola, vi el programa del taller El arte de amar a tu adolescente y quiero reservar mi lugar.",
+      "asegurar": "Hola, quiero asegurar mi lugar en el taller El arte de amar a tu adolescente.",
+      "arco": "Hola, quiero ejercer mis derechos ARCO."
+    }
+  },
+
+  "inicio": {
+    "head": {
+      "title": "Armando Duarte · Consultoría familiar, talleres y libros · Mérida",
+      "description": "Doctor en Liderazgo, autor de Construyendo Familias Fuertes. Consultoría familiar, talleres para padres y conferencias. Mérida, Yucatán.",
+      "ogImageAlt": "Armando Duarte · Consultoría familiar, talleres y libros · Mérida"
+    },
+    "hero": {
+      "eyebrow": "Consultoría familiar · Autor · Conferencista · Mérida",
+      "titulo1": "Familias fuertes",
+      "titulo2": "se construyen.",
+      "sub": "Acompaño a padres a entender a sus hijos y a recuperar la paz en casa. Con ciencia, con criterio y con la experiencia de criar a siete.",
+      "ctaTaller": "Ver el taller en Mérida",
+      "ctaWhatsapp": "Escribir por WhatsApp",
+      "micro1": "Padre de 7",
+      "micro2": "Doctor en Liderazgo",
+      "micro3": "2 libros",
+      "fotoAlt": "Armando Duarte, sentado, sonriendo"
+    },
+    "ahora": {
+      "pill": "Ahora",
+      "titulo": "El arte de amar a tu adolescente · taller presencial",
+      "meta1": "Mérida",
+      "meta2": "9:00 a 13:30",
+      "meta3": "Cupo limitado",
+      "cta": "Ver el taller"
+    },
+    "quien": {
+      "eyebrow": "Quién soy",
+      "titulo1": "Un padre de siete",
+      "titulo2": "que estudió la familia.",
+      "cuerpo": "Soy un apasionado por la familia y por su papel en el desarrollo de las nuevas generaciones. Investigador, escritor y conferencista. Casado y padre de siete hijos, de 23 a 7 años. Mi trabajo está enfocado en mejorar la calidad de las relaciones y en disfrutar la convivencia familiar.",
+      "fichaFormacionClave": "Formación",
+      "fichaFormacionValor": "Licenciatura en Ciencias de la Familia · Maestría en Educación · Doctorado en Liderazgo",
+      "fichaPracticaClave": "Práctica",
+      "fichaPracticaValor": "1.000 horas al año en sesiones de consultoría familiar",
+      "fichaObraClave": "Obra",
+      "fichaObraAntes": "Autor de ",
+      "fichaObraLibro1": "Construyendo Familias Fuertes",
+      "fichaObraEntre": " y ",
+      "fichaObraLibro2": "Padres digitalmente responsables",
+      "fichaBaseClave": "Base",
+      "fichaBaseValor": "Mérida, Yucatán · México",
+      "cita": "Mi propósito es guiar a padres comprometidos a trascender la reactividad y el miedo, y convertirse en el refugio seguro y la guía que sus hijos necesitan para crecer libres, seguros y responsables.",
+      "citaFirma": "Armando Duarte",
+      "fotoAlt": "Armando Duarte de pie"
+    },
+    "hago": {
+      "eyebrow": "Qué hago",
+      "titulo1": "Tres maneras",
+      "titulo2": "de trabajar juntos.",
+      "unoTitulo": "Consultoría familiar",
+      "unoTexto": "Sesiones privadas con padres, parejas y familias. Mil horas al año, una a la vez.",
+      "dosTitulo": "Talleres y conferencias",
+      "dosTexto": "Encuentros presenciales y en vivo para padres de familia. El próximo: el taller para padres de adolescentes en Mérida.",
+      "tresTitulo": "Libros",
+      "tresTexto": "Dos títulos para leer en casa y volver a ellos: la familia fuerte y la crianza en la era digital."
+    },
+    "taller": {
+      "eyebrow": "Taller presencial · Mérida",
+      "titulo1": "El arte de amar",
+      "titulo2": "a tu adolescente.",
+      "lead": "Descodifica su cerebro, sana la distancia emocional y conviértete en la guía que tu hijo necesita. Cuatro horas y media, en vivo, con cupo limitado.",
+      "ctaPrograma": "Ver el programa",
+      "ctaWhatsapp": "Reservar por WhatsApp",
+      "fichaHorarioClave": "Horario",
+      "fichaHorarioValor": "9:00 a 13:30 · 4 horas y media",
+      "fichaLugarClave": "Lugar",
+      "fichaLugarValor": "Mérida",
+      "fichaModalidadClave": "Modalidad",
+      "fichaModalidadValor": "Sesión privada en vivo · cupo limitado",
+      "fichaInversionClave": "Inversión",
+      "fichaInversionValor": "$1,170 MXN · incluye workbook, cuaderno, coffee break y tarea por WhatsApp"
+    },
+    "libros": {
+      "eyebrow": "Libros",
+      "titulo1": "Dos libros",
+      "titulo2": "para tener en casa.",
+      "tapaAutor": "Armando Duarte",
+      "unoTapa": "Construyendo Familias Fuertes",
+      "unoTitulo": "Construyendo Familias Fuertes",
+      "unoTexto": "El libro que da nombre a todo. Cómo se construye una familia que sostiene, desde la pareja hasta los hijos.",
+      "unoCta": "Comprar en San Pablo",
+      "dosTapa": "Padres digitalmente responsables",
+      "dosTitulo": "Padres digitalmente responsables",
+      "dosTexto": "Criar con pantallas en casa sin perder a los hijos en ellas. Límites, criterio y presencia."
+    },
+    "programa": {
+      "eyebrow": "El programa",
+      "titulo1": "Construyendo",
+      "titulo2": "Familias Fuertes.",
+      "cuerpo": "Es el nombre del primer libro y del trabajo entero: cientos de videos, un podcast, sesiones en vivo y talleres para padres de familia. Todo lo que publico vive bajo ese nombre, y es gratis salvo los talleres.",
+      "selloAlt": "Construyendo Familias Fuertes",
+      "unoTitulo": "Canal de YouTube",
+      "unoTexto": "Cientos de videos sobre familia, pareja, adolescencia y crianza. El lugar donde más contenido hay.",
+      "dosTitulo": "Podcast en Spotify",
+      "dosTexto": "Construyendo Familias Fuertes, para escuchar en el auto o en la cocina.",
+      "tresTitulo": "Facebook",
+      "tresTexto": "Sesiones en vivo y avisos de talleres y conferencias."
+    },
+    "contacto": {
+      "eyebrow": "Contacto",
+      "titulo1": "Escríbeme.",
+      "titulo2": "Te responde mi equipo, y yo.",
+      "whatsapp": "WhatsApp · +52 55 5501 5641",
+      "youtube": "YouTube",
+      "spotify": "Spotify",
+      "facebook": "Facebook",
+      "base": "Mérida, Yucatán · México"
+    }
+  },
+
+  "taller": {
+    "head": {
+      "title": "Taller para padres de adolescentes en Mérida · El arte de amar a tu adolescente · Armando Duarte",
+      "description": "Taller presencial de 4 horas y media para padres de adolescentes. Neurociencia y crianza consciente con Armando Duarte. Mérida, cupo limitado.",
+      "ogImageAlt": "El arte de amar a tu adolescente · taller presencial en Mérida con Armando Duarte"
+    },
+    "hero": {
+      "eyebrow": "Taller presencial · Mérida",
+      "titulo1": "El arte de amar",
+      "titulo2": "a tu adolescente.",
+      "sub": "Descodifica su cerebro, sana la distancia emocional y conviértete en la guía que tu hijo necesita.",
+      "ctaReservar": "Reservar mi lugar",
+      "ctaPrograma": "Ver el programa",
+      "micro1": "4 horas y media",
+      "micro2": "9:00 a 13:30",
+      "micro3": "Cupo limitado",
+      "fotoAlt": "Armando Duarte"
+    },
+    "hechos": {
+      "horarioClave": "Horario",
+      "horarioValor": "9:00 a 13:30",
+      "dondeClave": "Dónde",
+      "dondeValor": "Mérida",
+      "modalidadClave": "Modalidad",
+      "modalidadValor": "Sesión privada en vivo"
+    },
+    "suena": {
+      "eyebrow": "¿Te suena?",
+      "titulo1": "¿El niño dulce que criaste",
+      "titulo2": "se volvió un desconocido?",
+      "cuerpo": "Durante años invertiste tiempo, amor y recursos en darle la mejor educación posible. Y al llegar la adolescencia te encuentras con escenas que no sabes leer.",
+      "unoTitulo": "El muro de silencio",
+      "unoTexto": "Entra a casa, se encierra en su habitación y apenas responde con monosílabos.",
+      "dosTitulo": "La irritabilidad",
+      "dosTexto": "Cualquier sugerencia o muestra de afecto se interpreta como un ataque o una intromisión.",
+      "tresTitulo": "El refugio digital",
+      "tresTexto": "Pasa horas frente a las pantallas, más conectado con el mundo virtual que con su familia.",
+      "cita": "«No estás sola ni te has equivocado como madre. Lo que estás presenciando no es una falta de amor hacia ti: es la turbulenta remodelación de su cerebro y la búsqueda de su propia identidad y autonomía»."
+    },
+    "porque": {
+      "eyebrow": "Por qué",
+      "titulo1": "Las estrategias del pasado",
+      "titulo2": "ya no funcionan.",
+      "cuerpo1": "Cuando nuestros hijos son pequeños ejercemos el rol de gobernadores: un control directo sobre su entorno. En la adolescencia, mantener ese control por imposición o ultimátum solo activa su cerebro impulsivo y desencadena un ciclo coercitivo destructivo.",
+      "cuerpo2": "Para acompañarle no necesitas más disciplina autoritaria ni permisividad distante. Necesitas evolucionar hacia el rol de guía consciente."
+    },
+    "programa": {
+      "eyebrow": "El programa",
+      "titulo1": "Cuatro núcleos.",
+      "titulo2": "Cuatro horas y media.",
+      "uno": {
+        "rotulo": "Núcleo 1",
+        "titulo": "La arquitectura del cerebro adolescente",
+        "texto1": "Por qué actúa impulsivamente y cómo la remodelación de su cerebro afecta sus reacciones.",
+        "texto2": "La paradoja de la madurez: razona como adulto en calma, actúa por impulso bajo presión."
+      },
+      "dos": {
+        "rotulo": "Núcleo 2",
+        "titulo": "De la coacción a la co-regulación emocional",
+        "texto1": "La regla de oro: conectar antes de redirigir.",
+        "texto2": "Validar sus emociones sin ceder en tus normas: «sí al sentimiento, no a la conducta»."
+      },
+      "tres": {
+        "rotulo": "Núcleo 3",
+        "titulo": "Las cinco victorias del adolescente",
+        "texto1": "Individualidad, identidad, autonomía, independencia y emancipación: cómo acompañar cada hito.",
+        "texto2": "Tratar al adolescente mayor como a un «huésped de honor»."
+      },
+      "cuatro": {
+        "rotulo": "Núcleo 4",
+        "titulo": "Límites y comunicación asertiva",
+        "texto1": "La «motivación dialogada» y los acuerdos de los que él se hace responsable.",
+        "texto2": "Reformular el «no» en un «sí condicional» para expandir su tolerancia a la frustración."
+      },
+      "receso": "Con un receso de 20 minutos entre el núcleo 2 y el 3"
+    },
+    "llevas": {
+      "eyebrow": "Al terminar",
+      "titulo": "Lo que te llevas.",
+      "unoTitulo": "Claridad",
+      "unoTexto": "Entenderás qué le ocurre a tu hijo en cada estallido o retraimiento.",
+      "dosTitulo": "Palabras precisas",
+      "dosTexto": "Sabrás qué decir y qué callar para mantener abiertos los canales de comunicación.",
+      "tresTitulo": "Serenidad con firmeza",
+      "tresTexto": "Mantendrás la calma sin caer en gritos, culpas ni desgaste.",
+      "cta": "Reservar mi lugar"
+    },
+    "facilitador": {
+      "eyebrow": "Sobre el facilitador",
+      "titulo1": "Armando Duarte.",
+      "titulo2": "Padre de siete, experto en familia.",
+      "familiaClave": "Familia",
+      "familiaValor": "Casado, padre de siete hijos de 23 a 7 años",
+      "practicaClave": "Práctica",
+      "practicaValor": "1.000 horas al año de consultoría familiar",
+      "formacionClave": "Formación",
+      "formacionValor": "Licenciatura en Ciencias de la Familia · Maestría en Educación · Doctorado en Liderazgo",
+      "obraClave": "Obra",
+      "obraValor": "Construyendo Familias Fuertes · Padres digitalmente responsables",
+      "cita": "Mi propósito es guiar a padres comprometidos a trascender la reactividad y el miedo, y convertirse en el refugio seguro y la guía que sus hijos necesitan.",
+      "citaFirma": "Armando Duarte",
+      "fotoAlt": "Armando Duarte"
+    },
+    "testimonios": {
+      "eyebrow": "Asistentes",
+      "titulo1": "Lo que dicen",
+      "titulo2": "al salir.",
+      "unoTexto": "«Llegué exhausta por las discusiones diarias con mi hija de 15 años. En cuatro horas y media entendí qué pasaba en su cerebro. Aplicar “conectar antes de redirigir” cambió la energía de nuestra casa ese mismo fin de semana».",
+      "unoFirma": "Dra. Mariana G. · madre de dos adolescentes",
+      "dosTexto": "«Aprendí a poner límites claros con elegancia y sin culpa. Mi hijo ha vuelto a buscarme para pedirme consejo».",
+      "dosFirma": "Sofi L. · empresaria y madre"
+    },
+    "inversion": {
+      "eyebrow": "Inversión",
+      "titulo1": "Un solo precio.",
+      "titulo2": "Todo incluido.",
+      "nombre": "Taller presencial · Mérida",
+      "precio": "$1,170",
+      "moneda": "MXN",
+      "por": "por persona · inversión única",
+      "cta": "Asegurar mi lugar",
+      "incluye1": "Acceso al taller completo, 4 horas y media",
+      "incluye2": "Workbook de trabajo",
+      "incluye3": "Cuaderno y pluma",
+      "incluye4": "Coffee break",
+      "incluye5": "Tarea de seguimiento por WhatsApp",
+      "garantiaTitulo": "Garantía de satisfacción.",
+      "garantiaTexto": " Si tras la primera hora sientes que el contenido no transformó tu perspectiva sobre la crianza de tu hijo, te devolvemos el 100 % de tu inversión, sin preguntas."
+    },
+    "preguntas": {
+      "eyebrow": "Para tu reflexión",
+      "titulo1": "Siete preguntas",
+      "titulo2": "que te haces en silencio.",
+      "uno": "¿Por qué mi hijo se aísla de mí y ya no quiere hablarme de su vida?",
+      "dos": "¿Por qué me da tanto miedo que las malas compañías destruyan a mi hijo?",
+      "tres": "¿Por qué siento que prefiere el celular antes que hablar conmigo?",
+      "cuatro": "¿Por qué me miente, y qué hago mal para que no confíe en mí?",
+      "cinco": "¿Por qué me frustra tanto verlo desmotivado y sin metas claras?",
+      "seis": "¿Por qué tolero sus malos modos sin saber cómo fijar un límite?",
+      "siete": "¿Por qué me da pánico pensar que no sabrá valerse por sí mismo?"
+    },
+    "reservar": {
+      "eyebrow": "Reservar",
+      "titulo": "El amor incondicional no es la ausencia de límites. Es la presencia de unos padres conscientes.",
+      "lead": "No dejes que los años más determinantes de la vida de tu hijo transcurran entre el distanciamiento y la fricción.",
+      "ctaAsegurar": "Asegurar mi lugar",
+      "ctaConocer": "Conocer a Armando"
+    }
+  },
+
+  "privacidad": {
+    "head": {
+      "title": "Aviso de privacidad · Armando Duarte",
+      "description": "Aviso de privacidad de armandoduarte.com, conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares."
+    },
+    "eyebrow": "Legal",
+    "titulo": "Aviso de privacidad",
+    "lead": "Este aviso explica qué datos personales se recaban a través de este sitio, para qué se usan y cómo puedes controlarlos. Está redactado conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).",
+    "responsableTitulo": "Responsable",
+    "responsableAntes": "El responsable del tratamiento de tus datos personales es Armando Duarte, con domicilio en Mérida, Yucatán, México. Para cualquier asunto relacionado con este aviso puedes escribirnos por WhatsApp al ",
+    "responsableEnlace": "+52 55 5501 5641",
+    "responsableDespues": ".",
+    "datosTitulo": "Qué datos se recaban",
+    "datosTexto": "Este sitio no tiene formularios: no hay ningún campo donde dejes tus datos. Los únicos datos personales que llegan son los que tú escribes cuando inicias una conversación por WhatsApp desde alguno de los botones de la página: tu nombre, tu número de teléfono y lo que decidas contar en el mensaje.",
+    "usoTitulo": "Para qué se usan",
+    "usoTexto": "Para responder tu consulta, para reservar tu lugar en talleres y sesiones, y —solo si tú lo pides— para avisarte de próximas actividades. No se usan para ningún otro fin.",
+    "comparteTitulo": "Con quién se comparten",
+    "comparteAntes": "Con nadie. Tus datos no se venden, no se ceden y no se transfieren a terceros. La conversación ocurre dentro de WhatsApp, y los mensajes que intercambias ahí los trata Meta conforme a su propia ",
+    "comparteEnlace": "política de privacidad",
+    "comparteDespues": ", que es independiente de este aviso.",
+    "cookiesTitulo": "Cookies y medición",
+    "cookiesTexto": "Hoy este sitio no usa cookies, ni píxeles de seguimiento, ni herramientas de analítica. Si en algún momento se empieza a pautar en redes sociales y eso implica instalar un píxel de medición, este aviso se actualiza antes de hacerlo.",
+    "arcoTitulo": "Tus derechos ARCO",
+    "arcoTexto": "Tienes derecho a acceder a tus datos personales, a rectificarlos si son inexactos, a cancelarlos cuando consideres que no son necesarios y a oponerte a su uso para fines específicos. También puedes revocar en cualquier momento el consentimiento que hayas dado.",
+    "arcoEjercerAntes": "Para ejercer cualquiera de estos derechos, escríbenos por WhatsApp al ",
+    "arcoEjercerEnlace": "+52 55 5501 5641",
+    "arcoEjercerDespues": " indicando tu nombre y qué derecho quieres ejercer. La respuesta llega en un plazo máximo de 20 días hábiles, como marca la ley.",
+    "cambiosTitulo": "Cambios a este aviso",
+    "cambiosTexto": "Si este aviso cambia, la versión nueva se publica en esta misma página. Última actualización: 12 de septiembre de 2026."
+  },
+
+  "terminos": {
+    "head": {
+      "title": "Términos de uso · Armando Duarte",
+      "description": "Términos de uso del sitio armandoduarte.com: qué es, cómo se reservan talleres y sesiones, y quién es dueño del contenido."
+    },
+    "eyebrow": "Legal",
+    "titulo": "Términos de uso",
+    "lead": "Al usar este sitio aceptas lo que dice esta página. Es corta a propósito.",
+    "queEsTitulo": "Qué es este sitio",
+    "queEsTexto": "armandoduarte.com es un sitio informativo: presenta el trabajo de Armando Duarte con las familias, los talleres y los libros, y te da una vía para ponerte en contacto. No es una tienda ni una plataforma de reservas, y la información que encuentras acá es orientativa: no sustituye una consulta profesional.",
+    "reservasTitulo": "Reservas y pagos",
+    "reservasTexto": "Los lugares en talleres y las sesiones se acuerdan por WhatsApp, directamente con el equipo de Armando. Ahí se confirman el cupo, la forma de pago y las condiciones de cada actividad. En este sitio no se cobra nada ni se procesan pagos.",
+    "contenidoTitulo": "El contenido es de Armando",
+    "contenidoTexto": "Los textos, las fotografías, los libros y los materiales de los talleres son de Armando Duarte y están protegidos por la ley de derechos de autor. Puedes leerlos y compartir el enlace a esta página; no puedes reproducirlos, adaptarlos ni usarlos con fines comerciales sin permiso por escrito.",
+    "talCualTitulo": "El sitio se ofrece tal cual",
+    "talCualTexto": "Este sitio se ofrece tal como está. Su contenido puede cambiar o dejar de estar disponible en cualquier momento, y se procura que las fechas y los datos estén al día, sin que eso constituya una garantía.",
+    "leyTitulo": "Ley aplicable",
+    "leyTexto": "Estos términos se rigen por la legislación mexicana. Para cualquier controversia relacionada con este sitio, las partes se someten a los tribunales competentes de Mérida, Yucatán.",
+    "actualizacion": "Última actualización: 12 de septiembre de 2026."
+  }
+}

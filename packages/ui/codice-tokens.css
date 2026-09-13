@@ -1,0 +1,63 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Códice · tokens como variables CSS · v1.1.0
+   Fuente: packages/ui/codice-tokens.json. Si un valor cambia, cambia allá
+   primero — el JSON es el documento y esto es su forma ejecutable.
+
+   ── Por qué los nombres son éstos y no otros ─────────────────────────────
+   Son los que `estilo.css` de armandoduarte-web ya usaba: --crema, --tinta,
+   --ocre, --teal… Podrían haber sido --bg, --text, --primary como en Omnia, y
+   entonces el port de la web habría sido una TRADUCCIÓN —cada regla reescrita,
+   cada error posible— en vez de una sustitución. La orden #01 lo pide así por
+   eso: lo único que esta orden puede permitirse cambiar es dónde vive el
+   valor, nunca cuál es.
+
+   ── Ningún hex vive fuera de este archivo ────────────────────────────────
+   Lo vigila `scripts/check-tokens.mjs` sobre `apps/` y `packages/ui/components`.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  /* ── Fondos ─────────────────────────────────────────────────────────── */
+  --crema:#FAF7F1;          /* color.background.cream · el fondo por defecto */
+  --superficie:#FFFFFF;     /* color.background.surface · la sección blanca */
+  --calido:#F3EBDD;         /* color.background.surfaceWarm · la sección cálida */
+
+  /* ── Tinta ──────────────────────────────────────────────────────────── */
+  --tinta:#2E2B25;          /* color.ink.primary · nunca negro puro */
+  --gris:#7A7267;           /* color.ink.muted */
+  --gris-claro:#A89F92;
+
+  /* ── Marca ──────────────────────────────────────────────────────────── */
+  --ocre:#8F6B3D;           /* color.brand.ochre · primario */
+  --ocre-medio:#B08A52;     /* color.brand.ochre.mid · el acento sobre fondo oscuro */
+  --teal:#33585C;           /* color.brand.teal · acento de titulares */
+  --teal-medio:#527E82;     /* color.brand.teal.mid */
+  --navy:#2F3A4E;           /* color.support.navy · la tapa del segundo libro */
+
+  /* ── Hairlines · casi no existen; el aire separa ─────────────────────── */
+  --hair:#EAE4D8;           /* color.border.hairline */
+  --hair-hover:#D8CFBE;     /* color.border.hairlineHover */
+  --hair-oscura:rgba(250,247,241,.16);  /* la hairline sobre fondo oscuro: crema al 16 % */
+
+  /* ── Mezclas ────────────────────────────────────────────────────────── */
+  --ocre-suave:color-mix(in oklab, var(--ocre) 7%, var(--crema));
+  --teal-suave:color-mix(in oklab, var(--teal) 8%, var(--crema));
+
+  /* ── Familias ───────────────────────────────────────────────────────── */
+  --display:'Montserrat',system-ui,sans-serif;   /* typography.families.structure */
+  --lectura:'Open Sans',system-ui,sans-serif;    /* typography.families.reading */
+  --script:'Great Vibes',cursive;                /* typography.families.script */
+
+  /* ── Escala display de la web · peso 300, fluida ─────────────────────── */
+  --display-xl:clamp(42px,5.6vw,80px);   /* web.typography.display.xl */
+  --display-l:clamp(36px,5vw,68px);      /* web.typography.display.l */
+  --display-m:clamp(30px,3.8vw,52px);    /* web.typography.display.m */
+  --display-s:clamp(22px,2.4vw,32px);    /* web.typography.display.s */
+  --lead:clamp(18px,1.45vw,21px);        /* web.typography.lead */
+  --script-size:clamp(28px,3vw,42px);    /* web.typography.script */
+
+  /* ── Header y movimiento ────────────────────────────────────────────── */
+  --header-h:76px;          /* web.header.height.default */
+  --ease:ease-out;          /* motion.easing */
+
+  /* ── Ritmo vertical ─────────────────────────────────────────────────── */
+  --s3:20px;--s4:28px;--s5:40px;--s6:56px;--s7:80px;--s8:112px;
+}

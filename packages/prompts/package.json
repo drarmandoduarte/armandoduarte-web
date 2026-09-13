@@ -1,0 +1,15 @@
+{
+  "name": "@codice/prompts",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Los prompts del asistente y el perfil de estilo de escritura del doctor. El único lugar del monorepo donde se vosea.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  }
+}

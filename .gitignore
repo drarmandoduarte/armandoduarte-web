@@ -1,0 +1,22 @@
+node_modules/
+dist/
+build/
+.vercel
+.DS_Store
+*.local
+
+# El reporte que deja cada suite para el guardián de guardianes. Se borra y se
+# vuelve a escribir en cada corrida: versionarlo sería guardar el resultado de
+# ayer con cara de resultado de hoy.
+.vitest-report.json
+
+# Lo que deja Playwright cuando un guardián de fidelidad se cae: trazas y
+# capturas del que falló. Son para mirar en el momento, no para versionar.
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/.playwright-report.json
+
+# Las capturas que el guardián de fidelidad toma del sitio estático para
+# comparar. Se regeneran con un comando y pesan; lo que sí va al repo son las
+# del informe, en docs/informes/.
+apps/web/e2e/.capturas/
