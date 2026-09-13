@@ -6,8 +6,9 @@
 <link rel="stylesheet" href="../fuentes/local.css">
 <link rel="stylesheet" href="../estilo.css">
 <style>
-  /* Lienzo exacto de la imagen para compartir. La fecha vive en un solo lugar:
-     el <span data-fecha>. En la Parte 2 se cambia ahí y se regenera. */
+  /* Lienzo exacto de la imagen para compartir. La fecha salió en la Parte 2 (no la
+     dio Armando): cuando exista, vuelve como <span data-fecha> en .og__linea y se
+     regenera con check/og-capturar.mjs. */
   html,body{margin:0;padding:0;background:var(--crema)}
   .og{width:1200px;height:630px;background:var(--crema);display:grid;
       grid-template-columns:1fr 400px;align-items:end;overflow:hidden}
@@ -25,7 +26,7 @@
 <div class="og">
   <div class="og__texto">
     <div class="og__titulo">El arte de amar a tu adolescente</div>
-    <div class="og__linea">Taller presencial · Mérida · <span data-fecha>[fecha]</span></div>
+    <div class="og__linea">Taller presencial · Mérida</div>
     <div class="og__marca">Armando Duarte</div>
   </div>
   <div class="og__foto"><img src="../img/armando-parado-crema.jpg" alt=""></div>
