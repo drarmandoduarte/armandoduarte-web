@@ -8,7 +8,8 @@ Las órdenes viven fuera del repo, en `03 Producto/web/ordenes/` del proyecto. A
 |---|---|---|
 | #01 | El repo nace limpio, y `vercel.json` | cerrada 12/9 |
 | #05 | Cortina | **en pausa** (dirección 12/9): no se usa mientras la web viva solo en `armandoduarte-web.vercel.app`. PR #2 abierto, rama `web/05-cortina` sin borrar. |
-| #02 | Completar la web (los `<span class="dato">` punteados) | pendiente |
+| #02 | Completar la web · Parte 1 (legales, og, favicon, sitemap) | en curso (rama `web/02-parte-1`) |
+| #02 | Completar la web · Parte 2 (los `<span class="dato">` punteados) | espera los datos de Armando |
 | #03 | Verificación | pendiente |
 | #04 | Tokens web | pendiente |
 
@@ -37,6 +38,6 @@ Dos cosas que se verificaron sobre el preview y conviene no volver a descubrir: 
 
 Falta que Germán abra Search Console del dominio y pase las URLs que aparezcan ahí o en el sitio viejo.
 
-### 4. Enlaces de privacidad y términos
+### 4. El correo público de Armando para el aviso de privacidad
 
-Los dos enlaces del pie apuntan a `#`. Es la #02 / un pendiente legal (aviso de privacidad mexicano, LFPDPPP), no de infraestructura.
+El aviso de privacidad y los derechos ARCO necesitan un correo **de cara al público**, que no puede ser `development@armandoduarte.com` (es la cuenta operativa). No existe todavía, así que en `privacidad.html` quedaron dos `<span class="dato">` punteados. Mientras estén, esa página no se publica; las otras tres sí.

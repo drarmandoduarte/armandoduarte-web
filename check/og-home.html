@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<title>Plantilla og:image · home</title>
+<link rel="stylesheet" href="../fuentes/local.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* Lienzo exacto de la imagen para compartir. Todo lo demás sale de estilo.css. */
+  html,body{margin:0;padding:0;background:var(--crema)}
+  .og{width:1200px;height:630px;background:var(--crema);display:grid;
+      grid-template-columns:1fr 420px;align-items:end;overflow:hidden;position:relative}
+  .og__texto{padding:72px 0 72px 80px;align-self:center}
+  .og__marca{font-family:var(--display);font-weight:300;font-size:64px;line-height:1.05;
+             letter-spacing:-.01em;color:var(--tinta)}
+  .og__linea{margin-top:22px;font-family:var(--lectura);font-size:23px;line-height:1.5;color:var(--gris)}
+  .og__regla{margin-top:34px;width:120px;height:1px;background:var(--ocre)}
+  .og__foto{height:630px;display:flex;align-items:flex-end;justify-content:center}
+  .og__foto img{height:600px;width:auto;object-fit:contain;object-position:bottom}
+</style>
+</head>
+<body>
+<div class="og">
+  <div class="og__texto">
+    <div class="og__marca">Armando Duarte</div>
+    <div class="og__linea">Consultoría familiar, talleres y libros · Mérida</div>
+    <div class="og__regla"></div>
+  </div>
+  <div class="og__foto"><img src="../img/armando-parado-crema.jpg" alt=""></div>
+</div>
+</body>
+</html>

@@ -287,3 +287,8 @@ img{display:block;max-width:100%}
   .ft__bottom{flex-direction:column;align-items:flex-start}
   .preguntas li{grid-template-columns:36px 1fr}
 }
+
+/* ── Legal · ancho de lectura de privacidad y términos (#02). El enlace
+   dentro del texto usa el subrayado ocre de la sección de contacto. ──── */
+.legal .body,.legal .lead,.legal .small{max-width:56ch}
+.legal a{border-bottom:1px solid var(--ocre)}
