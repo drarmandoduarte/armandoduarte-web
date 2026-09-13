@@ -12,7 +12,7 @@ Falla (sale 1) si algún `href` apunta a un `.html` en vez de a una ruta limpia.
 
 ## `og-home.html`, `og-taller.html`, `og-capturar.mjs` — imágenes para compartir (#02)
 
-Las dos imágenes (`img/og-home.jpg` e `img/og.jpg`) **no se hacen a mano**: se generan desde estas plantillas, que usan el mismo `estilo.css` y las mismas fuentes locales que la web. Así, cuando cambie la fecha del taller, se cambia el `<span data-fecha>` de `og-taller.html` y se vuelve a capturar.
+Las dos imágenes (`img/og-home.jpg` e `img/og.jpg`) **no se hacen a mano**: se generan desde estas plantillas, que usan el mismo `estilo.css` y las mismas fuentes locales que la web. Así, el día que haya fecha del taller, se agrega a la línea `.og__linea` de `og-taller.html` y se vuelve a capturar.
 
 Este repo no tiene `package.json` ni `node_modules` a propósito, así que el Playwright se toma prestado de otro proyecto de la casa con la variable `PLAYWRIGHT_MODULE`:
 
