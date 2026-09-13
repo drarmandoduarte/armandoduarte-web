@@ -21,6 +21,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 12 |
 | `@codice/prompts` | 3 |
 | `@codice/web` | 9 |
+| `@codice/navegador` | 12 |
 
 ## De dónde salen estos números
 
@@ -29,4 +30,7 @@ estimados—. `@codice/ui` es el guardián de los tokens; `@codice/core`, el del
 i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo;
 `@codice/web`, el de las rutas.
 
-La Fase B y la Fase C los suben con lo que agregan, en su propio commit.
+`@codice/navegador` no es un paquete: es el guardián de fidelidad, que corre en Chromium
+y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
+Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
+nada, y desde afuera se ve igual que uno que corrió bien.

@@ -16,7 +16,9 @@ apps/web/test-results/
 apps/web/playwright-report/
 apps/web/.playwright-report.json
 
-# Las capturas que el guardián de fidelidad toma del sitio estático para
-# comparar. Se regeneran con un comando y pesan; lo que sí va al repo son las
-# del informe, en docs/informes/.
-apps/web/e2e/.capturas/
+# Las capturas de referencia del guardián de fidelidad. NO se versionan, y es la
+# mitad de cómo funciona: se reescriben en cada corrida **desde el sitio
+# estático**, que es la fuente. Una captura guardada en el repo envejece —y el
+# día que envejezca, el guardián estaría comparando el port contra una foto
+# vieja de sí mismo en vez de contra la web que existe.
+apps/web/e2e/*-snapshots/

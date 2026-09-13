@@ -34,7 +34,32 @@ module.exports = {
     './src/**/*.{ts,tsx}',
     '../../packages/ui/components/**/*.{js,jsx}',
   ],
-  corePlugins: { preflight: false },
+  /*
+   * Dos plugins apagados, y los dos por el mismo motivo: que Tailwind no
+   * escriba reglas que la web no pidió.
+   *
+   * `preflight` — su reset le pone `font-size: inherit` y `font-weight:
+   * inherit` a los seis niveles de título, le saca el `list-style` y el relleno
+   * a las listas y le cambia el borde por defecto a todo elemento. La web
+   * estática **ya trae su propio reset** (`*{box-sizing:border-box;margin:0;
+   * padding:0}`, primera línea del CSS portado) y sobre ése está medido cada
+   * espacio de las cuatro páginas. Encenderlo sería apilar dos resets y después
+   * escribir CSS de compensación hasta que el guardián se ponga verde.
+   *
+   * `container` — **esto lo cazó el guardián de fidelidad, no el ojo.** La web
+   * tiene su propia clase `.container`, con `width: min(90%, 1400px, calc(100%
+   * - 40px))`. El plugin de Tailwind genera **otra** `.container`, con
+   * `max-width` por breakpoint. Como son propiedades distintas —`width` contra
+   * `max-width`— no hay pelea que ganar por orden ni por especificidad: las dos
+   * aplican, y la de Tailwind recorta. Medido a 900px de ancho: el contenedor
+   * del sitio mide **810px** y el del port medía **768px**, el `max-width` de
+   * `md`. Cada línea de texto de las cuatro páginas, corrida 21px. Se veía bien;
+   * no era igual.
+   *
+   * Lo que se apaga no es una decisión de diseño: es la única forma de que no
+   * haya ninguna.
+   */
+  corePlugins: { preflight: false, container: false },
   theme: {
     colors: {
       transparent: 'transparent',

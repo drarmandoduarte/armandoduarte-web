@@ -45,6 +45,25 @@ const SUITES = [
   ['@codice/web', 'apps/web'],
 ];
 
+/**
+ * Y la quinta suite, que no es de Vitest: el guardián de fidelidad.
+ *
+ * ── Por qué entra a `pnpm test` y no queda como un comando aparte ─────────
+ * Porque **lo que hay que acordarse de correr no se corre**, y esta es la única
+ * comprobación que mide lo que la orden #01 pide: que el port sea indistinguible
+ * del sitio estático. Dejarlo en `pnpm test:e2e` sería dejar la afirmación
+ * central del trabajo a cargo de la memoria de alguien.
+ *
+ * Cuesta unos cuarenta segundos y un build. Es caro y es lo que vale: el resto
+ * de la gate puede estar verde con la web dibujando otra cosa.
+ *
+ * ── Lo que necesita, y falla fuerte si no está ───────────────────────────
+ * El sitio estático, en `ESTATICO_DIR` o al lado del repo, y Chromium
+ * (`pnpm qa:instalar`). Las dos ausencias dan un rojo que dice cuál es.
+ */
+const NAVEGADOR = '@codice/navegador';
+const REPORTE_NAVEGADOR = 'apps/web/.playwright-report.json';
+
 const REPORTE = '.vitest-report.json';
 const PERMITIDOS = 'qa/skips-permitidos.md';
 const PISO = 'qa/piso-de-tests.md';
@@ -265,6 +284,10 @@ function main() {
     process.exit(1);
   }
 
+  /* El de navegador, después de eslint y antes de analizar: si las reglas de
+     los hooks ya están rojas, no tiene sentido levantar Chromium. */
+  reportes[NAVEGADOR] = revisarLaFidelidad();
+
   const permitidos = leerPermitidos(readFileSync(join(RAIZ, PERMITIDOS), 'utf8'));
   const piso = leerPiso(readFileSync(join(RAIZ, PISO), 'utf8'));
   const problemas = analizar({ reportes, permitidos, piso });
@@ -276,6 +299,12 @@ function main() {
     process.exit(1);
   }
 
+  const enRojo = (reportes[NAVEGADOR]?.testResults?.[0]?.assertionResults ?? []).filter((t) => t.status === 'failed');
+  if (enRojo.length) {
+    console.error(`\n✗ ${enRojo.length} comprobación(es) de fidelidad en rojo. La salida de arriba dice cuál.\n`);
+    process.exit(1);
+  }
+
   if (salidaDeLasSuites !== 0) {
     /* Las suites ya se quejaron con su propio formato; acá solo se propaga el
        código. Propagarlo es la mitad del trabajo: un arnés que encadena después
@@ -283,12 +312,74 @@ function main() {
     process.exit(salidaDeLasSuites);
   }
 
-  const declarados = Object.values(reportes).reduce((s, r) => s + (r?.numTotalTests ?? 0), 0);
+  const enNavegador = (reportes[NAVEGADOR]?.testResults?.[0]?.assertionResults ?? []).length;
+  const declarados = Object.values(reportes).reduce((s, r) => s + (r?.numTotalTests ?? 0), 0) + enNavegador;
   const saltados = Object.values(reportes).reduce((s, r) => s + (r?.numPendingTests ?? 0) + (r?.numTodoTests ?? 0), 0);
   console.log(
-    `\n✓ guardián de guardianes: ${declarados} tests declarados, ${saltados} saltados `
-    + '(todos con permiso escrito), ninguna suite por debajo de su piso.\n',
+    `\n✓ guardián de guardianes: ${declarados} tests declarados —${enNavegador} de ellos comparando el port `
+    + `contra el sitio estático—, ${saltados} saltados (todos con permiso escrito), ninguna suite por debajo `
+    + 'de su piso.\n',
   );
+}
+
+/**
+ * Corre el guardián de fidelidad y devuelve su reporte con la forma de Vitest,
+ * para que `analizar()` no tenga que saber que existen dos corredores —y para
+ * que el piso, los saltos y la baja de la cuenta valgan igual para él.
+ *
+ * Compila primero: mide sobre `apps/web/dist`, y sin el build mediría el `dist`
+ * de la corrida anterior. Es el mismo build que la gate corre después; son unos
+ * segundos, y la alternativa es que el orden de los comandos decida en silencio
+ * si este guardián mira algo.
+ */
+function revisarLaFidelidad() {
+  execFileSync('pnpm', ['--filter', '@codice/web', 'build'], { cwd: RAIZ, stdio: 'inherit' });
+
+  const salida = join(RAIZ, REPORTE_NAVEGADOR);
+  rmSync(salida, { force: true });
+  try {
+    execFileSync(
+      'npx',
+      ['playwright', 'test', '--reporter', 'list,json'],
+      {
+        cwd: join(RAIZ, 'apps/web'),
+        stdio: 'inherit',
+        env: { ...process.env, PLAYWRIGHT_JSON_OUTPUT_NAME: salida, PLAYWRIGHT_HTML_OPEN: 'never' },
+      },
+    );
+  } catch (e) {
+    /* Playwright sale con 1 cuando algo falla: eso ya se vio en pantalla y el
+       reporte igual está. Solo es un fallo del corredor si no dejó reporte —un
+       navegador sin instalar, el sitio estático ausente— y eso se distingue
+       mirando el archivo, no el código de salida. */
+    if (!existsSync(salida)) {
+      throw new Error(
+        'no se pudo correr el guardián de fidelidad, así que NO se comprobó que el port sea '
+        + 'indistinguible del sitio estático.\n  Si es la primera vez en esta máquina:  pnpm qa:instalar\n  '
+        + 'Si falta el sitio estático:  ESTATICO_DIR=<ruta a armandoduarte-web> pnpm test\n  '
+        + (e.message ?? ''),
+      );
+    }
+  }
+  if (!existsSync(salida)) return null;
+
+  /* Playwright anida `suites` dentro de `suites`; se recorre en profundidad y se
+     le da la forma de Vitest, porque `analizar()` ya sabe leer eso y duplicar
+     ese analizador sería duplicar sus defectos. */
+  const crudo = JSON.parse(readFileSync(salida, 'utf8'));
+  const casos = [];
+  const recorrer = (suite, camino) => {
+    const aqui = [...camino, suite.title].filter(Boolean);
+    for (const spec of suite.specs ?? []) {
+      for (const t of spec.tests ?? []) {
+        const estado = t.status === 'skipped' ? 'skipped' : (t.status === 'expected' ? 'passed' : 'failed');
+        casos.push({ ancestorTitles: aqui, title: spec.title, status: estado });
+      }
+    }
+    for (const hija of suite.suites ?? []) recorrer(hija, aqui);
+  };
+  for (const suite of crudo.suites ?? []) recorrer(suite, []);
+  return { testResults: [{ assertionResults: casos }] };
 }
 
 /**
