@@ -12,10 +12,22 @@
  * que la disciplina sobreviva al port.
  *
  * ── Dónde mira y dónde no, declarado ─────────────────────────────────────
- * Mira `apps/` y `packages/ui/components`: lo que se dibuja.
- * **No mira** `packages/ui/codice-tokens.css`, que es donde los hex tienen que
- * vivir, ni `codice-tokens.json`, que es su documento. Tampoco mira `public/`
- * (son archivos de Armando, no código) ni los SVG de favicon.
+ * Mira `apps/` y `packages/ui/components`: **lo que se dibuja**. Cualquier
+ * `.ts`, `.tsx`, `.css`, `.html` o config de ahí adentro, comentarios incluidos:
+ * un hex escrito en un comentario es igual de copia que uno escrito en una
+ * regla, y envejece igual. Está medido — la primera corrida sobre el port cazó
+ * dos, en una nota que explicaba justamente por qué ese color no se repetía.
+ *
+ * **No mira** cuatro cosas, cada una con su motivo:
+ *   · `packages/ui/codice-tokens.css`, que es donde los hex tienen que vivir;
+ *   · `public/`, que son los archivos de Armando y no código;
+ *   · los reportes que dejan los corredores, que son `.json` generados;
+ *   · **los archivos de test.** Una fixture necesita poder escribir un color
+ *     para probar algo sobre colores: `useTinteDeCabecera.test.ts` convierte
+ *     blanco y negro para comprobar que su conversión convierte, y ese piso no
+ *     se puede escribir sin nombrarlos. Es la misma excepción que hace
+ *     `check-estilo` con el voseo de sus propias fixtures, y por la misma razón:
+ *     un test no se publica.
  *
  * ── Y el piso, primero ───────────────────────────────────────────────────
  * «Cero hex» sobre cero archivos leídos es idéntico a «cero hex» sobre una casa
@@ -37,14 +49,15 @@ const IGNORAR_DIR = ['node_modules', 'dist', '.git', 'public', 'test-results', '
 const IGNORAR_ARCHIVO = ['.vitest-report.json', '.playwright-report.json'];
 
 /*
- * El piso, y por qué hoy dice 16.
+ * El piso, que la orden #01 fija en 20.
  *
- * La orden #01 lo fija en 20 para el final del trabajo. La Fase A todavía no
- * tiene el port: `apps/web` son 16 archivos y poner 20 acá sería un rojo
- * permanente que alguien apagaría. Sube a 20 en la Fase B, en su propio commit
- * y en un renglón que se lee — que es como esta casa cambia una vigilancia.
+ * En la Fase A estuvo en 16, que era el número real de `apps/web` antes del
+ * port: poner 20 sobre 16 archivos habría sido un rojo permanente, y un rojo
+ * permanente termina apagado. Sube acá, en la Fase B, cuando el port lo hace
+ * cierto — y sube en un renglón que se lee, que es como esta casa mueve una
+ * vigilancia en cualquiera de las dos direcciones.
  */
-const PISO_DE_ARCHIVOS = 16;
+const PISO_DE_ARCHIVOS = 20;
 
 /** El único archivo del repo donde un hex es lo correcto. */
 const DONDE_VIVEN = 'packages/ui/codice-tokens.css';
@@ -59,7 +72,7 @@ function recorrer(dir) {
     if (IGNORAR_DIR.includes(entrada)) continue;
     const full = join(dir, entrada);
     if (statSync(full).isDirectory()) out.push(...recorrer(full));
-    else if (EXTENSIONES.some((e) => full.endsWith(e))) out.push(full);
+    else if (EXTENSIONES.some((e) => full.endsWith(e)) && !/\.(test|spec)\./.test(entrada)) out.push(full);
   }
   return out;
 }

@@ -1,5 +1,5 @@
 import { hydrateRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router';
 import '@codice/ui/styles.css';
 import './index.css';
 import './i18n';

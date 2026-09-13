@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<title>Plantilla og:image · taller</title>
+<link rel="stylesheet" href="../fuentes/local.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* Lienzo exacto de la imagen para compartir. La fecha salió en la Parte 2 (no la
+     dio Armando): cuando exista, vuelve como <span data-fecha> en .og__linea y se
+     regenera con check/og-capturar.mjs. */
+  html,body{margin:0;padding:0;background:var(--crema)}
+  .og{width:1200px;height:630px;background:var(--crema);display:grid;
+      grid-template-columns:1fr 400px;align-items:end;overflow:hidden}
+  .og__texto{padding:72px 0 72px 80px;align-self:center}
+  .og__titulo{font-family:var(--display);font-weight:300;font-size:60px;
+              line-height:1.06;letter-spacing:-.01em;color:var(--tinta);max-width:14ch}
+  .og__linea{margin-top:26px;font-family:var(--lectura);font-size:23px;line-height:1.5;color:var(--gris)}
+  .og__marca{margin-top:38px;font-family:var(--display);font-weight:500;font-size:15px;
+             letter-spacing:.3em;text-transform:uppercase;color:var(--tinta)}
+  .og__foto{height:630px;display:flex;align-items:flex-end;justify-content:center}
+  .og__foto img{height:580px;width:auto;object-fit:contain;object-position:bottom}
+</style>
+</head>
+<body>
+<div class="og">
+  <div class="og__texto">
+    <div class="og__titulo">El arte de amar a tu adolescente</div>
+    <div class="og__linea">Taller presencial · Mérida</div>
+    <div class="og__marca">Armando Duarte</div>
+  </div>
+  <div class="og__foto"><img src="../img/armando-parado-crema.jpg" alt=""></div>
+</div>
+</body>
+</html>

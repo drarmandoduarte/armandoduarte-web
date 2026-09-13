@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 import { Inicio } from './web/inicio/Inicio';
 import { Taller } from './web/taller/Taller';
 import { Privacidad } from './web/legal/Privacidad';

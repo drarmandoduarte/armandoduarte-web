@@ -20,7 +20,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 12 |
 | `@codice/core` | 12 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 3 |
+| `@codice/web` | 9 |
 
 ## De dónde salen estos números
 

@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -5,6 +6,16 @@ export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
+      /*
+       * La única entrada es `index.html`.
+       *
+       * Sin esto Vite barre el proyecto buscando `.html` y se lleva por delante
+       * `check/og-home.html` y `check/og-taller.html`, que son plantillas para
+       * generar las imágenes de compartir y **no son páginas**: cargan el CSS
+       * del sitio estático por una ruta relativa que en este repo no existe, así
+       * que el build se cae con un error que habla de otra cosa.
+       */
+      input: fileURLToPath(new URL('./index.html', import.meta.url)),
       output: {
         /*
          * Las fuentes salen a `/fuentes/` con su nombre de siempre, sin hash.
