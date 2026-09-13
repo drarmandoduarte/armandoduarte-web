@@ -22,12 +22,21 @@
  *   · `packages/ui/codice-tokens.css`, que es donde los hex tienen que vivir;
  *   · `public/`, que son los archivos de Armando y no código;
  *   · los reportes que dejan los corredores, que son `.json` generados;
- *   · **los archivos de test.** Una fixture necesita poder escribir un color
- *     para probar algo sobre colores: `comportamiento.test.ts` convierte
- *     blanco y negro para comprobar que su conversión convierte, y ese piso no
- *     se puede escribir sin nombrarlos. Es la misma excepción que hace
- *     `check-estilo` con el voseo de sus propias fixtures, y por la misma razón:
- *     un test no se publica.
+ *   · **los archivos de test, y desde la #03 la carpeta `e2e/` entera.** Una
+ *     fixture necesita poder escribir un color para probar algo sobre colores:
+ *     `comportamiento.test.ts` convierte blanco y negro para comprobar que su
+ *     conversión convierte, y ese piso no se puede escribir sin nombrarlos. Lo
+ *     mismo, más fuerte, en `e2e/cambios-visibles.ts`: ese archivo **es** la
+ *     declaración de los tres hex que la orden del contraste movió, con el valor
+ *     viejo y el nuevo uno al lado del otro para poder leerlos. Un guardián que
+ *     lo pusiera en rojo estaría prohibiendo escribir qué cambió. Es la misma
+ *     excepción que hace `check-estilo` con el voseo de sus propias fixtures, y
+ *     por la misma razón: **un test no se publica** —`.vercelignore` deja `e2e/`
+ *     y `check/` fuera del deploy—.
+ *
+ *     `check/` **sí** se mira, y a propósito: ahí viven las plantillas
+ *     `og-*.html`, que dibujan las dos imágenes de compartir y por lo tanto
+ *     tienen que usar tokens como cualquier otra cosa que se dibuje.
  *
  * ── Y el piso, primero ───────────────────────────────────────────────────
  * «Cero hex» sobre cero archivos leídos es idéntico a «cero hex» sobre una casa
@@ -42,7 +51,7 @@ import { fileURLToPath } from 'node:url';
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CARPETAS = ['apps', 'packages/ui/components'];
 const EXTENSIONES = ['.ts', '.tsx', '.js', '.jsx', '.css', '.html', '.json', '.mjs', '.cjs'];
-const IGNORAR_DIR = ['node_modules', 'dist', '.git', 'public', 'test-results', '.capturas'];
+const IGNORAR_DIR = ['node_modules', 'dist', '.git', 'public', 'test-results', '.capturas', 'e2e'];
 /* Los reportes que dejan los corredores. Son `.json` y viven dentro de `apps/`,
    así que el barrido los contaría como archivos leídos —y un piso que se cumple
    con archivos generados es un piso que se cumple solo. */

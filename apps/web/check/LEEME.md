@@ -23,3 +23,14 @@ Las plantillas venían del sitio estático con sus rutas relativas intactas (`..
 ## `favicon.svg` — de dónde sale (#02)
 
 La «A» del favicon no es un `<text>`: es el contorno del glifo `A` de Montserrat en peso 500 —el mismo peso de la marca del header— extraído con `fontTools` desde `fuentes/Montserrat-300-600-latin.woff2` y pegado como `<path>`. Así se ve igual aunque quien la mire no tenga la fuente. De ese SVG salen `favicon.ico` (32 px) y `apple-touch-icon.png` (180 px, fondo crema porque iOS no usa transparencia).
+
+
+## `contraste.mjs` — el barrido de pares de color (#03)
+
+```sh
+node check/contraste.mjs http://127.0.0.1:4180 /tmp/pares.json
+```
+
+Necesita `dist/` compilado y servido (`node e2e/servidor.mjs "$PWD/dist" 4180`). Recorre las cuatro páginas a 1440 y a 390 px, con el menú cerrado y abierto, y lista **todos** los pares texto/fondo distintos con su ratio de contraste, el umbral que les corresponde y si llegan. Ordenados por margen: el peor primero.
+
+Existe porque Lighthouse dice *que* algo falla y nombra unos pocos ejemplos, pero no da la lista completa ni ve lo que está oculto —el menú de pantalla completa, por ejemplo—, y sin la lista no se puede elegir «el cambio más chico que alcance el umbral». La corrida de la orden #03 está en `docs/informes/03/LEEME.md`; ahí también está lo que este barrido **no** mira.

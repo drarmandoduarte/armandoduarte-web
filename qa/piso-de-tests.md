@@ -17,7 +17,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 
 | paquete | piso |
 |---|---|
-| `@codice/ui` | 12 |
+| `@codice/ui` | 21 |
 | `@codice/core` | 12 |
 | `@codice/prompts` | 3 |
 | `@codice/web` | 13 |
@@ -34,6 +34,16 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #03
+
+`@codice/ui` sube de 12 a 21: nueve tests nuevos de contraste. Ocho son un par
+token-contra-token que tiene que dar ≥ 4,5:1, y el noveno es su piso —negro sobre
+blanco da 21, un color contra sí mismo da 1, y el gris viejo sobre el cálido sigue
+dando 4,00—. Van en aritmética y al lado de los valores porque un hex que se
+aclara medio punto dentro de seis meses no rompe nada, no se ve en un diff de
+color y devuelve la web al 96 de Lighthouse sin que ninguna comprobación diga una
+palabra.
 
 ## Lo que movió la orden #02
 

@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { PUERTO_ESTATICO, PUERTO_PORT } from '../playwright.config';
+import { CAMBIOS_VISIBLES_03 } from './cambios-visibles';
 
 /**
  * «Indistinguible o no se cierra» — orden Códice #01, C3.
@@ -21,6 +22,17 @@ import { PUERTO_ESTATICO, PUERTO_PORT } from '../playwright.config';
  *       WhatsApp: título, descripción, canónica e imagen de compartir.
  *
  * Ninguna de las cuatro sobra: cada una caza algo que las otras tres dejan pasar.
+ *
+ * ── Desde la #03: la referencia es «el estático MÁS el delta declarado» ───
+ * La orden del contraste cambió tres tokens y dos reglas, así que el estático y
+ * el port ya no dibujan lo mismo. En vez de bajar el umbral o guardar capturas
+ * en el repo, al sitio estático se le inyecta `CAMBIOS_VISIBLES_03` antes de
+ * capturarlo. La referencia se sigue generando en vivo, el presupuesto sigue
+ * siendo **cero píxeles**, y lo que el guardián afirma es más fuerte: que la
+ * única diferencia entre las dos versiones es esa lista de cinco líneas.
+ *
+ * El texto, los `href` y el `<head>` se comparan **sin** el delta, porque el
+ * delta no los toca: si alguno se moviera, es un defecto y tiene que verse.
  *
  * ── Cómo se compara una captura contra otra página ────────────────────────
  * `toHaveScreenshot` compara contra un archivo de referencia, no contra otra
@@ -77,9 +89,10 @@ const DIFERENCIA_MAXIMA = 0;
 const url = (puerto: number, ruta: string) => `http://127.0.0.1:${puerto}${ruta}`;
 
 /** Deja la página quieta y con todo revelado, lista para medir. */
-async function asentar(page: Page, ruta: string, puerto: number, ancho: number) {
+async function asentar(page: Page, ruta: string, puerto: number, ancho: number, delta?: string) {
   await page.setViewportSize({ width: ancho, height: 900 });
   await page.goto(url(puerto, ruta), { waitUntil: 'load' });
+  if (delta) await page.addStyleTag({ content: delta });
   await page.evaluate(() => document.fonts.ready);
   /* Hasta el final y de vuelta arriba: el sitio estático revela con un
      IntersectionObserver, y aunque `reducedMotion` ya deja todo opaco, el
@@ -115,7 +128,7 @@ for (const { nombre, ruta } of PAGINAS) {
       test(`${ancho}px`, async ({ page }, info) => {
         const estatica = await page.context().newPage();
 
-        await asentar(estatica, ruta, PUERTO_ESTATICO, ancho);
+        await asentar(estatica, ruta, PUERTO_ESTATICO, ancho, CAMBIOS_VISIBLES_03);
         await asentar(page, ruta, PUERTO_PORT, ancho);
 
         const [textoEstatico, textoPort] = [await textoVisible(estatica), await textoVisible(page)];

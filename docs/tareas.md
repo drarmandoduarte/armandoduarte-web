@@ -8,8 +8,8 @@ estado y lo que va quedando pendiente.
 | # | Qué | Estado |
 |---|---|---|
 | #01 | Nace el monorepo, y la web pública se porta a React | cerrada (ramas `codice/01a-molde`, `01b-port`, `01c-fidelidad`) |
-| #02 | La web pública no se hidrata | en curso (rama `codice/02-sin-hidratar`, sobre `01c-fidelidad`) |
-| #03 | Contraste a AA, con el número delante | pendiente (va apilada sobre la #02) |
+| #02 | La web pública no se hidrata | cerrada (rama `codice/02-sin-hidratar`, sobre `01c-fidelidad`) |
+| #03 | Contraste a AA, con el número delante | en curso (rama `codice/03-contraste`, sobre `02-sin-hidratar`) |
 
 ## Pendientes abiertos
 
@@ -36,17 +36,37 @@ Se regeneraron las dos imágenes y salieron **idénticas byte a byte** a las que
 estaban: mismo `sha256`, 45.647 y 51.634 bytes. El día que haya fecha del taller,
 se agrega a `.og__linea` de `og-taller.html` y se vuelve a capturar.
 
-### 4. Contraste de color: 96/100 en accesibilidad · **decidido: es la orden #03**
+### 4. Contraste de color ~~96/100~~ · **cerrado en la #03**
 
-Lighthouse móvil da **96** en el inicio y el taller y **95** en las dos legales,
-en el port **y en el sitio estático por igual** — el único audit que falla es
-`color-contrast`. No lo trajo el port: es del diseño, y viene de la paleta de D6
-(el gris `#7A7267` sobre crema, y el crema al 60–75 % sobre teal y tinta).
+Las cuatro páginas dan **accesibilidad 100** en Lighthouse móvil. Tres tokens se
+movieron lo mínimo medido —`--gris` #7A7267 → #716A60, `--ocre` #8F6B3D → #866539,
+`--ocre-medio` #B08A52 → #B18C54— más dos reglas de `index.css`. El fondo que
+obligaba el cambio no era el crema sino el cálido (#F3EBDD), donde el gris daba
+4,00 y el ocre 4,09.
 
-Dirección resolvió corregirlo **al mínimo que alcance AA, en el token, midiendo
-antes y después**. Es la orden **#03**, apilada sobre la #02, y es la primera que
-cambia algo visible: por eso va aparte y última, y se aprueba mirando capturas.
-La #02 no lo tocó — sigue en 96/96/96/95, igual que el estático.
+La tabla completa de los 125 pares de color de las cuatro páginas, las capturas
+antes/después y los cuatro pares que **no** se tocaron están en
+`docs/informes/03/LEEME.md`. El barrido que la produjo quedó en el repo:
+`apps/web/check/contraste.mjs`.
+
+### 4b. El bloque de contacto estaba invisible · **arreglado en la #03, y está vivo en producción**
+
+El teléfono de WhatsApp y los enlaces a YouTube, Spotify y Facebook de la portada
+se dibujaban **tinta sobre tinta** —contraste 1,00:1— por una colisión de
+especificidad entre `.tinta .grande` y `.contacto .grande` en `estilo.css`. En el
+monorepo está arreglado (`color:inherit`, el cambio más chico posible).
+
+**En `armandoduarte.com` sigue roto**, porque Rodolfo no toca el sitio estático.
+Mientras el monorepo no sea producción, cada visitante que baja a «Escríbeme» no
+ve el teléfono. Es de dirección decidir si se corrige allá o se acelera el
+cambio de producción.
+
+### 4c. El ocre medio sobre teal no llega a AA: **2,51** · **de dirección**
+
+Los rótulos, enlaces y flechas de las secciones teal. Llegar a 4,5 exige un ocre
+`#D6C2A4` —un arena pálido— que ya no es el ámbar de la marca: es una decisión de
+paleta, no de contraste, y por eso la #03 no la tomó. Con su número y sus
+alternativas en `docs/informes/03/LEEME.md`, punto D.
 
 ### 5. Performance: el bundle costaba 17 puntos · **cerrado en la #02**
 
@@ -97,7 +117,20 @@ No hay CSP todavía, igual que en el sitio estático. Con el port desapareció e
 hash, y desde la #02 es **uno solo de 1,8 KB**—, así que el día que se escriba es
 más fácil que antes. Va junto con la apertura del dominio.
 
-### 7. `pnpm lint` estaba rojo desde la #01, y nadie lo veía
+### 7. Dos documentos del mismo design system · **de dirección**
+
+`01 Documentos/Marca/armando-design-system.tokens.json` y
+`04 Codigo/codice/packages/ui/codice-tokens.json` dicen ser el mismo design
+system y ya no lo son: el de Marca venía en **1.0.0** y sin la sección `web` que
+la #01 le agregó al del repo. La #03 le aplicó los tres colores nuevos y su
+changelog, así que los colores coinciden otra vez, pero el resto no.
+
+Dos verdades esperando a no coincidir. O el de Marca pasa a ser una exportación
+del de `packages/ui` —que es lo que el `CLAUDE.md` del repo llama fuente de
+verdad— o se declara histórico. El `CLAUDE.md` del proyecto todavía lo llama
+«design system canon (D6)»: hay que elegir uno.
+
+### 8. `pnpm lint` estaba rojo desde la #01, y nadie lo veía
 
 Encontrado corriendo la gate de la #02. Un comentario de
 `scripts/guardian-de-guardianes.mjs` empezaba con la palabra `eslint`, y un bloque

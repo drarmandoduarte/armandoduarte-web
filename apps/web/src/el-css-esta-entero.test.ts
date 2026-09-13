@@ -33,9 +33,43 @@ try {
   original = readFileSync(join(ESTATICO, 'estilo.css'), 'utf8');
 } catch { /* se cae en el piso, con el nombre a la vista */ }
 
-/** Las dos sustituciones que la Fase B hizo, y las únicas que puede haber. */
+/**
+ * Las sustituciones declaradas, y las únicas que puede haber.
+ *
+ * ── La de la #01 ─────────────────────────────────────────────────────────
+ * `#fff` → `var(--superficie)`: el único hex que el port no podía dejar escrito,
+ * porque ningún hex vive fuera de `codice-tokens.css`.
+ *
+ * ── Las dos de la #03, que son cambios de verdad y por eso están acá ──────
+ * Son las **dos únicas reglas** que la orden del contraste tocó fuera de los
+ * tokens, y las dos se miden:
+ *
+ *   · `.contacto .grande` pasaba `color:var(--tinta)` **encima** de
+ *     `.tinta .grande{color:var(--crema)}` —misma especificidad, línea
+ *     posterior—, así que el bloque de contacto de la portada se dibujaba
+ *     tinta sobre tinta: contraste **1:1**, el teléfono de Armando invisible.
+ *     `inherit` es el cambio más chico que lo arregla: en un fondo claro
+ *     hereda la tinta del `<body>` y no cambia nada; en la sección oscura
+ *     hereda el crema, que es lo que la regla de al lado siempre quiso.
+ *
+ *   · `.oscuro .ficha li span:first-child` al 60 % de crema sobre teal daba
+ *     **3,77**; al 70 % da **4,52**. Es el rótulo de la ficha del taller
+ *     («Horario», «Lugar», «Modalidad», «Inversión»), 12 px.
+ *
+ * Las tres del design system —el gris, el ocre y el ocre medio— **no** están
+ * acá y es correcto: viven en `codice-tokens.css`, y este guardián se saltea el
+ * bloque `:root` a propósito.
+ */
 const PERMITIDAS: [string, string][] = [
   ['#fff', 'var(--superficie)'],
+  [
+    '.contacto .grande{font-family:var(--display);font-weight:300;font-size:clamp(24px,2.6vw,36px);line-height:1.25;color:var(--tinta)}',
+    '.contacto .grande{font-family:var(--display);font-weight:300;font-size:clamp(24px,2.6vw,36px);line-height:1.25;color:inherit}',
+  ],
+  [
+    '.oscuro .ficha li span:first-child{color:rgba(250,247,241,.6)}',
+    '.oscuro .ficha li span:first-child{color:rgba(250,247,241,.7)}',
+  ],
 ];
 
 describe('el CSS portado', () => {

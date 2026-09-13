@@ -1,7 +1,7 @@
 {
   "$meta": {
     "name": "Códice — Design System (App Dr. Armando)",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "tagline": "Construyendo familias fuertes",
     "generated": "2026-09-13",
     "philosophy": "Quiet luxury con la atmósfera del set de grabación del doctor: luz ámbar de tarde, orden, cercanía sin ruido. Restraint editorial, whitespace generoso, tipografía por encima de imagen, sin sombras, sin degradados, motion invisible.",
@@ -10,6 +10,16 @@
     ],
     "density": "comfortable",
     "changelog": [
+      {
+        "version": "1.1.1",
+        "date": "2026-09-13",
+        "orden": "Códice #03",
+        "cambios": [
+          "Contraste AA. Tres valores se mueven lo mínimo medido para llegar a 4,5:1 sobre el fondo más exigente en el que cada uno se usa: `color.ink.muted` #7A7267 → #716A60, `color.brand.ochre` #8F6B3D → #866539 y `color.brand.ochre.mid` #B08A52 → #B18C54.",
+          "El fondo que manda no es el crema sino el cálido (#F3EBDD): el gris daba 4,00 sobre él y 4,43 sobre crema. Medido sobre las cuatro páginas de la web, no estimado.",
+          "Ningún otro token cambia. Lo que quedó sin llegar al umbral y no se tocó —el ocre medio sobre teal (2,45), el rótulo del menú al 50 % (1,62) y la tapa del libro (3,54)— está en `docs/informes/03/` con su número: corregirlos no es mover un valor, es cambiar el carácter, y eso es decisión de dirección."
+        ]
+      },
       {
         "version": "1.1.0",
         "date": "2026-09-13",
@@ -51,14 +61,14 @@
         "role": "Texto y titulares. Marrón-negro cálido, nunca negro puro."
       },
       "muted": {
-        "value": "#7A7267",
+        "value": "#716A60",
         "role": "Texto secundario, captions, metadatos, placeholders."
       }
     },
     "brand": {
       "ochre": {
-        "value": "#8F6B3D",
-        "mid": "#B08A52",
+        "value": "#866539",
+        "mid": "#B18C54",
         "role": "Primario. Wordmark, CTAs, nav activa, marcadores, citas de libro. La luz ámbar de sus videos."
       },
       "teal": {

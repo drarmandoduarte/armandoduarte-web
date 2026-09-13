@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   Códice · tokens como variables CSS · v1.1.0
+   Códice · tokens como variables CSS · v1.1.1
    Fuente: packages/ui/codice-tokens.json. Si un valor cambia, cambia allá
    primero — el JSON es el documento y esto es su forma ejecutable.
 
@@ -13,6 +13,18 @@
 
    ── Ningún hex vive fuera de este archivo ────────────────────────────────
    Lo vigila `scripts/check-tokens.mjs` sobre `apps/` y `packages/ui/components`.
+
+   ── v1.1.1 · contraste AA (orden Códice #03) ─────────────────────────────
+   Tres valores se movieron **lo mínimo medido** para llegar a 4,5:1 sobre el
+   fondo más exigente en el que cada uno se usa, que no siempre es el crema:
+
+     --gris        #7A7267 → #716A60   sobre --calido 4,00 → 4,51
+     --ocre        #8F6B3D → #866539   sobre --calido 4,09 → 4,51
+     --ocre-medio  #B08A52 → #B18C54   sobre --tinta  4,44 → 4,53
+
+   No son los candidatos que la orden proponía de memoria (#6F675C, #6B6358):
+   ésos llegaban a 5,21 y 5,53 sobre crema, o sea más oscuros de lo necesario.
+   El criterio es el mínimo, y el mínimo se mide.
    ═══════════════════════════════════════════════════════════════════════ */
 :root{
   /* ── Fondos ─────────────────────────────────────────────────────────── */
@@ -22,12 +34,12 @@
 
   /* ── Tinta ──────────────────────────────────────────────────────────── */
   --tinta:#2E2B25;          /* color.ink.primary · nunca negro puro */
-  --gris:#7A7267;           /* color.ink.muted */
+  --gris:#716A60;           /* color.ink.muted · contraste AA (#03) */
   --gris-claro:#A89F92;
 
   /* ── Marca ──────────────────────────────────────────────────────────── */
-  --ocre:#8F6B3D;           /* color.brand.ochre · primario */
-  --ocre-medio:#B08A52;     /* color.brand.ochre.mid · el acento sobre fondo oscuro */
+  --ocre:#866539;           /* color.brand.ochre · primario · contraste AA (#03) */
+  --ocre-medio:#B18C54;     /* color.brand.ochre.mid · el acento sobre fondo oscuro · contraste AA (#03) */
   --teal:#33585C;           /* color.brand.teal · acento de titulares */
   --teal-medio:#527E82;     /* color.brand.teal.mid */
   --navy:#2F3A4E;           /* color.support.navy · la tapa del segundo libro */
