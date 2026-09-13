@@ -20,8 +20,8 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 12 |
 | `@codice/core` | 12 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 9 |
-| `@codice/navegador` | 12 |
+| `@codice/web` | 13 |
+| `@codice/navegador` | 14 |
 
 ## De dónde salen estos números
 
@@ -34,3 +34,13 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #02
+
+`@codice/web` sube de 9 a 13 y `@codice/navegador` de 12 a 14, y los seis tests nuevos
+son el mismo trabajo mirado desde dos distancias. La orden le sacó React al navegador,
+así que hacen falta dos cosas que antes nadie tenía que comprobar: que el bundle no
+vuelva —`el-html-no-carga-react`, cuatro afirmaciones baratas sobre el `dist/`— y que los
+tres comportamientos sigan vivos sin él —`comportamiento.spec.ts`, dos en Chromium contra
+el sitio estático—. Las doce de fidelidad no los cubrían: miden la página quieta, y lo
+único que React hacía en el navegador era moverse.

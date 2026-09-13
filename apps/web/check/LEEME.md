@@ -2,32 +2,23 @@
 
 Nada de esta carpeta se publica: `.vercelignore` la deja fuera del deploy.
 
-## `enlaces.sh` — guardián de enlaces internos (#01)
+## `og-home.html`, `og-taller.html`, `og-capturar.mjs` — imágenes para compartir
 
-```sh
-sh check/enlaces.sh
-```
+Las dos imágenes (`public/img/og-home.jpg` e `public/img/og.jpg`) **no se hacen a mano**: se generan desde estas plantillas, que usan los mismos tokens, el mismo CSS y las mismas fuentes locales que la web. Así, el día que haya fecha del taller, se agrega a la línea `.og__linea` de `og-taller.html` y se vuelve a capturar.
 
-Falla (sale 1) si algún `href` apunta a un `.html` en vez de a una ruta limpia. Se corre antes de cada commit.
-
-## `og-home.html`, `og-taller.html`, `og-capturar.mjs` — imágenes para compartir (#02)
-
-Las dos imágenes (`img/og-home.jpg` e `img/og.jpg`) **no se hacen a mano**: se generan desde estas plantillas, que usan el mismo `estilo.css` y las mismas fuentes locales que la web. Así, el día que haya fecha del taller, se agrega a la línea `.og__linea` de `og-taller.html` y se vuelve a capturar.
-
-Este repo no tiene `package.json` ni `node_modules` a propósito, así que el Playwright se toma prestado de otro proyecto de la casa con la variable `PLAYWRIGHT_MODULE`:
-
-```sh
-PLAYWRIGHT_MODULE=/Users/germanfalcioni/Development/Bitacora/node_modules/playwright/index.mjs \
-  node check/og-capturar.mjs
-```
-
-Desde un proyecto que ya tenga Playwright instalado, la variable no hace falta:
+Se corre **desde `apps/web`**:
 
 ```sh
 node check/og-capturar.mjs
 ```
 
-Salida: `img/og-home.jpg` e `img/og.jpg`, 1200×630, JPEG calidad 88, bastante por debajo de los 150 KB.
+Salida: `public/img/og-home.jpg` e `public/img/og.jpg`, 1200×630, JPEG calidad 88, bastante por debajo de los 150 KB. De ahí Vite las copia a `dist/img/`, que es donde el `og:image` del `<head>` las nombra.
+
+### Lo que la orden #02 cambió, y lo que comprobó
+
+Las plantillas venían del sitio estático con sus rutas relativas intactas (`../estilo.css`, `../fuentes/local.css`, `../img/…`), o sea describiendo la anatomía de `armandoduarte-web`: se podían leer, no correr. Ahora apuntan a donde las cosas viven acá —`packages/ui/fuentes/fonts.css`, `packages/ui/codice-tokens.css`, `apps/web/src/index.css` y `public/img/`— y el Chromium sale de `@playwright/test`, que este paquete ya tiene.
+
+`fonts.css` y el `local.css` del sitio estático son **el mismo archivo** (`diff` vacío), y las tres hojas de acá son `estilo.css` partido en tres. Por eso la comprobación pudo ser la dura: se regeneraron las dos imágenes y salieron **idénticas byte a byte** a las que estaban —mismo `sha256`, 45.647 y 51.634 bytes—. No se parecen: son las mismas.
 
 ## `favicon.svg` — de dónde sale (#02)
 

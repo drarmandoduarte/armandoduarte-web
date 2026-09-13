@@ -247,6 +247,18 @@ function main() {
     process.exit(1);
   }
 
+  /*
+   * El build, ANTES de las suites.
+   *
+   * Dos guardianes miden sobre `apps/web/dist`: el de fidelidad, que compara el
+   * port contra el sitio estático, y —desde la orden #02— `el-html-no-carga-react`,
+   * que es de Vitest y por lo tanto corre en el primer tramo. Si el build fuera
+   * después, ese test estaría leyendo el `dist/` de la corrida anterior: verde
+   * sobre una medición vieja, que es el defecto exacto que este archivo persigue.
+   * Compilar acá es unos segundos y deja a los dos mirando la misma salida.
+   */
+  compilarLaWeb();
+
   for (const [, dir] of SUITES) rmSync(join(RAIZ, dir, REPORTE), { force: true });
 
   let salidaDeLasSuites = 0;
@@ -323,18 +335,22 @@ function main() {
 }
 
 /**
+ * Compila la web pública. Lo hace `main()` antes que nada, y no cada guardián
+ * por su cuenta, porque son **dos** los que miden sobre `apps/web/dist` y el
+ * orden de los comandos no puede decidir en silencio si miran algo.
+ */
+function compilarLaWeb() {
+  execFileSync('pnpm', ['--filter', '@codice/web', 'build'], { cwd: RAIZ, stdio: 'inherit' });
+}
+
+/**
  * Corre el guardián de fidelidad y devuelve su reporte con la forma de Vitest,
  * para que `analizar()` no tenga que saber que existen dos corredores —y para
  * que el piso, los saltos y la baja de la cuenta valgan igual para él.
  *
- * Compila primero: mide sobre `apps/web/dist`, y sin el build mediría el `dist`
- * de la corrida anterior. Es el mismo build que la gate corre después; son unos
- * segundos, y la alternativa es que el orden de los comandos decida en silencio
- * si este guardián mira algo.
+ * Mide sobre el `dist/` que dejó `compilarLaWeb()` al empezar la corrida.
  */
 function revisarLaFidelidad() {
-  execFileSync('pnpm', ['--filter', '@codice/web', 'build'], { cwd: RAIZ, stdio: 'inherit' });
-
   const salida = join(RAIZ, REPORTE_NAVEGADOR);
   rmSync(salida, { force: true });
   try {
@@ -394,7 +410,13 @@ function revisarLosHooks() {
   try {
     salida = execFileSync('npx', ['eslint', '.', '-f', 'json'], { cwd: RAIZ, encoding: 'utf8', maxBuffer: 1 << 26 });
   } catch (e) {
-    /* eslint sale con 1 cuando encuentra errores: eso es lo NORMAL acá y su
+    /* Ojo con la primera palabra de este comentario: un bloque que empieza con
+       `eslint` es una directiva de configuración en línea, y eslint intentaba
+       leerlo como JSON y se ponía rojo con `ruleId: null` —invisible para el
+       filtro de abajo, que solo mira `rules-of-hooks`, y visible para
+       `pnpm lint`, que quedaba en 1—. Encontrado corriendo la gate de la #02.
+
+       Dicho eso: `eslint` sale con 1 cuando encuentra errores: eso es lo NORMAL acá y su
        salida sigue estando en stdout. Solo es un fallo de verdad si no dejó
        JSON, y eso se distingue mirando el cuerpo y no el código. */
     salida = e.stdout ?? '';

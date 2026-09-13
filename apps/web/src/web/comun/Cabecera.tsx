@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { enlaceWhatsApp } from '@codice/core';
 import { IconoWhatsApp } from './IconoWhatsApp';
 import { MenuMovil } from './MenuMovil';
-import { useTinteDeCabecera } from './useTinteDeCabecera';
 
 /**
  * El header de tres columnas: menú, marca, WhatsApp.
@@ -15,13 +13,19 @@ import { useTinteDeCabecera } from './useTinteDeCabecera';
  * quedar por debajo de algo. Es la clase de detalle que no se ve hasta que se
  * ve.
  *
- * El estado de abierto/cerrado vive acá, que es el único lugar donde las dos
- * piezas se tocan.
+ * ── Por qué acá no hay estado (orden #02) ─────────────────────────────────
+ * Porque esta página **no se hidrata**: React dibuja el HTML una vez, en Node, y
+ * después no hay nadie escuchando un `onClick`. Abierto/cerrado es un estado del
+ * documento, no del árbol, y lo maneja `comportamiento.ts` poniendo y sacando la
+ * clase `open` —exactamente como lo hacía el sitio estático—.
+ *
+ * Lo que este componente escribe es **el estado de reposo**: el menú cerrado y
+ * `aria-expanded="false"`. Que sea el mismo HTML que antes no es una coincidencia
+ * feliz: es lo que el guardián de fidelidad mide, y los `id` (`hd`, `abrir`,
+ * `cerrar`, `ov`) son el contrato con el script.
  */
 export function Cabecera({ mensaje }: { mensaje: string }) {
   const { t } = useTranslation();
-  const [abierto, setAbierto] = useState(false);
-  useTinteDeCabecera();
 
   return (
     <>
@@ -32,9 +36,8 @@ export function Cabecera({ mensaje }: { mensaje: string }) {
               className="hd__menu"
               id="abrir"
               aria-label={t('comun.cabecera.abrirMenu')}
-              aria-expanded={abierto}
+              aria-expanded="false"
               aria-controls="ov"
-              onClick={() => setAbierto(true)}
             >
               <i /><span>{t('comun.cabecera.menu')}</span>
             </button>
@@ -59,7 +62,7 @@ export function Cabecera({ mensaje }: { mensaje: string }) {
         </div>
       </header>
 
-      <MenuMovil abierto={abierto} onCerrar={() => setAbierto(false)} mensaje={mensaje} />
+      <MenuMovil mensaje={mensaje} />
     </>
   );
 }

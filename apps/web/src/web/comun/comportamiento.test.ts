@@ -19,7 +19,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import tokens from '@codice/ui/tokens.json';
-import { SECCIONES_OSCURAS } from './useTinteDeCabecera';
+import { SECCIONES_OSCURAS } from './comportamiento';
 
 /** `#33585C` → `rgb(51, 88, 92)`, que es como lo escribe el navegador. */
 function comoLoEscribeElNavegador(hex: string): string {

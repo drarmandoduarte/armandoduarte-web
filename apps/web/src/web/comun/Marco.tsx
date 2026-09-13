@@ -2,11 +2,13 @@ import type { ReactNode } from 'react';
 import { Cabecera } from './Cabecera';
 import { Pie } from './Pie';
 import { useCabeza, type Pagina } from './cabeza';
-import { useRevelar } from './useRevelar';
 
 /**
- * El esqueleto que las cuatro páginas comparten: header, `<main>`, pie, y los
- * dos comportamientos de toda la web —el fundido de entrada y el `<head>`—.
+ * El esqueleto que las cuatro páginas comparten: header, `<main>` y pie.
+ *
+ * El fundido de entrada ya no se pide desde acá: desde la orden #02 lo hace
+ * `comportamiento.ts`, que corre sin React sobre el HTML que el prerender dejó
+ * escrito. Lo que sí queda es el `<head>`, que en dev cambia al navegar.
  *
  * Está acá y no repetido en cada página porque en el sitio estático era
  * literalmente el mismo bloque de HTML copiado cuatro veces y el mismo
@@ -28,7 +30,6 @@ export function Marco({
   children: ReactNode;
 }) {
   useCabeza(pagina);
-  useRevelar();
 
   return (
     <>

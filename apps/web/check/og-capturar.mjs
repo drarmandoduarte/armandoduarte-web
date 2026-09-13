@@ -1,18 +1,26 @@
 // Captura las plantillas og a JPG de 1200x630, reproducible.
 //
-// Este repo no tiene package.json ni node_modules a propósito, así que el
-// Playwright se toma prestado de otro proyecto de la casa mediante la variable
-// PLAYWRIGHT_MODULE. Cómo se corre: ver check/LEEME.md
+// Se corre desde `apps/web` (orden #02, D):
+//
+//     node check/og-capturar.mjs
+//
+// El Chromium sale de `@playwright/test`, que este paquete ya tiene porque lo
+// usa el guardián de fidelidad. En el sitio estático esto no se podía —aquel
+// repo no tiene `package.json` a propósito y el navegador se tomaba prestado de
+// otro proyecto con `PLAYWRIGHT_MODULE`—; la variable sigue funcionando como
+// escape, pero ya no hace falta.
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '@playwright/test');
 
 const aqui = dirname(fileURLToPath(import.meta.url));
 const raiz = join(aqui, '..');
+/* Salen a `public/img/`, que es de donde Vite las copia a `dist/img/` y de donde
+   el `og:image` de `cabeza.ts` las nombra. */
 const piezas = [
-  { plantilla: 'og-home.html',   salida: 'img/og-home.jpg' },
-  { plantilla: 'og-taller.html', salida: 'img/og.jpg' },
+  { plantilla: 'og-home.html',   salida: 'public/img/og-home.jpg' },
+  { plantilla: 'og-taller.html', salida: 'public/img/og.jpg' },
 ];
 
 const navegador = await chromium.launch();

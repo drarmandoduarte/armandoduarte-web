@@ -3,8 +3,15 @@
 <head>
 <meta charset="utf-8">
 <title>Plantilla og:image · taller</title>
-<link rel="stylesheet" href="../fuentes/local.css">
-<link rel="stylesheet" href="../estilo.css">
+<!-- La anatomía del monorepo, que es la misma hoja partida en tres (orden #02, D):
+     las fuentes y los tokens viven en `packages/ui`, y el cuerpo del CSS de la web
+     en `apps/web/src`. Juntos son lo que el sitio estático linkeaba como
+     `fuentes/local.css` + `estilo.css`. Se leen por `file://`, sin compilar: las
+     tres líneas de `@tailwind` de `index.css` quedan sin procesar y el navegador
+     las ignora, que es lo correcto —esta plantilla solo usa tokens—. -->
+<link rel="stylesheet" href="../../../packages/ui/fuentes/fonts.css">
+<link rel="stylesheet" href="../../../packages/ui/codice-tokens.css">
+<link rel="stylesheet" href="../src/index.css">
 <style>
   /* Lienzo exacto de la imagen para compartir. La fecha salió en la Parte 2 (no la
      dio Armando): cuando exista, vuelve como <span data-fecha> en .og__linea y se
@@ -29,7 +36,7 @@
     <div class="og__linea">Taller presencial · Mérida</div>
     <div class="og__marca">Armando Duarte</div>
   </div>
-  <div class="og__foto"><img src="../img/armando-parado-crema.jpg" alt=""></div>
+  <div class="og__foto"><img src="../public/img/armando-parado-crema.jpg" alt=""></div>
 </div>
 </body>
 </html>

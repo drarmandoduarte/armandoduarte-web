@@ -23,7 +23,7 @@
  *   · `public/`, que son los archivos de Armando y no código;
  *   · los reportes que dejan los corredores, que son `.json` generados;
  *   · **los archivos de test.** Una fixture necesita poder escribir un color
- *     para probar algo sobre colores: `useTinteDeCabecera.test.ts` convierte
+ *     para probar algo sobre colores: `comportamiento.test.ts` convierte
  *     blanco y negro para comprobar que su conversión convierte, y ese piso no
  *     se puede escribir sin nombrarlos. Es la misma excepción que hace
  *     `check-estilo` con el voseo de sus propias fixtures, y por la misma razón:
