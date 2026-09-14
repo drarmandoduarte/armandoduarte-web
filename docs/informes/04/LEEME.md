@@ -181,6 +181,10 @@ muestra —`vercel_blob_rw_…` tiene dos guiones bajos y el patrón admitía un
 Un patrón roto no encuentra nada, y eso se lee exactamente igual que un repo
 limpio.
 
+Dirección tomó el 97 por cumplido con esta evidencia, y dejó una regla de la
+casa: **todo umbral de Lighthouse se escribe junto al método que lo produjo**
+—dónde se sirvió, cuántas corridas, cuál se toma—. Queda en `docs/tareas.md`.
+
 ## Lo que se apartó de la letra de la orden, y por qué
 
 1. **El merge dio un conflicto y no se frenó.** La orden dice que no debe haber

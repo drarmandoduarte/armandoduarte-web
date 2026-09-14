@@ -16,6 +16,33 @@ usa.
 | #03 | Contraste a AA, con el número delante | cerrada (rama `codice/03-contraste`, sobre `02-sin-hidratar`) |
 | #04 | El monorepo entra al repo de Armando | en curso (rama `codice/04-entra-al-repo`, sobre `main` de `armandoduarte-web`) |
 
+## Reglas de la casa, con el caso que las obligó
+
+### Todo umbral de Lighthouse se escribe junto al método que lo produjo
+
+Dónde se sirvió, cuántas corridas, y cuál de ellas se toma. Las tres cosas, al
+lado del número, siempre.
+
+**El caso, que es de la #04.** La orden pedía `performance ≥ 86/92/99/99` sobre
+el preview. Esos cuatro números venían de la #02, donde se habían medido **local
+sobre `dist/`, tres corridas, la peor** — pero el umbral viajó a la orden
+siguiente sin su método, y ahí se leyó como si fuera una propiedad del código.
+
+Sobre el preview privacidad dio 97 y pareció una regresión de dos puntos. No lo
+era: midiendo con el método original las cuatro páginas daban **exactamente
+86/92/99/99**, los mismos números; sobre red inicio y taller salían **mejor** (91
+y 93) y privacidad dispersaba 97/98/99. La diferencia era el transporte. Media
+hora en averiguarlo, y la única razón por la que hizo falta averiguarlo es que
+el número había perdido su método por el camino.
+
+De yapa, la misma corrida mostró la otra mitad de la regla: **una corrida suelta
+no es una medición.** La primera pasada dio 91 en taller y 97 en terminos, y
+tres corridas los desmintieron (93 y 99).
+
+Vale para cualquier número que se cite como umbral, no solo para Lighthouse: un
+número sin su método vuelve a hacer perder media hora al que lo lea en tres
+meses, y esa media hora la paga alguien que no estaba en la conversación.
+
 ## Pendientes abiertos
 
 ### 1. Conectar Vercel al monorepo ~~· es de dirección~~ · **cerrado en la #04**
