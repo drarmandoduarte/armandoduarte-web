@@ -1,3 +1,22 @@
-README.md
+# Lo que no se sirve. Vercel despliega desde el repo, así que acá solo hace
+# falta nombrar lo que está versionado y no tiene que subir.
+
+# La referencia del guardián de fidelidad: 5,5 MB de sitio estático que existen
+# para que Playwright los compare, no para publicarse. Si esto subiera, el sitio
+# viejo quedaría accesible al lado del nuevo.
+qa/
+
+# Los informes de las órdenes: capturas en JPG, 4,2 MB.
 docs/
-check/
+
+# Los guardianes de la web y las plantillas de las imágenes de compartir: se
+# corren en la máquina, no en el despliegue. Van con su ruta completa a
+# propósito: `scripts/` a secas también se llevaría `apps/web/scripts/`, que es
+# donde vive el prerender y sin el cual el build no deja las cuatro páginas.
+apps/web/e2e/
+apps/web/check/
+
+# Los tests. No entran en el grafo del build, pero tampoco pintan nada en dist.
+packages/*/src/**/*.test.*
+packages/ui/tokens.test.mjs
+apps/web/src/**/*.test.*

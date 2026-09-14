@@ -1,0 +1,31 @@
+{
+  "name": "codice",
+  "private": true,
+  "version": "0.0.1",
+  "description": "C\u00f3dice \u2014 la plataforma del Dr. Armando Duarte: consultorio, academia y asistente. Su primer contenido es la web p\u00fablica.",
+  "scripts": {
+    "dev": "pnpm --filter @codice/web dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "node scripts/guardian-de-guardianes.mjs",
+    "lint": "eslint .",
+    "check:tuteo": "node scripts/check-tuteo.mjs",
+    "check:i18n": "node scripts/check-i18n-parity.mjs",
+    "check:estilo": "node scripts/check-estilo.mjs",
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "check:secretos": "node scripts/check-secretos.mjs",
+    "qa:instalar": "playwright install chromium"
+  },
+  "packageManager": "pnpm@10.4.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.10.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "typescript-eslint": "^8.70.0"
+  }
+}

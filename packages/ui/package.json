@@ -1,0 +1,23 @@
+{
+  "name": "@codice/ui",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Design system de Códice — tokens, fuentes locales y los componentes que comparten más de una página.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./styles.css": "./styles.css",
+    "./tokens.css": "./codice-tokens.css",
+    "./tokens.json": "./codice-tokens.json"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  },
+  "scripts": {
+    "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  }
+}

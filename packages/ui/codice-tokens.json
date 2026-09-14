@@ -1,0 +1,657 @@
+{
+  "$meta": {
+    "name": "Códice — Design System (App Dr. Armando)",
+    "version": "1.1.1",
+    "tagline": "Construyendo familias fuertes",
+    "generated": "2026-09-13",
+    "philosophy": "Quiet luxury con la atmósfera del set de grabación del doctor: luz ámbar de tarde, orden, cercanía sin ruido. Restraint editorial, whitespace generoso, tipografía por encima de imagen, sin sombras, sin degradados, motion invisible.",
+    "modes": [
+      "light"
+    ],
+    "density": "comfortable",
+    "changelog": [
+      {
+        "version": "1.1.1",
+        "date": "2026-09-13",
+        "orden": "Códice #03",
+        "cambios": [
+          "Contraste AA. Tres valores se mueven lo mínimo medido para llegar a 4,5:1 sobre el fondo más exigente en el que cada uno se usa: `color.ink.muted` #7A7267 → #716A60, `color.brand.ochre` #8F6B3D → #866539 y `color.brand.ochre.mid` #B08A52 → #B18C54.",
+          "El fondo que manda no es el crema sino el cálido (#F3EBDD): el gris daba 4,00 sobre él y 4,43 sobre crema. Medido sobre las cuatro páginas de la web, no estimado.",
+          "Ningún otro token cambia. Lo que quedó sin llegar al umbral y no se tocó —el ocre medio sobre teal (2,45), el rótulo del menú al 50 % (1,62) y la tapa del libro (3,54)— está en `docs/informes/03/` con su número: corregirlos no es mover un valor, es cambiar el carácter, y eso es decisión de dirección."
+        ]
+      },
+      {
+        "version": "1.1.0",
+        "date": "2026-09-13",
+        "orden": "Códice #01",
+        "cambios": [
+          "Se agrega la sección `web`: los tokens de la web pública (armandoduarte.com), leídos de su `estilo.css` — escala display 300, acento de titulares teal, ritmo de fondos, aire de secciones, hero, arco de la foto, header y script.",
+          "Ningún color nuevo: la sección `web` referencia tokens de `color` por su ruta, nunca por su hex. El guardián `packages/ui/tokens.test.mjs` lo vigila.",
+          "La versión 1.0.0 describía solo la app (chat, corpus, inspector). La web pública no estaba, y por eso la orden web #04 pedía escribirla; se escribe acá, donde vive el design system del monorepo."
+        ]
+      },
+      {
+        "version": "1.0.0",
+        "date": "2026-07-02",
+        "orden": "D6",
+        "cambios": [
+          "Design system de la app: color, tipografía, espaciado, componentes, estilo de escritura y pantallas."
+        ]
+      }
+    ]
+  },
+  "color": {
+    "background": {
+      "cream": {
+        "value": "#FAF7F1",
+        "role": "Fondo por defecto de la app. La luz cálida del set, nunca blanco clínico."
+      },
+      "surface": {
+        "value": "#FFFFFF",
+        "role": "Cards, burbujas del asistente, inputs sobre crema."
+      },
+      "surfaceWarm": {
+        "value": "#F3EBDD",
+        "role": "Fondo de citas de libro, zonas de reposo, secciones alternas."
+      }
+    },
+    "ink": {
+      "primary": {
+        "value": "#2E2B25",
+        "role": "Texto y titulares. Marrón-negro cálido, nunca negro puro."
+      },
+      "muted": {
+        "value": "#716A60",
+        "role": "Texto secundario, captions, metadatos, placeholders."
+      }
+    },
+    "brand": {
+      "ochre": {
+        "value": "#866539",
+        "mid": "#B18C54",
+        "role": "Primario. Wordmark, CTAs, nav activa, marcadores, citas de libro. La luz ámbar de sus videos."
+      },
+      "teal": {
+        "value": "#33585C",
+        "mid": "#527E82",
+        "role": "Acento. Links, focus, citas de video, CTAs secundarias, rigor. La tapa de su libro insignia."
+      }
+    },
+    "support": {
+      "sage": {
+        "value": "#8FA48A",
+        "role": "Éxito, estado indexado, badges sutiles."
+      },
+      "camel": {
+        "value": "#A6906F",
+        "role": "Superficies hover, metadatos secundarios. Su traje. Con moderación."
+      },
+      "navy": {
+        "value": "#2F3A4E",
+        "role": "Raro. Segundo libro (Padres Digitalmente Responsables)."
+      }
+    },
+    "border": {
+      "hairline": {
+        "value": "#EAE4D8",
+        "role": "Borde por defecto 0.5px."
+      },
+      "hairlineHover": {
+        "value": "#D8CFBE",
+        "role": "Borde en hover 0.5px."
+      }
+    },
+    "semantic": {
+      "success": {
+        "value": "#6E8F6A",
+        "role": "Corpus listo, video indexado."
+      },
+      "warning": {
+        "value": "#B08A52",
+        "role": "Transcribiendo, umbral bajo."
+      },
+      "danger": {
+        "value": "#A05A48",
+        "role": "Transcripción fallida, prohibidos."
+      },
+      "info": {
+        "value": "#527E82",
+        "role": "Sugerencias, notas del inspector."
+      }
+    },
+    "citationRule": {
+      "invariant": true,
+      "video": {
+        "text": "#33585C",
+        "bg": "#E3ECEC",
+        "icon": "play"
+      },
+      "book": {
+        "text": "#8F6B3D",
+        "bg": "#F3EBDD",
+        "icon": "book"
+      },
+      "note": "La fuente se reconoce de un vistazo. No cambia entre pantallas ni temas."
+    },
+    "forbidden": [
+      "Negro puro (#000)",
+      "Blanco puro como fondo de app",
+      "Neón o cualquier color saturado",
+      "La paleta de las miniaturas de YouTube (#E8963C, #2E8F96 full-sat): es la capa promocional, no la app"
+    ]
+  },
+  "typography": {
+    "families": {
+      "structure": {
+        "family": "Montserrat",
+        "weights": [
+          400,
+          500,
+          600
+        ],
+        "role": "Headings, navegación, botones, labels, marcadores. 95% del texto."
+      },
+      "reading": {
+        "family": "Open Sans",
+        "weights": [
+          400,
+          600
+        ],
+        "lineHeight": 1.7,
+        "role": "Cuerpo, mensajes del chat, formularios."
+      },
+      "script": {
+        "family": "Great Vibes",
+        "weights": [
+          400
+        ],
+        "role": "SOLO tagline, wordmark y una palabra emocional en el sign-in. Nunca headings, números ni UI."
+      }
+    },
+    "scale": {
+      "display": {
+        "size": "60px",
+        "family": "Montserrat",
+        "weight": 500,
+        "letterSpacing": "0.05em",
+        "lineHeight": 1.05
+      },
+      "h1": {
+        "size": "36px",
+        "family": "Montserrat",
+        "weight": 600,
+        "letterSpacing": "0.03em",
+        "lineHeight": 1.15
+      },
+      "h2": {
+        "size": "28px",
+        "family": "Montserrat",
+        "weight": 600,
+        "letterSpacing": "0.03em",
+        "lineHeight": 1.2
+      },
+      "h3": {
+        "size": "20px",
+        "family": "Montserrat",
+        "weight": 500,
+        "letterSpacing": "0.02em",
+        "lineHeight": 1.3
+      },
+      "body": {
+        "size": "16px",
+        "family": "Open Sans",
+        "weight": 400,
+        "lineHeight": 1.7
+      },
+      "chat": {
+        "size": "15px",
+        "family": "Open Sans",
+        "weight": 400,
+        "lineHeight": 1.7
+      },
+      "small": {
+        "size": "14px",
+        "family": "Open Sans",
+        "weight": 400
+      },
+      "tiny": {
+        "size": "12px",
+        "family": "Montserrat",
+        "weight": 500,
+        "letterSpacing": "0.06em"
+      }
+    },
+    "forbidden": [
+      "Italic en títulos (Montserrat va siempre recto)",
+      "La condensed bold de las miniaturas ('FAMILIAS FUERTES')",
+      "Great Vibes en más de una palabra por pantalla, o para números/UI",
+      "Inter, Roboto, Arial, monospace visible"
+    ]
+  },
+  "spacing": {
+    "unit": "4px",
+    "scale": [
+      4,
+      8,
+      12,
+      16,
+      24,
+      32,
+      48,
+      64
+    ],
+    "sectionSpacing": {
+      "app": "32-48px",
+      "marketingLike": "96-128px"
+    },
+    "rule": "El aire es el material principal. rem para ritmo vertical, px para gaps internos."
+  },
+  "radius": {
+    "sm": "4px",
+    "md": "8px  · inputs",
+    "lg": "12px · cards, burbujas",
+    "xl": "16px · superficies",
+    "pill": "999px · botones"
+  },
+  "border": {
+    "philosophy": "Casi no existen; el aire separa.",
+    "default": "0.5px solid #EAE4D8",
+    "hover": "0.5px solid #D8CFBE",
+    "focus": "2px solid #33585C",
+    "buttonsOnly": "1px solid (ochre o teal)"
+  },
+  "elevation": {
+    "shadow": "none",
+    "rule": "Ninguna sombra, nunca. Jerarquía por color de superficie y aire. Cuando hace falta límite, hairline 0.5px."
+  },
+  "motion": {
+    "philosophy": "Invisible. Lenta y mínima.",
+    "easing": "ease-out",
+    "durations": {
+      "hover": "400ms",
+      "messageEnter": "500ms",
+      "viewChange": "600ms"
+    },
+    "hover": "Fundido de fondo al 5% del color. Sin escala, sin sombra, sin transform.",
+    "thinking": "Una línea de pulso sutil mientras el asistente busca. Nunca puntos que rebotan.",
+    "forbidden": [
+      "spring/bouncy",
+      "escala 1.05+",
+      "rotación",
+      "parallax",
+      "spinners"
+    ]
+  },
+  "iconography": {
+    "family": "Lucide",
+    "strokeWidth": "1.5px",
+    "emojis": false,
+    "common": [
+      "arrow-right",
+      "play (video)",
+      "book (libro)",
+      "message-square",
+      "search",
+      "check (indexado)",
+      "settings",
+      "plus"
+    ]
+  },
+  "sectionMarkers": {
+    "pattern": "§ + ROMANO + · + NOMBRE-MAYÚSCULAS",
+    "style": {
+      "size": "12-13px",
+      "letterSpacing": "0.15em",
+      "weight": 500,
+      "family": "Montserrat",
+      "color": "#8F6B3D",
+      "placement": "Sobre el título de la sección."
+    },
+    "examples": [
+      "§ I · CONVERSACIONES",
+      "§ II · CORPUS",
+      "§ III · EL ESTILO DEL DOCTOR",
+      "§ IV · AJUSTES"
+    ]
+  },
+  "components": {
+    "button": {
+      "base": {
+        "shape": "pill",
+        "background": "transparent",
+        "textTransform": "uppercase",
+        "letterSpacing": "0.08em",
+        "fontSize": "12px",
+        "fontFamily": "Montserrat",
+        "fontWeight": 500,
+        "padding": "12px 24px",
+        "iconEnd": "arrow-right (Lucide 1.5px)"
+      },
+      "primary": {
+        "border": "1px solid #8F6B3D",
+        "color": "#8F6B3D",
+        "hover": "background rgba(143,107,61,0.05)"
+      },
+      "secondary": {
+        "border": "1px solid #33585C",
+        "color": "#33585C",
+        "hover": "background rgba(51,88,92,0.05)"
+      },
+      "tertiary": {
+        "style": "underlined text link",
+        "color": "#33585C o #8F6B3D",
+        "hover": "underline 2px"
+      },
+      "forbidden": [
+        "fondo relleno sólido",
+        "sombra o escala en hover",
+        "rectángulo redondeado (no pill)",
+        "minúsculas"
+      ]
+    },
+    "card": {
+      "background": "#FFFFFF",
+      "radius": "12-16px",
+      "border": "0.5px solid #EAE4D8 (opcional)",
+      "shadow": "none",
+      "align": "left",
+      "citation": {
+        "inheritsSourceColor": true,
+        "video": "bg #E3ECEC / text #33585C",
+        "book": "bg #F3EBDD / text #8F6B3D"
+      }
+    },
+    "badge": {
+      "shape": "pill",
+      "background": "#FAF7F1",
+      "border": "0.5px solid #EAE4D8",
+      "fontFamily": "Montserrat",
+      "fontSize": "13px",
+      "dot": "8px",
+      "corpusStates": {
+        "pendiente": {
+          "color": "#7A7267",
+          "dot": "#7A7267"
+        },
+        "transcribiendo": {
+          "color": "#B08A52",
+          "dot": "#B08A52"
+        },
+        "indexado": {
+          "color": "#6E8F6A",
+          "dot": "#6E8F6A"
+        },
+        "fallido": {
+          "color": "#A05A48",
+          "dot": "#A05A48"
+        },
+        "excluido": {
+          "color": "#7A7267",
+          "dot": "transparent con borde #7A7267"
+        }
+      }
+    },
+    "input": {
+      "radius": "8px",
+      "rest": "0.5px solid #EAE4D8 sobre #FAF7F1 o #FFFFFF",
+      "focus": "2px solid #33585C",
+      "label": "Montserrat 13px 500",
+      "value": "Open Sans 15px",
+      "placeholder": "registro de la UI, describe la acción",
+      "forbidden": [
+        "fondos grises pesados"
+      ]
+    },
+    "feedbackControl": {
+      "type": "texto (nunca pulgares ni emojis)",
+      "copy": "¿Suena como el doctor? Sí · No",
+      "placement": "bajo cada respuesta del asistente"
+    }
+  },
+  "estilo": {
+    "rule": "Dos registros que nunca se mezclan.",
+    "ui": {
+      "register": "Español neutro, tuteo (tú/tienes/puedes). Refinada, frases cortas, sin emojis, sin exclamaciones. Describe exacto qué pasa.",
+      "dos": [
+        "Tu corpus está listo.",
+        "Indexando 12 videos nuevos.",
+        "La respuesta cita 2 fuentes.",
+        "¿Suena como el doctor? Sí · No"
+      ],
+      "donts": [
+        "¡Listo! Tu contenido está súper indexado 🎉",
+        "El sistema ha procesado exitosamente los recursos del usuario.",
+        "Optimiza tu productividad con IA."
+      ],
+      "avoid": [
+        "plataforma",
+        "sistema",
+        "software",
+        "usuario",
+        "optimizar",
+        "productividad",
+        "IA revolucionaria"
+      ],
+      "use": [
+        "tu app",
+        "el corpus",
+        "el doctor",
+        "las fuentes",
+        "el estilo de escritura del doctor"
+      ]
+    },
+    "assistant": {
+      "register": "La estilo aprendido del doctor: voseo cálido rioplatense (vos/tenés/podés), analítico. Contexto, matices y recién la conclusión. Nunca superficial.",
+      "example": "Mirá, antes de hablar de castigos conviene entender qué está buscando el chico. Cuando desafía un límite, muchas veces está probando si el vínculo lo sostiene. Recién ahí tiene sentido pensar en la consecuencia: firme, pero sin romper el lazo.",
+      "dont": "Aquí tienes 3 tips para poner límites de forma efectiva."
+    }
+  },
+  "layout": {
+    "maxWidth": "1200px centrado",
+    "chatColumn": "760px máx. para lectura cómoda",
+    "philosophy": "Editorial asimétrico. Contenido alineado a la izquierda. Whitespace generoso."
+  },
+  "screens": [
+    {
+      "id": "signin",
+      "name": "Sign in",
+      "notes": "Magic link, sin contraseñas. Una palabra emocional en Great Vibes ('conversable'). Solo el equipo entra."
+    },
+    {
+      "id": "chat",
+      "name": "Chat",
+      "notes": "Sidebar de conversaciones + hilo. Burbuja de usuario en #F3EBDD; respuesta del asistente en #FFFFFF con tarjetas de cita (video teal 'min 4:32', libro ocre 'cap. 5, pág. 112'). Feedback '¿Suena como el doctor?'. Input: 'Preguntar sobre el contenido del doctor'. Línea de pulso al buscar."
+    },
+    {
+      "id": "corpus",
+      "name": "Corpus",
+      "notes": "Números grandes en Montserrat 500 ('482 videos indexados'). Lista de videos con estado pendiente/transcribiendo/indexado/fallido/excluido. Libros propios como cards cálidas."
+    },
+    {
+      "id": "inspector",
+      "name": "Inspector de retrieval",
+      "notes": "Solo owner. Fragmentos (chunks) con score de similitud junto a la respuesta. Los que caen bajo umbral se atenúan."
+    },
+    {
+      "id": "settings",
+      "name": "Ajustes",
+      "notes": "Editor del perfil de estilo del doctor (ejemplos few-shot), umbral de búsqueda (slider), miembros del equipo con roles."
+    },
+    {
+      "id": "empty",
+      "name": "Empty states",
+      "notes": "Primer uso: 'Todavía no hay corpus' y 'Aún no preguntaste nada'. Calmos, sin ilustraciones infantiles, un CTA claro."
+    }
+  ],
+  "web": {
+    "$note": "Los tokens de la web pública. Se leyeron de `estilo.css` de `armandoduarte-web` en `main`, que es la especificación pixel a pixel del port: si un valor de acá no aparece textualmente allá, el guardián `packages/ui/tokens.test.mjs` se pone rojo. Los colores van por REFERENCIA al token de `color`, nunca repetidos en hex: un hex repetido es dos verdades que un día no coinciden.",
+    "typography": {
+      "$note": "La web usa la misma familia que la app (Montserrat para estructura, Open Sans para lectura, Great Vibes para la firma) con una escala propia: titulares fluidos en peso 300, que es más liviano que el 500 de `typography.scale.display` de la app. No es una contradicción: la app es densa y la web respira.",
+      "display": {
+        "xl": {
+          "size": "clamp(42px,5.6vw,80px)",
+          "family": "typography.families.structure",
+          "weight": 300,
+          "lineHeight": 1.02,
+          "letterSpacing": "-.01em",
+          "role": "El h1 del hero. Uno por página."
+        },
+        "l": {
+          "size": "clamp(36px,5vw,68px)",
+          "family": "typography.families.structure",
+          "weight": 300,
+          "lineHeight": 1.05,
+          "letterSpacing": "-.01em",
+          "role": "Titular de sección grande."
+        },
+        "m": {
+          "size": "clamp(30px,3.8vw,52px)",
+          "family": "typography.families.structure",
+          "weight": 300,
+          "lineHeight": 1.1,
+          "letterSpacing": "-.005em",
+          "role": "Titular de sección."
+        },
+        "s": {
+          "size": "clamp(22px,2.4vw,32px)",
+          "family": "typography.families.structure",
+          "weight": 400,
+          "lineHeight": 1.2,
+          "letterSpacing": "normal",
+          "role": "Titular de bloque y de página legal."
+        }
+      },
+      "lead": {
+        "size": "clamp(18px,1.45vw,21px)",
+        "family": "typography.families.reading",
+        "lineHeight": 1.6,
+        "color": "color.ink.muted",
+        "maxWidth": "56ch",
+        "role": "La bajada que sigue a un titular."
+      },
+      "body": {
+        "size": "17px",
+        "family": "typography.families.reading",
+        "lineHeight": 1.75,
+        "color": "color.ink.primary",
+        "maxWidth": "62ch"
+      },
+      "small": {
+        "size": "14px",
+        "family": "typography.families.reading",
+        "lineHeight": 1.6,
+        "color": "color.ink.muted"
+      },
+      "eyebrow": {
+        "size": "12px",
+        "family": "typography.families.structure",
+        "weight": 500,
+        "letterSpacing": ".24em",
+        "textTransform": "uppercase",
+        "color": "color.brand.ochre",
+        "role": "El rótulo que anuncia la sección. Va SOBRE el titular."
+      },
+      "script": {
+        "size": "clamp(28px,3vw,42px)",
+        "family": "typography.families.script",
+        "color": "color.brand.ochre",
+        "role": "Solo el tagline, y una vez por página. Misma regla que en la app."
+      },
+      "titleAccent": {
+        "color": "color.brand.teal",
+        "role": "La segunda línea del titular, la que cambia de color. Es el teal de la tapa de su libro, nunca el ocre."
+      }
+    },
+    "surfaces": {
+      "$note": "El ritmo de fondos. Las secciones alternan para que el ojo sepa dónde termina una y empieza la otra, sin una sola línea divisoria: crema por defecto, y cada tanto una cálida, una blanca o una oscura. Dos secciones oscuras seguidas no existen.",
+      "default": {
+        "background": "color.background.cream"
+      },
+      "calido": {
+        "background": "color.background.surfaceWarm"
+      },
+      "blanco": {
+        "background": "color.background.surface"
+      },
+      "oscuro": {
+        "background": "color.brand.teal",
+        "color": "color.background.cream",
+        "role": "La sección que corta. El texto pasa a crema y el acento a ocre medio."
+      },
+      "tinta": {
+        "background": "color.ink.primary",
+        "color": "color.background.cream",
+        "role": "El cierre y el contacto. Más oscura todavía que la teal."
+      },
+      "rhythm": "crema → (cálido | blanco | oscuro | tinta) → crema. La oscura y la tinta se usan una vez por página, para lo que se quiere que se recuerde: el taller en el inicio, el cierre en la página del taller."
+    },
+    "section": {
+      "paddingBlock": "clamp(88px,12vh,140px)",
+      "containerWidth": "min(90%,1400px,calc(100% - 40px))",
+      "role": "El aire es el material principal (regla de `spacing`). Una sección no se marca con líneas: se marca con espacio y con fondo."
+    },
+    "cierre": {
+      "paddingBlock": "clamp(110px,16vh,180px)",
+      "align": "center",
+      "role": "La última sección de la página del taller. Respira más que las demás."
+    },
+    "hero": {
+      "minHeight": "min(100svh,880px)",
+      "paddingTop": "calc(var(--header-h) + clamp(40px,6vh,72px))",
+      "paddingBottom": "clamp(48px,7vh,80px)",
+      "grid": "1.15fr .85fr",
+      "gap": "clamp(40px,6vw,96px)",
+      "role": "Alto de pantalla, con la foto real a la derecha. Por debajo de 900px la foto baja y el alto deja de fijarse."
+    },
+    "foto": {
+      "radius": "12px",
+      "arco": {
+        "borderRadius": "260px 260px 12px 12px",
+        "background": "color.background.surfaceWarm",
+        "objectPosition": "center top",
+        "role": "El arco. Es la firma visual de la casa: la foto no es un rectángulo, es una ventana."
+      },
+      "libre": {
+        "background": "transparent",
+        "borderRadius": "0",
+        "role": "La foto recortada, sin caja. Se usa cuando la figura ya tiene su propio contorno."
+      }
+    },
+    "header": {
+      "height": {
+        "default": "76px",
+        "compact": "64px",
+        "compactBelow": "600px"
+      },
+      "layout": "Tres columnas: menú a la izquierda, marca al centro, WhatsApp a la derecha.",
+      "behaviour": "Transparente en reposo. Mientras se hace scroll toma el color de la sección que tiene debajo, con un velo del 92 % y desenfoque de 16px; al detenerse vuelve a transparente. Nunca se esconde.",
+      "onDark": {
+        "color": "color.background.cream",
+        "accent": "color.brand.ochre.mid",
+        "when": "La sección bajo el header es `oscuro` o `tinta`."
+      },
+      "hairline": "1px de currentColor al 15 % de opacidad (10 % mientras se desplaza). Acompaña, no separa."
+    },
+    "motion": {
+      "ease": "ease-out",
+      "reveal": {
+        "property": "opacity",
+        "duration": ".6s",
+        "delays": [
+          ".1s",
+          ".2s",
+          ".3s"
+        ],
+        "trigger": "IntersectionObserver, una sola vez por elemento"
+      },
+      "hover": ".4s",
+      "$note": "Se hereda la filosofía de `motion` de la app: invisible. Acá se agrega una sola cosa, el fundido de entrada de cada bloque al aparecer. Sin transform, sin escala, sin parallax."
+    },
+    "breakpoints": {
+      "wide": "1100px",
+      "tablet": "900px",
+      "phone": "600px",
+      "$note": "Los tres cortes de `estilo.css`, de mayor a menor. No hay un cuarto."
+    }
+  }
+}

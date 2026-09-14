@@ -1,49 +1,92 @@
-> **Qué es esto.** El sitio público de `armandoduarte.com`: dos páginas estáticas, sin build y sin `package.json`.
-> **Cómo se publica.** Push a `main` → Vercel publica la raíz del repo tal cual. Rutas limpias y cabeceras salen de `vercel.json`.
-> **El HTML es la fuente.** `build.py` (el generador que sobrescribía las dos páginas) ya no existe en el repo: quedó en `_historico/` del proyecto. No volver a meterlo.
-> **Nada a `main` sin PR.** `main` está protegida en GitHub: solo entra por PR (el repo es público desde el 12/9/2026). Antes de cada commit se corre `sh check/enlaces.sh`.
-> **Las órdenes viven fuera del repo**, en `03 Producto/web/ordenes/` del proyecto. Los pendientes abiertos, en `docs/tareas.md`.
+# armandoduarte-web
 
-# armandoduarte.com · v1.1 · 12/9/2026
+Este repo es hoy **el monorepo de Códice**: la plataforma del Dr. Armando
+Duarte —web pública, y más adelante consultorio, academia y asistente—.
 
-Dos páginas estáticas, sin backend: `index.html` (la web de Armando) y `taller.html` (la landing del taller). Comparten `estilo.css`, `fuentes/` (Montserrat, Open Sans y Great Vibes, de Google, servidas locales) e `img/`. Se publican tal cual en Vercel (proyecto estático, carpeta raíz): el HTML es la fuente, no hay generador ni paso de build.
+**Se llama así por historia.** Nació como el sitio estático de
+`armandoduarte.com`, escrito a mano en HTML y CSS; ese sitio no se tiró: vive en
+[`qa/referencia/`](qa/referencia/LEEME.md) y es la referencia contra la que se
+mide el port a React. El día que convenga, el monorepo se extrae a su propio
+repo; hasta entonces, un solo lugar, porque es el que ya tiene `main` protegido,
+Vercel conectado y producción andando.
 
-## Qué cambió de la v1 a la v1.1 (revisión de Germán)
+La web nace acá, y no al costado, por una razón de dirección: **raíces.** El día
+que exista la academia, la página del taller tiene que ser la plantilla de
+«página de curso» y no una página suelta que haya que tirar.
 
-- **Ritmo de fondos.** La v1 era toda crema y las secciones no se distinguían. Ahora alternan: crema → franja «Ahora» en teal → crema → cálido → teal → blanco → cálido → tinta (contacto), y en el taller: crema → blanco → cálido → crema → teal → blanco → cálido → crema → tinta (cierre). Ninguna sección tiene el mismo fondo que la anterior.
-- **Fotos recortadas.** Armando ya no está sobre el gris del estudio: se lo recortó del fondo y va sobre el color de cada sección (arco cálido en el hero, crema en «Quién soy», teal en «Sobre el facilitador»). Los originales quedan en `img/` por si se quieren volver a usar.
-- **Acento teal en los titulares.** El ocre a 80 px se veía barroso; el teal sobre crema es más elegante y es el color que los tokens asignan al «rigor». El ocre sigue en eyebrows, botones y detalles.
-- **Header a lo Rolls-Royce.** Transparente sobre el hero; al bajar toma el color de la sección que tiene debajo (crema, cálido, blanco, teal o tinta) de lado a lado, con velo del 92 % y desenfoque, y el texto pasa a claro sobre las oscuras. Nunca se esconde: en reposo es transparente; mientras se hace scroll toma el color de la sección, y al detenerse vuelve a transparente. La línea es una hairline del color del texto al 15 %. Lo hace el script del pie leyendo el fondo de la sección bajo el header; no hay que marcar nada en el HTML.
-- El hero ya no fuerza 100 vh en pantallas muy altas (tope 880 px) para no dejar un vacío debajo.
+## Cómo se corre
 
-## Decisiones que ya están tomadas
+```sh
+nvm use            # Node 22 (.nvmrc)
+pnpm install
+pnpm dev           # la web en vivo
+pnpm build         # dist/ con un .html por ruta (prerender)
+pnpm test          # todas las suites + el guardián de fidelidad, en Chromium
+```
 
-- **Gramática 512** (header de tres columnas, hairlines, eyebrows, listas numeradas, pasos, cifras cortas, footer con marquita) sobre **los tokens del design system de la app** (`docs/design/armando-design-system.tokens.json`): crema, tinta, ocre, teal; Montserrat para títulos, navegación y botones; Open Sans para lectura; Great Vibes una sola vez (el tagline del pie). Las mismas fuentes que va a usar la app, para que la web y la app sean una sola cosa.
-- **WhatsApp en el header, a la derecha, nunca flotante.** Cada botón lleva un mensaje prearmado distinto (header, hero, después del programa, inversión, cierre) para saber desde dónde escribió cada persona.
-- **La marca es «Armando Duarte»** tipográfico. Construyendo Familias Fuertes aparece como programa (sello chico junto a los libros y tagline en el pie).
-- **Tuteo mexicano** («tú», «reserva», «tu hijo»). Los textos de Armando se respetaron en estructura y se podaron adjetivos.
-- **Un bloque «Ahora»** debajo del hero de la home (`<section id="ahora" data-ahora="…">`) es lo que cambia según lo que Armando necesite destacar: hoy el taller; mañana un curso. Es un solo bloque, no un carrusel.
-- **La web dice lo que existe**: consultoría, talleres, libros. Academia y asistente entran cuando estén en el producto.
+La primera vez en una máquina hace falta el navegador: `pnpm qa:instalar`.
 
-## Lo que falta antes de publicar (lo tiene que dar Armando)
+La gate, antes de cada commit:
 
-Los datos pendientes se ven **punteados en ocre** en la página (`<span class="dato">`), a propósito, para que no se publique sin ellos:
+```sh
+pnpm check:tuteo && pnpm check:i18n && pnpm check:estilo && pnpm check:tokens \
+  && pnpm check:secretos && pnpm typecheck && pnpm test \
+  && pnpm --filter @codice/web build
+```
 
-1. **Fecha del taller** (aparece en la home, el hero del taller, la franja de hechos, la ficha del taller y el JSON-LD).
-2. **Nombre completo del lugar** (hoy «Auditorio del Club …»).
-3. **Cupo**, si se quiere mostrar el número. Si no es real, se deja «cupo limitado».
-4. **Testimonios**: los dos que mandó Armando están puestos con los nombres que él dio (Dra. Mariana G., Sofi L.). Hay que confirmar que son reales y que las personas autorizan; si no, se sacan y la sección desaparece sin dejar hueco.
-5. **Aviso de privacidad y términos**: los enlaces del pie apuntan a `#`. Hace falta un aviso de privacidad mexicano (LFPDPPP) aunque la página no tenga formulario, porque hay WhatsApp y va a haber píxel.
-6. **Imagen para compartir (og:image)**, 1200×630, con el título y la fecha. Se genera cuando haya fecha.
-7. **Probar el enlace de WhatsApp en un celular real** de México: es `wa.me/525555015641` sin el «1» después del 52.
-8. **Instagram**: el enlace está punteado porque no tengo el usuario confirmado. YouTube (`youtube.com/c/DrArmandoDuarte`), el podcast en Spotify y Facebook (`armandoduartepantoja`) están puestos con lo que aparece públicamente; que Armando confirme que son los suyos y si falta alguno (TikTok, X).
-9. **Foto horizontal** de Armando (pedida a la secretaria) para mejorar el hero en escritorio; y si hay fotos del set con luz ámbar, mejor que las de estudio.
+## El mapa
 
-## Para subirla (CEO de la web de Armando / Rodolfo)
+| Carpeta | Qué es |
+|---|---|
+| `apps/web` | La web pública y, más adelante, las pantallas de la plataforma. Vite + React 19 + TypeScript estricto. |
+| `packages/config` | El `tsconfig` base, estricto. Lo extienden todos. |
+| `packages/ui` | El design system: `codice-tokens.json` (el documento), `codice-tokens.css` (su forma ejecutable), las fuentes locales y los componentes que **más de una** página comparte. |
+| `packages/core` | Tipos, contratos e i18n. Es lo que la app nativa va a reusar entero. |
+| `packages/db` | Migraciones y esquema. Vacío hasta la orden del consultorio. |
+| `packages/prompts` | Los prompts del asistente y el perfil de estilo de escritura del doctor. **El único lugar del monorepo donde se vosea.** |
+| `scripts` | Los guardianes. |
+| `qa` | El piso de tests, los saltos permitidos —que los guardianes leen— y `referencia/`, el sitio estático contra el que se mide la fidelidad. |
+| `docs` | `tareas.md` (la cola de órdenes y los pendientes) e `informes/` (lo que dejó cada orden). |
 
-- Repo en el GitHub de Armando, proyecto estático en Vercel, dominio `armandoduarte.com` apuntando a Vercel **tocando solo A y CNAME: los registros MX quedan en IONOS** o el correo development@ deja de llegar.
-- `taller.html` se sirve también como `/taller` (rewrite en `vercel.json`). El sitio viejo en Divi se reemplaza entero; las URLs viejas (`/biografia`, `/conferencias`) redirigen a la home.
-- Search Console con el dominio verificado y sitemap. Píxel de Meta solo si se va a pautar.
-- Lighthouse móvil: accesibilidad 100, performance ≥95. Las imágenes ya están optimizadas (270 KB la del hero); si hace falta, pasar a AVIF.
-- Vara: S·A·P·E completas más V (titular con qué/para quién/dónde; prueba real arriba del pliegue; un CTA por pantalla; cero relleno). Auditar PASA/NO PASA con captura antes de publicar.
-- Guion de respuesta para la secretaria (dos plantillas: «quiero reservar» y «cuánto cuesta / cómo pago»). Sin eso, la landing convierte y el chat pierde.
+## Cómo se despliega
+
+Vercel, desde `main`, con los tres comandos escritos en el `vercel.json` de la
+raíz —instalar, construir, y servir `apps/web/dist`— y no en el dashboard. Es a
+propósito: así el commit que cambia el repo es el mismo que cambia cómo se
+construye, y no hay una ventana entre las dos cosas en la que producción sirva
+cualquier cosa.
+
+`qa/` y `docs/` no se publican: están en el `.vercelignore`.
+
+## La regla de arriba de todo
+
+> **Ninguna regla de negocio fuera de `packages/core`, y con test. Las pantallas
+> solo muestran.**
+
+Existe porque Armando quiere app en iPhone y Android, y la app nativa va a reusar
+`core` entero: **lo que hoy se escriba dentro de un `.tsx` es lógica que mañana
+hay que escribir dos veces.** No es una preferencia de arquitectura, es la
+diferencia entre tener una app móvil y volver a empezar.
+
+## La segunda: este repo es público
+
+Y mientras lo único que contenga sea la web pública, está bien: es lo que hace
+que Vercel Hobby despliegue los commits de cualquier autor sin pagar nada.
+
+> **Nada secreto entra al repo.** Ni claves, ni tokens, ni URLs de base de
+> datos, ni el código de acceso de una cortina, ni un `.env` con algo adentro.
+> Lo secreto vive en las variables de entorno de Vercel y se lee con
+> `process.env`; el repo solo conoce el **nombre** de la variable.
+
+Sin excepciones. Si una orden parece pedir lo contrario, está mal escrita: se
+frena y se pregunta. Lo vigila `pnpm check:secretos`, que está en la gate.
+
+El día que entre el consultorio —fichas de pacientes, claves de Supabase— el
+repo pasa a privado y eso cuesta plata: ver `docs/tareas.md`.
+
+## La tercera, de terminología
+
+Nunca se dice **«voz»** del doctor: se dice **estilo de escritura**. «Voz» se lee
+como audio y el asistente jamás genera audio ni clona la voz real de nadie (D5).
+La única excepción es cuando se está prohibiendo el audio explícitamente. Aplica
+a archivos, variables, colas y scripts.

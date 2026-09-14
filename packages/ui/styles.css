@@ -1,0 +1,4 @@
+/* La hoja que importa `apps/web`. Un solo import y el producto tiene la marca:
+   las fuentes (locales, nunca CDN) y los tokens. Nada más vive acá. */
+@import "./fuentes/fonts.css";
+@import "./codice-tokens.css";
