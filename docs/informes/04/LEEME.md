@@ -98,6 +98,7 @@ nombrando la ruta que buscó. No se saltea. Devuelta a su lugar, verde.
 |---|---|---|
 | **producción hoy** | `contacto-produccion-1440.jpg` | `contacto-produccion-390.jpg` |
 | **preview (lo que entra)** | `contacto-preview-1440.jpg` | `contacto-preview-390.jpg` |
+| **producción después del merge** | `contacto-PRODUCCION-final-1440.jpg` | `contacto-PRODUCCION-final-390.jpg` |
 
 Y el número, que es lo que de verdad se afirma —una captura se mira, un
 contraste se mide—:
@@ -184,6 +185,37 @@ limpio.
 Dirección tomó el 97 por cumplido con esta evidencia, y dejó una regla de la
 casa: **todo umbral de Lighthouse se escribe junto al método que lo produjo**
 —dónde se sirvió, cuántas corridas, cuál se toma—. Queda en `docs/tareas.md`.
+
+## Verificación de cierre, en producción
+
+Mergeado en `a465fab` (merge normal: la historia del monorepo entró entera). Las
+seis comprobaciones, repetidas sobre `armandoduarte-web.vercel.app`:
+
+· **F1** las cuatro rutas 200, `class="dato"` = 0 en las cuatro.
+· **F2** `/taller.html` → 308 `/taller`, `/biografia` y `/conferencias` → 308 `/`,
+  las cinco cabeceras incluido `x-robots-tag: noindex, nofollow`.
+· **F3** un solo `<script defer>` y un solo `assets/*.js` en las cuatro. Y
+  `vercel.live` = **0** en las cuatro, que confirma lo que decía F3 del preview:
+  esa barra era del preview, no nuestra.
+· **F4** la gate completa sobre `main` sale en **0**; 63 tests, 14 comparando el
+  port contra `qa/referencia/`, 0 saltados.
+· **F5** contraste **13,19:1**, y los cuatro enlaces presentes: «WhatsApp · +52 55
+  5501 5641 | YouTube | Spotify | Facebook». Las capturas son las dos últimas
+  filas de la tabla de arriba.
+· **F6** con su método pegado, que es la regla que dejó esta orden: **producción
+  sobre red, Lighthouse móvil `--throttling-method=simulate`, tres corridas, se
+  toma la peor.**
+
+| página | perf (3 corridas) | peor | umbral | acc |
+|---|---|--:|--:|--:|
+| inicio | 95 / 95 / 95 | **95** | 86 | 100 |
+| taller | 96 / 96 / 96 | **96** | 92 | 100 |
+| privacidad | 100 / 99 / 100 | **99** | 99 | 100 |
+| terminos | 100 / 99 / 99 | **99** | 99 | 100 |
+
+Las cuatro pasan, y producción salió **mejor que el preview** en las cuatro:
+privacidad subió de 97 a 99. Sostiene el diagnóstico de F6 del preview — era
+varianza del transporte, no del port.
 
 ## Lo que se apartó de la letra de la orden, y por qué
 
