@@ -5,21 +5,30 @@ import { fileURLToPath } from 'node:url';
 /**
  * El guardián de fidelidad: dos sitios, el mismo servidor, el mismo navegador.
  *
- * ── `ESTATICO_DIR` es obligatorio y no se saltea ──────────────────────────
+ * ── El sitio estático vive acá adentro, en `qa/referencia/` ───────────────
+ * Desde la orden #04 la referencia no es un repo de al lado: es una carpeta de
+ * **este** repo, versionada, y el valor por omisión apunta ahí. Ya no hay una
+ * ruta externa que alguien pueda mover sin enterarse, ni una variable de
+ * entorno que haya que acordarse de pasar.
+ *
+ * `ESTATICO_DIR` sigue existiendo por si alguna vez hay que apuntar a otro
+ * lado, pero nadie tiene que usarla para que esto corra.
+ *
+ * ── Y no se saltea si falta ───────────────────────────────────────────────
  * Si no está el sitio estático, esta suite **no puede comprobar nada**, y un
  * guardián que se salta cuando le falta el insumo es un guardián que se apaga
- * solo el día que más falta hace. Falla acá, al levantar, con el nombre de la
- * variable y la ruta que buscó.
+ * solo el día que más falta hace. Falla acá, al levantar, con la ruta que buscó.
  */
 const RAIZ = fileURLToPath(new URL('.', import.meta.url));
 const ESTATICO = process.env.ESTATICO_DIR
-  ?? fileURLToPath(new URL('../../../armandoduarte-web', import.meta.url));
+  ?? fileURLToPath(new URL('../../qa/referencia', import.meta.url));
 
 if (!existsSync(`${ESTATICO}/estilo.css`)) {
   throw new Error(
     `No está el sitio estático en ${ESTATICO}.\n`
     + 'Es la especificación del port: sin él, la fidelidad no se mide, se supone.\n'
-    + 'Pasá ESTATICO_DIR=<ruta a armandoduarte-web> o dejalo al lado de codice/.',
+    + 'Vive en `qa/referencia/` de este repo y se versiona con él (orden #04): si no\n'
+    + 'está, no es que falte configurar algo, es que alguien lo borró. No se sigue.',
   );
 }
 

@@ -26,7 +26,9 @@ import portado from './index.css?raw';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..', '..', '..');
-const ESTATICO = process.env.ESTATICO_DIR || join(RAIZ, '..', 'armandoduarte-web');
+/* Desde la orden #04 el sitio estático vive en `qa/referencia/` de este mismo
+   repo, versionado. `ESTATICO_DIR` queda por si hay que apuntar a otro lado. */
+const ESTATICO = process.env.ESTATICO_DIR || join(RAIZ, 'qa', 'referencia');
 
 let original = '';
 try {

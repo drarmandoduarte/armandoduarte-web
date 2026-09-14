@@ -18,10 +18,11 @@
  * `ESTATICO_DIR` mal puesto se lee como «los tokens no coinciden».
  *
  * ── Dónde está el sitio estático ──────────────────────────────────────────
- * En `ESTATICO_DIR`, y si no está, en `../armandoduarte-web` al lado de este
- * repo, que es donde vive en la carpeta del proyecto. **No se saltea si falta**:
- * un guardián que se saltea cuando no encuentra su insumo es un guardián que se
- * apaga solo el día que más falta hace.
+ * En `qa/referencia/` de este mismo repo, versionado, desde la orden #04 —antes
+ * era un repo de al lado—. `ESTATICO_DIR` sigue pudiendo apuntar a otro lado,
+ * pero por omisión no hace falta. **No se saltea si falta**: un guardián que se
+ * saltea cuando no encuentra su insumo es un guardián que se apaga solo el día
+ * que más falta hace.
  */
 import { describe, expect, it } from 'vitest';
 import { readFileSync, statSync } from 'node:fs';
@@ -30,7 +31,7 @@ import { fileURLToPath } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..', '..');
-const ESTATICO = process.env.ESTATICO_DIR || join(RAIZ, '..', 'armandoduarte-web');
+const ESTATICO = process.env.ESTATICO_DIR || join(RAIZ, 'qa', 'referencia');
 
 const tokens = JSON.parse(readFileSync(join(AQUI, 'codice-tokens.json'), 'utf8'));
 
@@ -142,7 +143,7 @@ describe('los tokens de Códice', () => {
       expect(
         bytes,
         `no se pudo leer ${rutaCss}. Es la especificación del port: sin él este guardián no `
-        + 'compara nada. Pasá ESTATICO_DIR o poné el repo estático al lado de éste.',
+        + 'compara nada. Vive en `qa/referencia/` de este repo y se versiona con él.',
       ).toBeGreaterThan(10_000);
       expect(css.length).toBeGreaterThan(10_000);
     });

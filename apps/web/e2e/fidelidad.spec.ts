@@ -45,6 +45,10 @@ import { CAMBIOS_VISIBLES_03 } from './cambios-visibles';
  * Las referencias no se versionan: se regeneran en cada corrida desde el sitio
  * estático, que es la fuente. Una captura guardada en el repo envejece.
  *
+ * Desde la orden #04 ese sitio estático es `qa/referencia/` de este mismo repo
+ * —no un repo de al lado—: la fuente está versionada y no depende de una ruta
+ * externa. La ruta la resuelve `playwright.config.ts`.
+ *
  * ── El piso ──────────────────────────────────────────────────────────────
  * Antes de comparar se afirma que las dos páginas **trajeron algo**: más de 500
  * caracteres de texto visible cada una. Sin eso, dos páginas rotas se parecen

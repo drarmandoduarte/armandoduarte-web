@@ -58,8 +58,9 @@ const SUITES = [
  * de la gate puede estar verde con la web dibujando otra cosa.
  *
  * ── Lo que necesita, y falla fuerte si no está ───────────────────────────
- * El sitio estático, en `ESTATICO_DIR` o al lado del repo, y Chromium
- * (`pnpm qa:instalar`). Las dos ausencias dan un rojo que dice cuál es.
+ * El sitio estático —desde la orden #04, `qa/referencia/` de este mismo repo,
+ * versionado— y Chromium (`pnpm qa:instalar`). Las dos ausencias dan un rojo
+ * que dice cuál es.
  */
 const NAVEGADOR = '@codice/navegador';
 const REPORTE_NAVEGADOR = 'apps/web/.playwright-report.json';
@@ -372,7 +373,7 @@ function revisarLaFidelidad() {
       throw new Error(
         'no se pudo correr el guardián de fidelidad, así que NO se comprobó que el port sea '
         + 'indistinguible del sitio estático.\n  Si es la primera vez en esta máquina:  pnpm qa:instalar\n  '
-        + 'Si falta el sitio estático:  ESTATICO_DIR=<ruta a armandoduarte-web> pnpm test\n  '
+        + 'Si falta el sitio estático: va en `qa/referencia/`, versionado con el repo.\n  '
         + (e.message ?? ''),
       );
     }
