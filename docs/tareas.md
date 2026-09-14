@@ -1,7 +1,11 @@
-# Tareas y cola de órdenes — codice
+# Tareas y cola de órdenes — Códice
 
 Las órdenes viven fuera del repo, en `03 Producto/codice/ordenes/`. Acá queda el
 estado y lo que va quedando pendiente.
+
+Desde la orden #04 el monorepo vive en `drarmandoduarte/armandoduarte-web`, que
+ya es público, tiene `main` protegido y Vercel conectado. El repo `codice` no se
+usa.
 
 ## Cola de órdenes
 
@@ -9,23 +13,33 @@ estado y lo que va quedando pendiente.
 |---|---|---|
 | #01 | Nace el monorepo, y la web pública se porta a React | cerrada (ramas `codice/01a-molde`, `01b-port`, `01c-fidelidad`) |
 | #02 | La web pública no se hidrata | cerrada (rama `codice/02-sin-hidratar`, sobre `01c-fidelidad`) |
-| #03 | Contraste a AA, con el número delante | en curso (rama `codice/03-contraste`, sobre `02-sin-hidratar`) |
+| #03 | Contraste a AA, con el número delante | cerrada (rama `codice/03-contraste`, sobre `02-sin-hidratar`) |
+| #04 | El monorepo entra al repo de Armando | en curso (rama `codice/04-entra-al-repo`, sobre `main` de `armandoduarte-web`) |
 
 ## Pendientes abiertos
 
-### 1. Conectar Vercel al monorepo · **es de dirección**
+### 1. Conectar Vercel al monorepo ~~· es de dirección~~ · **cerrado en la #04**
 
-La orden #01 **no despliega**: no hay proyecto de Vercel para `codice` todavía.
-`armandoduarte-web` sigue siendo producción hasta que dirección conecte el
-monorepo. Cuando lo haga: raíz del proyecto `apps/web`, comando de build
-`pnpm --filter @codice/web build`, salida `apps/web/dist`. El `vercel.json` ya
-está en `apps/web`, copiado tal cual del sitio estático.
+No hizo falta conectar nada, y ése fue el punto: en vez de crear un proyecto
+nuevo para `codice`, el monorepo entró al repo que Vercel ya estaba
+desplegando. La URL de producción no cambió.
+
+Los tres comandos viven en el `vercel.json` de la **raíz** —`pnpm install
+--frozen-lockfile`, `pnpm --filter @codice/web build`, salida `apps/web/dist`—
+y no en el dashboard, para que el commit que cambia el repo sea el mismo que
+cambia cómo se construye. El de `apps/web/vercel.json` se queda donde está como
+referencia de sus reglas.
+
+Queda una cosa sabida: si alguien activara el override de build en el dashboard,
+ese override le gana al archivo. Nadie tiene que tocarlo.
 
 ### 2. Quitar `X-Robots-Tag: noindex, nofollow` el día que se abra el dominio
 
 Viene copiado del sitio estático y está bien mientras la web viva en una URL
-`.vercel.app`. El día que `armandoduarte.com` apunte acá hay que sacarlo de
-`apps/web/vercel.json`: si no, la web abre invisible para los buscadores.
+`.vercel.app`. El día que `armandoduarte.com` apunte acá hay que sacarlo del
+`vercel.json` de la **raíz**, que es el que sirve desde la #04: si no, la web
+abre invisible para los buscadores. (El de `apps/web/vercel.json` ya no lo lee
+nadie, pero dice lo mismo: se saca de los dos o se borra ése.)
 
 ### 3. Las plantillas `check/og-*.html` ~~todavía apuntan a la carpeta vieja~~ · **cerrado en la #02**
 
@@ -49,17 +63,22 @@ antes/después y los cuatro pares que **no** se tocaron están en
 `docs/informes/03/LEEME.md`. El barrido que la produjo quedó en el repo:
 `apps/web/check/contraste.mjs`.
 
-### 4b. El bloque de contacto estaba invisible · **arreglado en la #03, y está vivo en producción**
+### 4b. El bloque de contacto estaba invisible · **arreglado en la #03, llega a producción con la #04**
 
 El teléfono de WhatsApp y los enlaces a YouTube, Spotify y Facebook de la portada
 se dibujaban **tinta sobre tinta** —contraste 1,00:1— por una colisión de
 especificidad entre `.tinta .grande` y `.contacto .grande` en `estilo.css`. En el
 monorepo está arreglado (`color:inherit`, el cambio más chico posible).
 
-**En `armandoduarte.com` sigue roto**, porque Rodolfo no toca el sitio estático.
-Mientras el monorepo no sea producción, cada visitante que baja a «Escríbeme» no
-ve el teléfono. Es de dirección decidir si se corrige allá o se acelera el
-cambio de producción.
+**En producción estuvo roto hasta la #04**, porque Rodolfo no toca el sitio
+estático y el arreglo vivía solo en el monorepo: cada visitante que bajaba a
+«Escríbeme» no veía el teléfono. Dirección eligió el segundo camino —acelerar el
+cambio de producción en vez de parchear el estático—, así que el arreglo llega
+con el merge de la #04, junto con el port y el contraste.
+
+El sitio estático **conserva el defecto** y es correcto que lo conserve: ahora es
+`qa/referencia/`, la referencia del guardián de fidelidad, y la diferencia está
+declarada en `apps/web/e2e/cambios-visibles.ts`. Tocarlo sería mover la vara.
 
 ### 4c. El ocre medio sobre teal no llega a AA: **2,51** · **de dirección**
 
@@ -141,3 +160,23 @@ seguía verde; el que se ponía en 1 era `pnpm lint`, que no está en la gate.
 
 Arreglado cambiando la primera palabra del comentario. Está fuera de la letra de
 la #02 y se declara acá por eso.
+
+### 9. El día que entre el consultorio, el repo pasa a privado — y eso cuesta plata · **de dirección**
+
+Hoy el repo es **público** por decisión de dirección (14/9/2026), y es lo que
+hace que **Vercel Hobby** despliegue los commits de cualquier autor sin pagar
+nada. Está bien mientras lo único que contenga sea la web pública.
+
+El día que entre el consultorio —fichas de pacientes, claves de Supabase, datos
+de personas— el repo pasa a privado, y ahí Vercel Hobby **deja de desplegar
+commits que no sean del dueño de la cuenta**. Hay que pasar a **Pro, USD 20/mes**,
+que paga Armando.
+
+Queda anotado acá para que no aparezca como sorpresa a mitad de camino: **es lo
+primero que hay que resolver antes de la primera orden del consultorio**, no
+durante.
+
+Mientras tanto rige la regla sin excepciones: nada secreto entra al repo. Lo
+vigila `pnpm check:secretos`, que está en la gate y falla nombrando archivo y
+línea. Si una orden futura parece pedir lo contrario, está mal escrita: se frena
+y se pregunta.
