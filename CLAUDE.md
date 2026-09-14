@@ -26,6 +26,18 @@ en la orden en curso, **se pregunta**.
    archivos, variables, colas y scripts.
 5. **Nunca PII identificable a la API de IA**, y nunca el contenido de una
    conversación en un log.
+6. **Nada secreto entra al repo.** Este repo es **público** por decisión de
+   dirección (14/9/2026), y es lo que hace que Vercel Hobby despliegue los
+   commits de cualquier autor sin pagar nada. Ni claves, ni tokens, ni URLs de
+   base de datos, ni el código de acceso de una cortina, ni un `.env` con algo
+   adentro: lo secreto vive en las variables de entorno de Vercel y se lee con
+   `process.env`; el repo solo conoce el **nombre** de la variable. Lo vigila
+   `check:secretos`, que está en la gate. Sin excepciones, y **si una orden
+   parece pedir lo contrario, está mal escrita: se frena y se pregunta.** El
+   caso: un secreto commiteado a un repo público no se arregla borrándolo
+   —queda en la historia, en los forks y en los espejos—, se arregla rotando la
+   credencial. El día que entre el consultorio el repo pasa a privado y eso
+   cuesta Vercel Pro; está anotado en `docs/tareas.md`.
 
 ## La regla de dos registros (D6)
 
@@ -82,14 +94,21 @@ orden y este contrato, gana el contrato y se pregunta**.
   ajenas. `--force-with-lease` sí, y solo sobre una rama propia abierta por una
   orden, después de un rebase: falla si alguien más la tocó, que es justamente la
   garantía que lo hace seguro.
-- **Tocar el sitio estático `armandoduarte-web`, el scaffold viejo
-  `Development/Codice` o el repo de Omnia.** Son referencias de solo lectura.
+- **Tocar el sitio estático, que desde la orden #04 vive en `qa/referencia/` de
+  este mismo repo**, el scaffold viejo `Development/Codice` o el repo de Omnia.
+  Son referencias de solo lectura. La de `qa/referencia/` lo es por una razón
+  que se paga sola: es contra lo que el guardián de fidelidad mide el port, y
+  editarla es mover la vara en vez de saltarla. Si la web tiene que cambiar, se
+  cambia en `apps/web` y la diferencia se declara en `e2e/cambios-visibles.ts`.
+  (Antes esta línea decía «el repo `armandoduarte-web`». Ese repo ahora es éste:
+  la regla no cambió de sentido, cambió de dirección postal.)
 
 **Antes de cada commit, sin excepción:**
 
 ```sh
 pnpm check:tuteo && pnpm check:i18n && pnpm check:estilo && pnpm check:tokens \
-  && pnpm typecheck && pnpm test && pnpm --filter @codice/web build
+  && pnpm check:secretos && pnpm typecheck && pnpm test \
+  && pnpm --filter @codice/web build
 ```
 
 Rojo = no se commitea.
