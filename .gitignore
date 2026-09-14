@@ -1,2 +1,24 @@
+node_modules/
+dist/
+build/
+.vercel
 .DS_Store
-.vercel/
+*.local
+
+# El reporte que deja cada suite para el guardián de guardianes. Se borra y se
+# vuelve a escribir en cada corrida: versionarlo sería guardar el resultado de
+# ayer con cara de resultado de hoy.
+.vitest-report.json
+
+# Lo que deja Playwright cuando un guardián de fidelidad se cae: trazas y
+# capturas del que falló. Son para mirar en el momento, no para versionar.
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/.playwright-report.json
+
+# Las capturas de referencia del guardián de fidelidad. NO se versionan, y es la
+# mitad de cómo funciona: se reescriben en cada corrida **desde el sitio
+# estático**, que es la fuente. Una captura guardada en el repo envejece —y el
+# día que envejezca, el guardián estaría comparando el port contra una foto
+# vieja de sí mismo en vez de contra la web que existe.
+apps/web/e2e/*-snapshots/

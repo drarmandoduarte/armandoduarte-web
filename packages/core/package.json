@@ -1,0 +1,15 @@
+{
+  "name": "@codice/core",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Tipos, contratos e i18n compartidos de Códice. Ninguna regla de negocio fuera de acá.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  }
+}
