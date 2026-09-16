@@ -1,5 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { TELEFONO_TALLER } from '@codice/core';
 import { BotonWhatsApp } from '../comun/BotonWhatsApp';
+import { Foto } from '../comun/Foto';
+import { Icono } from '../comun/Icono';
 import { Seccion } from '../comun/Seccion';
 
 /**
@@ -12,11 +15,19 @@ import { Seccion } from '../comun/Seccion';
  */
 export function Programa() {
   const { t } = useTranslation();
+  /* El cuarto valor es el ícono de Lucía. El orden es el que ella marcó sobre
+     la captura: cerebro, emociones, las cinco victorias, comunicación. */
   const nucleos = [
-    ['01', '1', 'uno'],
-    ['02', '2', 'dos'],
-    ['03', '3', 'tres'],
-    ['04', '3', 'cuatro'],
+    ['01', '1', 'uno', 'cerebro'],
+    ['02', '2', 'dos', 'emociones'],
+    ['03', '3', 'tres', 'victorias'],
+    ['04', '3', 'cuatro', 'comunicacion'],
+  ] as const;
+
+  const llevas = [
+    ['01', 'uno', 'llevas-claridad'],
+    ['02', 'dos', 'llevas-palabras'],
+    ['03', 'tres', 'llevas-serenidad'],
   ] as const;
 
   return (
@@ -26,9 +37,13 @@ export function Programa() {
         {t('taller.programa.titulo1')}<br /><span className="suave">{t('taller.programa.titulo2')}</span>
       </h2>
       <div className="pasos">
-        {nucleos.map(([n, demora, clave]) => (
+        {nucleos.map(([n, demora, clave, icono]) => (
           <div className="paso reveal" data-d={demora} key={n}>
-            <div className="paso__head"><span className="paso__num">{n}</span><span className="paso__line" /></div>
+            <div className="paso__head">
+              <span className="paso__num">{n}</span>
+              <Icono nombre={icono} ancho={48} alto={48} clase="paso__icono" />
+              <span className="paso__line" />
+            </div>
             <h3><b>{t(`taller.programa.${clave}.rotulo`)}</b>{t(`taller.programa.${clave}.titulo`)}</h3>
             <p>{t(`taller.programa.${clave}.texto1`)}</p>
             <p>{t(`taller.programa.${clave}.texto2`)}</p>
@@ -41,15 +56,29 @@ export function Programa() {
         <span className="eyebrow reveal">{t('taller.llevas.eyebrow')}</span>
         <h2 className="display-m u-mt-4 reveal" data-d="1">{t('taller.llevas.titulo')}</h2>
         <div className="tres reveal" data-d="2">
-          <div><span className="n">01</span><h3>{t('taller.llevas.unoTitulo')}</h3><p>{t('taller.llevas.unoTexto')}</p></div>
-          <div><span className="n">02</span><h3>{t('taller.llevas.dosTitulo')}</h3><p>{t('taller.llevas.dosTexto')}</p></div>
-          <div><span className="n">03</span><h3>{t('taller.llevas.tresTitulo')}</h3><p>{t('taller.llevas.tresTexto')}</p></div>
+          {llevas.map(([n, clave, foto]) => (
+            <div key={n}>
+              <figure>
+                <Foto
+                  nombre={foto}
+                  alt={t(`taller.llevas.${clave}FotoAlt`)}
+                  ancho={800}
+                  alto={1000}
+                  tamanos="(max-width:900px) 92vw, 30vw"
+                />
+              </figure>
+              <span className="n">{n}</span>
+              <h3>{t(`taller.llevas.${clave}Titulo`)}</h3>
+              <p>{t(`taller.llevas.${clave}Texto`)}</p>
+            </div>
+          ))}
         </div>
         <div className="hero-cta reveal" data-d="3">
           <BotonWhatsApp
+            telefono={TELEFONO_TALLER}
             mensaje={t('comun.mensajes.programa')}
             texto={t('taller.llevas.cta')}
-            clase="btn btn--ocre"
+            clase="btn btn--naranja"
           />
         </div>
       </div>

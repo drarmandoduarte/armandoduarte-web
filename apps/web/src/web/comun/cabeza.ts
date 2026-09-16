@@ -8,7 +8,7 @@ import { RECURSOS_I18N } from '@codice/core';
  * ── Por qué es una lista de etiquetas y no un componente ──────────────────
  * Porque lo consumen **dos** cosas muy distintas: el prerender, que lo escribe
  * como texto dentro de la plantilla de Vite antes de que exista un navegador, y
- * el cliente, que lo ajusta al navegar de `/` a `/taller` sin recargar. Una
+ * el cliente, que lo ajusta al navegar de `/` a `/merida` sin recargar. Una
  * lista de datos sirve para las dos; un componente, para ninguna de las dos
  * bien.
  *
@@ -45,7 +45,7 @@ const ICONOS: Etiqueta[] = [
 /** Las rutas canónicas, que no son las del router: `/` lleva barra y las otras no. */
 const CANONICA: Record<Pagina, string> = {
   inicio: `${SITIO}/`,
-  taller: `${SITIO}/taller`,
+  taller: `${SITIO}/merida`,
   privacidad: `${SITIO}/privacidad`,
   terminos: `${SITIO}/terminos`,
 };
@@ -110,7 +110,7 @@ export function cabezaHtml(pagina: Pagina): string {
 /**
  * El head en el cliente. En una carga directa no cambia nada —el prerender ya
  * lo dejó escrito— y su trabajo aparece al navegar dentro de la web: sin esto,
- * ir de `/` a `/taller` dejaría el título de la home en la pestaña.
+ * ir de `/` a `/merida` dejaría el título de la home en la pestaña.
  *
  * Solo toca lo que puede cambiar entre páginas. Los iconos son los mismos en
  * las cuatro y no se tocan.

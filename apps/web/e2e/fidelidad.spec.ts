@@ -1,64 +1,65 @@
 import { expect, test, type Page } from '@playwright/test';
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
-import { PUERTO_ESTATICO, PUERTO_PORT } from '../playwright.config';
-import { CAMBIOS_VISIBLES_03 } from './cambios-visibles';
+import { PUERTO_PORT } from '../playwright.config';
 
 /**
- * «Indistinguible o no se cierra» — orden Códice #01, C3.
+ * El guardián de fidelidad — orden Códice #01 (C3), con referencia nueva desde
+ * la #05 (D24).
  *
  * ── Qué mide, y por qué cuatro cosas y no una ─────────────────────────────
- * La orden pide que la versión React sea indistinguible de la estática, y
- * «indistinguible» tiene cuatro caras que se rompen por separado:
+ * «Indistinguible» tiene cuatro caras que se rompen por separado:
  *
  *   a · **el texto visible**, comparado con igualdad estricta. Caza una palabra
  *       perdida en una clave de i18n, que ninguna captura al 0,3 % vería;
  *   b · **los píxeles**, página completa. Caza el espacio, el color y la fuente:
  *       lo que un texto idéntico puede seguir dibujando mal;
  *   c · **los `href`, en orden**, con sus `text=` de WhatsApp. Caza el botón que
- *       quedó apuntando al mensaje equivocado —invisible en la captura, y lo que
- *       le llega a Armando por teléfono;
+ *       quedó apuntando al mensaje —o al teléfono— equivocado: invisible en la
+ *       captura, y lo que le llega a alguien por teléfono;
  *   d · **el `<head>`**. Caza lo que solo se ve en Google y en la vista previa de
  *       WhatsApp: título, descripción, canónica e imagen de compartir.
  *
  * Ninguna de las cuatro sobra: cada una caza algo que las otras tres dejan pasar.
  *
- * ── Desde la #03: la referencia es «el estático MÁS el delta declarado» ───
- * La orden del contraste cambió tres tokens y dos reglas, así que el estático y
- * el port ya no dibujan lo mismo. En vez de bajar el umbral o guardar capturas
- * en el repo, al sitio estático se le inyecta `CAMBIOS_VISIBLES_03` antes de
- * capturarlo. La referencia se sigue generando en vivo, el presupuesto sigue
- * siendo **cero píxeles**, y lo que el guardián afirma es más fuerte: que la
- * única diferencia entre las dos versiones es esa lista de cinco líneas.
+ * ── Contra qué compara, y por qué cambió (orden #05, G · D24) ─────────────
+ * Hasta la #04 comparaba contra **el sitio estático en vivo**, servido desde
+ * `qa/referencia/`, a cero píxeles. Su trabajo era probar que el port de la #01
+ * era fiel, y lo probó: doce comprobaciones en verde con `threshold: 0`.
  *
- * El texto, los `href` y el `<head>` se comparan **sin** el delta, porque el
- * delta no los toca: si alguno se moviera, es un defecto y tiene que verse.
+ * La #05 es la primera orden que cambia la web **a pedido del cliente** —la
+ * paleta entera, ocho íconos, seis fotografías, dos teléfonos y una ruta— y
+ * contra el estático ya no hay nada que probar. Sostener esa comparación habría
+ * significado inyectarle al estático treinta «cambios visibles» declarados, que
+ * es la técnica de la #03 llevada al punto en que deja de ser una declaración
+ * legible y pasa a ser una segunda implementación de la web.
  *
- * ── Cómo se compara una captura contra otra página ────────────────────────
- * `toHaveScreenshot` compara contra un archivo de referencia, no contra otra
- * pestaña. Así que primero se abre el sitio estático, se captura, y **esa
- * captura se escribe como referencia**; después se le pide al port que coincida.
- * El resultado es el que pide la orden —diferencia contra el estático, no contra
- * una imagen guardada en el repo— y de yapa, cuando falla, Playwright deja el
- * diff en `test-results/` con los píxeles marcados en rojo.
+ * Así que la referencia cambia; **el rigor no**. Ahora se compara contra las
+ * capturas de la última versión aprobada, versionadas en `e2e/__snapshots__/`.
+ * El presupuesto sigue siendo **cero píxeles**.
  *
- * Las referencias no se versionan: se regeneran en cada corrida desde el sitio
- * estático, que es la fuente. Una captura guardada en el repo envejece.
+ * ── Lo que hace que una captura guardada no envejezca ────────────────────
+ * La #01 tenía razón en su objeción: una captura en el repo envejece, y al mes
+ * nadie sabe si el rojo es un defecto o la imagen vieja. Lo que la desactiva no
+ * es no guardarlas: es **quién puede cambiarlas y con qué ruido**.
  *
- * Desde la orden #04 ese sitio estático es `qa/referencia/` de este mismo repo
- * —no un repo de al lado—: la fuente está versionada y no depende de una ruta
- * externa. La ruta la resuelve `playwright.config.ts`.
+ * Se actualizan solo con `--update-snapshots`, y el PR que lo haga tiene que
+ * decir la frase «capturas actualizadas por la orden #NN» con la lista de qué
+ * cambió. Un PR que actualiza capturas sin decir por qué no se mergea. Es la
+ * regla de Omnia: un guardián fija una decisión, y la decisión se revisa en el
+ * mismo PR que la cambia. Una captura vieja deja de ser un misterio cuando hay
+ * un renglón que dice quién la movió.
  *
- * ── El piso ──────────────────────────────────────────────────────────────
- * Antes de comparar se afirma que las dos páginas **trajeron algo**: más de 500
- * caracteres de texto visible cada una. Sin eso, dos páginas rotas se parecen
- * muchísimo — `'' === ''` es verdadero y pasaría en verde. Es el mismo piso que
- * el resto de la casa, puesto antes de la afirmación que sostiene.
+ * ── Por qué el texto, los `href` y el `<head>` van una sola vez por página ─
+ * El texto **sí** cambia con el ancho —a 600 px o menos, `.hd__menu span` y
+ * `.marca small` se ocultan— así que se guarda uno por ancho. Los `href` y el
+ * `<head>` no dependen del ancho: guardarlos tres veces serían dos archivos que
+ * solo pueden decir lo mismo, y treinta y seis archivos casi idénticos esconden
+ * la señal en vez de mostrarla. Si algún día uno de los dos dependiera del
+ * ancho, eso sería el hallazgo — y esta nota, el lugar donde se lo discute.
  */
 
 const PAGINAS = [
   { nombre: 'inicio', ruta: '/' },
-  { nombre: 'taller', ruta: '/taller' },
+  { nombre: 'taller', ruta: '/merida' },
   { nombre: 'privacidad', ruta: '/privacidad' },
   { nombre: 'terminos', ruta: '/terminos' },
 ] as const;
@@ -68,44 +69,60 @@ const ANCHOS = [1440, 900, 390] as const;
 const PISO_DE_TEXTO = 500;
 
 /**
- * Cero píxeles de diferencia, y no el 0,3 % que la orden puso de presupuesto.
+ * Cero píxeles de diferencia, y no el 0,3 % que la orden #01 puso de presupuesto.
  *
- * ── Por qué se bajó ──────────────────────────────────────────────────────
- * Porque el 0,3 % **no caza nada a esta escala**, y está medido. La mutación de
- * control de esta orden —cambiar `var(--ocre)` por `var(--teal)` en `.eyebrow`,
- * o sea que el rótulo «LEGAL» de la página de privacidad cambie de color—
- * mueve **43 píxeles** sobre más de tres millones. Con el umbral en 0,3 % las
- * tres comprobaciones salieron **verdes** con la palabra pintada de otro color
- * en el navegador. Un guardián que aprueba eso no es un guardián: es un
- * presupuesto.
+ * ── Por qué se bajó, medido ──────────────────────────────────────────────
+ * Porque el 0,3 % **no caza nada a esta escala**. La mutación de control de la
+ * #01 —cambiar el color del rótulo «LEGAL» de la página de privacidad— mueve
+ * **43 píxeles** sobre más de tres millones. Con el umbral en 0,3 % las tres
+ * comprobaciones salían **verdes** con la palabra pintada de otro color. Un
+ * guardián que aprueba eso no es un guardián: es un presupuesto.
  *
- * El 0,3 % era razonable como presupuesto antes de medir. Medido, el port
- * dibuja **exactamente los mismos píxeles que el sitio estático**: con
- * `threshold: 0` y `maxDiffPixelRatio: 0` —o sea, ni un píxel puede diferir en
- * nada— las doce comprobaciones pasan. No hay nada que presupuestar.
- *
- * Queda el `threshold` por píxel que trae Playwright (0,2 en YIQ), que tolera
- * el antialias de una máquina a otra sin tolerar un color distinto. Si algún día
+ * Queda el `threshold` por píxel que trae Playwright (0,2 en YIQ), que tolera el
+ * antialias de una máquina a otra sin tolerar un color distinto. Si algún día
  * este número tiene que subir, sube con la medición al lado.
  */
 const DIFERENCIA_MAXIMA = 0;
 
-const url = (puerto: number, ruta: string) => `http://127.0.0.1:${puerto}${ruta}`;
+const url = (ruta: string) => `http://127.0.0.1:${PUERTO_PORT}${ruta}`;
 
 /** Deja la página quieta y con todo revelado, lista para medir. */
-async function asentar(page: Page, ruta: string, puerto: number, ancho: number, delta?: string) {
+async function asentar(page: Page, ruta: string, ancho: number) {
   await page.setViewportSize({ width: ancho, height: 900 });
-  await page.goto(url(puerto, ruta), { waitUntil: 'load' });
-  if (delta) await page.addStyleTag({ content: delta });
+  await page.goto(url(ruta), { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
-  /* Hasta el final y de vuelta arriba: el sitio estático revela con un
-     IntersectionObserver, y aunque `reducedMotion` ya deja todo opaco, el
-     recorrido dispara el mismo trabajo de layout de los dos lados. Volver
-     arriba deja el header en su estado de reposo, que es donde se lo mide. */
+  /* Hasta el final y de vuelta arriba: revela todo lo que espera al
+     IntersectionObserver y dispara el mismo trabajo de layout que haría alguien
+     leyendo. Volver arriba deja el header en su estado de reposo, que es donde
+     se lo mide. */
   await page.evaluate(async () => {
     window.scrollTo(0, document.body.scrollHeight);
     await new Promise((r) => setTimeout(r, 120));
     window.scrollTo(0, 0);
+  });
+  /* Y que las imágenes estén enteras antes de la foto: desde la #05 hay catorce
+     —ocho íconos y seis fotografías— y casi todas son `loading="lazy"`. Una
+     captura tomada a mitad de la decodificación es un rojo que no se repite.
+
+     Dos detalles, los dos aprendidos rompiéndolo:
+
+     · **`loading` pasa a `eager` antes de esperar.** Una imagen perezosa que
+       quedó lejos del viewport no empieza a cargar nunca, así que `complete`
+       sigue en `false` y su `onload` no llega: la primera versión de esto se
+       colgaba los 30 segundos del timeout en las tres medidas del taller.
+     · **la espera tiene techo.** Si algún día una imagen falta de verdad, esto
+       tiene que dejar que la comparación siga y se ponga roja por la imagen
+       rota —que es el defecto— y no por un timeout del corredor, que no dice
+       cuál era el problema. */
+  await page.evaluate(async () => {
+    const imagenes = [...document.images];
+    imagenes.forEach((i) => { i.loading = 'eager'; });
+    const conTecho = (p: Promise<unknown>) =>
+      Promise.race([p, new Promise((r) => setTimeout(r, 5000))]);
+    await Promise.all(imagenes.map((i) => conTecho(
+      i.complete ? Promise.resolve() : new Promise((r) => { i.onload = r; i.onerror = r; }),
+    )));
+    await conTecho(Promise.all(imagenes.map((i) => i.decode().catch(() => {}))));
   });
   await page.waitForTimeout(400);
 }
@@ -127,36 +144,32 @@ const cabeza = (page: Page) => page.evaluate(() => ({
 }));
 
 for (const { nombre, ruta } of PAGINAS) {
-  test.describe(`${nombre} · el port es indistinguible del sitio estático`, () => {
+  test.describe(`${nombre} · la web dibuja lo que la última versión aprobada dibujaba`, () => {
     for (const ancho of ANCHOS) {
-      test(`${ancho}px`, async ({ page }, info) => {
-        const estatica = await page.context().newPage();
+      test(`${ancho}px`, async ({ page }) => {
+        await asentar(page, ruta, ancho);
 
-        await asentar(estatica, ruta, PUERTO_ESTATICO, ancho, CAMBIOS_VISIBLES_03);
-        await asentar(page, ruta, PUERTO_PORT, ancho);
+        const texto = await textoVisible(page);
 
-        const [textoEstatico, textoPort] = [await textoVisible(estatica), await textoVisible(page)];
-
-        /* EL PISO, PRIMERO: dos páginas vacías son idénticas. */
-        expect(textoEstatico.length, `el sitio estático no trajo texto en ${ruta}`).toBeGreaterThan(PISO_DE_TEXTO);
-        expect(textoPort.length, `el port no trajo texto en ${ruta}`).toBeGreaterThan(PISO_DE_TEXTO);
+        /* EL PISO, PRIMERO: una página vacía coincide consigo misma. Sin esto,
+           un `dist/` a medio escribir se compararía contra una captura de un
+           `dist/` a medio escribir y saldría en verde. */
+        expect(texto.length, `la página no trajo texto en ${ruta}`).toBeGreaterThan(PISO_DE_TEXTO);
 
         // (a) el texto visible
-        expect(textoPort, 'el texto visible no es idéntico').toBe(textoEstatico);
+        expect(texto).toMatchSnapshot(`${nombre}-${ancho}-texto.txt`);
 
-        // (c) los enlaces, en orden
-        expect(await enlaces(page), 'los href no son los mismos, o no en el mismo orden')
-          .toEqual(await enlaces(estatica));
+        if (ancho === ANCHOS[0]) {
+          // (c) los enlaces, en orden — no dependen del ancho
+          expect(JSON.stringify(await enlaces(page), null, 2))
+            .toMatchSnapshot(`${nombre}-enlaces.json`);
 
-        // (d) el head
-        expect(await cabeza(page), 'el <head> no coincide').toEqual(await cabeza(estatica));
+          // (d) el head — tampoco
+          expect(JSON.stringify(await cabeza(page), null, 2))
+            .toMatchSnapshot(`${nombre}-cabeza.json`);
+        }
 
-        // (b) los píxeles: la captura del estático se vuelve la referencia
-        const referencia = info.snapshotPath(`${nombre}-${ancho}.png`);
-        mkdirSync(dirname(referencia), { recursive: true });
-        writeFileSync(referencia, await estatica.screenshot({ fullPage: true, animations: 'disabled' }));
-        await estatica.close();
-
+        // (b) los píxeles
         await expect(page).toHaveScreenshot(`${nombre}-${ancho}.png`, {
           fullPage: true,
           animations: 'disabled',

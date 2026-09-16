@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { CONTACTO_DE_PAGINA } from '@codice/core';
 import { Cabecera } from './Cabecera';
 import { Pie } from './Pie';
 import { useCabeza, type Pagina } from './cabeza';
@@ -16,9 +17,15 @@ import { useCabeza, type Pagina } from './cabeza';
  * editaran juntas; la orden web #02 mostró el costo cuando no: hubo que sacar el
  * enlace de Instagram del pie **de las cuatro**, una por una.
  *
- * `mensaje` es lo único que cambia entre páginas: el texto con el que se abre
- * WhatsApp desde el header y desde el menú. En `/taller` dice que quiere
- * reservar; en las otras tres, saluda.
+ * `mensaje` es el texto con el que se abre WhatsApp desde el header y desde el
+ * menú: en `/merida` dice que quiere reservar; en las otras tres, saluda.
+ *
+ * El **número** ya no es el mismo en las cuatro (orden #05, E): sale de
+ * `CONTACTO_DE_PAGINA`, en `@codice/core`, indexado por la página que este
+ * componente ya recibía. No se pasa por prop desde cada página a propósito —
+ * serían cuatro lugares donde poner el de la otra— y el pie lo hereda de acá,
+ * que es lo que hace que el pie del taller lleve el de Mérida sin que nadie se
+ * acuerde de decírselo.
  */
 export function Marco({
   pagina,
@@ -30,12 +37,13 @@ export function Marco({
   children: ReactNode;
 }) {
   useCabeza(pagina);
+  const contacto = CONTACTO_DE_PAGINA[pagina];
 
   return (
     <>
-      <Cabecera mensaje={mensaje} />
+      <Cabecera telefono={contacto.numero} mensaje={mensaje} />
       <main>{children}</main>
-      <Pie />
+      <Pie telefono={contacto.numero} visible={contacto.visible} />
     </>
   );
 }

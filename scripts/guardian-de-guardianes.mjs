@@ -49,10 +49,16 @@ const SUITES = [
  * Y la quinta suite, que no es de Vitest: el guardián de fidelidad.
  *
  * ── Por qué entra a `pnpm test` y no queda como un comando aparte ─────────
- * Porque **lo que hay que acordarse de correr no se corre**, y esta es la única
- * comprobación que mide lo que la orden #01 pide: que el port sea indistinguible
- * del sitio estático. Dejarlo en `pnpm test:e2e` sería dejar la afirmación
- * central del trabajo a cargo de la memoria de alguien.
+ * Porque **lo que hay que acordarse de correr no se corre**, y es la única
+ * comprobación que mide lo que se ve: que la web dibuje lo que la última versión
+ * aprobada dibujaba, a cero píxeles. Dejarlo en `pnpm test:e2e` sería dejar la
+ * afirmación central del trabajo a cargo de la memoria de alguien.
+ *
+ * Desde la orden #05 (D24) compara contra las capturas versionadas en
+ * `apps/web/e2e/__snapshots__/` y no contra el sitio estático: la web cambia a
+ * pedido del cliente y el estático dejó de ser contra qué medirla. El rigor es
+ * el mismo —cero píxeles— y lo que lo sostiene es que las capturas solo se
+ * actualizan con `--update-snapshots` y con la frase declarada en el PR.
  *
  * Cuesta unos cuarenta segundos y un build. Es caro y es lo que vale: el resto
  * de la gate puede estar verde con la web dibujando otra cosa.
@@ -329,8 +335,8 @@ function main() {
   const declarados = Object.values(reportes).reduce((s, r) => s + (r?.numTotalTests ?? 0), 0) + enNavegador;
   const saltados = Object.values(reportes).reduce((s, r) => s + (r?.numPendingTests ?? 0) + (r?.numTodoTests ?? 0), 0);
   console.log(
-    `\n✓ guardián de guardianes: ${declarados} tests declarados —${enNavegador} de ellos comparando el port `
-    + `contra el sitio estático—, ${saltados} saltados (todos con permiso escrito), ninguna suite por debajo `
+    `\n✓ guardián de guardianes: ${declarados} tests declarados —${enNavegador} de ellos en Chromium, `
+    + `sobre la web dibujada—, ${saltados} saltados (todos con permiso escrito), ninguna suite por debajo `
     + 'de su piso.\n',
   );
 }

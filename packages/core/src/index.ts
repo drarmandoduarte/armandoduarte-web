@@ -11,4 +11,11 @@
 
 export { RECURSOS_I18N, IDIOMAS } from './i18n/recursos';
 export type { Idioma } from './i18n/recursos';
-export { TELEFONO_WHATSAPP, TELEFONO_VISIBLE, enlaceWhatsApp } from './web/contacto';
+export {
+  TELEFONO_GABY,
+  TELEFONO_GABY_VISIBLE,
+  TELEFONO_TALLER,
+  TELEFONO_TALLER_VISIBLE,
+  CONTACTO_DE_PAGINA,
+  enlaceWhatsApp,
+} from './web/contacto';

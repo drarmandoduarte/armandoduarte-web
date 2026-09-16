@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Retrato } from '../comun/Retrato';
 import { Seccion } from '../comun/Seccion';
 
 /**
@@ -25,7 +26,7 @@ export function Facilitador() {
     <Seccion id="facilitador" tono="oscuro" contenedor={false}>
       <div className="container grid-2 centro">
         <figure className="foto foto--libre reveal" style={{ maxWidth: '480px' }}>
-          <img src="img/armando-parado-teal.jpg" width={1094} height={1750} alt={t('taller.facilitador.fotoAlt')} loading="lazy" />
+          <Retrato cual="de-pie" alt={t('taller.facilitador.fotoAlt')} tamanos="(max-width:900px) 92vw, 480px" />
         </figure>
         <div>
           <span className="eyebrow reveal">{t('taller.facilitador.eyebrow')}</span>

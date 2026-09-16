@@ -17,8 +17,8 @@ alguien lo va a leer en el PR. Ése es el punto.
 
 | paquete | piso |
 |---|---|
-| `@codice/ui` | 21 |
-| `@codice/core` | 12 |
+| `@codice/ui` | 35 |
+| `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
 | `@codice/web` | 13 |
 | `@codice/navegador` | 14 |
@@ -34,6 +34,35 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #05
+
+`@codice/ui` sube de 21 a 35 y `@codice/core` de 12 a 23. Los veinticinco tests
+nuevos son de las dos cosas que la orden #05 podía romper en silencio.
+
+**Contraste (14 en `@codice/ui`).** La web cambió a la paleta del manual de
+Construyendo Familias Fuertes, así que hay pares nuevos: el naranja de texto
+contra los tres fondos claros, el crema contra el teal oscuro, el ámbar contra la
+tinta. Los ocho pares viejos —el ocre y el teal de D6— **no se borraron**: siguen
+siendo ciertos y son los que va a usar la app. Tres de los nuevos son al revés,
+afirmaciones de lo que **no** llega: el teal claro sobre el teal oscuro (2,56), el
+teal claro sobre el cálido (2,73) y el ámbar sobre el teal (2,81, el pendiente
+4c). Están escritos como igualdad y no como «menor que» a propósito: el día que
+alguien los arregle, el test se pone rojo y lo obliga a venir a borrar la
+excepción. Una excepción que se arregla sola en silencio vuelve a los seis meses.
+
+**Los dos teléfonos (11 en `@codice/core`).** Desde la #05 la portada llama a
+Gaby y el taller a Mérida, y el modo de fallar no es un enlace roto: es un enlace
+perfecto que suena en el teléfono equivocado. Eso no lo ve una captura, no lo ve
+el `<head>` y no lo caza el guardián de fidelidad. Las dos comprobaciones que
+importan son cruzadas —ningún `wa.me` de la portada con el número del taller, y
+ninguno del taller con el de Gaby— y van en las dos direcciones por separado:
+una sola dejaría pasar la mitad de los cruces.
+
+`@codice/web` y `@codice/navegador` **no se mueven**, y vale decir por qué no: el
+guardián de fidelidad sigue siendo doce comprobaciones —cuatro páginas por tres
+anchos—, lo que cambió es contra qué compara (D24). Mismo número, referencia
+nueva.
 
 ## Lo que movió la orden #03
 

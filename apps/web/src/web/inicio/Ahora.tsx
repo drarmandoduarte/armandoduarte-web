@@ -22,7 +22,7 @@ export function Ahora() {
             <span>{t('inicio.ahora.meta3')}</span>
           </p>
         </div>
-        <a href="/taller" className="link">{t('inicio.ahora.cta')} <span className="btn-arrow">→</span></a>
+        <a href="/merida" className="link">{t('inicio.ahora.cta')} <span className="btn-arrow">→</span></a>
       </div>
     </section>
   );

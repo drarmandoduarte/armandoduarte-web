@@ -72,8 +72,8 @@ function contraste(hexA, hexB) {
 
 describe('los tokens de Códice', () => {
   it('la versión del documento es la que esta orden dejó', () => {
-    expect(tokens.$meta.version).toBe('1.1.1');
-    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.1.1');
+    expect(tokens.$meta.version).toBe('1.2.0');
+    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.0');
   });
 
   /*
@@ -106,6 +106,42 @@ describe('los tokens de Códice', () => {
       ['ink.primary sobre brand.ochre.mid',        C.ink.primary.value, C.brand.ochre.mid],
     ];
 
+    /*
+     * ── Y los pares de la paleta CFF (orden #05) ──────────────────────────
+     *
+     * Los de arriba siguen siendo ciertos y siguen valiendo: describen el ocre
+     * y el teal de D6, que es lo que **la app** va a usar. Lo que la orden #05
+     * cambió es a cuál mira **la web**, así que sus pares se agregan, no se
+     * reemplazan. Borrar los de arriba sería dejar de vigilar la paleta de la
+     * app el día que alguien la toque.
+     *
+     * Dos umbrales distintos y por eso dos listas. El de 4,5 es el de texto
+     * normal; el de 3 es el que la WCAG da para texto grande (≥ 24 px) y para
+     * lo que no es texto —íconos, líneas, aros—. Escribir los dos grupos con el
+     * mismo número habría sido más corto y habría prohibido el naranja del
+     * manual en los íconos, que es exactamente lo que la orden vino a poner.
+     */
+    const PARES_CFF_45 = [
+      ['cff.orangeText sobre background.cream',       C.cff.orangeText.value, C.background.cream.value],
+      ['cff.orangeText sobre background.surfaceWarm', C.cff.orangeText.value, C.background.surfaceWarm.value],
+      ['cff.orangeText sobre background.surface',     C.cff.orangeText.value, C.background.surface.value],
+      ['background.cream sobre cff.orangeText',       C.background.cream.value, C.cff.orangeText.value],
+      ['background.cream sobre cff.tealDark',         C.background.cream.value, C.cff.tealDark.value],
+      ['cff.amber sobre ink.primary',                 C.cff.amber.value, C.ink.primary.value],
+      ['ink.primary sobre cff.amber',                 C.ink.primary.value, C.cff.amber.value],
+    ];
+
+    /* Solo para ≥ 24 px, íconos y líneas. Ninguno de estos tres puede usarse
+       como texto chico, y el comentario es la mitad del guardián: sin él, el
+       número 3 se lee como «acá alcanza con menos» en vez de «acá el texto es
+       grande». Dónde se usa cada uno está en `codice-tokens.css`. */
+    const PARES_CFF_3 = [
+      ['cff.orange sobre background.cream',      C.cff.orange.value, C.background.cream.value],
+      ['cff.orange sobre background.surface',    C.cff.orange.value, C.background.surface.value],
+      ['cff.tealLight sobre background.cream',   C.cff.tealLight.value, C.background.cream.value],
+      ['cff.tealLight sobre background.surface', C.cff.tealLight.value, C.background.surface.value],
+    ];
+
     it('piso · la fórmula sabe medir lo que ya se sabe', () => {
       /* Negro sobre blanco es 21:1 y un color contra sí mismo es 1:1. Sin este
          piso, una fórmula rota que devolviera siempre 21 pondría todo en verde. */
@@ -116,7 +152,7 @@ describe('los tokens de Códice', () => {
       expect(Number(contraste('#7A7267', '#F3EBDD').toFixed(2))).toBe(4);
     });
 
-    for (const [nombre, fg, bg] of PARES) {
+    for (const [nombre, fg, bg] of [...PARES, ...PARES_CFF_45]) {
       it(`${nombre} ≥ 4,5`, () => {
         expect(
           Number(contraste(fg, bg).toFixed(2)),
@@ -125,6 +161,63 @@ describe('los tokens de Códice', () => {
         ).toBeGreaterThanOrEqual(4.5);
       });
     }
+
+    for (const [nombre, fg, bg] of PARES_CFF_3) {
+      it(`${nombre} ≥ 3 · solo para ≥ 24 px, íconos y líneas`, () => {
+        expect(
+          Number(contraste(fg, bg).toFixed(2)),
+          `${fg} sobre ${bg} no llega a 3:1, que es el umbral de la WCAG para texto grande y para `
+          + 'lo que no es texto. Por debajo de eso no se puede usar ni siquiera en un ícono.',
+        ).toBeGreaterThanOrEqual(3);
+      });
+    }
+
+    /*
+     * El que NO pasa, escrito acá para que no se lo pueda olvidar.
+     *
+     * El ámbar sobre el teal da 2,81 y el umbral es 4,5: son los rótulos, los
+     * enlaces y las flechas de las secciones teal, y es el pendiente 4c. La #05
+     * lo movió de 2,51 a 2,81 sin querer —cambió la paleta, no el contraste— y
+     * lo dejó igual de lejos de AA.
+     *
+     * Está afirmado como igualdad y no como «menor que» a propósito: el día que
+     * alguien lo arregle, este test se pone rojo y lo obliga a venir hasta acá a
+     * borrar la excepción. Una excepción que se arregla sola en silencio vuelve
+     * a aparecer a los seis meses.
+     */
+    /*
+     * El teal claro sobre el teal oscuro: 2,56, y no llega ni al 3.
+     *
+     * La orden #05 lo daba por bueno —«acento sobre teal oscuro»— y medido no lo
+     * es: ni como texto grande, ni como ícono, ni como línea. Hoy no se usa así
+     * en ningún lado (`--teal-medio` no aparece ni una vez en `index.css`), o
+     * sea que no hay nada que arreglar; lo que hay es algo que impedir.
+     *
+     * Por eso está escrito como afirmación y no como comentario: el día que
+     * alguien ponga un ícono teal sobre una sección teal, va a venir a leer esto
+     * antes que a descubrirlo en Lighthouse. Sobre teal oscuro el acento que sí
+     * pasa es el crema (7,74), que es el que la hoja usa.
+     */
+    it('el teal claro NO sirve sobre el teal oscuro: 2,56', () => {
+      expect(
+        Number(contraste(C.cff.tealLight.value, C.cff.tealDark.value).toFixed(2)),
+        'si esto cambió, alguien movió uno de los dos teales del manual.',
+      ).toBe(2.56);
+    });
+
+    /* Y tampoco sobre el cálido: 2,73. Los íconos teal van sobre crema (3,03) y
+       sobre blanco (3,24), que son las dos secciones donde la #05 los puso. */
+    it('el teal claro NO sirve sobre el cálido: 2,73', () => {
+      expect(Number(contraste(C.cff.tealLight.value, C.background.surfaceWarm.value).toFixed(2))).toBe(2.73);
+    });
+
+    it('pendiente 4c · cff.amber sobre cff.tealDark sigue en 2,81 y no cumple AA', () => {
+      expect(
+        Number(contraste(C.cff.amber.value, C.cff.tealDark.value).toFixed(2)),
+        'si este número cambió, el pendiente 4c se movió: se actualiza acá y en `docs/tareas.md`, '
+        + 'que es donde dirección lo lee.',
+      ).toBe(2.81);
+    });
   });
 
   describe('la sección `web` describe el CSS que el navegador dibuja hoy', () => {

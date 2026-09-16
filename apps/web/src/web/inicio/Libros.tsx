@@ -17,7 +17,7 @@ export function Libros() {
       </h2>
       <div className="libros reveal" data-d="2">
         <article className="libro">
-          <div className="tapa ocre" aria-hidden="true">
+          <div className="tapa naranja" aria-hidden="true">
             <small>{t('inicio.libros.tapaAutor')}</small><b>{t('inicio.libros.unoTapa')}</b>
           </div>
           <div>
