@@ -177,6 +177,20 @@ por separado. Eso toca el contrato de `@codice/ui` —«un solo import y el prod
 tiene la marca»— y lo van a heredar el consultorio, la academia y el asistente:
 no es una decisión de una orden de la web. Queda medido y anotado.
 
+**La #05 le puso un segundo caso al mismo pendiente.** `terminos` bajó de 99 a 98
+—tres corridas de cada lado, sin una sola excepción— y la causa está aislada:
+`terminos.html` pesa **exactamente lo mismo** en las dos ramas (6.299 bytes, byte
+por byte, porque lo único que cambió en esa página es el teléfono del pie y los
+dos números tienen los mismos dígitos). La única variable es la hoja, que creció
+de 28.237 a **29.601 bytes** con las reglas de los íconos y las fotografías.
+`terminos` no usa ninguna y las baja igual, porque la web sirve una hoja para las
+cuatro páginas.
+
+O sea que partir el CSS ya no es sólo «el punto que le falta a la portada»:
+es también lo que hace que una orden que agrega una sección le cueste un punto a
+una página que no la tiene. Sigue siendo decisión de dirección y sigue tocando el
+contrato de `@codice/ui`.
+
 Dos caminos que se midieron y **empeoraron**, para que nadie los vuelva a
 intentar: mover los `<link rel="preload" as="image">` que React inyecta al
 `<head>` (86/86/87) y quitarlos del todo (70, LCP 5,78 s — hacen falta).
