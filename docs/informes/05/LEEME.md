@@ -1,7 +1,9 @@
 # Orden Códice #05 — La devolución de Lucía y de Armando
 
-Rama `web/05-devolucion` sobre `main`. La primera orden que cambia la web **a
-pedido del cliente**, bajo D23.
+Rama `web/05-devolucion` sobre `main` · PR #7.
+Previsualización: <https://armandoduarte-web-git-web-05-devolucion-drarmandoduarte-7842.vercel.app>
+
+La primera orden que cambia la web **a pedido del cliente**, bajo D23.
 
 Ocho capturas comentadas por Lucía Duarte (16/9, 20:41–22:29) y un mensaje de
 Armando, traducidos a paleta, íconos, fotografías, teléfonos y URL.
@@ -343,10 +345,38 @@ y sin cambios.
                             · el redirect existe en vercel.json de la raíz
 ```
 
-`/taller` → 308 → `/merida` **no se puede comprobar en local**: el servidor de
-pruebas sirve archivos y no lee `vercel.json`. Está declarado en el `vercel.json`
-de la raíz —que es el que Vercel lee desde la #04— y el guardián de enlaces
-verifica que la declaración esté. Se comprueba en la previsualización.
+Las redirecciones no se pueden comprobar en local —el servidor de pruebas sirve
+archivos y no lee `vercel.json`— así que se comprobaron **sobre la
+previsualización publicada**:
+
+```
+/                200
+/merida          200
+/privacidad      200
+/terminos        200
+/taller          308 → /merida
+/taller.html     308 → /taller → 308 → /merida     (dos saltos, ver abajo)
+/biografia       308 → /
+```
+
+Y el contenido publicado, que es la comprobación que de verdad importa:
+
+```
+portada    6 × wa.me/524621993143   ·   0 × wa.me/525555015641
+/merida    7 × wa.me/525555015641   ·   0 × wa.me/524621993143
+canónica de /merida   https://armandoduarte.com/merida
+x-robots-tag          noindex, nofollow        (sigue puesto, pendiente 2)
+```
+
+**`/taller.html` llega a `/merida` en dos saltos y no en uno.** `cleanUrls` de
+Vercel se aplica **antes** que los `redirects`, así que convierte `/taller.html`
+en `/taller` y recién ahí entra nuestra regla. El destino final es el correcto y
+los dos saltos son 308 permanentes, o sea que un buscador consolida igual. No se
+forzó a un salto porque la única manera sería apagar `cleanUrls`, que es lo que
+hace que toda la web sirva URLs sin `.html`. Es la misma cadena que ya tenía el
+sitio antes de esta orden —la #04 la registró como `/taller.html 308 → /taller`—
+y afecta sólo a quien tenga guardado un enlace con `.html`, que en esta web nunca
+se publicó.
 
 ### La gate
 
