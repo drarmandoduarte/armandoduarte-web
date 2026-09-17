@@ -18,7 +18,7 @@ usa.
 | #05 | La devolución de Lucía y de Armando: paleta CFF, íconos, fotos, dos teléfonos y `/merida` | **cerrada** (PR #7, mergeado el 16/9/2026) |
 | #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
 | #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | **cerrada** (PR #12, mergeado el 17/9/2026) |
-| #08 | La apertura: sacar el `noindex` sin abrir la puerta de atrás | en curso (rama `web/08-apertura`, sobre `main`) |
+| #08 | La apertura: sacar el `noindex` sin abrir la puerta de atrás | **cerrada** (PR #14, mergeado el 17/9/2026) |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -64,7 +64,7 @@ referencia de sus reglas.
 Queda una cosa sabida: si alguien activara el override de build en el dashboard,
 ese override le gana al archivo. Nadie tiene que tocarlo.
 
-### 2. Quitar `X-Robots-Tag: noindex, nofollow` · **resuelto en la #08, se cierra al verificar producción**
+### 2. Quitar `X-Robots-Tag: noindex, nofollow` ~~el día que se abra el dominio~~ · **CERRADO en la #08**
 
 Estuvo abierto desde la #01. La #08 lo resolvió, y **no borrando la cabecera**:
 condicionándola al host.
@@ -85,8 +85,44 @@ Y lo que faltaba de verdad: **nadie vigilaba `vercel.json`**. Quitar el `has` no
 ponía nada en rojo. La #08 escribió doce comprobaciones —seis por archivo— que
 ahora lo cazan.
 
-**Se cierra** cuando las mismas mediciones se repitan sobre `armandoduarte.com`
-en producción, después del merge.
+**Medido sobre producción el 17/9, después del merge** — que es lo que lo
+cierra:
+
+```
+armandoduarte.com                 (sin x-robots-tag)        ← indexable
+armandoduarte-web.vercel.app      x-robots-tag: noindex, nofollow   ← en las 4 rutas
+```
+
+Y el resto de la apertura, sobre el dominio propio:
+
+| | |
+|---|---|
+| las cuatro rutas | 200 |
+| `/taller` · `/biografia` · `/conferencias` | 308 |
+| `www` y `http` | 308 → `https://armandoduarte.com/` |
+| cabeceras de seguridad | las cinco, intactas |
+| canónicas y `og:url` | del dominio propio, sin `www` ni barra final salvo la home |
+| `robots.txt` y `sitemap.xml` | servidos, con `lastmod` 2026-09-17 |
+| `class="dato"` | 0 en las cuatro |
+
+**Lighthouse móvil sobre `armandoduarte.com`**, tres corridas, la peor:
+
+| página | SEO | accesibilidad | performance |
+|---|--:|--:|--:|
+| `/` | **100** | 100 | 97 |
+| `/merida` | **100** | 100 | 98 |
+| `/privacidad` | 66 | 100 | 99 |
+| `/terminos` | 66 | 100 | 99 |
+
+**El 66 de las dos legales es correcto y no se va a arreglar.** La única
+auditoría que baja es `is-crawlable` —«Page is blocked from indexing»— y la
+bloquea el `noindex, follow` que esas dos páginas llevan **a propósito**: un
+aviso de privacidad y unos términos de uso no van en Google. Las otras ocho
+auditorías de SEO pasan. Subirlas a 100 sería meter los legales al índice para
+contentar a un número.
+
+O sea: **SEO 100 en las dos páginas que se quieren indexar**, que es lo que la
+#08 vino a conseguir.
 
 ### 2b. Dar de alta Search Console y pedir la indexación · **de dirección**
 
