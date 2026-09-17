@@ -50,6 +50,47 @@ Vale para cualquier número que se cite como umbral, no solo para Lighthouse: un
 número sin su método vuelve a hacer perder media hora al que lo lea en tres
 meses, y esa media hora la paga alguien que no estaba en la conversación.
 
+### Cuando una consulta devuelve «no hay», confirmá que podías verlo
+
+**Ausencia de permiso se presenta como ausencia del dato.** Antes de actuar sobre
+un «no hay», hay que separar las dos cosas: que no exista, o que no lo puedas
+leer. Se confirma con una segunda consulta que sí tenga permiso, o probando la
+acción contra el guardián en vez de contra la consulta.
+
+**El caso, del 17/9/2026.** Para dejar el `docs/tareas.md` del cierre de la #09
+había que llevar un commit a `main`. Se preguntó por la protección de la rama:
+
+```
+GET /repos/.../branches/main/protection   →   404 Not Found
+GET /repos/.../rulesets                   →   []
+```
+
+Se leyó como **«`main` no está protegido»** y se intentó el push directo. Lo paró
+el remoto:
+
+```
+remote: - Changes must be made through a pull request.
+! [remote rejected] main -> main (protected branch hook declined)
+```
+
+La rama **sí** estaba protegida. El 404 no decía «no hay protección», decía «no
+tenés permiso para leer esta configuración» — la API de GitHub usa el mismo
+código para las dos cosas a propósito, para no filtrar la existencia del recurso.
+Y la lista vacía de rulesets tampoco era prueba: sólo dice que la protección no
+está implementada **por ese mecanismo**.
+
+**Es el mismo modo de falla que el guardián que lee la copia equivocada del
+token** (§ 14, y el `--crema` sin los dos puntos del § 5b): el dato existía y era
+otro, y la herramienta contestó con seguridad sobre lo que no había mirado. La
+diferencia con un rojo honesto es que acá **la respuesta parecía información**,
+no un error.
+
+Lo barato de esta regla es que el costo de confirmar es una consulta y el costo de
+no confirmar es una acción destructiva sobre algo protegido. Acá salió gratis
+porque **el contrato de Rodolfo ya prohibía tocar `main` directo** y el hook del
+remoto lo hizo cumplir: dos defensas independientes, y la que atajó no fue la
+lectura.
+
 ## Pendientes abiertos
 
 ### 1. Conectar Vercel al monorepo ~~· es de dirección~~ · **cerrado en la #04**
@@ -359,30 +400,34 @@ llega desde Google, las primeras visitas son casi todas.
   tipografías.
 - **Lo que no se rescató, y por qué**: los tests de paralelo y de prioridades no
   tienen sentido con una hoja sola, y los cuatro del salto de texto son del
-  pendiente 5c, que dirección decidió tratar en su propia orden.
+  pendiente 5c, que dirección **decidió no abrir** el 17/9/2026 (§ 5c). Siguen
+  guardados donde se escribieron, y por eso `web/09-css-en-dos` no se borra.
 - **El guardián de la #02** —«ningún otro `.js` en `dist/assets`»— **no hacía
   falta rescatarlo**: en `main` nunca se rompió. Se rompió y se restauró dentro
   de la rama de la #09, que no entra.
 - **El contrato de `@codice/ui` sigue siendo un solo import.** `CLAUDE.md` no
   cambia.
 - **El punto de `terminos`** —el segundo caso de este pendiente, donde una orden
-  que agrega una sección le cuesta un punto a una página que no la usa— **sigue
-  abierto, y se mudó al § 5e** con número propio: este pendiente queda cerrado y
-  algo abierto adentro de algo cerrado no se vuelve a leer. Partir por página era
-  lo que la #09 dejaba afuera explícitamente, y ahora se sabe que partir por
-  frecuencia de cambio no lo arregla.
-- **El salto de texto** que la #09 encontró midiendo el CLS **también queda
-  abierto, en el § 5c**, que hasta ahora se citaba sin existir.
+  que agrega una sección le cuesta un punto a una página que no la usa— **se mudó
+  al § 5e** con número propio, porque algo abierto adentro de algo cerrado no se
+  vuelve a leer. Dirección lo **cerró el 17/9/2026 con el mismo veredicto que
+  éste**: un punto en dos páginas legales no paga la orden. Queda medido que
+  partir por frecuencia de cambio no lo arregla.
+- **El salto de texto** que la #09 encontró midiendo el CLS quedó en el **§ 5c**,
+  que hasta acá se citaba sin existir. Dirección **no lo abre** (17/9/2026): no lo
+  cobra nadie y no se mide estable. Sus cuatro tests siguen en
+  `web/09-css-en-dos`, **que por eso no se borra**.
 
 **Un pendiente cerrado con «se midió y no convenía» vale tanto como uno cerrado
 con código.** Lo que no vale es dejarlo abierto con una hipótesis que ya se sabe
 falsa.
 
-### 5c. El salto de texto al cargar la tipografía · **ABIERTO · lo decide dirección**
+### 5c. El salto de texto al cargar la tipografía · **NO SE ABRE POR AHORA** (dirección, 17/9/2026)
 
 Hasta acá este pendiente existía **sólo como referencia**: lo citaban el § 5b y el
-informe de la #09, y no tenía sección propia. Queda escrito, porque un pendiente
-que sólo se menciona de paso es un pendiente que se pierde.
+informe de la #09, y no tenía sección propia. Queda escrito —con su medición— y
+**cerrado en el mismo movimiento**: se escribe para no volver a descubrirlo, no
+para trabajarlo.
 
 **Qué es.** Las cuatro páginas cambian la tipografía del sistema por la buena
 **después** de pintar, y en ese cambio el texto salta. No lo trajo ninguna orden:
@@ -417,17 +462,60 @@ motivo por el que no se mergeó la #09 — el contrato de `@codice/ui` no lo cam
 una orden de la web— y es la misma familia que el pendiente 7, los dos documentos
 del design system.
 
-**Lo que hay que saber antes de abrirla:** los cuatro tests del salto de texto
-**ya están escritos** en la rama de la #09 —`web/09-css-en-dos`, que no se
-mergeó— y **no se rescataron a propósito**, porque son de este pendiente y no de
-aquél. Las dos mutaciones que los hacen morder están anotadas en el informe de la
-#09 (§ C): `--lectura` de `system-ui` a `Georgia,serif` mueve inicio (×20),
-privacidad y terminos (×200), y `--display` mueve inicio y taller. O sea que la
-orden que venga **no arranca de cero**: arranca de una rama sin mergear que ya
-tiene los guardianes y la mutación que los prueba.
+#### El veredicto de dirección, 17/9/2026: no se abre
 
-**Lo que se necesita de dirección:** si `size-adjust` entra a `packages/ui`.
-Mientras no haya respuesta, esto no se toca.
+**Y lo decide la medición de arriba, que es el punto.** Dos razones, las dos en la
+tabla:
+
+1. **No lo cobra nadie.** Ninguna página pasa el umbral de 0,1 de Google. El salto
+   se ve; no cuesta puntaje.
+2. **No lo podemos medir estable.** `privacidad` mide **diez veces distinto** según
+   Lighthouse o `PerformanceObserver`. Sin una cifra en la que confiar no hay cómo
+   saber si un arreglo arregló.
+
+**No se toca el design system que heredan tres productos por algo que no se cobra
+y que no podemos medir estable.** `size-adjust` iría a `packages/ui`, de donde el
+consultorio, la academia y el asistente sacan la marca: el costo del cambio no lo
+paga la web, lo pagan los tres. Es el mismo criterio que dejó la #09 afuera.
+
+Si algún día se reabre, lo que la haría reabrir es **una de las dos razones
+cayéndose**: que una página pase el 0,1, o que las dos formas de medir converjan.
+
+#### Lo que queda guardado, y por qué la rama NO se borra
+
+Los cuatro tests del salto de texto **ya están escritos** en la rama de la #09
+—**`web/09-css-en-dos`**, que no se mergeó— y **no se rescataron a propósito**,
+porque son de este pendiente y no de aquél. Las dos mutaciones que los hacen
+morder están anotadas en el informe de la #09 (§ C): `--lectura` de `system-ui` a
+`Georgia,serif` mueve inicio (×20), privacidad y terminos (×200), y `--display`
+mueve inicio y taller.
+
+> **`web/09-css-en-dos` no se borra, y éste es el motivo escrito.** Es la única
+> copia de esos cuatro guardianes y de la mutación que los prueba. La rama se ve
+> como una rama muerta —su PR está cerrado sin mergear— y por eso el motivo va
+> acá y no en la cabeza de nadie: el día que alguien limpie refs viejas, esto es
+> lo que tiene que leer antes. Si se reabre el 5c, la orden **no arranca de
+> cero**.
+
+Las otras dos ramas vivas, para que la lista se lea de una: **`main`** y
+**`web/05-cortina`** (en pausa a propósito desde el 12/9/2026).
+
+Las cinco `codice/*` **se borraron el 17/9/2026** por decisión de dirección: una
+ref muerta confunde a quien liste ramas, y éstas no guardaban **nada** que `main`
+no tuviera. Se comprobó una por una que su punta fuera ancestro de `main` antes de
+tocarlas, y las puntas quedan escritas acá para que el borrado sea reversible —los
+commits siguen alcanzables desde `main`, así que esto es comodidad, no rescate—:
+
+| rama borrada | punta |
+|---|---|
+| `codice/01a-molde` | `3b5edfa` |
+| `codice/01b-port` | `635df74` |
+| `codice/01c-fidelidad` | `01f7966` |
+| `codice/02-sin-hidratar` | `4a72ccc` |
+| `codice/03-contraste` | `8a700ca` |
+
+Ésa es la diferencia con `web/09-css-en-dos`: aquéllas estaban **dentro** de
+`main`; ésta tiene dos commits que no están en ninguna otra parte.
 
 ### 5d. `/assets/` se servía sin `Cache-Control` · **CERRADO en la #11**
 
@@ -466,11 +554,12 @@ Lo que estos tests **no** comprueban, declarado: que Vercel aplique las
 cabeceras. Eso se mide con `curl` contra producción después del merge y va al
 informe, igual que la #08 hizo con el `has` por host.
 
-### 5e. Una orden que agrega una sección le cuesta un punto a una página que no la usa · **ABIERTO · lo decide dirección**
+### 5e. Una orden que agrega una sección le cuesta un punto a una página que no la usa · **CERRADO: se midió y no convenía** (dirección, 17/9/2026)
 
-Era el segundo caso del § 5b y **sobrevive a su cierre**, así que sale de ahí y
-queda con número propio: 5b se cerró con «se midió y no convenía», y un pendiente
-abierto adentro de uno cerrado es un pendiente que nadie vuelve a leer.
+Era el segundo caso del § 5b, así que sale de ahí y queda con número propio —un
+pendiente adentro de uno cerrado es un pendiente que nadie vuelve a leer— y se
+cierra con **el mismo veredicto que el 5b**, que es el que le corresponde: se
+midió, y no convenía.
 
 **Qué es.** La web sirve **una hoja para las cuatro páginas**, así que cada
 sección nueva la engorda para todas — también para las que no la usan. El caso
@@ -494,13 +583,27 @@ propia medición: hay que ver qué cuesta en pedidos de prioridad `VeryHigh`, qu
 el mecanismo real que la #09 destapó —lo que retrasa a la foto no es el **peso**
 de lo que va delante sino **cuántos pedidos `VeryHigh`** hay antes que ella—.
 
-**Y hay que decir el tamaño del premio antes de gastar en él:** es **un punto de
-Lighthouse en dos páginas legales**. La #09 se abrió persiguiendo un punto que
-—medido— ya no existía. Vale la pena mirar ese antecedente antes de abrir esta.
+#### El veredicto de dirección, 17/9/2026: no se abre, y se cierra
 
-**Lo que se necesita de dirección:** si se abre la orden de partir por página, o
-si un punto en `/privacidad` y `/terminos` se acepta y esto se cierra como se
-cerró 5b.
+**El tamaño del premio es lo que lo decide:** un punto de Lighthouse en
+`/privacidad` y `/terminos`, dos páginas legales, contra una orden entera de
+partir el CSS por página y remedirlo todo.
+
+**Y el antecedente pesa más que el premio.** La #09 ya se abrió una vez
+persiguiendo un punto que —medido— **ya no existía**: el «86 contra 87» se había
+escrito antes de la #05 y nadie lo revisó. Abrir esta orden sería repetir el
+movimiento sabiendo cómo salió: se paga el trabajo por adelantado y el punto se
+mide al final.
+
+Así que el punto **se acepta**. `/privacidad` y `/terminos` en 98 es el precio de
+servir una hoja para las cuatro páginas, y es un precio que la web paga en las dos
+páginas que menos importan comercialmente.
+
+**Lo que queda escrito para el que venga**, que es el valor real de este
+pendiente: partir por frecuencia de cambio **está medido y no arregla esto**; el
+único camino que queda es partir por página; y el mecanismo que lo explica no es el
+peso sino **cuántos pedidos `VeryHigh`** van delante de la foto. Si alguien lo
+reabre, que sea con un premio más grande que un punto — y midiendo primero.
 
 ### 6. Content-Security-Policy · **CERRADO en la #10**
 
