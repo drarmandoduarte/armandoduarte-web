@@ -16,7 +16,7 @@ usa.
 | #03 | Contraste a AA, con el número delante | cerrada (rama `codice/03-contraste`, sobre `02-sin-hidratar`) |
 | #04 | El monorepo entra al repo de Armando | cerrada (PR #5) |
 | #05 | La devolución de Lucía y de Armando: paleta CFF, íconos, fotos, dos teléfonos y `/merida` | **cerrada** (PR #7, mergeado el 16/9/2026) |
-| #06 | El cromo a nivel 512: menú, header, foco y pie | en curso (rama `web/06-cromo`, sobre `main`) |
+| #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
 
 ## Reglas de la casa, con el caso que las obligó
 
