@@ -161,11 +161,20 @@ const textoVisible = (page: Page) =>
 const enlaces = (page: Page) =>
   page.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href') ?? ''));
 
-/** Las cuatro etiquetas del `<head>` que se ven fuera de la página. */
+/**
+ * Las etiquetas del `<head>` que se ven fuera de la página.
+ *
+ * `og:url` entró en la #08, con el dominio ya abierto. No estaba, y ésa fue la
+ * razón de agregarlo acá y no solo al `<head>`: un tag que nadie mira es un tag
+ * que mañana apunta a otro dominio sin que nada lo note. Las cinco dicen dónde
+ * vive esta página para Google y para WhatsApp — que es justo lo que la apertura
+ * puso en juego.
+ */
 const cabeza = (page: Page) => page.evaluate(() => ({
   title: document.title,
   description: document.querySelector('meta[name="description"]')?.getAttribute('content') ?? null,
   canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? null,
+  ogUrl: document.querySelector('meta[property="og:url"]')?.getAttribute('content') ?? null,
   ogImage: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? null,
 }));
 

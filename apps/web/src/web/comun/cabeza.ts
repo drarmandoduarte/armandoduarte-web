@@ -82,6 +82,14 @@ export function etiquetasDe(pagina: Pagina): Etiqueta[] {
     { tipo: 'meta', attrs: { name: 'theme-color', content: CREMA } },
     { tipo: 'meta', attrs: { property: 'og:type', content: 'website' } },
     { tipo: 'meta', attrs: { property: 'og:site_name', content: 'Armando Duarte' } },
+    /* `og:url` se agrega en la #08, y no es cosmético: es la URL que WhatsApp,
+       Facebook y LinkedIn toman como la del contenido. Sin él usan la que se
+       compartió — y desde que el dominio está abierto, esa puede ser la de
+       `.vercel.app`, que sirve exactamente lo mismo. La orden #08 pedía
+       verificar que fuera absoluta y del dominio propio; no existía. Es la misma
+       URL que la canónica, y por eso sale de la misma constante: dos fuentes
+       para la misma dirección son dos verdades que un día no coinciden. */
+    { tipo: 'meta', attrs: { property: 'og:url', content: CANONICA[pagina] } },
     { tipo: 'meta', attrs: { property: 'og:title', content: textos.title } },
     { tipo: 'meta', attrs: { property: 'og:description', content: textos.description } },
     { tipo: 'meta', attrs: { property: 'og:locale', content: 'es_MX' } },
