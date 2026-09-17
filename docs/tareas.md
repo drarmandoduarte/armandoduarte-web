@@ -19,7 +19,7 @@ usa.
 | #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
 | #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | **cerrada** (PR #12, mergeado el 17/9/2026) |
 | #08 | La apertura: sacar el `noindex` sin abrir la puerta de atrás | **cerrada** (PR #14, mergeado el 17/9/2026) |
-| #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | **cerrada sin mergear** — se midió y no convenía (PR #16 cerrado). Lo que valía se rescató en la rama `web/09b-rescate` |
+| #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | **cerrada sin mergear** — se midió y no convenía (PR #16 cerrado). Lo que valía entró aparte: **PR #19, mergeado el 17/9/2026** (rama `web/09b-rescate`, ya borrada) |
 | #10 | La CSP, mientras todavía es fácil | **cerrada** (PR #18, mergeado el 17/9/2026) |
 | #11 | `Cache-Control` para `/assets/` | **cerrada** (PR #17, mergeado el 17/9/2026) |
 
@@ -269,6 +269,11 @@ es también lo que hace que una orden que agrega una sección le cueste un punto
 una página que no la tiene. Sigue siendo decisión de dirección y sigue tocando el
 contrato de `@codice/ui`.
 
+> Lo de arriba es el pendiente **como se escribió antes de medirlo**, y se deja
+> tal cual porque es lo que la #09 fue a comprobar. El estado vivo de este caso
+> está en el **§ 5e**; la hipótesis de los 25 KB que se lee más arriba quedó
+> **desmentida** —el detalle, unas líneas abajo—.
+
 Dos caminos que se midieron y **empeoraron**, para que nadie los vuelva a
 intentar: mover los `<link rel="preload" as="image">` que React inyecta al
 `<head>` (86/86/87) y quitarlos del todo (70, LCP 5,78 s — hacen falta).
@@ -344,9 +349,11 @@ llega desde Google, las primeras visitas son casi todas.
 
 #### Qué queda de todo esto
 
-- **Lo que se rescató**, en la rama `web/09b-rescate`: el guardián de fidelidad
-  pasa a mirar **las hojas de estilo enlazadas** —estuvo verde con un `<link>`
-  nuevo en las cuatro páginas, y esa ceguera no dependía de la división— y entra
+- **Lo que se rescató**, ya en `main` —**PR #19, mergeado el 17/9/2026**; la rama
+  `web/09b-rescate` quedó borrada y sus commits viven en la historia del merge—:
+  el guardián de fidelidad pasa a mirar **las hojas de estilo enlazadas** —estuvo
+  verde con un `<link>` nuevo en las cuatro páginas, y esa ceguera no dependía de
+  la división— y entra
   `src/el-css-publicado-trae-lo-suyo.test.ts`, porque cortar el `@import` de
   `packages/ui/styles.css` dejaba el build **en verde** con la web sin
   tipografías.
@@ -360,13 +367,67 @@ llega desde Google, las primeras visitas son casi todas.
   cambia.
 - **El punto de `terminos`** —el segundo caso de este pendiente, donde una orden
   que agrega una sección le cuesta un punto a una página que no la usa— **sigue
-  abierto**. Partir por página era lo que la #09 dejaba afuera explícitamente, y
-  ahora se sabe que partir por frecuencia de cambio no lo arregla. Si dirección
-  lo quiere, es su propia orden y su propia medición.
+  abierto, y se mudó al § 5e** con número propio: este pendiente queda cerrado y
+  algo abierto adentro de algo cerrado no se vuelve a leer. Partir por página era
+  lo que la #09 dejaba afuera explícitamente, y ahora se sabe que partir por
+  frecuencia de cambio no lo arregla.
+- **El salto de texto** que la #09 encontró midiendo el CLS **también queda
+  abierto, en el § 5c**, que hasta ahora se citaba sin existir.
 
 **Un pendiente cerrado con «se midió y no convenía» vale tanto como uno cerrado
 con código.** Lo que no vale es dejarlo abierto con una hipótesis que ya se sabe
 falsa.
+
+### 5c. El salto de texto al cargar la tipografía · **ABIERTO · lo decide dirección**
+
+Hasta acá este pendiente existía **sólo como referencia**: lo citaban el § 5b y el
+informe de la #09, y no tenía sección propia. Queda escrito, porque un pendiente
+que sólo se menciona de paso es un pendiente que se pierde.
+
+**Qué es.** Las cuatro páginas cambian la tipografía del sistema por la buena
+**después** de pintar, y en ese cambio el texto salta. No lo trajo ninguna orden:
+es anterior a la #09, que se lo encontró de paso mientras medía otra cosa.
+
+**Lo que ya está medido**, y es lo que ahorra la primera mitad de la orden que
+venga. La #09 pedía comprobar que «CLS sigue en 0»; la división no lo movió ni un
+dígito, pero **la premisa era falsa: nunca fue 0**. Cinco corridas de Lighthouse
+por lado y tres de `PerformanceObserver`, idénticas hasta el último dígito:
+
+| página | CLS (Lighthouse) | CLS (`PerformanceObserver`) |
+|---|--:|--:|
+| inicio | 0,0008 | 0,00078 |
+| taller | 0,0002 | 0,00015 |
+| privacidad | **0,0531** | 0,00488 |
+| terminos | 0,0068 | 0,00003 |
+
+Dos lecturas honestas de esa tabla: **ninguna página pasa el umbral de 0,1 de
+Google**, así que esto no cuesta puntaje hoy —el salto se ve, no se cobra—; y
+`privacidad` mide **diez veces distinto** según quién mida, así que si dirección
+abre la orden, el primer trabajo es decidir contra cuál de las dos cifras se mide,
+no ponerse a arreglar.
+
+**El arreglo estándar es `size-adjust` en los `@font-face`** de `packages/ui`: se
+le declara a la fuente de reserva el ancho de la buena, y el intercambio deja de
+correr el texto.
+
+**Por qué es de dirección y no de una orden de la web.** `size-adjust` se escribe
+en el design system, no en la web: toca `packages/ui`, que es de donde el
+consultorio, la academia y el asistente van a heredar la marca. Es el mismo
+motivo por el que no se mergeó la #09 — el contrato de `@codice/ui` no lo cambia
+una orden de la web— y es la misma familia que el pendiente 7, los dos documentos
+del design system.
+
+**Lo que hay que saber antes de abrirla:** los cuatro tests del salto de texto
+**ya están escritos** en la rama de la #09 —`web/09-css-en-dos`, que no se
+mergeó— y **no se rescataron a propósito**, porque son de este pendiente y no de
+aquél. Las dos mutaciones que los hacen morder están anotadas en el informe de la
+#09 (§ C): `--lectura` de `system-ui` a `Georgia,serif` mueve inicio (×20),
+privacidad y terminos (×200), y `--display` mueve inicio y taller. O sea que la
+orden que venga **no arranca de cero**: arranca de una rama sin mergear que ya
+tiene los guardianes y la mutación que los prueba.
+
+**Lo que se necesita de dirección:** si `size-adjust` entra a `packages/ui`.
+Mientras no haya respuesta, esto no se toca.
 
 ### 5d. `/assets/` se servía sin `Cache-Control` · **CERRADO en la #11**
 
@@ -378,7 +439,9 @@ visita.
 
 Lo encontró la **#09**, que se apoyaba en el beneficio de caché para justificar
 partir el CSS en dos y descubrió que ese beneficio no existía. La #11 lo
-arregla primero; la #09 queda abierta esperando a remedirse encima.
+arregla primero, y con la regla ya puesta se midió el beneficio de caché que la
+#09 perseguía: **2.710 bytes y 20 ms** en la segunda visita, que no pagan los
+72–148 ms que cuesta cada primera. La #09 **se cerró sin mergear** (§ 5b).
 
 La regla va en los **dos** `vercel.json` —el de la raíz, que es el que Vercel
 lee, y el de `apps/web/`, que es su referencia escrita— con el mismo valor que
@@ -402,6 +465,42 @@ hay despliegue que lo saque de ahí. La afirmación (3) existe sólo para eso.
 Lo que estos tests **no** comprueban, declarado: que Vercel aplique las
 cabeceras. Eso se mide con `curl` contra producción después del merge y va al
 informe, igual que la #08 hizo con el `has` por host.
+
+### 5e. Una orden que agrega una sección le cuesta un punto a una página que no la usa · **ABIERTO · lo decide dirección**
+
+Era el segundo caso del § 5b y **sobrevive a su cierre**, así que sale de ahí y
+queda con número propio: 5b se cerró con «se midió y no convenía», y un pendiente
+abierto adentro de uno cerrado es un pendiente que nadie vuelve a leer.
+
+**Qué es.** La web sirve **una hoja para las cuatro páginas**, así que cada
+sección nueva la engorda para todas — también para las que no la usan. El caso
+medido es de la #05: `terminos` bajó de 99 a 98, tres corridas de cada lado sin
+una excepción, y la causa quedó aislada sin margen de duda. `terminos.html` pesa
+**exactamente lo mismo** en las dos ramas —6.299 bytes, byte por byte, porque lo
+único que cambió en esa página es el teléfono del pie y los dos números tienen los
+mismos dígitos—. La única variable es la hoja, que creció de 28.237 a **29.601
+bytes** con las reglas de los íconos y las fotografías. `terminos` no usa ninguna
+de las dos cosas y paga igual.
+
+**Lo que la #09 descartó, y es el aporte que deja:** **partir por frecuencia de
+cambio NO lo arregla.** Eso ya no es una hipótesis, está medido — separar los
+`@font-face` del resto reparte los mismos bytes en dos hojas y `terminos` sigue
+recibiendo las reglas que no usa. Peor: la división le costó **+72 a +148 ms de
+LCP** a las dos páginas con foto, que son las que importan comercialmente (§ 5b).
+
+**El camino que queda es partir por página** —que cada página baje sus propias
+reglas— y es **explícitamente lo que la #09 dejaba afuera**. Es otra orden, con su
+propia medición: hay que ver qué cuesta en pedidos de prioridad `VeryHigh`, que es
+el mecanismo real que la #09 destapó —lo que retrasa a la foto no es el **peso**
+de lo que va delante sino **cuántos pedidos `VeryHigh`** hay antes que ella—.
+
+**Y hay que decir el tamaño del premio antes de gastar en él:** es **un punto de
+Lighthouse en dos páginas legales**. La #09 se abrió persiguiendo un punto que
+—medido— ya no existía. Vale la pena mirar ese antecedente antes de abrir esta.
+
+**Lo que se necesita de dirección:** si se abre la orden de partir por página, o
+si un punto en `/privacidad` y `/terminos` se acepta y esto se cierra como se
+cerró 5b.
 
 ### 6. Content-Security-Policy · **CERRADO en la #10**
 
