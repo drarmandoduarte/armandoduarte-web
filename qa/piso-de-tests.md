@@ -17,11 +17,11 @@ alguien lo va a leer en el PR. Ése es el punto.
 
 | paquete | piso |
 |---|---|
-| `@codice/ui` | 27 |
+| `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 9 |
-| `@codice/navegador` | 14 |
+| `@codice/web` | 17 |
+| `@codice/navegador` | 20 |
 
 ## De dónde salen estos números
 
@@ -34,6 +34,51 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #06
+
+`@codice/web` sube de 9 a **17**, `@codice/navegador` de 14 a **17** y `@codice/ui`
+de 27 a **30**. Catorce tests nuevos, y casi todos vigilan cosas que **no se ven
+en una captura**.
+
+**Tres en `@codice/ui`** — los pares del telón del menú: crema sobre grafito
+(16,62), el pie del menú en crema al 65 % sobre grafito (7,13) y el ámbar del
+hover sobre grafito (6,03). El del 65 % se **calcula** en el test en vez de
+escribirse: una mezcla escrita a mano es un cuarto valor que se desincroniza.
+
+**Ocho en `@codice/web`** — `comportamiento.test.ts` pasó de 2 a 10. Antes
+comprobaba que una lista de dos colores coincidiera con dos tokens; ahora
+comprueba que la **medición** de luminancia clasifique bien los seis fondos que
+la web pinta, más cuatro pisos: que la conversión convierta, que la medición
+mida los dos extremos, que `rgba(0,0,0,0)` no cuente como oscuro y que una
+cadena que no es un color no rompa nada.
+
+El cambio de forma importa más que el número. El test viejo vigilaba **una
+copia** y por eso se podía desincronizar apuntando a la fuente equivocada — y se
+desincronizó: entre la #05 y la #06 el header quedó en 1,70:1 sobre el teal con
+el test en verde (pendiente 14). El nuevo vigila una función que mide, y lo único
+que puede fallar es que alguien elija un fondo que de verdad esté en el límite,
+que es exactamente lo que un test debería hacer notar.
+
+**Seis en `@codice/navegador`** — `comportamiento.spec.ts` pasó de 2 a 8. Tres
+son del menú abierto y se agregaron **después de descubrir que nadie lo miraba**:
+las doce capturas del guardián de fidelidad son de la página con el menú cerrado,
+y cerrado el overlay es `visibility:hidden`. La mutación que la orden proponía
+—devolver el `font-size` de los ítems al `clamp()` viejo— dio **cero capturas en
+rojo** la primera vez que se corrió: el rediseño entero del menú no tenía nada
+que lo vigilara. Ahora hay dos capturas del overlay (1440 y 390) y un test que
+mide sus números con `getComputedStyle` contra los del motor de 512. Con eso la
+misma mutación tira el test **y** 32.737 píxeles.
+
+Los otros tres son de foco:
+
+- que el anillo sea del color del texto, 2 px, offset 3, **y que el clic con el
+  mouse no lo deje** —el orden de las dos mitades importa y está escrito: una
+  vez que el teclado encendió `:focus-visible`, el navegador se lo deja puesto,
+  así que medir el mouse después del Tab da verde siempre;
+- que con el menú abierto el `Tab` recorra cierre → ítems → WhatsApp **sin salirse
+  del overlay**;
+- que `Escape` cierre y devuelva el foco al botón «Menú».
 
 ## Lo que la orden #05 **bajó**, que es lo que hay que leer con cuidado
 

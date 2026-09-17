@@ -1,15 +1,26 @@
 {
   "$meta": {
     "name": "Códice — Design System (App Dr. Armando)",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "tagline": "Construyendo familias fuertes",
-    "generated": "2026-09-16",
+    "generated": "2026-09-17",
     "philosophy": "Quiet luxury con la atmósfera del set de grabación del doctor: luz ámbar de tarde, orden, cercanía sin ruido. Restraint editorial, whitespace generoso, tipografía por encima de imagen, sin sombras, sin degradados, motion invisible.",
     "modes": [
       "light"
     ],
     "density": "comfortable",
     "changelog": [
+      {
+        "version": "1.2.1",
+        "date": "2026-09-17",
+        "orden": "Códice #06",
+        "cambios": [
+          "Grafito del overlay, #06. Un token nuevo: `color.chrome.graphite` #16181C, el telón del menú de pantalla completa. Sale del motor de 512 (`--color-graphite`) y es un neutro, como el crema y la tinta: no viene del manual CFF y no tiene que venir.",
+          "Antes el telón era `color.ink.primary` al 96 %: la tinta marrón de la marca, que con el desenfoque dejaba una mancha de color y hacía que el menú se leyera como un bloque de marca en vez de como estructura. Crema sobre grafito da ~17:1.",
+          "**D25 queda escrita con el token**: el cromo —header, overlay, pie— no lleva color de marca salvo en el estado hover/activo. La marca vive en el contenido. En esta misma orden eso saca el naranja de la marquita del pie y del anillo de foco de toda la web.",
+          "Ningún otro valor cambia."
+        ]
+      },
       {
         "version": "1.2.0",
         "date": "2026-09-16",
@@ -122,6 +133,15 @@
         "value": "#DA8100",
         "role": "Acento sobre fondos oscuros: rótulos y enlaces sobre teal y sobre tinta.",
         "contrast": "sobre tinta 4,78:1 (pasa). Sobre teal 2,81:1 (NO pasa) — es el pendiente 4c, decisión de dirección."
+      }
+    },
+    "chrome": {
+      "$description": "El cromo: lo que se repite en todas las páginas y no es contenido —header, overlay del menú, pie—. D25: no lleva color de marca salvo en hover/activo. Son neutros a propósito, para que el chasis no compita con lo que sostiene.",
+      "graphite": {
+        "value": "#16181C",
+        "role": "El telón del menú de pantalla completa, al 96 % con desenfoque.",
+        "contrast": "crema encima: ~17:1. Reemplaza a `ink.primary` al 96 %, que era la tinta de la marca.",
+        "origen": "Motor de 512 · tema-cero/inc/universal/header.css · --color-graphite."
       }
     },
     "support": {

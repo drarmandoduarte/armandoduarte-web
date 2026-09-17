@@ -26,6 +26,22 @@
    ésos llegaban a 5,21 y 5,53 sobre crema, o sea más oscuros de lo necesario.
    El criterio es el mínimo, y el mínimo se mide.
 
+   ── v1.2.1 · el grafito del overlay (orden Códice #06) ───────────────────
+   Un token nuevo y nada más: **--grafito #16181C**, el telón del menú.
+
+   Viene del motor de 512 (`tema-cero/inc/universal/header.css`,
+   `--color-graphite`) y es un **neutro**, como el crema y la tinta: no sale del
+   manual CFF y no tiene que salir. Antes el telón era la tinta marrón al 96 %,
+   y el resultado se leía como un bloque de marca con una mancha borrosa atrás.
+   Un telón es estructura, no marca.
+
+   Y queda la regla que lo explica, que es más grande que el token — **D25: el
+   cromo no lleva color de marca salvo en hover/activo.** Header, overlay y pie
+   son el chasis; la marca vive en el contenido. Por eso en esta misma orden la
+   marquita del pie deja de ser naranja y el foco deja de ser naranja.
+
+   Crema sobre grafito da ~17:1.
+
    ── v1.2.0 · la paleta CFF (orden Códice #05) ────────────────────────────
    La web adopta **la paleta del manual de Construyendo Familias Fuertes**, que
    es la marca del cliente. No solo el naranja que pidió Lucía: los cinco. Poner
@@ -90,6 +106,9 @@
   --crema:#FAF7F1;          /* color.background.cream · el fondo por defecto */
   --superficie:#FFFFFF;     /* color.background.surface · la sección blanca */
   --calido:#F3EBDD;         /* color.background.surfaceWarm · la sección cálida */
+
+  /* ── Cromo · el telón del menú (#06, D25) ───────────────────────────── */
+  --grafito:#16181C;        /* color.chrome.graphite · el telón del overlay */
 
   /* ── Tinta · tampoco del manual, y tampoco se toca ──────────────────── */
   --tinta:#2E2B25;          /* color.ink.primary · nunca negro puro */

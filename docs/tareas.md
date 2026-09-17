@@ -16,6 +16,7 @@ usa.
 | #03 | Contraste a AA, con el número delante | cerrada (rama `codice/03-contraste`, sobre `02-sin-hidratar`) |
 | #04 | El monorepo entra al repo de Armando | cerrada (PR #5) |
 | #05 | La devolución de Lucía y de Armando: paleta CFF, íconos, fotos, dos teléfonos y `/merida` | **cerrada** (PR #7, mergeado el 16/9/2026) |
+| #06 | El cromo a nivel 512: menú, header, foco y pie | en curso (rama `web/06-cromo`, sobre `main`) |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -123,21 +124,21 @@ Lo afirma en aritmética `packages/ui/tokens.test.mjs`, escrito como igualdad
 —`toBe(2.81)`— y no como «menor que»: el día que alguien lo arregle, el test se
 pone rojo y lo obliga a venir hasta acá a borrar la excepción.
 
-Los otros tres pares que tampoco llegan, medidos en la misma corrida y todos
-**mejores** que antes de la #05, salvo el primero:
+Los otros pares que tampoco llegaban. **La #06 cerró dos de los tres**, y no
+bajándoles la exigencia sino sacando de la página lo que los producía:
 
-| dónde | antes | ahora |
-|---|--:|--:|
-| el rótulo del menú, al 50 % de opacidad | 1,62 | **1,46** |
-| el ámbar sobre el velo del menú (`a.pr`) | 4,05 | **4,27** |
-| la tapa del libro (`small` al 80 %) | 3,54 | **3,72** |
+| dónde | #05 | #06 | |
+|---|--:|--:|---|
+| el rótulo del menú, al 50 % de opacidad | 1,46 | — | **cerrado**: el rótulo `ARMANDODUARTE.COM` del overlay ya no existe (orden #06, C) |
+| el ámbar sobre el velo del menú (`a.pr`) | 4,27 | — | **cerrado**: el pie del menú pasó a crema al 65 %, que da **7,13** (orden #06, D) |
+| el ámbar sobre teal del **header** | 2,81 | **3,10** | **cerrado**: el botón del header sobre oscuro pasó a crema con borde al 50 % (orden #06, F) |
+| la tapa del libro (`small` al 80 %) | 3,72 | 3,72 | sigue abierto — es contenido, lo mira la **#07** |
 
-El primero empeoró y es honesto decirlo: el rótulo del overlay hereda el color de
-acento, que pasó de ocre a naranja de texto. Los dos están igual de lejos del
-umbral —1,6 y 1,5 sobre 4,5— porque el problema de ese rótulo no es el color sino
-el `opacity:.5` escrito en línea en `MenuMovil.tsx`. Se arregla sacando esa
-opacidad, no cambiando la paleta; no se tocó porque es una decisión de diseño y
-la orden #05 no la pide.
+Lo que queda de 4c es **el ámbar sobre teal en el contenido**: el enlace de la
+franja «Ahora» y el rótulo de la sección del taller. Medido con axe el 17/9 son
+**dos nodos** en toda la web, los dos en `/` y `/merida`. El cromo ya no aporta
+ninguno: la #06 lo sacó del header y del menú, que es donde D25 dice que el color
+de marca no va.
 
 ### 5. Performance: el bundle costaba 17 puntos · **cerrado en la #02**
 
@@ -326,6 +327,33 @@ que el guardián sirva para cambios chicos.** La de la #01 movía 7.356 de delta
 sobre un tope de 1.409 y dejó creer que cualquier color distinto se cazaba. Si
 una comprobación tiene un umbral, la mutación que la valida tiene que caer
 **cerca** del umbral, no lejos.
+
+### 14. El header quedó ilegible sobre el teal entre la #05 y la #06 · **encontrado y arreglado en la #06**
+
+Estuvo **en producción desde el merge de la #05** (16/9) hasta el de la #06, y
+nadie lo vio: sobre «Sobre el facilitador» el wordmark del header se dibujaba
+tinta sobre teal, **1,70:1**. Medido en producción el 17/9, antes de tocar nada.
+
+La causa es una copia. `comportamiento.ts` decidía si una sección era oscura
+consultando un `Set` de dos cadenas —`'rgb(51, 88, 92)'` y `'rgb(46, 43, 37)'`,
+que es el formato en que `getComputedStyle` devuelve un color— y la #05 cambió el
+teal de la web de `#33585C` a `#005761` sin tocar ese `Set`.
+
+**Lo peor es que había un test para exactamente esto** y siguió en verde. Estaba
+bien pensado: recalculaba los dos valores desde los tokens y comparaba. Pero leía
+`color.brand.teal`, que la #05 dejó intacto **a propósito** para la app, mientras
+la web pasaba a usar `color.cff.tealDark`. El test no estaba mal escrito: estaba
+**vigilando la copia equivocada**.
+
+Arreglado quitando la copia. `esOscuro()` mide la luminancia del fondo que el
+navegador realmente pintó; no hay lista que mantener, y un color nuevo o un token
+renombrado funcionan sin tocar el archivo. El test pasó a afirmar la
+clasificación de **los seis fondos que la web usa**, leídos de los tokens que la
+web usa.
+
+**La lección, que es la que hay que recordar:** cuando se vigila una copia, el
+test tiene que apuntar a la misma fuente que usa el código — y eso es una segunda
+cosa que se puede desincronizar. Si se puede medir en vez de copiar, se mide.
 
 ### 12. Los tres íconos de la franja de hechos no llegan a 2× · **de Lucía**
 
