@@ -12,7 +12,28 @@ body{font-family:var(--lectura);font-size:17px;font-weight:400;line-height:1.7;b
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 img{display:block;max-width:100%}
-:focus-visible{outline:1px solid var(--naranja);outline-offset:4px}
+/* ── El foco (orden #06, E) ───────────────────────────────────────────────
+   Era `1px solid var(--naranja)` con offset 4: el rectángulo naranja que
+   dirección vio alrededor del enlace de WhatsApp en «Contacto», y que aparecía
+   en cada botón de la web también al tocarlo con el dedo.
+
+   Tres cosas cambian y cada una arregla algo distinto:
+
+   · `currentColor` — el anillo toma el color del texto donde está: tinta sobre
+     crema, crema sobre teal o tinta, ámbar si el ítem está en hover. Nunca es
+     naranja por su cuenta. Es D25: el cromo no lleva color de marca.
+   · `:focus:not(:focus-visible){outline:0}` — el clic con el mouse no deja
+     anillo; el `Tab` sí. Los navegadores ya hacen casi esto con
+     `:focus-visible`, y esta línea cierra el caso del `<button>` clickeado.
+   · `-webkit-tap-highlight-color` — el recuadro gris que Safari y Chrome de
+     Android pintan al tocar. No es foco, es otra cosa, y se ve igual de mal.
+
+   El `outline` sigue el `border-radius` del elemento en todos los navegadores
+   actuales: en las píldoras se ve redondo, no un rectángulo alrededor de una
+   píldora. Está en la captura del PR. ─────────────────────────────────────── */
+:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+:focus:not(:focus-visible){outline:0}
+a,button{-webkit-tap-highlight-color:transparent}
 .container{width:min(90%,1400px,calc(100% - 40px));margin:0 auto}
 .num{font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1!important}}
@@ -82,7 +103,6 @@ img{display:block;max-width:100%}
 /* ── Marca ─────────────────────────────────────────────────────────── */
 .marca{display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-family:var(--display);color:var(--tinta)}
 .marca b{font-weight:500;font-size:14px;letter-spacing:.3em;text-transform:uppercase;white-space:nowrap}
-.marca small{margin-top:5px;font-weight:400;font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--naranja-texto)}
 
 /* ── Header · a lo Rolls-Royce ───────────────────────────────────────────
    Transparente arriba del hero. Al bajar, toma EL COLOR DE LA SECCIÓN que
@@ -98,8 +118,16 @@ img{display:block;max-width:100%}
 .hd__inner{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;width:min(90%,1400px,calc(100% - 40px));margin:0 auto;column-gap:28px;position:relative;height:100%}
 .hd__inner::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;opacity:.15;transition:opacity .45s var(--ease)}
 .hd.scrolled .hd__inner::after{opacity:.1}
-.hd__start{justify-self:start}.hd__center{justify-self:center}.hd__end{justify-self:end;display:flex;align-items:center;gap:28px;height:44px}
-.hd .marca{color:inherit}.hd .marca small{color:var(--hd-acento,var(--naranja-texto))}
+/* Las tres columnas son flex, y la del medio lo es por una razón medida: el
+   wordmark es un `inline-flex` dentro de un bloque, así que se apoya en la
+   línea base de una caja de línea cuyo alto lo fija el `line-height:1.7` del
+   `<body>` — no su propio alto. Resultado: quedaba 1,1 px bajo del centro a
+   1440 y 3,1 px a 390. `display:flex` lo saca de la línea base y lo centra de
+   verdad; medido después, 0,00 px de diferencia en los dos anchos. */
+.hd__start{justify-self:start;display:flex;align-items:center}
+.hd__center{justify-self:center;display:flex;align-items:center}
+.hd__end{justify-self:end;display:flex;align-items:center;gap:28px;height:44px}
+.hd .marca{color:inherit}
 .hd__menu{display:inline-flex;align-items:center;gap:12px;height:44px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;transition:opacity .32s}
 .hd__menu:hover{opacity:.6}
 .hd__menu i{display:flex;flex-direction:column;gap:5px}
@@ -111,20 +139,83 @@ img{display:block;max-width:100%}
 .hd__wa:hover{background:var(--hd-acento,var(--teal));color:var(--hd-bg,var(--crema))}
 /* Sobre sección oscura: texto crema, acento ocre claro. */
 .hd.claro{--hd-fg:var(--crema);--hd-acento:var(--ambar)}
+/* El botón del header sobre oscuro: crema, con el borde al 50 % (orden #06, F).
+   La orden lo daba por hecho —«ya está así»— y no lo estaba: el botón tomaba
+   `--hd-acento`, que sobre oscuro es el ámbar, para el texto **y** para el
+   borde. Medido sobre el teal: **2,57:1**, cuando el texto necesita 4,5 y el
+   borde 3. Con crema el texto da 7,74 y el borde al 50 % pasa el 3.
+
+   El ámbar no desaparece, se corre al hover, que es donde D25 lo permite.
+
+   Medido, crema al 50 % como borde: **3,14 sobre el teal** y 4,49 sobre la
+   tinta. El ámbar daba 2,81 y 4,78 — o sea que el problema era solo el teal, y
+   es el mismo par del pendiente 4c: el ámbar sobre teal nunca llegó. Acá se
+   resuelve sacando el ámbar del borde, no cambiando el ámbar. */
+.hd.claro .hd__wa{color:var(--crema);border-color:color-mix(in oklab, var(--crema) 50%, transparent)}
+.hd.claro .hd__wa:hover{background:var(--crema);border-color:var(--crema);color:var(--hd-bg)}
+/* Con el menú abierto el header se aparta (orden #06, C). Antes quedaba debajo
+   del telón y a veces se transparentaba: dos wordmarks, uno encima del otro.
+
+   `visibility:hidden` además de `opacity:0`, y no es decoración: con solo la
+   opacidad el header sigue **en el orden de tabulación**. Medido — con el menú
+   abierto, los dos primeros `Tab` caían en el wordmark y en el botón de
+   WhatsApp del header, invisibles debajo del telón, antes de llegar a «Cerrar».
+   Un foco que aterriza en algo que no se ve es peor que un header que se
+   transparenta. `visibility` los saca del recorrido. */
+.ov-abierto .hd{opacity:0;pointer-events:none;visibility:hidden}
 
 /* ── Overlay · menú ─────────────────────────────────────────────────── */
-.ov{position:fixed;inset:0;z-index:60;background:color-mix(in oklab, var(--tinta) 96%, transparent);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);color:var(--crema);display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .45s var(--ease),visibility .45s;overflow:auto}
+/* ── El telón (orden #06, A) ──────────────────────────────────────────────
+   Grafito neutro al 96 %, no la tinta de la marca. Un telón es estructura: si
+   lleva el color del cliente se lee como un bloque de marca, y lo que se cuela
+   de atrás queda como una mancha. El `saturate(140%)` es del motor de 512 y
+   hace que ese poco que se cuela no quede gris muerto.
+
+   La curva `cubic-bezier(.16,1,.3,1)` también es del motor: entra rápido y
+   frena largo. Es la diferencia entre que el menú «aparezca» y que «se abra».
+   ────────────────────────────────────────────────────────────────────────── */
+.ov{position:fixed;inset:0;z-index:60;background:color-mix(in oklab, var(--grafito) 96%, transparent);backdrop-filter:blur(40px) saturate(140%);-webkit-backdrop-filter:blur(40px) saturate(140%);color:var(--crema);display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .32s cubic-bezier(.16,1,.3,1),visibility .32s;overflow:auto}
 .ov.open{opacity:1;visibility:visible}
-.ov__top{height:var(--header-h);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,4vw,48px)}
-.ov__top .marca{color:var(--crema)}
-.ov__close{display:flex;align-items:center;gap:12px;height:44px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;transition:opacity .32s}
-.ov__close:hover{opacity:.6}
-.ov__inner{width:min(90%,1400px,calc(100% - 40px));margin:0 auto;padding:60px 0 48px;display:flex;flex-direction:column;gap:64px;min-height:calc(100% - var(--header-h))}
+
+/* ── Arriba, una sola cosa: CERRAR (orden #06, C) ─────────────────────────
+   Había tres —cerrar, la marca centrada y ARMANDODUARTE.COM en ámbar—, y a
+   375 px se pisaban entre sí: se leía «CERRARARMANDO DUARTEARMANDOD…» cortado
+   por el borde. Con una sola pieza el defecto desaparece solo, sin una regla
+   de responsive que lo tape.
+
+   La marca no hace falta: el overlay se abre desde una página que ya la tiene.
+   `position:fixed` con la altura del header lo deja exactamente donde estaba el
+   botón «Menú» que uno acaba de tocar, que es donde la mano ya está. ──────── */
+.ov__close{position:fixed;top:0;left:0;z-index:1;height:var(--header-h);padding:0 clamp(20px,3.5vw,56px);display:inline-flex;align-items:center;gap:14px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:inherit;transition:opacity .32s cubic-bezier(.16,1,.3,1)}
+.ov__close:hover{opacity:.7}
+.ov__close svg{display:block;width:22px;height:22px}
+
+/* ── La lista (orden #06, B) ──────────────────────────────────────────────
+   24 px a peso 500 en una columna de 1200, que es la escala del motor. Antes
+   era `clamp(1.7rem,3.6vw,3rem)` a peso 300: a 1440 daban 48 px finitos, que
+   es tamaño de titular con peso de pie de foto. El menú no es el contenido.
+
+   En móvil los ítems **no se achican**: el motor tampoco los achica, y 24 px es
+   el tamaño al que un ítem se toca cómodo. Lo que se achica es el aire de los
+   costados. ──────────────────────────────────────────────────────────────── */
+.ov__inner{width:100%;max-width:1200px;margin:0 auto;padding:calc(var(--header-h) + 48px) clamp(20px,3.5vw,64px) 64px;display:flex;flex-direction:column;gap:80px}
 .ov__list{list-style:none}
-.ov__list a{display:flex;align-items:baseline;gap:24px;padding:20px 0;font-family:var(--display);font-size:clamp(1.7rem,3.6vw,3rem);font-weight:300;line-height:1.05;border-bottom:1px solid var(--hair-oscura);transition:color .32s,padding-left .4s var(--ease)}
-.ov__list a:hover{color:var(--ambar);padding-left:12px}
-.ov__foot{margin-top:auto;border-top:1px solid var(--hair-oscura);padding-top:20px;display:flex;justify-content:space-between;align-items:center;gap:32px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(250,247,241,.6)}
-.ov__foot a.pr{color:var(--ambar)}
+.ov__list a{display:flex;align-items:baseline;gap:16px;padding:18px 0;font-family:var(--display);font-size:24px;font-weight:500;letter-spacing:.005em;line-height:1.2;border-bottom:1px solid color-mix(in oklab, var(--crema) 12%, transparent);transition:color .32s cubic-bezier(.16,1,.3,1),transform .32s cubic-bezier(.16,1,.3,1)}
+.ov__list a:hover{color:var(--ambar);transform:translateX(6px)}
+.ov__list a.activo{color:var(--ambar)}
+
+/* ── El pie del menú (orden #06, D) ───────────────────────────────────────
+   Tres zonas y un solo tono, como en 512: el lugar, el hueco del idioma y el
+   contacto. Antes eran dos piezas y una venía en ámbar, que le daba al pie más
+   peso que a la lista.
+
+   El del medio va vacío y con `aria-hidden` a propósito: cuando entren EN y PT
+   (D13) ahí va el selector, y dejándolo puesto la izquierda y la derecha ya
+   quedan donde van a quedar. Sin él, `space-between` con dos hijos los manda a
+   los extremos y el día que entre el tercero se mueve todo. ───────────────── */
+.ov__foot{border-top:1px solid color-mix(in oklab, var(--crema) 14%, transparent);padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:32px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in oklab, var(--crema) 65%, transparent)}
+.ov__foot a{color:inherit;transition:color .32s cubic-bezier(.16,1,.3,1)}
+.ov__foot a:hover{color:var(--ambar)}
 
 /* ── Hero · pantalla completa, foto real a la derecha ───────────────── */
 .hero{min-height:min(100svh,880px);padding:calc(var(--header-h) + clamp(40px,6vh,72px)) 0 clamp(48px,7vh,80px);display:flex;align-items:center}
@@ -250,12 +341,17 @@ img{display:block;max-width:100%}
 .ft__brand .marca b{font-size:16px}
 .ft__brand .script{font-size:30px}
 .ft__rule{position:relative;height:1px;background:var(--hair);margin:24px 0 56px}
-.ft__rule span{position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:50%;border:1px solid var(--naranja);background:var(--crema);transform:translate(-50%,-50%)}
+/* La marquita del centro de la hairline: gris y no naranja. Es cromo (D25). */
+.ft__rule span{position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:50%;border:1px solid var(--gris);background:var(--crema);transform:translate(-50%,-50%)}
 .ft__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-bottom:56px}
 .ft__col h3{font-family:var(--display);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.24em;margin-bottom:16px;color:var(--gris)}
 .ft__col a{display:block;font-size:16px;padding:3px 0;color:var(--tinta);margin-bottom:6px;transition:color .32s,padding-left .32s var(--ease)}
 .ft__col a:hover{color:var(--naranja-texto);padding-left:6px}
 .ft__col .muted{color:var(--gris);font-size:15px;display:block;padding:3px 0}
+/* El teléfono del pie no se parte en dos líneas (orden #06, G). A 375 px
+   «WhatsApp · +52 462 199 3143» caía en dos renglones y el número quedaba
+   colgando solo debajo de la palabra. */
+.ft__col a.entero{white-space:nowrap}
 .ft__bottom{border-top:1px solid var(--hair);padding-top:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)}
 .ft__bottom .grupo{display:flex;gap:24px;flex-wrap:wrap}
 .ft__bottom a:hover{color:var(--naranja-texto)}
@@ -321,17 +417,20 @@ img{display:block;max-width:100%}
   .fondo-foto img{object-position:62% 18%}
   .plan{grid-template-columns:1fr;gap:var(--s5)}
   .ft__grid{grid-template-columns:1fr 1fr}
-  .ov__inner{padding:40px 32px 32px;gap:48px}
 }
 @media (max-width:600px){
   :root{--header-h:64px}
   .hd__menu span,.hd__wa span{display:none}.hd__wa{padding:0 13px;width:42px;justify-content:center}.hd__inner{column-gap:12px}
-  .marca b{font-size:12px;letter-spacing:.24em}.marca small{display:none}
+  .marca b{font-size:12px;letter-spacing:.24em}
   .btn{padding:15px 22px}
   .pasos,.hechos{grid-template-columns:1fr}
   .ficha li{grid-template-columns:1fr;gap:4px}
   .libro{grid-template-columns:110px 1fr}
-  .ov__inner{padding:24px 20px 24px;gap:36px}.ov__foot{flex-wrap:wrap;gap:14px}
+  /* El overlay en móvil: los ítems se quedan en 24 px —el motor tampoco los
+     achica, y es el tamaño al que se tocan cómodo—; lo que se achica es el
+     aire de los costados y el del pie. */
+  .ov__inner{padding:calc(var(--header-h) + 32px) 20px 40px;gap:48px}
+  .ov__foot{gap:24px}
   .ft__bottom{flex-direction:column;align-items:flex-start}
   .preguntas li{grid-template-columns:36px 1fr}
 }

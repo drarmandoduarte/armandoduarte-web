@@ -256,7 +256,13 @@ for (const [nombre, ruta] of PAGINAS) {
     await p.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1!important}' });
     await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
     for (const conMenu of [false, true]) {
-      if (conMenu) await p.evaluate(() => document.getElementById('ov')?.classList.add('open'));
+      if (conMenu) await p.evaluate(() => {
+        document.getElementById('ov')?.classList.add('open');
+        /* Y la clase del `<body>` que aparta el header (orden #06, C): sin ella
+           el barrido mediría el header debajo del telón, que en la web real no
+           existe — y no mediría que, por estar apartado, deja de contar. */
+        document.body.classList.add('ov-abierto');
+      });
       await p.waitForTimeout(250);
       let pares = await p.evaluate(RECOLECTAR);
 

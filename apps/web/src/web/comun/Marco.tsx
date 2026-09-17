@@ -41,7 +41,7 @@ export function Marco({
 
   return (
     <>
-      <Cabecera telefono={contacto.numero} mensaje={mensaje} />
+      <Cabecera pagina={pagina} telefono={contacto.numero} mensaje={mensaje} />
       <main>{children}</main>
       <Pie telefono={contacto.numero} visible={contacto.visible} />
     </>

@@ -27,19 +27,44 @@
  */
 
 /**
- * Los dos fondos oscuros, como los devuelve `getComputedStyle`.
+ * ¿Esta sección es oscura? Se decide **midiendo**, no consultando una lista.
  *
- * Van escritos como `rgb(...)` y no como token porque ésa es la cadena que
- * devuelve `getComputedStyle().backgroundColor`, o sea el formato del navegador
- * y no el del diseño: comparar contra `var(--teal)` no compararía nada, porque
- * ese valor nunca llega hasta acá resuelto.
+ * ── La lista que había acá, y lo que costó ───────────────────────────────
+ * Hasta la #06 esto era `SECCIONES_OSCURAS`, un `Set` con dos cadenas —
+ * `'rgb(51, 88, 92)'` y `'rgb(46, 43, 37)'`— porque ése es el formato en el que
+ * `getComputedStyle().backgroundColor` devuelve un color. Tenía su test, que
+ * recalculaba los dos valores desde los tokens y comparaba.
  *
- * Son el teal y la tinta, o sea `color.brand.teal` y `color.ink.primary`. Que
- * sigan siéndolo no depende de que alguien se acuerde: `comportamiento.test.ts`
- * los recalcula desde los tokens y compara. Sin ese test serían dos copias de un
- * color escritas en el único formato en el que nadie las va a encontrar.
+ * **Y aun así se desincronizó.** La #05 movió el teal de la web al del manual
+ * CFF —`color.cff.tealDark`— dejando `color.brand.teal` intacto para la app, así
+ * que el test siguió en verde mirando el token de la app mientras la web pintaba
+ * el otro. Resultado en producción, medido el 17/9: sobre «Sobre el facilitador»
+ * el header no se ponía claro y el wordmark quedaba en **1,70:1** sobre el teal.
+ * Ilegible, y sin que nada más se rompiera.
+ *
+ * La lección no es «apuntar el test al token correcto»: es que **una lista de
+ * colores es una copia**, y una copia se desincroniza aunque tenga un test —
+ * basta con que el test mire la copia equivocada. Así que no hay lista. Se mide
+ * la luminancia del fondo que el navegador realmente pintó y se decide con ella.
+ * Un color nuevo, un token renombrado o una sección con un fondo a estrenar
+ * funcionan sin tocar este archivo.
+ *
+ * El umbral 0,5 es el de siempre para elegir entre texto claro y oscuro. Los
+ * fondos de esta web están lejos del límite —el más oscuro de los claros es el
+ * cálido en 0,84 y el más claro de los oscuros es el teal en 0,09— así que no
+ * hay caso dudoso.
  */
-export const SECCIONES_OSCURAS = new Set(['rgb(51, 88, 92)', 'rgb(46, 43, 37)']);
+export function esOscuro(fondo: string): boolean {
+  const n = fondo.match(/[\d.]+/g);
+  if (!n || n.length < 3) return false;
+  /* Transparente: la sección no tiene fondo propio y la decide la de atrás. */
+  if (n.length > 3 && Number(n[3]) === 0) return false;
+  const [r, g, b] = n.slice(0, 3).map(Number).map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.5;
+}
 
 /**
  * El tinte de la cabecera.
@@ -69,8 +94,12 @@ function tinteDeCabecera(): void {
     });
     const bg = s ? getComputedStyle(s).backgroundColor : '';
     const esBg = bg && bg !== 'rgba(0, 0, 0, 0)';
-    hd.style.setProperty('--hd-bg', esBg ? bg : getComputedStyle(document.body).backgroundColor);
-    hd.classList.toggle('claro', SECCIONES_OSCURAS.has(bg));
+    /* El header se tiñe del fondo **de la sección que pisa** —teal sobre teal,
+       tinta sobre tinta— y nunca de crema mezclada con un oscuro, que era el
+       beige sucio que dirección vio sobre «Contacto». */
+    const fondo = esBg ? bg : getComputedStyle(document.body).backgroundColor;
+    hd.style.setProperty('--hd-bg', fondo);
+    hd.classList.toggle('claro', esOscuro(fondo));
     hd.classList.toggle('scrolled', y > 24);
     window.clearTimeout(quieto);
     quieto = window.setTimeout(() => hd.classList.remove('scrolled'), 650);
@@ -99,17 +128,71 @@ function menuDePantallaCompleta(): void {
     ov.classList.add('open');
     abrir.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
+    /* El header se aparta mientras el telón está arriba (orden #06, C): debajo
+       del desenfoque se transparentaba y se veían dos wordmarks. Lo hace una
+       clase en el `<body>` y no un estilo en línea, para que la regla viva en
+       la hoja con las demás del header. */
+    document.body.classList.add('ov-abierto');
   };
   const cerrarlo = () => {
+    const teniaElFoco = ov.contains(document.activeElement);
     ov.classList.remove('open');
     abrir.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
+    document.body.classList.remove('ov-abierto');
+    /* Y el foco vuelve al botón que abrió el menú, **solo si estaba adentro**.
+       Sin esto, cerrar con Escape lo deja en el `<body>` y el siguiente `Tab`
+       empieza de nuevo desde arriba de la página; con esto pero sin la
+       condición, un `Escape` con el menú ya cerrado le robaría el foco a lo que
+       el visitante estuviera usando. */
+    if (teniaElFoco) abrir.focus();
   };
 
   abrir.addEventListener('click', abrirlo);
   cerrar.addEventListener('click', cerrarlo);
   ov.querySelectorAll('[data-nav]').forEach((a) => a.addEventListener('click', cerrarlo));
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarlo(); });
+
+  /*
+   * ── El foco no se escapa del menú (orden #06, H) ───────────────────────
+   *
+   * Un overlay a pantalla completa que deja seguir al `Tab` hacia la página de
+   * atrás está a medio hacer: quien navega con teclado sigue tabulando y
+   * empieza a recorrer, a ciegas, botones que están tapados por el telón. Hasta
+   * acá pasaba exactamente eso — medido: después del octavo `Tab` el foco salía
+   * al «Ver el taller en Mérida» del hero.
+   *
+   * La vuelta es el único caso que hay que manejar, y son tres:
+   *
+   *   · `Tab` en el último  → al primero;
+   *   · `Shift+Tab` en el primero → al último;
+   *   · el foco **fuera** del overlay con el menú abierto → adentro. Este
+   *     tercero no es defensivo: es el caso normal. Al abrir con el mouse el
+   *     foco se queda en el botón «Menú», que está fuera, y sin esta rama el
+   *     primer `Tab` iría al header oculto en vez de a «Cerrar».
+   *
+   * La lista se calcula en cada pulsación y no una vez al abrir: los destinos
+   * del menú son los mismos siempre, pero una lista cacheada es una copia, y
+   * una copia se desincroniza el día que alguien agregue un enlace. Son ocho
+   * elementos; recorrerlos cuesta nada.
+   */
+  const enfocables = () => [...ov.querySelectorAll<HTMLElement>('a[href], button')];
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { cerrarlo(); return; }
+    if (e.key !== 'Tab' || !ov.classList.contains('open')) return;
+
+    const focos = enfocables();
+    if (!focos.length) return;
+    const primero = focos[0];
+    const ultimo = focos[focos.length - 1];
+    const actual = document.activeElement;
+    const adentro = actual instanceof Node && ov.contains(actual);
+
+    if (e.shiftKey ? (actual === primero || !adentro) : (actual === ultimo || !adentro)) {
+      e.preventDefault();
+      (e.shiftKey ? ultimo : primero).focus();
+    }
+  });
 }
 
 /**

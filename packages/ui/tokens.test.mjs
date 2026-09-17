@@ -75,8 +75,8 @@ function contraste(hexA, hexB) {
 
 describe('los tokens de Códice', () => {
   it('la versión del documento es la que esta orden dejó', () => {
-    expect(tokens.$meta.version).toBe('1.2.0');
-    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.0');
+    expect(tokens.$meta.version).toBe('1.2.1');
+    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.1');
   });
 
   /*
@@ -134,6 +134,31 @@ describe('los tokens de Códice', () => {
       ['ink.primary sobre cff.amber',                 C.ink.primary.value, C.cff.amber.value],
     ];
 
+    /*
+     * ── El telón del menú (orden #06, A) ──────────────────────────────────
+     * El grafito es cromo, no marca, y encima va crema: a pleno para los ítems
+     * y el cierre, y al 65 % para el pie. El ámbar solo aparece en el hover de
+     * un ítem de 24 px, así que le rige el umbral de texto grande.
+     *
+     * El 65 % se calcula acá y no se escribe: es una mezcla, y una mezcla
+     * escrita a mano es un cuarto valor que se puede desincronizar del CSS.
+     */
+    const sobre = (fg, bg, alfa) => {
+      const c = (h) => h.replace('#', '').match(/../g).map((x) => parseInt(x, 16));
+      const [f, b] = [c(fg), c(bg)];
+      return '#' + f.map((v, i) => Math.round(v * alfa + b[i] * (1 - alfa)).toString(16).padStart(2, '0')).join('');
+    };
+
+    const PARES_TELON_45 = [
+      ['background.cream sobre chrome.graphite', C.background.cream.value, C.chrome.graphite.value],
+      ['el pie del menú · crema al 65 % sobre grafito',
+        sobre(C.background.cream.value, C.chrome.graphite.value, 0.65), C.chrome.graphite.value],
+    ];
+
+    const PARES_TELON_3 = [
+      ['cff.amber sobre chrome.graphite · hover del ítem', C.cff.amber.value, C.chrome.graphite.value],
+    ];
+
     /* Solo para ≥ 24 px, íconos y líneas. Ninguno de estos tres puede usarse
        como texto chico, y el comentario es la mitad del guardián: sin él, el
        número 3 se lee como «acá alcanza con menos» en vez de «acá el texto es
@@ -155,7 +180,7 @@ describe('los tokens de Códice', () => {
       expect(Number(contraste('#7A7267', '#F3EBDD').toFixed(2))).toBe(4);
     });
 
-    for (const [nombre, fg, bg] of [...PARES, ...PARES_CFF_45]) {
+    for (const [nombre, fg, bg] of [...PARES, ...PARES_CFF_45, ...PARES_TELON_45]) {
       it(`${nombre} ≥ 4,5`, () => {
         expect(
           Number(contraste(fg, bg).toFixed(2)),
@@ -165,7 +190,7 @@ describe('los tokens de Códice', () => {
       });
     }
 
-    for (const [nombre, fg, bg] of PARES_CFF_3) {
+    for (const [nombre, fg, bg] of [...PARES_CFF_3, ...PARES_TELON_3]) {
       it(`${nombre} ≥ 3 · solo para ≥ 24 px, íconos y líneas`, () => {
         expect(
           Number(contraste(fg, bg).toFixed(2)),

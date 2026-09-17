@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { enlaceWhatsApp } from '@codice/core';
 import { IconoWhatsApp } from './IconoWhatsApp';
 import { MenuMovil } from './MenuMovil';
+import type { Pagina } from './cabeza';
 
 /**
  * El header de tres columnas: menú, marca, WhatsApp.
@@ -20,11 +21,29 @@ import { MenuMovil } from './MenuMovil';
  * clase `open` —exactamente como lo hacía el sitio estático—.
  *
  * Lo que este componente escribe es **el estado de reposo**: el menú cerrado y
- * `aria-expanded="false"`. Que sea el mismo HTML que antes no es una coincidencia
- * feliz: es lo que el guardián de fidelidad mide, y los `id` (`hd`, `abrir`,
- * `cerrar`, `ov`) son el contrato con el script.
+ * `aria-expanded="false"`. Los `id` (`hd`, `abrir`, `cerrar`, `ov`) son el
+ * contrato con el script.
+ *
+ * ── Por qué el header ya no dice el tagline (orden #06, F) ───────────────
+ * Debajo del wordmark iba «CONSTRUYENDO FAMILIAS FUERTES» en naranja de 9 px.
+ * A ese tamaño no es una frase, es una textura — y sobre las secciones oscuras
+ * directamente desaparecía: el naranja sobre teal no llega ni a 2:1.
+ *
+ * El tagline no se pierde: sigue en el pie, en Great Vibes y a 30 px, que es
+ * donde una firma se lee. `comun.marca.tagline` queda en i18n por eso.
+ *
+ * Con una sola línea el wordmark se centra verticalmente solo, sin compensar
+ * nada a mano: se verifica en el PR que su caja queda a mitad del header.
  */
-export function Cabecera({ telefono, mensaje }: { telefono: string; mensaje: string }) {
+export function Cabecera({
+  pagina,
+  telefono,
+  mensaje,
+}: {
+  pagina: Pagina;
+  telefono: string;
+  mensaje: string;
+}) {
   const { t } = useTranslation();
 
   return (
@@ -45,7 +64,6 @@ export function Cabecera({ telefono, mensaje }: { telefono: string; mensaje: str
           <div className="hd__center">
             <a href="/" className="marca" aria-label={t('comun.marca.ariaInicio')}>
               <b>{t('comun.marca.nombre')}</b>
-              <small>{t('comun.marca.tagline')}</small>
             </a>
           </div>
           <div className="hd__end">
@@ -62,7 +80,7 @@ export function Cabecera({ telefono, mensaje }: { telefono: string; mensaje: str
         </div>
       </header>
 
-      <MenuMovil telefono={telefono} mensaje={mensaje} />
+      <MenuMovil pagina={pagina} telefono={telefono} mensaje={mensaje} />
     </>
   );
 }

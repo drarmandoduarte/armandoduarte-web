@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { enlaceWhatsApp } from '@codice/core';
+import { IconoCerrar } from './IconoCerrar';
+import type { Pagina } from './cabeza';
 
 /**
  * El menú a pantalla completa, en su estado de reposo: cerrado.
@@ -11,13 +13,44 @@ import { enlaceWhatsApp } from '@codice/core';
  * lo encuentra: `ov`, `cerrar` y los `[data-nav]`.
  *
  * Los enlaces salen con `/#seccion` —no con el `<Link>` del router— porque eso
- * es lo que el sitio estático tiene y lo que hace que el ancla funcione igual
- * desde `/merida` que desde `/`: el navegador navega y después salta. El
- * guardián de fidelidad compara los `href` en orden, así que acá no se
- * improvisa.
+ * es lo que el sitio estático tenía y lo que hace que el ancla funcione igual
+ * desde `/merida` que desde `/`: el navegador navega y después salta.
+ *
+ * ── Lo que cambió en la #06, y por qué ───────────────────────────────────
+ * La barra de arriba tenía **tres** cosas: «✕ CERRAR», la marca centrada y
+ * `ARMANDODUARTE.COM` en ámbar al 50 %. A 375 px las tres se pisaban —se leía
+ * «CERRARARMANDO DUARTEARMANDOD…» cortado por el borde— y el sitio aparecía dos
+ * veces, porque el pie del menú también lo decía.
+ *
+ * Ahora hay **una sola**: cerrar. No es una regla de responsive que tapa el
+ * choque, es que el choque no existe. La marca no hace falta —el overlay se abre
+ * desde una página que ya la tiene— y el sitio lo reemplaza el lugar, abajo.
+ *
+ * El pie pasa a tres zonas como el motor de 512: el lugar, el hueco del idioma
+ * y el contacto, **todo en el mismo tono**. El del medio va vacío y con
+ * `aria-hidden` a propósito: cuando entren EN y PT (D13) ahí va el selector, y
+ * dejándolo puesto la izquierda y la derecha ya quedan donde van a quedar.
  */
-export function MenuMovil({ telefono, mensaje }: { telefono: string; mensaje: string }) {
+export function MenuMovil({
+  pagina,
+  telefono,
+  mensaje,
+}: {
+  pagina: Pagina;
+  telefono: string;
+  mensaje: string;
+}) {
   const { t } = useTranslation();
+
+  /*
+   * El ítem de la página en la que uno está, en ámbar (orden #06, B).
+   *
+   * Solo puede haber uno y solo puede ser `/merida`: los otros cinco destinos
+   * son anclas de la portada, no páginas. Marcar «Quién soy» como activo estando
+   * en la portada sería mentir —no es donde uno está, es a dónde va a saltar— y
+   * las dos legales no están en el menú.
+   */
+  const activo = (href: string) => (pagina === 'taller' && href === '/merida' ? 'activo' : undefined);
 
   const destinos = [
     ['/#quien', t('comun.nav.quien')],
@@ -36,24 +69,26 @@ export function MenuMovil({ telefono, mensaje }: { telefono: string; mensaje: st
       aria-modal="true"
       aria-label={t('comun.menu.aria')}
     >
-      <div className="ov__top">
-        <button className="ov__close" id="cerrar" aria-label={t('comun.menu.cerrar')}>
-          <span>✕</span><span>{t('comun.menu.cerrar')}</span>
-        </button>
-        <a href="/" className="marca" aria-label={t('comun.marca.aria')}><b>{t('comun.marca.nombre')}</b></a>
-        <span className="eyebrow" style={{ opacity: 0.5 }}>{t('comun.marca.sitio')}</span>
-      </div>
+      <button className="ov__close" id="cerrar" aria-label={t('comun.menu.cerrar')}>
+        <IconoCerrar /><span>{t('comun.menu.cerrar')}</span>
+      </button>
       <div className="ov__inner">
         <nav aria-label={t('comun.menu.secciones')}>
           <ul className="ov__list">
             {destinos.map(([href, texto]) => (
-              <li key={href}><a href={href} data-nav>{texto}</a></li>
+              <li key={href}>
+                <a href={href} className={activo(href)} aria-current={activo(href) && 'page'} data-nav>
+                  {texto}
+                </a>
+              </li>
             ))}
           </ul>
         </nav>
         <div className="ov__foot">
-          <span>{t('comun.marca.sitio')}</span>
-          <a className="pr" href={enlaceWhatsApp(telefono, mensaje)} target="_blank" rel="noopener">
+          <span>{t('comun.menu.lugar')}</span>
+          {/* El hueco del selector de idioma (D13). Ver la cabecera del archivo. */}
+          <span aria-hidden="true" />
+          <a href={enlaceWhatsApp(telefono, mensaje)} target="_blank" rel="noopener">
             {t('comun.menu.escribir')}
           </a>
         </div>
