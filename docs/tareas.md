@@ -17,7 +17,7 @@ usa.
 | #04 | El monorepo entra al repo de Armando | cerrada (PR #5) |
 | #05 | La devolución de Lucía y de Armando: paleta CFF, íconos, fotos, dos teléfonos y `/merida` | **cerrada** (PR #7, mergeado el 16/9/2026) |
 | #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
-| #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | en curso (rama `web/07-contenido`, sobre `main`) |
+| #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | **cerrada** (PR #12, mergeado el 17/9/2026) |
 
 ## Reglas de la casa, con el caso que las obligó
 
