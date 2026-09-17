@@ -10,14 +10,20 @@
  * nadie los arregle en silencio— y la regla de que un color no se escribe dos
  * veces.
  *
- * ── El piso va primero, y por qué ─────────────────────────────────────────
- * La comprobación central es «este valor aparece textualmente en el CSS». Si el
- * CSS no se pudo leer, esa comprobación no falla: **pasa a hablar de la nada**,
- * y un `includes()` sobre cadena vacía es rojo por el motivo equivocado —o
- * verde, si algún día se afloja a `?.`—. Así que antes de medir se afirma que
- * hay algo que medir: el archivo pesa más de 10 KB. Es la regla de la casa —el
- * piso va ANTES de la afirmación que sostiene— y acá se paga sola: sin ella, un
- * `ESTATICO_DIR` mal puesto se lee como «los tokens no coinciden».
+ * ── Los dos pisos, y por qué van primero ──────────────────────────────────
+ * Cada afirmación de acá puede pasar en verde hablando de la nada, así que antes
+ * de creerle a una se comprueba que tenga de qué hablar. Es la regla de la casa:
+ * el piso va ANTES de la afirmación que sostiene.
+ *
+ *   · **La fórmula sabe medir.** Negro sobre blanco da 21 y un color contra sí
+ *     mismo da 1. Sin eso, una fórmula rota que devolviera siempre 21 pondría
+ *     los treinta pares de contraste en verde.
+ *   · **Se leyeron los colores.** La sección `color` tiene que traer al menos 15
+ *     hex. Sin eso, «ningún color se escribe dos veces» es cierto sobre una
+ *     lista vacía, que es la manera más silenciosa de no vigilar nada.
+ *
+ * Hasta la #04 había un tercero —que `estilo.css` del sitio estático pesara más
+ * de 10 KB— y se fue con el bloque que lo necesitaba. Está contado abajo.
  *
  * ── Lo que se retiró en la #05 ────────────────────────────────────────────
  * La comparación contra `estilo.css` del sitio estático. El motivo está escrito
