@@ -10,7 +10,10 @@ vez desde que existe.**
 
 ---
 
-## Lo que hay que decidir
+## Las tres decisiones, tomadas
+
+Las tres se subieron a dirección con su medición y las tres volvieron resueltas
+el 17/9. Quedan escritas con el número que las decidió, no solo con el veredicto.
 
 ### 1 · La foto de público NO quedó de fondo de «Tres maneras»
 
@@ -35,9 +38,9 @@ suena?»: una foto detrás de texto chico no es una foto, es una mancha. Así qu
 sacó. El archivo queda en el repo (`fotos/tres-maneras-fondo.*`) y está anotado
 en `docs/creditos.md` como «en el repo, sin usar».
 
-**Lo que decide dirección:** dejarla afuera, o dónde ponerla. Si va, el camino
-que sí funciona es el de la decisión 5 — dentro de una tarjeta, con velo fuerte y
-solo texto grande en crema encima—; ahí la foto se ve y el contraste sobra.
+**Decidido por dirección (17/9): afuera.** «Tres maneras» queda limpia; no se
+mete una tarjeta ahí solo para justificar una foto. El archivo se queda en el
+repo anotado como sin usar, por si algún día encuentra su lugar.
 
 ### 2 · `familia.svg` quedó sin usar
 
@@ -51,8 +54,13 @@ Se pusieron los tres que coinciden —formación, práctica, obra— y **lugar**
 usar: agregarle íconos a una sección que la orden no menciona habría sido
 resolverlo abajo.
 
-**Lo que decide dirección:** si la ficha de «Sobre el facilitador» también lleva
-íconos. Si sí, los cuatro están listos y es un renglón.
+**Decidido por dirección (17/9): queda sin usar, y esa ficha NO lleva íconos.**
+El motivo no es de gusto: la ficha del facilitador está **sobre teal**, y los
+íconos son un círculo de **teal claro**. Medido desde la #06 y afirmado en
+`tokens.test.mjs`: `cff.tealLight` sobre `cff.tealDark` da **2,56** — ni llega al
+3:1 de un ícono. Serían once círculos que no se ven. El día que esa ficha lleve
+íconos va a necesitar otro tratamiento, y eso es una decisión. Queda en
+`docs/tareas.md`, pendiente 15.
 
 ### 3 · Dos contradicciones internas de la orden, resueltas por la decisión 4
 
@@ -208,15 +216,32 @@ imágenes nuevas adentro.
 
 ### La gate
 
+**`check:acento` entró en la gate** por decisión de dirección (17/9). No como
+script suelto: como `e2e/acento.spec.ts`, que **importa** `PAGINAS`, `PERMITIDO`
+y `RECOLECTAR` del mismo `check/acento.mjs` que corre por consola. Dos puertas,
+un solo barrido — copiar la lista de lo permitido habría sido crear las dos
+verdades que la #06 ya pagó una vez.
+
+El motivo de dirección, que vale más que el renglón: la regla del acento **se
+deshace sola**. Nadie pinta veinte cosas de naranja de un saque; alguien pone un
+número, tres órdenes después otro pone un filete, y en un año la web volvió a
+estar como estaba. Contra la deriva no sirve una herramienta que hay que
+acordarse de correr.
+
+**Lo que cuesta: ~2,3 s** sobre una gate de **31,3 s** — un 7 %, y barato porque
+reusa el servidor y el Chromium que la suite ya tenía en pie. No es tiempo feo.
+
+`check:contraste` se queda como herramienta de PR, como estaba.
+
 ```
-pnpm test       95 tests declarados, 0 saltados, ninguna suite bajo su piso
+pnpm test       99 tests declarados, 0 saltados, ninguna suite bajo su piso
 check:acento    785 elementos, cero acentos fuera de lugar
 check:tokens    59 archivos, ningún hex fuera de codice-tokens.css
 check:secretos  137 archivos, ninguna forma encontrada
 typecheck · lint · build   limpios
 ```
 
-Piso: `@codice/navegador` 20 → **22** (los dos tests del hero).
+Piso: `@codice/navegador` 20 → **26** (cuatro del acento, dos del hero).
 
 ### Las mutaciones (F-bis 2)
 

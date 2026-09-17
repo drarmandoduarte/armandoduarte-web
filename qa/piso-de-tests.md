@@ -21,7 +21,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
 | `@codice/web` | 17 |
-| `@codice/navegador` | 22 |
+| `@codice/navegador` | 26 |
 
 ## De dónde salen estos números
 
@@ -37,14 +37,28 @@ nada, y desde afuera se ve igual que uno que corrió bien.
 
 ## Lo que movió la orden #07
 
-`@codice/navegador` sube de 20 a **22**: los dos tests del hero opaco, uno por
-página. Afirman que **después de que el script corrió** ningún elemento del hero
-lleva `.reveal` ni arranca translúcido.
+`@codice/navegador` sube de 20 a **26**. Seis tests nuevos, en dos grupos.
 
-Que se midan después del script y no antes es la mitad del test: la regla que
-apaga los bloques es `.js .reveal`, así que sin JavaScript todo vale 1 y la
-comprobación pasaría sola. Se espera a que `comportamiento.ts` ponga la clase
-`js` y recién ahí se mira.
+**Cuatro del acento**, uno por página. Dirección los puso en la gate al aprobar
+la #07, y el motivo vale más que el número: la regla del acento —el naranja es
+del CTA primario y del hover, y de nada más— es de las que **se deshacen solas**.
+Nadie va a pintar veinte cosas de naranja de un saque; alguien pone un número,
+tres órdenes después otro pone un filete, y en un año la web volvió a estar como
+estaba. Ninguna de esas veces se ve mal por sí sola.
+
+Es el mismo modo de falla que el token duplicado de la #06: no un error, una
+deriva. Y contra la deriva no sirve una herramienta que hay que acordarse de
+correr; sirve un guardián en la gate.
+
+La lógica **no se duplicó**: el spec importa `PAGINAS`, `PERMITIDO` y
+`RECOLECTAR` de `check/acento.mjs`, que es el mismo archivo que corre por
+consola. Dos copias de la lista de lo permitido serían dos verdades que un día no
+coinciden. Cuestan **~2,3 s** sobre una gate que ya levanta Chromium.
+
+**Dos del hero opaco**, uno por página. Afirman que **después de que el script
+corrió** ningún elemento del hero lleva `.reveal` ni arranca translúcido. Que se
+midan después del script es la mitad del test: la regla que apaga los bloques es
+`.js .reveal`, así que sin JavaScript todo vale 1 y la comprobación pasaría sola.
 
 Contra el hero de antes de la #07 los dos dan rojo —seis elementos con
 `.reveal`— y contra el de ahora, verde.

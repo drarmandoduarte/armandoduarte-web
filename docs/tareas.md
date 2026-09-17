@@ -290,6 +290,32 @@ Borrados de `public/img/` los tres que ya no usaba nadie —`armando-parado.jpg`
 `armando-retrato.jpg` y `armando-sentado.jpg`, 528 KB—. Los nueve originales
 siguen en `qa/referencia/img/`, que es el sitio tal como se publicó el 12/9.
 
+### 15. `familia.svg` queda guardado sin usar, y la ficha del facilitador NO lleva íconos · **decidido por dirección**
+
+La #07 puso íconos en las fichas de «Quién soy» y «Tres maneras». Los cuatro
+nombres que la orden listaba —`familia, practica, formacion, obra`— son en
+realidad las filas de **«Sobre el facilitador»**, en `/merida`, que la orden no
+nombraba; las de «Quién soy» son Formación · Práctica · Obra · **Base**. Se
+pusieron los tres que coinciden más `lugar` para «Base», y `familia.svg` quedó
+sin usar.
+
+**Dirección decidió (17/9) que se quede sin usar y que esa ficha no lleve
+íconos**, con un motivo que conviene tener escrito porque no es de gusto: **la
+ficha del facilitador está sobre teal, y los íconos son un círculo de teal claro**.
+
+Está medido desde la #06 y afirmado en `packages/ui/tokens.test.mjs`:
+
+    cff.tealLight sobre cff.tealDark  →  2,56
+
+Ni siquiera llega al 3:1 que rige para un ícono. Poner esos SVG ahí sería poner
+once círculos que no se ven.
+
+O sea que el día que esa ficha lleve íconos van a necesitar **otro tratamiento**
+—otro color de círculo, o el glifo sin círculo, o un fondo distinto para la
+sección—, y eso es una decisión de diseño, no un renglón. El test que lo impide
+ya existe y está escrito como igualdad, así que nadie puede llegar ahí por
+accidente.
+
 ### 13. El guardián de fidelidad estuvo ciego a un cambio de color · **encontrado y arreglado en la #05**
 
 Queda escrito porque es el modo de falso verde más caro que se pagó en este repo

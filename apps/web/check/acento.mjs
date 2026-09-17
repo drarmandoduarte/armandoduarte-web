@@ -35,6 +35,18 @@
  * miró, contra el piso de esa página. El porqué de cada número, más abajo.
  *
  *     node check/acento.mjs http://127.0.0.1:4180
+ *
+ * ── Y además corre dentro de `pnpm test` ─────────────────────────────────
+ * Desde que dirección lo puso en la gate (17/9), lo que hay acá es un **módulo**
+ * y la corrida por línea de comandos es solo una de sus dos puertas: la otra es
+ * `e2e/acento.spec.ts`, que importa estas mismas constantes y la misma función
+ * de barrido y las afirma página por página.
+ *
+ * Son dos puertas y **un solo barrido** a propósito. Copiar la lógica al test
+ * habría sido copiar también sus defectos, y el día que alguien ajuste la lista
+ * de lo permitido en un lado y no en el otro, el guardián de la gate y el de la
+ * consola dirían cosas distintas sobre la misma web. Es exactamente el modo de
+ * falla que la #06 pagó con el token duplicado.
  */
 import { chromium } from '@playwright/test';
 
@@ -54,7 +66,7 @@ const BASE = process.argv[2] || 'http://127.0.0.1:4180';
  * tiene que cazar: que la página no haya cargado, o que el selector se haya
  * roto y el barrido esté mirando la nada.
  */
-const PAGINAS = [
+export const PAGINAS = [
   // nombre        ruta            piso   (medido el 17/9)
   ['inicio', '/', 220],           //  268
   ['merida', '/merida', 270],     //  328
@@ -70,14 +82,14 @@ const PAGINAS = [
  * sí. Si algo de acá deja de existir, el barrido no se entera —y no tiene por
  * qué: su trabajo es cazar lo que sobra, no lo que falta—.
  */
-const PERMITIDO = [
+export const PERMITIDO = [
   ['.btn--naranja', 'el CTA primario: es el único acento por pantalla'],
   ['.eyebrow', 'el rótulo que abre cada sección, solo sobre fondo claro'],
   ['.script', 'la firma de la marca en Great Vibes, en el pie'],
   ['.dato', 'la marca de dato pendiente de Armando: no es diseño, es andamio'],
 ];
 
-const RECOLECTAR = ({ permitido }) => {
+export const RECOLECTAR = ({ permitido }) => {
   const lienzo = document.createElement('canvas');
   lienzo.width = lienzo.height = 1;
   const cx = lienzo.getContext('2d', { willReadFrequently: true });
@@ -149,48 +161,57 @@ const RECOLECTAR = ({ permitido }) => {
   return { mirados: todos.length, hallazgos };
 };
 
-const navegador = await chromium.launch();
-let fallo = false;
-let totalMirados = 0;
+/**
+ * La corrida por consola. Detrás de una guarda para que importar este módulo
+ * desde el test no levante un Chromium de más — el mismo patrón que
+ * `scripts/guardian-de-guardianes.mjs`.
+ */
+async function porConsola() {
+  const navegador = await chromium.launch();
+  let fallo = false;
+  let totalMirados = 0;
 
-for (const [nombre, ruta, piso] of PAGINAS) {
-  const p = await navegador.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
-  await p.goto(BASE + ruta, { waitUntil: 'load' });
-  await p.evaluate(() => document.fonts.ready);
-  /* Todo revelado y sin transiciones: un bloque a mitad del fundido tiene un
-     color que el diseño no tiene, y acá se compara por igualdad exacta. */
-  await p.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
-  await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
-  await p.waitForTimeout(250);
+  for (const [nombre, ruta, piso] of PAGINAS) {
+    const p = await navegador.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
+    await p.goto(BASE + ruta, { waitUntil: 'load' });
+    await p.evaluate(() => document.fonts.ready);
+    /* Todo revelado y sin transiciones: un bloque a mitad del fundido tiene un
+       color que el diseño no tiene, y acá se compara por igualdad exacta. */
+    await p.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
+    await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
+    await p.waitForTimeout(250);
 
-  const { mirados, hallazgos } = await p.evaluate(RECOLECTAR, { permitido: PERMITIDO });
-  totalMirados += mirados;
+    const { mirados, hallazgos } = await p.evaluate(RECOLECTAR, { permitido: PERMITIDO });
+    totalMirados += mirados;
 
-  /* EL PISO, ANTES DEL CERO. */
-  if (mirados < piso) {
-    console.error(`✗ ${nombre}: el barrido miró ${mirados} elementos y su piso es ${piso}. `
-      + 'Un «cero acentos de más» sobre casi nada no afirma nada: o la página no cargó, '
-      + 'o el selector se rompió y esto está mirando la nada.');
-    fallo = true;
-  }
-
-  if (hallazgos.length) {
-    fallo = true;
-    console.log(`✗ ${nombre} · ${mirados} elementos mirados · ${hallazgos.length} acento(s) fuera de lugar`);
-    for (const h of hallazgos) {
-      console.log(`    ${h.prop.padEnd(18)} ${h.token.padEnd(15)} ${h.donde}${h.texto ? `  «${h.texto}»` : ''}`);
+    /* EL PISO, ANTES DEL CERO. */
+    if (mirados < piso) {
+      console.error(`✗ ${nombre}: el barrido miró ${mirados} elementos y su piso es ${piso}. `
+        + 'Un «cero acentos de más» sobre casi nada no afirma nada: o la página no cargó, '
+        + 'o el selector se rompió y esto está mirando la nada.');
+      fallo = true;
     }
-  } else {
-    console.log(`✓ ${nombre} · ${mirados} elementos mirados · el naranja solo donde se decidió`);
-  }
-  await p.close();
-}
-await navegador.close();
 
-console.log(`\n${totalMirados} elementos en las cuatro páginas. Permitido: ${PERMITIDO.map(([s]) => s).join(', ')}.`);
-if (fallo) {
-  console.error('\nEl acento se usa una vez por pantalla. Lo que aparece arriba lo usa de más: '
-    + 'va en `--gris`, en `--hair` o en el color del texto.\n');
-  process.exit(1);
+    if (hallazgos.length) {
+      fallo = true;
+      console.log(`✗ ${nombre} · ${mirados} elementos mirados · ${hallazgos.length} acento(s) fuera de lugar`);
+      for (const h of hallazgos) {
+        console.log(`    ${h.prop.padEnd(18)} ${h.token.padEnd(15)} ${h.donde}${h.texto ? `  «${h.texto}»` : ''}`);
+      }
+    } else {
+      console.log(`✓ ${nombre} · ${mirados} elementos mirados · el naranja solo donde se decidió`);
+    }
+    await p.close();
+  }
+  await navegador.close();
+
+  console.log(`\n${totalMirados} elementos en las cuatro páginas. Permitido: ${PERMITIDO.map(([s]) => s).join(', ')}.`);
+  if (fallo) {
+    console.error('\nEl acento se usa una vez por pantalla. Lo que aparece arriba lo usa de más: '
+      + 'va en `--gris`, en `--hair` o en el color del texto.\n');
+    process.exit(1);
+  }
+  console.log('El acento está donde se decidió y en ningún otro lado.\n');
 }
-console.log('El acento está donde se decidió y en ningún otro lado.\n');
+
+if (process.argv[1] && process.argv[1].endsWith('acento.mjs')) await porConsola();
