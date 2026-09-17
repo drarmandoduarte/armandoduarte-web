@@ -46,23 +46,27 @@ títulos entrecomillados y los nombres de componente dicen cosas opuestas:
 Así que el fondo velado quedó en la sección del chico en el sillón y la tarjeta
 en la de la madre agobiada, que además es la lectura que tiene sentido.
 
-### 3 · La negrita del hero no era gris: era teal
+### 3 · La negrita del hero no era gris: era teal · **resuelto: queda en teal**
 
-La orden dice que «se construyen» es `span.suave` (gris, peso 300). Es
-`span.acento`: **teal**, peso 300. El cambio se hizo como la orden lo pide —peso
-600 y color de la tinta— pero conviene saber que además **le saca el acento teal
-al titular principal de la portada**, que puede no ser lo que Lucía imaginaba al
-escribir «probar poner en negritas».
+La orden decía que «se construyen» es `span.suave` (gris, peso 300). Era
+`span.acento`: **teal**, peso 300. La orden pedía además pasarlo al color de la
+tinta, y eso le sacaba el acento teal al titular principal de la portada.
 
-Van tres capturas para que elija, y las tres difieren **sólo** en esa línea:
+Se le pasaron a dirección las tres versiones y **eligió el teal**: lo único que
+cambia es el peso, y el titular conserva su acento.
 
-| | 1440 | 390 |
-|---|---|---|
-| antes (teal, 300) | `B-antes-1440.jpg` | `B-antes-390.jpg` |
-| después, como pide la orden (tinta, 600) | `B-despues-1440.jpg` | `B-despues-390.jpg` |
-| variante: negrita pero sigue teal | `B-variante-teal-1440.jpg` | `B-variante-teal-390.jpg` |
+| | 1440 | 390 | |
+|---|---|---|---|
+| antes (teal, 300) | `B-antes-1440.jpg` | `B-antes-390.jpg` | |
+| como pedía la orden (tinta, 600) | `B-despues-1440.jpg` | `B-despues-390.jpg` | descartada |
+| **teal, 600** | `B-variante-teal-1440.jpg` | `B-variante-teal-390.jpg` | **la elegida** |
 
-Volver atrás o pasar a la variante es **una línea** en `index.css` (`.fuerte`).
+El teal a peso 600 sobre crema da **7,74:1**, muy por encima del 3:1 que rige
+para texto grande: engordar un trazo nunca baja el contraste.
+
+**Y este cambio destapó un defecto grave en el guardián de fidelidad**, que está
+abajo en su propia sección. Vale la pena leerlo: el guardián dejaba pasar
+exactamente este cambio de color.
 
 ---
 
@@ -257,6 +261,80 @@ todos los `href` internos. `vercel.json` de la raíz redirige `/taller` y
 Son 32 archivos, 12 MB: 12 capturas de página completa, 12 de texto (el texto sí
 cambia con el ancho) y 4 + 4 de `href` y `<head>` (que no dependen del ancho).
 
+**Capturas actualizadas por la orden #05.** Se regeneraron dos veces: al crearlas
+y otra vez al pasar la negrita del hero a teal, que movió las tres de `inicio` y
+ninguna más.
+
+### Y los tres tests que todavía leían `qa/referencia/` se retiran
+
+Dirección lo resolvió con la orden ya aprobada: **retirados por D24, la
+referencia del port cumplió su propósito en la #04.**
+
+| test | qué se retiró | tests |
+|---|---|--:|
+| `packages/ui/tokens.test.mjs` | el bloque que ataba la sección `web` del JSON a `estilo.css` | −8 |
+| `apps/web/src/el-css-esta-entero.test.ts` | el archivo entero | −4 |
+| `apps/web/e2e/comportamiento.spec.ts` | **sólo la mitad comparativa** | −0 |
+
+El tercero merece la aclaración, porque es donde se podía perder vigilancia sin
+que se notara. Sus dos tests ya afirmaban **cada estado contra su valor literal**
+—el menú cerrado en `opacidad '0'`, abierto en `'1'`, el velo de la cabecera
+encendiendo en `'1'` y apagando en `'0'`, todos los `.reveal` revelados— y encima
+de eso comparaban contra la otra pestaña. Se fue la comparación; se quedaron los
+literales, que son los que cazan un menú muerto. El `toEqual` nunca lo hizo: dos
+páginas rotas igual se parecen muchísimo. Por eso `@codice/navegador` sigue en 14.
+
+De paso se fueron el segundo servidor de `playwright.config.ts`, `ESTATICO_DIR` y
+el `existsSync` que frenaba la corrida si faltaba la carpeta. **Hoy ningún test
+lee `qa/referencia/`.**
+
+Y los tres JPG viejos sin uso —`armando-parado.jpg`, `armando-retrato.jpg`,
+`armando-sentado.jpg`, 528 KB— se borraron de `public/img/`. Los nueve originales
+siguen en `qa/referencia/img/`.
+
+---
+
+## El guardián de fidelidad estaba ciego a un cambio de color
+
+Esto no estaba en la orden. Salió al hacer el cambio que dirección pidió, y es lo
+más importante que encontró esta orden.
+
+Al pasar «se construyen» de tinta a teal, recompilar y correr el guardián: **las
+doce comprobaciones pasaron en verde** con el titular de la portada pintado de
+otro color, y `--update-snapshots` no reescribió un solo archivo. Con la hoja de
+vuelta en tinta también pasaban. Estaba ciego a los dos lados del cambio.
+
+La causa es una frase que llevaba cuatro órdenes escrita en `fidelidad.spec.ts`
+como si fuera cierta: «queda el `threshold` por píxel que trae Playwright (0,2 en
+YIQ), que tolera el antialias de una máquina a otra **sin tolerar un color
+distinto**». La segunda mitad es falsa, medido con la métrica de pixelmatch que
+Playwright usa (`maxDelta = 35215 × threshold²`):
+
+| par de colores | delta | tope con 0,2 | |
+|---|--:|--:|---|
+| tinta `#2E2B25` → teal `#005761` | 1.253 | 1.409 | **no se contaba** |
+| naranja `#BF3F06` → teal `#005761` | 7.356 | 1.409 | se contaba |
+| antialias típico (±2 por canal) | 2 | 1.409 | no se cuenta |
+
+La mutación de control de la #01 —la que dejó creer que el guardián servía— movía
+**7.356 sobre un tope de 1.409**: pasaba holgada. Este cambio caía justo por
+debajo. Un presupuesto de «cero píxeles diferentes» no vale nada si la definición
+de «diferente» deja pasar dos colores de marca distintos.
+
+**Arreglado con `threshold: 0.05`**, que baja el tope a 88: el cambio de color se
+cuenta con 14× de margen y el antialias sigue absorbido con 44×. No se puso en 0
+porque ahí cualquier variación de un punto en el borde de una letra contaría y el
+guardián se pondría rojo solo.
+
+Comprobado: con la captura vieja y la página nueva da **9.807 píxeles** de
+diferencia, y **dos corridas limpias seguidas** pasan en verde, o sea que el
+dibujado es determinista en esta máquina a ese umbral.
+
+La lección va a `docs/tareas.md` porque vale más que el número: **una mutación que
+pasa holgada no prueba que el guardián sirva para cambios chicos.** Si una
+comprobación tiene un umbral, la mutación que la valida tiene que caer *cerca* del
+umbral, no lejos.
+
 ---
 
 ## Verificación de cierre
@@ -388,12 +466,23 @@ check:tokens    57 archivos, ningún hex fuera de codice-tokens.css
 check:secretos  110 archivos, 9 formas buscadas, ninguna encontrada
 typecheck       Done
 lint            limpio
-pnpm test       88 tests declarados, 0 saltados, ninguna suite bajo su piso
+pnpm test       76 tests declarados, 0 saltados, ninguna suite bajo su piso
 ```
 
-Piso de tests: `@codice/ui` 21 → **35**, `@codice/core` 12 → **23**.
-`@codice/web` y `@codice/navegador` no se mueven: el guardián de fidelidad sigue
-siendo doce comprobaciones, lo que cambió es contra qué compara.
+Piso de tests, con los dos movimientos por separado porque cuentan cosas
+distintas:
+
+| paquete | antes | la #05 suma | la #05 retira | queda |
+|---|--:|--:|--:|--:|
+| `@codice/ui` | 21 | +14 contraste CFF | −8 del estático | **27** |
+| `@codice/core` | 12 | +11 los dos teléfonos | — | **23** |
+| `@codice/web` | 13 | — | −4 `el-css-esta-entero` | **9** |
+| `@codice/navegador` | 14 | — | — | **14** |
+| `@codice/prompts` | 3 | — | — | **3** |
+
+Los doce que se retiran son los que comparaban contra `qa/referencia/`, y bajar
+un número de esa tabla es un acto visible: el motivo está escrito arriba y en
+`qa/piso-de-tests.md`.
 
 ### Las mutaciones — ningún test está terminado hasta que se lo vio fallar
 
@@ -403,8 +492,14 @@ siendo doce comprobaciones, lo que cambió es contra qué compara.
 | `--naranja-texto` subido a `#DF4907` | los 4 pares de `orangeText` en `tokens.test.mjs` |
 | `.eyebrow` pintado de teal | fidelidad: **921 píxeles** distintos, 6 comprobaciones rojas |
 | un `href="/taller"` de vuelta en el pie | `check/enlaces.sh`, punto 3 |
+| **la negrita del hero de teal a tinta** — delta 1.253, justo debajo del viejo tope | fidelidad: **3 comprobaciones**, 9.807 píxeles |
 
-Los cuatro archivos se devolvieron y las cuatro comprobaciones volvieron a verde.
+Los cinco archivos se devolvieron y las cinco comprobaciones volvieron a verde.
+
+La última es la que importa y es nueva: es la mutación **cerca del umbral**, no
+lejos. Con el `threshold` que traía Playwright pasaba en verde; con el 0,05
+medido, se pone roja. Es la que prueba que el guardián sirve para el tamaño de
+cambio que esta web hace de verdad.
 
 **Dos defectos que las mutaciones encontraron en los propios guardianes**, los
 dos arreglados acá:

@@ -253,44 +253,79 @@ vigila `pnpm check:secretos`, que está en la gate y falla nombrando archivo y
 línea. Si una orden futura parece pedir lo contrario, está mal escrita: se frena
 y se pregunta.
 
-### 10. `qa/referencia/` sigue leyéndolo tres tests, y la orden #05 decía que ninguno · **de dirección**
+### 10. `qa/referencia/` ~~sigue leyéndolo tres tests~~ · **cerrado en la #05**
 
-La D24 dice: «`qa/referencia/` se queda como historia y **ya no lo lee ningún
-test**». La #05 cumplió la primera mitad —el guardián de fidelidad dejó de
-compararse contra el sitio estático y ahora mira las capturas versionadas— pero
-la segunda **no es cierta todavía**. Lo siguen leyendo tres:
+Dirección lo resolvió el mismo día que se abrió: **los tres se retiran**. El
+motivo, con sus palabras: «comparan contra una referencia que D24 declaró
+historia; un guardián que vigila contra lo que ya no es verdad no es vigilancia,
+es ruido que un día se ignora».
 
-| test | qué le pide al estático | ¿sigue teniendo sentido? |
-|---|---|---|
-| `e2e/comportamiento.spec.ts` | que el menú, el tinte del header y el fundido se comporten igual de los dos lados | sí: mide comportamiento, que la #05 no tocó |
-| `packages/ui/tokens.test.mjs` | que la tipografía y el aire del JSON estén textualmente en `estilo.css` | a medias: describe «el CSS que el navegador dibuja hoy», y hoy eso es `index.css` |
-| `src/el-css-esta-entero.test.ts` | que no falte ni sobre ninguna regla | cada vez menos: la #05 le declaró 34 líneas de delta |
+Qué se fue, con su número:
 
-**No se tocaron a propósito.** La orden #05 nombra el guardián de fidelidad y
-solo ése; retirar los otros tres es bajar vigilancia, y bajar vigilancia es un
-acto visible que decide dirección, no una consecuencia que se saca sola de una
-frase. Los tres están verdes.
+| test | qué se retiró | tests |
+|---|---|--:|
+| `packages/ui/tokens.test.mjs` | el bloque que ataba la sección `web` del JSON a `estilo.css` | −8 |
+| `apps/web/src/el-css-esta-entero.test.ts` | el archivo entero: comparaba regla por regla en las dos direcciones | −4 |
+| `apps/web/e2e/comportamiento.spec.ts` | **sólo la mitad comparativa** (la segunda pestaña y los `toEqual`) | −0 |
 
-Lo que hay que decidir es una cosa y es chica: **si el sitio estático deja de ser
-la especificación de la web o no.** Si deja de serlo, `tokens.test.mjs` pasa a
-leer `index.css` —que es lo que ya dice que lee— y `el-css-esta-entero` pierde su
-razón de ser, porque lo que cuidaba era el port y el port terminó. Si no deja de
-serlo, la lista de deltas de `el-css-esta-entero` va a crecer una orden por vez
-hasta volverse la web escrita dos veces, que es exactamente lo que la D24 evitó
-para las capturas.
+El tercero es el que merece la aclaración. Sus dos tests ya afirmaban **cada
+estado contra su valor literal** y encima comparaban contra el estático; se fue
+la comparación y se quedaron los literales, que son los que cazan un menú muerto.
+El `toEqual` nunca lo hizo: dos páginas rotas igual se parecen muchísimo. Por eso
+`@codice/navegador` sigue en 14 y no baja.
 
-Es una orden corta. No urge: nada está rojo ni en riesgo.
+De paso se fue el segundo servidor de `playwright.config.ts`, `ESTATICO_DIR` y el
+`existsSync` que frenaba la corrida si faltaba la carpeta. **Hoy ningún test lee
+`qa/referencia/`**, que es lo que la D24 decía y ahora es cierto.
 
-### 11. Tres JPG viejos de Armando quedaron sin usar · **chico, de dirección**
+### 11. Tres JPG viejos de Armando ~~quedaron sin usar~~ · **cerrado en la #05**
 
-La #05 borró los **seis** recortes con el fondo horneado que la orden nombra
-(`armando-parado-{calido,crema,teal}.jpg` y `armando-sentado-*`). Quedaron en
-`public/img/` otros tres que ya no usa nadie y que la orden no nombra:
-`armando-parado.jpg`, `armando-retrato.jpg` y `armando-sentado.jpg` — 537 KB
-entre los tres, servidos a nadie.
+Borrados de `public/img/` los tres que ya no usaba nadie —`armando-parado.jpg`,
+`armando-retrato.jpg` y `armando-sentado.jpg`, 528 KB—. Los nueve originales
+siguen en `qa/referencia/img/`, que es el sitio tal como se publicó el 12/9.
 
-No se borraron porque la orden dice seis y dice cuáles. Se borran en dos
-segundos cuando dirección diga que sí.
+### 13. El guardián de fidelidad estuvo ciego a un cambio de color · **encontrado y arreglado en la #05**
+
+Queda escrito porque es el modo de falso verde más caro que se pagó en este repo
+y porque la frase que lo tapaba llevaba cuatro órdenes escrita como si fuera
+cierta.
+
+`fidelidad.spec.ts` decía desde la #01: «queda el `threshold` por píxel que trae
+Playwright (0,2 en YIQ), que tolera el antialias de una máquina a otra **sin
+tolerar un color distinto**». La segunda mitad es falsa.
+
+Se descubrió cuando dirección eligió que «se construyen» quedara en teal en vez
+de tinta: se cambió el color, se recompiló, y **las doce comprobaciones pasaron
+en verde** con el titular de la portada pintado de otro color. `--update-snapshots`
+tampoco reescribió un solo archivo. Con la hoja de vuelta en tinta también
+pasaban: el guardián estaba ciego a los dos lados del cambio.
+
+Medido con la métrica de pixelmatch que Playwright usa —`maxDelta = 35215 ×
+threshold²`—:
+
+| par de colores | delta | tope con 0,2 | |
+|---|--:|--:|---|
+| tinta `#2E2B25` → teal `#005761` | 1.253 | 1.409 | **no se contaba** |
+| naranja `#BF3F06` → teal `#005761` | 7.356 | 1.409 | se contaba |
+| antialias típico (±2 por canal) | 2 | 1.409 | no se cuenta |
+
+La mutación de control de la #01 caía muy por encima del tope —por eso el
+guardián parecía funcionar y nadie dudó de la frase— y este cambio caía justo por
+debajo. Un presupuesto de «cero píxeles diferentes» no vale nada si la definición
+de «diferente» deja pasar dos colores de marca distintos.
+
+**Arreglado con `threshold: 0.05`**, que baja el tope a 88: el cambio de color se
+cuenta con 14× de margen y el antialias sigue absorbido con 44×. No se puso en 0
+porque ahí cualquier variación de un punto en el borde de una letra contaría y el
+guardián se pondría rojo solo. Comprobado: con la captura vieja y la página nueva
+da **9.807 píxeles** de diferencia, y dos corridas limpias seguidas pasan en
+verde, o sea que el dibujado es determinista en esta máquina a ese umbral.
+
+La lección, que vale más que el número: **una mutación que pasa holgada no prueba
+que el guardián sirva para cambios chicos.** La de la #01 movía 7.356 de delta
+sobre un tope de 1.409 y dejó creer que cualquier color distinto se cazaba. Si
+una comprobación tiene un umbral, la mutación que la valida tiene que caer
+**cerca** del umbral, no lejos.
 
 ### 12. Los tres íconos de la franja de hechos no llegan a 2× · **de Lucía**
 

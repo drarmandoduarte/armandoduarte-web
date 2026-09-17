@@ -78,11 +78,37 @@ const PISO_DE_TEXTO = 500;
  * comprobaciones salían **verdes** con la palabra pintada de otro color. Un
  * guardián que aprueba eso no es un guardián: es un presupuesto.
  *
- * Queda el `threshold` por píxel que trae Playwright (0,2 en YIQ), que tolera el
- * antialias de una máquina a otra sin tolerar un color distinto. Si algún día
- * este número tiene que subir, sube con la medición al lado.
+ * ── Y el `threshold` por píxel, que NO se podía dejar en el que viene ────
+ * Esa frase estuvo acá desde la #01: «queda el `threshold` de Playwright (0,2 en
+ * YIQ), que tolera el antialias de una máquina a otra sin tolerar un color
+ * distinto». **Es falsa, y se descubrió con un color distinto.**
+ *
+ * Cuando dirección eligió que «se construyen» quedara en teal en vez de tinta,
+ * las capturas no se movieron: las doce comprobaciones pasaron en verde con el
+ * titular de la portada pintado de otro color, y `--update-snapshots` no
+ * reescribió un solo archivo. Con la hoja puesta en tinta también pasaban. El
+ * guardián estaba ciego a los dos lados del cambio.
+ *
+ * El motivo, medido con la métrica de pixelmatch que Playwright usa
+ * (`maxDelta = 35215 × threshold²`):
+ *
+ *   tinta #2E2B25 → teal #005761      delta  1.253   tope con 0,2: 1.409  → NO cuenta
+ *   naranja #BF3F06 → teal #005761    delta  7.356   tope con 0,2: 1.409  → cuenta
+ *   antialias típico (±2 por canal)   delta      2
+ *
+ * O sea: la mutación de control de la #01 pasaba por encima del tope con holgura
+ * —por eso el guardián parecía funcionar— y este cambio caía justo por debajo.
+ * Un presupuesto de «cero píxeles diferentes» no vale nada si la definición de
+ * «diferente» deja pasar dos colores de marca distintos.
+ *
+ * `threshold: 0.05` baja el tope a **88**: el cambio de color se cuenta con 14×
+ * de margen y el antialias sigue absorbido con 44×. No se puso en 0 porque ahí
+ * cualquier variación de un punto en el borde de una letra contaría, y eso hace
+ * un guardián que se pone rojo solo. El número sale de la tabla de arriba, no
+ * del gusto.
  */
 const DIFERENCIA_MAXIMA = 0;
+const TOLERANCIA_POR_PIXEL = 0.05;
 
 const url = (ruta: string) => `http://127.0.0.1:${PUERTO_PORT}${ruta}`;
 
@@ -174,6 +200,7 @@ for (const { nombre, ruta } of PAGINAS) {
           fullPage: true,
           animations: 'disabled',
           maxDiffPixelRatio: DIFERENCIA_MAXIMA,
+          threshold: TOLERANCIA_POR_PIXEL,
         });
       });
     }

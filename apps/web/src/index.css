@@ -31,12 +31,15 @@ img{display:block;max-width:100%}
 .suave{color:var(--gris);font-weight:300}
 /* «se construyen» del hero de la portada, en negritas (orden #05, B).
    Lucía pidió «probar poner en negritas». La orden lo daba por `.suave` —gris,
-   peso 300—; era `.acento`: teal, peso 300 heredado de `.display-xl`. Va a peso
-   600 y al color de la tinta, que es lo que la orden pide: una negrita gris se
-   ve como un error de impresión, y una negrita teal le disputa el acento a la
-   marca. Es un «probar»: se revierte borrando esta regla y devolviendo la
-   clase a `acento` en `inicio/Hero.tsx`. */
-.fuerte{color:var(--tinta);font-weight:600}
+   peso 300— y era `.acento`: teal, peso 300 heredado de `.display-xl`. La orden
+   pedía además pasarlo al color de la tinta; **dirección eligió el teal**
+   mirando las tres versiones, así que lo único que cambia es el peso y el
+   titular conserva su acento.
+
+   El teal a peso 600 sobre crema da 7,74:1, muy por encima del 3:1 que rige
+   para texto grande: engordar un trazo nunca baja el contraste. Se revierte
+   borrando esta regla y devolviendo la clase a `acento` en `inicio/Hero.tsx`. */
+.fuerte{color:var(--teal);font-weight:600}
 .lead{font-size:clamp(18px,1.45vw,21px);line-height:1.6;color:var(--gris);max-width:56ch}
 .body{font-size:17px;line-height:1.75;color:var(--tinta);max-width:62ch}
 .body+.body{margin-top:1em}

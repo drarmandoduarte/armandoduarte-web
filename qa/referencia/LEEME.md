@@ -18,20 +18,25 @@ de la última versión aprobada, versionadas en `apps/web/e2e/__snapshots__/`, c
 el mismo presupuesto de cero píxeles. `apps/web/e2e/cambios-visibles.ts`, que
 declaraba el delta de la #03, se borró: su trabajo terminó con él.
 
-## Pero todavía la leen tres tests, y conviene saber cuáles
+## Y desde la #05 no la lee ningún test
 
-La D24 dice «ya no lo lee ningún test». Es la intención, y todavía no es cierto:
+La D24 lo pedía y al cerrarse la #05 es cierto. Los tres que quedaban se
+retiraron con la frase **«retirados por D24: la referencia del port cumplió su
+propósito en la #04»**:
 
-- `apps/web/e2e/comportamiento.spec.ts` — compara el menú, el tinte del header y
-  el fundido de los dos lados. Mide **comportamiento**, que la #05 no tocó.
-- `packages/ui/tokens.test.mjs` — comprueba que la tipografía y el aire del JSON
-  estén textualmente en `estilo.css`.
-- `apps/web/src/el-css-esta-entero.test.ts` — que no falte ni sobre ninguna
-  regla, con el delta de cada orden declarado.
+- `packages/ui/tokens.test.mjs` — el bloque que ataba la sección `web` del JSON a
+  `estilo.css` (8 comprobaciones).
+- `apps/web/src/el-css-esta-entero.test.ts` — el archivo entero (4).
+- `apps/web/e2e/comportamiento.spec.ts` — sólo la mitad comparativa; sus dos
+  tests siguen vivos afirmando cada estado contra su valor literal.
 
-Los tres están verdes y ninguno se tocó en la #05: retirarlos es bajar
-vigilancia, y eso lo decide dirección. Está anotado en `docs/tareas.md`,
-pendiente 10.
+También se fue el segundo servidor de `playwright.config.ts` y la variable
+`ESTATICO_DIR`. Nada de la gate depende ya de esta carpeta: se puede leer, se
+puede citar, y si un día desaparece no se rompe ninguna comprobación.
+
+Lo que se queda acá y sigue teniendo valor son **las nueve fotos originales de
+Armando** en `img/`, incluidas las tres que la #05 sacó de `public/` por no
+usarse.
 
 **No se edita nunca**, y ahora por una razón más simple que antes: es lo que
 Armando vio y aprobó el 12/9. Si hay que cambiar algo de la web, se cambia en

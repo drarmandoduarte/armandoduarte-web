@@ -4,9 +4,11 @@
  * ── Qué cuida ──────────────────────────────────────────────────────────────
  * Que `codice-tokens.json` siga describiendo **la web que existe** y no la que
  * alguien recuerda. El JSON es un documento: se lee, se cita en las órdenes y
- * nadie lo ejecuta, así que envejece sin avisar. Este archivo lo ata a la única
- * fuente que no miente —`estilo.css` del sitio estático, que es lo que el
- * navegador dibuja hoy— y a la regla de que un color no se escribe dos veces.
+ * nadie lo ejecuta, así que envejece sin avisar. Este archivo lo ata a dos cosas
+ * que no se pueden falsear: **el contraste en aritmética** —cada par con su
+ * número al lado, y los tres que NO llegan afirmados como igualdad para que
+ * nadie los arregle en silencio— y la regla de que un color no se escribe dos
+ * veces.
  *
  * ── El piso va primero, y por qué ─────────────────────────────────────────
  * La comprobación central es «este valor aparece textualmente en el CSS». Si el
@@ -17,21 +19,16 @@
  * piso va ANTES de la afirmación que sostiene— y acá se paga sola: sin ella, un
  * `ESTATICO_DIR` mal puesto se lee como «los tokens no coinciden».
  *
- * ── Dónde está el sitio estático ──────────────────────────────────────────
- * En `qa/referencia/` de este mismo repo, versionado, desde la orden #04 —antes
- * era un repo de al lado—. `ESTATICO_DIR` sigue pudiendo apuntar a otro lado,
- * pero por omisión no hace falta. **No se saltea si falta**: un guardián que se
- * saltea cuando no encuentra su insumo es un guardián que se apaga solo el día
- * que más falta hace.
+ * ── Lo que se retiró en la #05 ────────────────────────────────────────────
+ * La comparación contra `estilo.css` del sitio estático. El motivo está escrito
+ * abajo, donde estaba el bloque.
  */
 import { describe, expect, it } from 'vitest';
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
-const RAIZ = join(AQUI, '..', '..');
-const ESTATICO = process.env.ESTATICO_DIR || join(RAIZ, 'qa', 'referencia');
 
 const tokens = JSON.parse(readFileSync(join(AQUI, 'codice-tokens.json'), 'utf8'));
 
@@ -220,49 +217,27 @@ describe('los tokens de Códice', () => {
     });
   });
 
-  describe('la sección `web` describe el CSS que el navegador dibuja hoy', () => {
-    /* EL PISO, PRIMERO. Ver la cabecera: sin esto, el rojo de abajo miente. */
-    const rutaCss = join(ESTATICO, 'estilo.css');
-    let css = '';
-    let bytes = 0;
-    try {
-      bytes = statSync(rutaCss).size;
-      css = readFileSync(rutaCss, 'utf8');
-    } catch {
-      /* se cae en el piso, con el nombre del archivo a la vista */
-    }
-
-    it(`piso · se leyó ${rutaCss}`, () => {
-      expect(
-        bytes,
-        `no se pudo leer ${rutaCss}. Es la especificación del port: sin él este guardián no `
-        + 'compara nada. Vive en `qa/referencia/` de este repo y se versiona con él.',
-      ).toBeGreaterThan(10_000);
-      expect(css.length).toBeGreaterThan(10_000);
-    });
-
-    for (const [nombre, escala] of Object.entries(tokens.web.typography.display)) {
-      it(`display ${nombre}: «${escala.size}» está textualmente en estilo.css`, () => {
-        expect(css).toContain(escala.size);
-      });
-    }
-
-    it('lead y script también', () => {
-      expect(css).toContain(tokens.web.typography.lead.size);
-      expect(css).toContain(tokens.web.typography.script.size);
-    });
-
-    it('el aire de sección, el hero y el arco también', () => {
-      expect(css).toContain(tokens.web.section.paddingBlock);
-      expect(css).toContain(tokens.web.hero.minHeight);
-      expect(css).toContain(tokens.web.foto.arco.borderRadius);
-    });
-
-    it('el header mide lo que dice medir, arriba y abajo de los 600px', () => {
-      expect(css).toContain(`--header-h:${tokens.web.header.height.default}`);
-      expect(css).toContain(`--header-h:${tokens.web.header.height.compact}`);
-    });
-  });
+  /*
+   * ── Acá vivía la comparación contra `estilo.css` del sitio estático ──────
+   *
+   * **Retirados por D24: la referencia del port cumplió su propósito en la #04.**
+   *
+   * Ocho comprobaciones ataban la sección `web` de este JSON al CSS del sitio
+   * estático: que cada `clamp()` de la escala display, el aire de sección, el
+   * alto del hero, el radio del arco y las dos alturas del header estuvieran
+   * **textualmente** en `qa/referencia/estilo.css`. Tenían razón de ser mientras
+   * el estático fuera la especificación de la web; desde la #05 la web tiene
+   * paleta, íconos y fotografías propias, y el estático es historia. Un guardián
+   * que compara contra algo que ya no es verdad no vigila: hace ruido, y el
+   * ruido se termina apagando.
+   *
+   * Lo que sigue vigilando que este JSON no envejezca es lo de arriba y lo de
+   * abajo: el contraste en aritmética —treinta afirmaciones con sus valores al
+   * lado— y que ningún color se escriba dos veces. Lo que ya no se afirma es que
+   * la tipografía del documento coincida con la del CSS; si eso hace falta otra
+   * vez, se ata a `apps/web/src/index.css`, que es lo que el navegador dibuja
+   * hoy, y no a una carpeta que dice «referencia» en el nombre.
+   */
 
   describe('ningún color se escribe dos veces', () => {
     const hexDeColor = new Set(

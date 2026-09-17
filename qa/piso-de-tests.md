@@ -17,10 +17,10 @@ alguien lo va a leer en el PR. Ése es el punto.
 
 | paquete | piso |
 |---|---|
-| `@codice/ui` | 35 |
+| `@codice/ui` | 27 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 13 |
+| `@codice/web` | 9 |
 | `@codice/navegador` | 14 |
 
 ## De dónde salen estos números
@@ -34,6 +34,35 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que la orden #05 **bajó**, que es lo que hay que leer con cuidado
+
+`@codice/ui` baja de 35 a **27** y `@codice/web` de 13 a **9**. Doce tests menos,
+y bajar un número de esta tabla es un acto visible: acá está el motivo.
+
+**Retirados por D24: la referencia del port cumplió su propósito en la #04.** Los
+doce comparaban la web contra `qa/referencia/`, el sitio estático:
+
+- **8 en `@codice/ui`** — el bloque que ataba la sección `web` del JSON de tokens
+  a `estilo.css`: que cada `clamp()` de la escala display, el aire de sección, el
+  alto del hero, el radio del arco y las dos alturas del header estuvieran
+  textualmente ahí.
+- **4 en `@codice/web`** — `el-css-esta-entero.test.ts` entero, que comparaba
+  regla por regla en las dos direcciones.
+
+Desde la #05 la web tiene paleta, íconos y fotografías propias: el estático dejó
+de ser su especificación. Un guardián que compara contra algo que ya no es verdad
+no vigila, hace ruido, y el ruido termina apagado. Lo que sí sigue vigilando que
+el JSON no envejezca son las 27 que quedan: el contraste en aritmética, con cada
+par y su número al lado, y que ningún color se escriba dos veces.
+
+`@codice/navegador` **no baja**, y eso es a propósito. `comportamiento.spec.ts`
+también leía el estático, pero sus dos tests ya afirmaban **cada estado contra su
+valor literal** —el menú cerrado en `opacidad '0'`, abierto en `'1'`, el velo de
+la cabecera encendiendo en `'1'` y apagando en `'0'`— y encima de eso comparaban
+contra la otra pestaña. Se retiró la comparación; se quedaron los literales, que
+son los que cazaban un menú muerto. El `toEqual` nunca lo hizo: dos páginas rotas
+igual se parecen muchísimo.
 
 ## Lo que movió la orden #05
 
