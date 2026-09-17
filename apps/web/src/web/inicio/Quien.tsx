@@ -1,8 +1,21 @@
 import { useTranslation } from 'react-i18next';
+import { Icono } from '../comun/Icono';
 import { Retrato } from '../comun/Retrato';
 import { Seccion } from '../comun/Seccion';
 
-/** Quién soy: la foto libre a la izquierda, la ficha y la cita a la derecha. */
+/**
+ * Quién soy: la foto libre a la izquierda, la ficha y la cita a la derecha.
+ *
+ * ── Los íconos de la ficha (orden #07, H) ────────────────────────────────
+ * Tres de los cuatro salen de los SVG nuevos con el mismo nombre que su fila:
+ * formación, práctica, obra. El cuarto es **lugar**, porque la cuarta fila de
+ * esta ficha es «Base · Mérida, Yucatán» — no «Familia».
+ *
+ * La orden pedía `familia, practica, formacion, obra` acá, pero esos cuatro son
+ * las filas de la ficha de «Sobre el facilitador», en `/merida`, no las de
+ * ésta. `familia.svg` quedó sin usar y está anotado en el informe: la orden no
+ * nombra esa sección, así que no se le agregaron íconos por cuenta propia.
+ */
 export function Quien() {
   const { t } = useTranslation();
   return (
@@ -18,10 +31,16 @@ export function Quien() {
           </h2>
           <p className="body u-mt-4 reveal" data-d="2">{t('inicio.quien.cuerpo')}</p>
           <ul className="ficha reveal" data-d="2">
-            <li><span>{t('inicio.quien.fichaFormacionClave')}</span><span>{t('inicio.quien.fichaFormacionValor')}</span></li>
-            <li><span>{t('inicio.quien.fichaPracticaClave')}</span><span>{t('inicio.quien.fichaPracticaValor')}</span></li>
             <li>
-              <span>{t('inicio.quien.fichaObraClave')}</span>
+              <span><Icono nombre="formacion" ancho={24} alto={24} />{t('inicio.quien.fichaFormacionClave')}</span>
+              <span>{t('inicio.quien.fichaFormacionValor')}</span>
+            </li>
+            <li>
+              <span><Icono nombre="practica" ancho={24} alto={24} />{t('inicio.quien.fichaPracticaClave')}</span>
+              <span>{t('inicio.quien.fichaPracticaValor')}</span>
+            </li>
+            <li>
+              <span><Icono nombre="obra" ancho={24} alto={24} />{t('inicio.quien.fichaObraClave')}</span>
               <span>
                 {t('inicio.quien.fichaObraAntes')}
                 <em>{t('inicio.quien.fichaObraLibro1')}</em>
@@ -29,7 +48,10 @@ export function Quien() {
                 <em>{t('inicio.quien.fichaObraLibro2')}</em>
               </span>
             </li>
-            <li><span>{t('inicio.quien.fichaBaseClave')}</span><span>{t('inicio.quien.fichaBaseValor')}</span></li>
+            <li>
+              <span><Icono nombre="lugar" ancho={24} alto={24} />{t('inicio.quien.fichaBaseClave')}</span>
+              <span>{t('inicio.quien.fichaBaseValor')}</span>
+            </li>
           </ul>
           <blockquote className="cita u-mt-5 reveal" data-d="3">
             {t('inicio.quien.cita')}<small>{t('inicio.quien.citaFirma')}</small>

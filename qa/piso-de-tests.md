@@ -21,7 +21,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
 | `@codice/web` | 17 |
-| `@codice/navegador` | 20 |
+| `@codice/navegador` | 22 |
 
 ## De dónde salen estos números
 
@@ -34,6 +34,20 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #07
+
+`@codice/navegador` sube de 20 a **22**: los dos tests del hero opaco, uno por
+página. Afirman que **después de que el script corrió** ningún elemento del hero
+lleva `.reveal` ni arranca translúcido.
+
+Que se midan después del script y no antes es la mitad del test: la regla que
+apaga los bloques es `.js .reveal`, así que sin JavaScript todo vale 1 y la
+comprobación pasaría sola. Se espera a que `comportamiento.ts` ponga la clase
+`js` y recién ahí se mira.
+
+Contra el hero de antes de la #07 los dos dan rojo —seis elementos con
+`.reveal`— y contra el de ahora, verde.
 
 ## Lo que movió la orden #06
 

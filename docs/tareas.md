@@ -17,6 +17,7 @@ usa.
 | #04 | El monorepo entra al repo de Armando | cerrada (PR #5) |
 | #05 | La devolución de Lucía y de Armando: paleta CFF, íconos, fotos, dos teléfonos y `/merida` | **cerrada** (PR #7, mergeado el 16/9/2026) |
 | #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
+| #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | en curso (rama `web/07-contenido`, sobre `main`) |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -109,7 +110,7 @@ El sitio estático **conserva el defecto** y es correcto que lo conserve: ahora 
 `qa/referencia/`, la referencia del guardián de fidelidad, y la diferencia está
 declarada en `apps/web/e2e/cambios-visibles.ts`. Tocarlo sería mover la vara.
 
-### 4c. El acento sobre teal no llega a AA: **2,81** · **de dirección**
+### 4c. El acento sobre teal no llegaba a AA ~~**2,81**~~ · **cerrado en la #07**
 
 Los rótulos, enlaces y flechas de las secciones teal. Era el ocre medio sobre el
 teal de D6 y daba **2,51**; desde la #05 es el **ámbar del manual CFF sobre el
@@ -134,11 +135,15 @@ bajándoles la exigencia sino sacando de la página lo que los producía:
 | el ámbar sobre teal del **header** | 2,81 | **3,10** | **cerrado**: el botón del header sobre oscuro pasó a crema con borde al 50 % (orden #06, F) |
 | la tapa del libro (`small` al 80 %) | 3,72 | 3,72 | sigue abierto — es contenido, lo mira la **#07** |
 
-Lo que queda de 4c es **el ámbar sobre teal en el contenido**: el enlace de la
-franja «Ahora» y el rótulo de la sección del taller. Medido con axe el 17/9 son
-**dos nodos** en toda la web, los dos en `/` y `/merida`. El cromo ya no aporta
-ninguno: la #06 lo sacó del header y del menú, que es donde D25 dice que el color
-de marca no va.
+**La #07 lo cerró.** El ámbar dejó de usarse como texto sobre teal: los
+eyebrows, los enlaces y las firmas sobre fondo oscuro pasaron a **crema al 70 %**
+—el primer valor medido que pasa 4,5 sobre teal (4,66) y sobre tinta (7,27)— y el
+pill de la franja «Ahora» pasó a crema 70 % con texto teal. El ámbar se quedó
+donde D25 lo permite: el hover.
+
+Con eso el barrido de contraste da **cero pares por debajo de AA en las cuatro
+páginas**, por primera vez desde que existe. La tapa del libro, que era el otro
+par abierto, desapareció con la portada real (#07, decisión 4).
 
 ### 5. Performance: el bundle costaba 17 puntos · **cerrado en la #02**
 
@@ -355,14 +360,12 @@ web usa.
 test tiene que apuntar a la misma fuente que usa el código — y eso es una segunda
 cosa que se puede desincronizar. Si se puede medir en vez de copiar, se mide.
 
-### 12. Los tres íconos de la franja de hechos no llegan a 2× · **de Lucía**
+### 12. Los tres íconos de la franja de hechos ~~no llegan a 2×~~ · **cerrado en la #07**
 
-La orden pide servir los íconos «a 2× del tamaño en que se muestran». Seis de los
-ocho lo cumplen de sobra. Los tres de la franja de hechos —`sesion.png` (67 px),
-`horario.png` (71 px) y `lugar.png` (76 px)— se muestran a 40 px, así que a 2×
-harían falta 80 y quedan entre 1,68× y 1,90×.
+Dirección los redibujó en vector el 17/9, junto con `taller.svg`, y reemplazan a
+los PNG del mismo nombre. A un SVG no le importa la densidad de la pantalla, así
+que el pendiente no se resolvió pidiendo archivos más grandes: se resolvió
+sacándole el problema de encima al formato.
 
-**No se escalaron**: agrandar un PNG no agrega información, solo peso. Se sirven
-como llegaron. En una pantalla de densidad doble la diferencia entre 1,7× y 2× en
-un ícono plano de dos colores es difícil de ver, así que no es un defecto — es un
-pedido chico para la próxima tanda: los mismos tres a 160 px de lado.
+Los cuatro naranja de «Cuatro núcleos» siguen siendo los PNG de Lucía: ésos ya
+llegaban a 2× y no había motivo para tocarlos.
