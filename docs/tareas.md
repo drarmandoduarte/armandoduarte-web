@@ -18,6 +18,7 @@ usa.
 | #05 | La devolución de Lucía y de Armando: paleta CFF, íconos, fotos, dos teléfonos y `/merida` | **cerrada** (PR #7, mergeado el 16/9/2026) |
 | #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
 | #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | **cerrada** (PR #12, mergeado el 17/9/2026) |
+| #08 | La apertura: sacar el `noindex` sin abrir la puerta de atrás | en curso (rama `web/08-apertura`, sobre `main`) |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -63,13 +64,45 @@ referencia de sus reglas.
 Queda una cosa sabida: si alguien activara el override de build en el dashboard,
 ese override le gana al archivo. Nadie tiene que tocarlo.
 
-### 2. Quitar `X-Robots-Tag: noindex, nofollow` el día que se abra el dominio
+### 2. Quitar `X-Robots-Tag: noindex, nofollow` · **resuelto en la #08, se cierra al verificar producción**
 
-Viene copiado del sitio estático y está bien mientras la web viva en una URL
-`.vercel.app`. El día que `armandoduarte.com` apunte acá hay que sacarlo del
-`vercel.json` de la **raíz**, que es el que sirve desde la #04: si no, la web
-abre invisible para los buscadores. (El de `apps/web/vercel.json` ya no lo lee
-nadie, pero dice lo mismo: se saca de los dos o se borra ése.)
+Estuvo abierto desde la #01. La #08 lo resolvió, y **no borrando la cabecera**:
+condicionándola al host.
+
+Si se borraba, pasaban a ser indexables **dos sitios idénticos** —
+`armandoduarte.com` y `armandoduarte-web.vercel.app`— y en un duplicado el que
+gana no suele ser el que uno quiere. Así que la regla salió del bloque general y
+volvió como la suya, con `has: [{type: host, value: armandoduarte-web.vercel.app}]`.
+El cambio está en los dos `vercel.json`, como este pendiente pedía.
+
+Que Vercel honra `has` con `host` en `headers` **está medido**: se desplegó una
+sonda temporal con una cabecera propia condicionada al host del preview, apareció
+solo ahí, y se quitó. De yapa quedó comprobado que los previews traen
+`x-robots-tag: noindex` puesto **por Vercel**, así que esa puerta tampoco queda
+abierta.
+
+Y lo que faltaba de verdad: **nadie vigilaba `vercel.json`**. Quitar el `has` no
+ponía nada en rojo. La #08 escribió doce comprobaciones —seis por archivo— que
+ahora lo cazan.
+
+**Se cierra** cuando las mismas mediciones se repitan sobre `armandoduarte.com`
+en producción, después del merge.
+
+### 2b. Dar de alta Search Console y pedir la indexación · **de dirección**
+
+Es lo siguiente de la apertura y **no vive en el repo**: necesita una cuenta de
+Google y una verificación de propiedad del dominio. La #08 deja el sitio listo
+para que lo indexen —sin `noindex`, con canónicas y `og:url` del dominio propio,
+`robots.txt` y `sitemap.xml` servidos y con `lastmod` al día— pero pedirle a
+Google que lo mire es una acción de dirección.
+
+Dos cosas para cuando se haga, que salen de esta misma orden:
+
+- El sitemap está en `https://armandoduarte.com/sitemap.xml` y lista **dos**
+  URLs: la portada y `/merida`. Las dos legales no están a propósito: llevan
+  `noindex, follow`.
+- La propiedad conviene darla de alta como **dominio** y no como prefijo de URL,
+  para que `www` —que redirige con 308— quede cubierta sin darla de alta aparte.
 
 ### 3. Las plantillas `check/og-*.html` ~~todavía apuntan a la carpeta vieja~~ · **cerrado en la #02**
 
