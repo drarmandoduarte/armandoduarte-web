@@ -191,8 +191,23 @@ Accesibilidad 100 en las cuatro y performance sin mover un punto: la pasada de
 cromo no costó nada.
 
 **Teclado**: con el menú abierto el `Tab` recorre cierre → seis ítems → WhatsApp
-sin salirse del overlay (ocho pasos, medidos). `Escape` cierra y devuelve el foco
-al botón «Menú» — y solo si el foco estaba adentro, para no robárselo a nadie.
+(ocho pasos, medidos) **y vuelve a «Cerrar»**; `Shift+Tab` desde «Cerrar» va al
+último. `Escape` cierra y devuelve el foco al botón «Menú» — y solo si el foco
+estaba adentro, para no robárselo a nadie.
+
+La vuelta es la **trampa de foco**, que no existía y que dirección mandó hacer al
+aprobar la orden, resolviendo la contradicción que se había subido: un overlay a
+pantalla completa que deja escapar el `Tab` al contenido de atrás no es una
+función que falta, es la accesibilidad del menú a medio terminar. Sin ella —
+medido— después del octavo `Tab` el foco salía al «Ver el taller en Mérida» del
+hero, un botón tapado por el telón que quien navega con teclado recorría a
+ciegas.
+
+Son tres casos y el tercero es el normal, no el defensivo: al abrir con el mouse
+el foco se queda en el botón «Menú», que está **fuera** del overlay, y sin esa
+rama el primer `Tab` se iría al header oculto en vez de a «Cerrar». La lista de
+enfocables se recalcula en cada pulsación en vez de cachearse al abrir: una lista
+cacheada es una copia, y esta orden ya pagó una vez por eso.
 
 ---
 
@@ -238,6 +253,7 @@ que es lo que la orden fijó para Montserrat).
 |---|---|
 | el `font-size` de los ítems, de vuelta al `clamp()` | el test de medidas **y** la captura del overlay: **32.737 píxeles** |
 | el foco, de vuelta a `1px solid var(--naranja)` | «el anillo no es del color del texto»: esperaba `rgb(0, 87, 97)`, recibió `rgb(223, 73, 7)` |
+| la trampa de foco, desactivada | «el Tab después del último ítem tiene que volver a "Cerrar", no escaparse» |
 
 **La primera no mordió la primera vez, y eso fue el hallazgo.** Dio **cero
 capturas en rojo**: las doce del guardián de fidelidad son de la página con el
@@ -249,6 +265,46 @@ mide sus números con `getComputedStyle`. Recién con eso la mutación que la or
 propone hace lo que la orden dice que hace.
 
 ---
+
+## Desvíos declarados
+
+Dos cosas de la sección F que **no se hicieron**, aprobadas por dirección al dar
+el PASA. Ninguna se revierte; van escritas porque un desvío que no se declara es
+un desvío que alguien descubre en tres meses.
+
+### F.1 · el header sigue siendo transparente en reposo
+
+La orden pedía que el header **siempre** tuviera fondo sobre sección oscura. Se
+mantuvo el comportamiento de hoy: transparente en reposo, toma el color de la
+sección al desplazar y vuelve a transparente al detenerse.
+
+Dirección confirmó que la orden estaba mal en este punto: **el header
+transparente que toma color al scrollear es una decisión cerrada del 11/9**, y
+sigue vigente. Lo que la #06 arregló no es cuándo se tiñe sino **de qué color**:
+antes sobre las secciones oscuras salía un beige sucio, ahora sale el color de la
+sección.
+
+### F.4 · no se comprobó que ninguna sección sea más baja que 2 × `--header-h`
+
+La regla existía para evitar que una sección corta quedara entera debajo del
+header. No se implementó como comprobación, y dirección aprobó que no esté
+—porque con el header opaco al desplazar, el texto en crema y el
+`scroll-padding-top` el defecto ya no aparece—. Medido, para que la afirmación
+tenga número y no solo argumento:
+
+| | umbral | sección más baja | por debajo |
+|---|--:|---|---|
+| `/` a 1440 | 152px | `ahora` **141px** | 1 |
+| `/` a 390 | 128px | `ahora` 241px | ninguna |
+| `/merida` a 1440 | 152px | `footer` 638px | ninguna |
+| `/merida` a 390 | 128px | `reservar` 854px | ninguna |
+
+**Una sola sección en toda la web incumple la regla, por 11 px, en un solo
+ancho.** Y en su peor posición de scroll —el header justo sobre el final de la
+franja— lo que se ve no es texto tapado: el header está teñido del **mismo teal
+de la franja**, con el velo al 100 % y el texto en crema, así que la banda se lee
+continua. El defecto que F.4 quería evitar no se produce ni en el único caso que
+podría producirlo.
 
 ## Piso de tests
 

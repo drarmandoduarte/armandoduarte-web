@@ -151,7 +151,48 @@ function menuDePantallaCompleta(): void {
   abrir.addEventListener('click', abrirlo);
   cerrar.addEventListener('click', cerrarlo);
   ov.querySelectorAll('[data-nav]').forEach((a) => a.addEventListener('click', cerrarlo));
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarlo(); });
+
+  /*
+   * ── El foco no se escapa del menú (orden #06, H) ───────────────────────
+   *
+   * Un overlay a pantalla completa que deja seguir al `Tab` hacia la página de
+   * atrás está a medio hacer: quien navega con teclado sigue tabulando y
+   * empieza a recorrer, a ciegas, botones que están tapados por el telón. Hasta
+   * acá pasaba exactamente eso — medido: después del octavo `Tab` el foco salía
+   * al «Ver el taller en Mérida» del hero.
+   *
+   * La vuelta es el único caso que hay que manejar, y son tres:
+   *
+   *   · `Tab` en el último  → al primero;
+   *   · `Shift+Tab` en el primero → al último;
+   *   · el foco **fuera** del overlay con el menú abierto → adentro. Este
+   *     tercero no es defensivo: es el caso normal. Al abrir con el mouse el
+   *     foco se queda en el botón «Menú», que está fuera, y sin esta rama el
+   *     primer `Tab` iría al header oculto en vez de a «Cerrar».
+   *
+   * La lista se calcula en cada pulsación y no una vez al abrir: los destinos
+   * del menú son los mismos siempre, pero una lista cacheada es una copia, y
+   * una copia se desincroniza el día que alguien agregue un enlace. Son ocho
+   * elementos; recorrerlos cuesta nada.
+   */
+  const enfocables = () => [...ov.querySelectorAll<HTMLElement>('a[href], button')];
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { cerrarlo(); return; }
+    if (e.key !== 'Tab' || !ov.classList.contains('open')) return;
+
+    const focos = enfocables();
+    if (!focos.length) return;
+    const primero = focos[0];
+    const ultimo = focos[focos.length - 1];
+    const actual = document.activeElement;
+    const adentro = actual instanceof Node && ov.contains(actual);
+
+    if (e.shiftKey ? (actual === primero || !adentro) : (actual === ultimo || !adentro)) {
+      e.preventDefault();
+      (e.shiftKey ? ultimo : primero).focus();
+    }
+  });
 }
 
 /**

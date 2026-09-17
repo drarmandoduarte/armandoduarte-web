@@ -252,6 +252,25 @@ test.describe('los tres comportamientos siguen vivos sin React', () => {
     ).toBe(true);
     expect(recorrido[7], 'el último del recorrido es el WhatsApp del pie del menú')
       .toContain('Escribir por WhatsApp');
+
+    /* ── Y vuelve: el noveno Tab no se escapa a la página de atrás ────────
+       Sin la trampa, acá el foco salía al «Ver el taller en Mérida» del hero —
+       un botón tapado por el telón, que quien navega con teclado recorrería a
+       ciegas. Es la mitad que faltaba de la accesibilidad del menú. */
+    await page.keyboard.press('Tab');
+    expect(
+      await page.evaluate(() => document.activeElement?.id),
+      'el Tab después del último ítem tiene que volver a «Cerrar», no escaparse',
+    ).toBe('cerrar');
+
+    /* Y al revés: Shift+Tab desde el primero va al último. */
+    await page.keyboard.down('Shift');
+    await page.keyboard.press('Tab');
+    await page.keyboard.up('Shift');
+    expect(
+      await page.evaluate(() => (document.activeElement?.textContent ?? '').trim()),
+      'Shift+Tab desde «Cerrar» tiene que ir al último del menú',
+    ).toContain('Escribir por WhatsApp');
   });
 
   test('390px · Escape cierra y devuelve el foco al botón «Menú»', async ({ page }) => {
