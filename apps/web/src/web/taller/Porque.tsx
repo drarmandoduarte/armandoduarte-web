@@ -30,7 +30,7 @@ export function Porque() {
   return (
     <Seccion id="porque" tono="calido" contenedor={false}>
       <div className="container grid-2 centro">
-        <figure className="foto-tarjeta reveal" style={{ maxWidth: '480px' }}>
+        <figure className="foto-tarjeta reveal">
           <Foto
             nombre="suena-tarjeta"
             alt={t('taller.porque.fotoAlt')}

@@ -21,7 +21,7 @@ export function Quien() {
   return (
     <Seccion id="quien" contenedor={false}>
       <div className="container grid-2 centro">
-        <figure className="foto foto--libre reveal" style={{ maxWidth: '520px' }}>
+        <figure className="foto foto--libre reveal">
           <Retrato cual="de-pie" alt={t('inicio.quien.fotoAlt')} tamanos="(max-width:900px) 92vw, 520px" />
         </figure>
         <div>

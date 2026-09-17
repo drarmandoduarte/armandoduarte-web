@@ -14,11 +14,22 @@
  * que ninguna diferencia puede venir del servidor: es la condición para que la
  * comparación signifique algo.
  *
+ * ── Y desde la #10, las cabeceras — leídas, no copiadas ──────────────────
+ * Las `headers` salen del **`vercel.json` de la raíz**, el mismo archivo que
+ * Vercel lee. No hay una segunda lista acá, y es a propósito: el guardián de la
+ * CSP tiene que medir **la política que se va a publicar**, no una copia que un
+ * día deje de coincidir. Es la regla que la #07 ya aplicó con `check/acento.mjs`
+ * —una sola lista, leída desde los dos lados—.
+ *
+ * Las reglas con `has` se saltean: son del host de Vercel (la del `noindex`, #08)
+ * y acá el host es `127.0.0.1`. Saltearlas es justamente lo que Vercel hace.
+ *
  *   node e2e/servidor.mjs <carpeta> <puerto>
  */
 import { createServer } from 'node:http';
-import { createReadStream, existsSync, statSync } from 'node:fs';
-import { extname, join, normalize } from 'node:path';
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
+import { dirname, extname, join, normalize } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const [carpeta, puerto] = process.argv.slice(2);
 if (!carpeta || !puerto) {
@@ -44,6 +55,31 @@ const TIPOS = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
+/**
+ * Las cabeceras del `vercel.json` de la raíz que aplican a una ruta.
+ *
+ * El `source` de Vercel es una ruta con comodines (`/(.*)`, `/img/(.*)`), no una
+ * expresión regular cualquiera: se traduce anclada a los dos extremos, que es
+ * como la aplica la plataforma. Un `source` que no se sepa traducir hace fallar
+ * el servidor en el arranque en vez de servir una cabecera de menos: una
+ * cabecera que no se aplica no da error, y ése es justo el defecto que la #08
+ * pagó.
+ */
+const VERCEL = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'vercel.json');
+const REGLAS = (JSON.parse(readFileSync(VERCEL, 'utf8')).headers ?? [])
+  .filter((r) => !r.has)
+  .map((r) => {
+    if (!/^\/(\(\.\*\)|[A-Za-z0-9/_-]*(\(\.\*\))?)$/.test(r.source)) {
+      console.error(`servidor: no sé traducir el source ${r.source} de vercel.json.`);
+      process.exit(1);
+    }
+    return { re: new RegExp(`^${r.source.replace(/\(\.\*\)/g, '.*')}$`), headers: r.headers };
+  });
+
+const cabecerasDe = (ruta) => Object.fromEntries(
+  REGLAS.filter((r) => r.re.test(ruta)).flatMap((r) => r.headers.map((h) => [h.key, h.value])),
+);
+
 createServer((req, res) => {
   const pedido = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   /* `normalize` y el corte de `..`: sin eso, `/../../etc/passwd` sale de la
@@ -55,7 +91,10 @@ createServer((req, res) => {
 
   for (const ruta of candidatos) {
     if (existsSync(ruta) && statSync(ruta).isFile()) {
-      res.writeHead(200, { 'Content-Type': TIPOS[extname(ruta)] ?? 'application/octet-stream' });
+      res.writeHead(200, {
+        'Content-Type': TIPOS[extname(ruta)] ?? 'application/octet-stream',
+        ...cabecerasDe(limpio),
+      });
       createReadStream(ruta).pipe(res);
       return;
     }

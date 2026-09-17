@@ -246,6 +246,23 @@ a,button{-webkit-tap-highlight-color:transparent}
 .foto--arco{background:var(--calido);border-radius:260px 260px 12px 12px;overflow:hidden}
 .foto--arco img{object-fit:cover;object-position:center top}
 .foto--libre{background:transparent;border-radius:0;overflow:visible}
+/* ── Los siete que vivían en un `style=` inline, hasta la orden #10 ─────
+   Los movió la CSP: `style-src 'self'` bloquea el atributo `style`, y sin ellos
+   la foto quedaba en `max-width:none` y las listas con el margen de su clase.
+
+   Van colgados del `id` de la sección —que ya existía y es su asa pública— y no
+   de una utilidad `u-mt-*`, y el motivo está medido: `.u-mt-0` y `.ficha` tienen
+   la **misma** especificidad, así que gana la que está más abajo en el archivo,
+   que es `.ficha`. El primer intento de esta orden hizo eso y el guardián de
+   fidelidad lo cazó con la portada 56 px más alta. Un `id` gana siempre, que es
+   lo que el `style=` inline hacía y lo que hay que conservar. */
+#quien .foto--libre{max-width:520px}
+#facilitador .foto--libre{max-width:480px}
+#porque .foto-tarjeta{max-width:480px}
+#programa .sello{margin-top:var(--s5)}
+#programa .lista--2{margin-top:0}
+#taller .ficha{margin-top:0}
+#suena .lista--2{margin-top:0}
 .foto--libre img{width:100%;height:auto;object-fit:contain}
 .foto__pie{position:absolute;left:16px;bottom:14px;font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(250,247,241,.9);background:rgba(46,43,37,.55);padding:8px 14px;border-radius:999px;backdrop-filter:blur(8px)}
 

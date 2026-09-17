@@ -166,6 +166,25 @@ export const RECOLECTAR = ({ permitido }) => {
  * desde el test no levante un Chromium de más — el mismo patrón que
  * `scripts/guardian-de-guardianes.mjs`.
  */
+/**
+ * Sin transiciones, por CSSOM y no con un `<style>`.
+ *
+ * `page.addStyleTag` inyecta una hoja **en línea**, y desde la #10 el servidor
+ * de QA sirve la CSP de verdad: `style-src 'self'` la bloquea y el guardián se
+ * rompía a sí mismo. Una hoja construida con `CSSStyleSheet` + `replaceSync` es
+ * CSSOM puro —no hay markup que analizar— y la CSP no la gobierna.
+ *
+ * Que el arreglo sea éste y no `'unsafe-inline'` importa: la política no se
+ * ablanda para que pase una herramienta nuestra.
+ */
+const SIN_MOVIMIENTO = '*,*::before,*::after{transition:none!important;animation:none!important}';
+
+export const QUIETAR = (p) => p.evaluate((css) => {
+  const hoja = new CSSStyleSheet();
+  hoja.replaceSync(css);
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, hoja];
+}, SIN_MOVIMIENTO);
+
 async function porConsola() {
   const navegador = await chromium.launch();
   let fallo = false;
@@ -177,7 +196,7 @@ async function porConsola() {
     await p.evaluate(() => document.fonts.ready);
     /* Todo revelado y sin transiciones: un bloque a mitad del fundido tiene un
        color que el diseño no tiene, y acá se compara por igualdad exacta. */
-    await p.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
+    await QUIETAR(p);
     await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
     await p.waitForTimeout(250);
 

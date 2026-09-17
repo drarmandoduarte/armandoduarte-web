@@ -21,7 +21,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
 | `@codice/web` | 39 |
-| `@codice/navegador` | 26 |
+| `@codice/navegador` | 29 |
 
 ## De dónde salen estos números
 
@@ -35,6 +35,27 @@ y compara el port contra el sitio estático. Son las cuatro páginas por los tre
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
 
+## Lo que movió la orden #10
+
+`@codice/navegador` sube de 26 a **29**. Tres tests en `e2e/csp.spec.ts`, y son
+tres porque **una CSP que no rompe nada puede ser una CSP que no está puesta**:
+recorrer la web y ver la consola limpia sale idéntico si la cabecera no llegó
+nunca. Así que uno mira que **llegue**, otro que **no rompa** (cuatro rutas por
+dos anchos, abriendo el menú y tocando el WhatsApp) y el tercero que **muerda**
+—un `<script>` en línea inyectado en la respuesta que el navegador tiene que
+negarse a ejecutar—. El tercero es el que convierte al segundo en una
+afirmación.
+
+La política **no se copia** en el spec: `e2e/servidor.mjs` sirve las cabeceras
+del `vercel.json` de la raíz, así que el test mide lo que se va a publicar. Una
+copia sería una segunda verdad que coincidiría justo hasta el día que importa.
+
+La sonda del (3) es **permanente** y no un commit temporal como la de la #08, y
+la diferencia es qué prueba cada una: aquélla probaba algo de Vercel —que honra
+`has` con `host`— y sólo se podía ver desplegando; ésta prueba algo del
+navegador, así que puede vivir en el repo y morder en cada corrida. No dice
+`alert(1)` a propósito: un `alert` que **no** fuera bloqueado congela la pestaña
+y deja un timeout que no dice cuál era el problema.
 ## Lo que movió la orden #11
 
 `@codice/web` sube de 29 a **39**. Diez tests nuevos en
