@@ -43,7 +43,18 @@
         {
           "key": "X-Frame-Options",
           "value": "DENY"
-        },
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "armandoduarte-web.vercel.app"
+        }
+      ],
+      "headers": [
         {
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow"

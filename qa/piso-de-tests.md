@@ -20,7 +20,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 17 |
+| `@codice/web` | 29 |
 | `@codice/navegador` | 26 |
 
 ## De dónde salen estos números
@@ -34,6 +34,33 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #08
+
+`@codice/web` sube de 17 a **29**: doce tests nuevos, seis por cada `vercel.json`
+—el de la raíz, que es el que Vercel lee, y el de `apps/web`, que quedó como
+referencia—. Vigilan una sola cosa: que la cabecera `X-Robots-Tag` siga
+**condicionada al host de Vercel** y no se aplique al dominio propio.
+
+**Se escribieron porque la mutación de la orden no tiraba nada.** La #08 pedía
+quitar la condición `has` y ver qué se ponía rojo; no se ponía rojo nada, porque
+ninguna comprobación del repo miraba `vercel.json`. La propia orden mandaba
+escribir la comprobación en ese caso — es la lección de la #06 aplicada por
+adelantado.
+
+Lo que las hace valer la pena es el perfil del defecto: quitar ese `has` es un
+renglón, se ve inocente en un diff y **no rompe nada que se pueda notar**. O
+Google indexa dos sitios idénticos, o el dominio propio se queda fuera del
+índice. Las dos cosas se descubren meses después.
+
+Son seis y no una porque hay seis maneras distintas de romperlo: que no haya
+regla de robots, que haya dos, que pierda la condición, que cambie de valor, que
+aparezca una segunda regla **sin** condición —que dejaría la primera en verde— y
+que alguien arrastre una cabecera de seguridad dentro del bloque condicionado,
+dejando al dominio propio sin `nosniff`.
+
+Lo que **no** comprueban, y está dicho en el archivo: que Vercel honre la
+condición. Eso se mide con `curl` contra los dos hosts y está en el informe.
 
 ## Lo que movió la orden #07
 
