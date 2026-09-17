@@ -16,11 +16,24 @@
  * tercera copia de un color, y `check:tokens` la caza —cazó estas dos líneas—.
  * Teñirlos con un filtro CSS sería pintar encima de lo que ya está bien.
  *
+ * ── Cuatro son PNG y once son SVG, y la lista está acá ──────────────────
+ * Los cuatro naranja de «Cuatro núcleos» son los PNG que mandó Lucía: llegan a
+ * 2× en el tamaño en que se muestran, así que no había motivo para redibujarlos.
+ * Los otros once son SVG —los siete nuevos y los cuatro que la #05 dejó cortos,
+ * redibujados en vector—, y a un SVG no le importa la densidad de pantalla.
+ *
+ * La lista vive acá y no en cada llamada porque el formato es una propiedad del
+ * archivo, no de dónde se lo usa: quien pone un ícono en una sección nueva no
+ * tiene por qué saber de qué tipo es.
+ *
  * ── `ancho` y `alto` explícitos, siempre ─────────────────────────────────
  * Es lo que evita el salto de maquetación cuando cargan. Los de la franja de
  * hechos y los del hero se muestran a menos de la mitad de su tamaño real, que
  * es lo que los deja nítidos en una pantalla de densidad doble.
  */
+/** Los cuatro de Lucía que siguen siendo PNG. El resto son SVG. */
+const PNG = new Set(['cerebro', 'emociones', 'victorias', 'comunicacion']);
+
 export function Icono({
   nombre,
   ancho,
@@ -35,7 +48,7 @@ export function Icono({
 }) {
   return (
     <img
-      src={`img/iconos/${nombre}.png`}
+      src={`img/iconos/${nombre}.${PNG.has(nombre) ? 'png' : 'svg'}`}
       width={ancho}
       height={alto}
       alt=""

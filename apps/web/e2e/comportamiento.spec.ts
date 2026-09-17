@@ -379,4 +379,47 @@ test.describe('los tres comportamientos siguen vivos sin React', () => {
       });
     });
   }
+
+  /*
+   * ── El primer viewport se pinta entero (orden #07, D) ──────────────────
+   *
+   * El fundido de entrada está bien para lo que hay que bajar a buscar. Para lo
+   * primero que se ve, no: el hero aparecía lavado y se armaba de a pedazos
+   * —eyebrow, título, bajada y botones entraban escalonados con `data-d`— y el
+   * `<h1>`, que es el LCP, esperaba al `IntersectionObserver` para existir.
+   *
+   * Se afirma **después de que el script corrió**, no antes, y esa distinción es
+   * la mitad del test: la regla que apaga los bloques es `.js .reveal`, así que
+   * sin JavaScript todo vale 1 y la comprobación pasaría sola. Se espera a que
+   * `comportamiento.ts` ponga la clase `js` y recién ahí se mide.
+   */
+  for (const [pagina, ruta] of [['portada', '/'], ['/merida', '/merida']] as const) {
+    test(`1440px · el hero de ${pagina} está opaco apenas carga`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(`http://127.0.0.1:${PUERTO_PORT}${ruta}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() => document.documentElement.classList.contains('js'));
+
+      const hero = await page.evaluate(() => {
+        const h = document.querySelector('.hero')!;
+        const opacidad = (el: Element) => Number(getComputedStyle(el).opacity);
+        return {
+          hijos: [...h.querySelectorAll('*')].length,
+          conReveal: [...h.querySelectorAll('.reveal')].length,
+          traslucidos: [...h.querySelectorAll('*')]
+            .filter((el) => opacidad(el) < 1)
+            .map((el) => `${el.tagName.toLowerCase()}.${(el.className || '').toString().trim()}`),
+        };
+      });
+
+      /* EL PISO: si el hero no trajo hijos, «ninguno translúcido» es cierto
+         sobre la nada. */
+      expect(hero.hijos, 'el hero no tiene hijos: no hay nada que medir').toBeGreaterThan(8);
+
+      expect(hero.conReveal, 'ningún elemento del hero puede llevar `.reveal`').toBe(0);
+      expect(
+        hero.traslucidos,
+        'estos elementos del hero arrancan translúcidos: la primera pantalla se arma de a pedazos',
+      ).toEqual([]);
+    });
+  }
 });

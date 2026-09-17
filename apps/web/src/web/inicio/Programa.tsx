@@ -24,7 +24,10 @@ export function Programa() {
           </h2>
           <p className="body u-mt-4 reveal" data-d="2">{t('inicio.programa.cuerpo')}</p>
           <div className="sello reveal" data-d="3" style={{ marginTop: 'var(--s5)' }}>
-            <img src="img/cff.png" width={150} height={43} alt={t('inicio.programa.selloAlt')} />
+            <picture>
+              <source type="image/webp" srcSet="img/cff-400.webp 400w, img/cff-800.webp 800w" sizes="200px" />
+              <img src="img/cff-800.webp" width={800} height={192} alt={t('inicio.programa.selloAlt')} loading="lazy" />
+            </picture>
           </div>
         </div>
         <ol className="lista lista--2 reveal" data-d="2" style={{ marginTop: 0 }}>

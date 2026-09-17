@@ -45,6 +45,7 @@ export function Pie({ telefono, visible }: { telefono: string; visible: string }
             <a href={CANALES.youtube} target="_blank" rel="noopener">{t('comun.pie.youtube')}</a>
             <a href={CANALES.spotify} target="_blank" rel="noopener">{t('comun.pie.spotify')}</a>
             <a href={CANALES.facebook} target="_blank" rel="noopener">{t('comun.pie.facebook')}</a>
+            <a href={CANALES.instagram} target="_blank" rel="noopener">{t('comun.pie.instagram')}</a>
             <a className="entero" href={enlaceWhatsApp(telefono, t('comun.mensajes.general'))} target="_blank" rel="noopener">
               {t('comun.pie.whatsapp', { telefono: visible })}
             </a>

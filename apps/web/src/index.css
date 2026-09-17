@@ -70,31 +70,47 @@ a,button{-webkit-tap-highlight-color:transparent}
 .dato{border-bottom:1px dotted var(--naranja-texto);color:var(--naranja-texto)} /* dato pendiente de Armando: se ve punteado hasta que se reemplaza */
 
 /* ── Botones · píldora, contorno; el primario relleno de ocre ─────────── */
-.btn{display:inline-flex;align-items:center;gap:12px;font-family:var(--display);font-size:13px;font-weight:500;letter-spacing:.06em;padding:16px 28px;border:1px solid var(--tinta);border-radius:999px;background:transparent;color:var(--tinta);white-space:nowrap;transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease)}
-.btn:hover{background:color-mix(in oklab, var(--tinta) 5%, transparent)}
+/* ── Los botones, con la anatomía de 512 (orden #07, B) ───────────────────
+   Medido en `512.com.uy` el 16/9: rectángulo de hairline, versalitas de 11 px,
+   tracking amplio, ~49 px de alto. Armando tenía píldora de 999px, 13 px a peso
+   500 sin versalitas y 56 de alto — más blando y más grande.
+
+   Peso 600 y no el 700 del motor, tracking .18em y no .22em: Montserrat es más
+   ancha que la tipografía de 512 y a 700/.22 el botón se lee negro. Está en la
+   captura del PR, al lado del par de 512.
+
+   El radio de 2px y no 0: a cero, el borde de 1px se ve astillado en las
+   esquinas a densidad 1×. Dos píxeles no se leen como redondeo y sí como borde
+   terminado. ─────────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;line-height:1;padding:18px 32px;min-height:52px;border:1px solid color-mix(in oklab, var(--tinta) 40%, transparent);border-radius:2px;background:transparent;color:var(--tinta);white-space:nowrap;transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease)}
+.btn:hover{border-color:var(--tinta);background:color-mix(in oklab, var(--tinta) 4%, transparent)}
 .btn--naranja{background:var(--naranja-texto);border-color:var(--naranja-texto);color:var(--crema)}
-.btn--naranja:hover{background:var(--ambar);border-color:var(--ambar)}
-.btn--teal{border-color:var(--teal);color:var(--teal)}
-.btn--teal:hover{background:color-mix(in oklab, var(--teal) 6%, transparent)}
-.btn svg{width:16px;height:16px;flex:none}
+.btn--naranja:hover{background:var(--naranja);border-color:var(--naranja)}
+.btn svg{width:14px;height:14px;flex:none}
 .btn-arrow{transition:transform .4s var(--ease)}.btn:hover .btn-arrow{transform:translateX(3px)}
-.link{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--naranja-texto);transition:gap .4s var(--ease)}
-.link:hover{gap:16px}
+.link{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta);transition:gap .4s var(--ease),color .4s var(--ease)}
+.link:hover{gap:16px;color:var(--naranja-texto)}
 
 /* ── Secciones ──────────────────────────────────────────────────────── */
 .section{padding:clamp(88px,12vh,140px) 0;position:relative}
 .calido{background:var(--calido);--velo:var(--calido)}
+
 .oscuro{background:var(--teal);color:var(--crema);--velo:var(--teal)}
 .blanco{background:var(--superficie);--velo:var(--superficie)}
 .tinta{background:var(--tinta);color:var(--crema)}
-.tinta .display-l,.tinta .display-m,.tinta .display-s,.tinta .grande{color:var(--crema)}.tinta .eyebrow{color:var(--ambar)}.tinta .lead,.tinta .small{color:rgba(250,247,241,.7)}.tinta .body{color:rgba(250,247,241,.88)}.tinta .grande a{border-color:var(--ambar)}.tinta .grande a:hover{color:var(--ambar)}.tinta .btn{color:var(--crema);border-color:rgba(250,247,241,.5)}.tinta .btn--naranja{background:var(--ambar);border-color:var(--ambar);color:var(--tinta)}.tinta .hairline{background:var(--hair-oscura)}
+.tinta .display-l,.tinta .display-m,.tinta .display-s,.tinta .grande{color:var(--crema)}.tinta .eyebrow{color:color-mix(in oklab, var(--crema) 70%, transparent)}.tinta .lead,.tinta .small{color:color-mix(in oklab, var(--crema) 70%, transparent)}.tinta .body{color:rgba(250,247,241,.88)}.tinta .hairline{background:var(--hair-oscura)}
 .oscuro .display-l,.oscuro .display-m,.oscuro .display-s{color:var(--crema)}
 .oscuro .lead,.oscuro .small{color:rgba(250,247,241,.75)}
 .oscuro .body{color:rgba(250,247,241,.88)}
-.oscuro .eyebrow{color:var(--ambar)}.oscuro .suave,.tinta .suave{color:rgba(250,247,241,.6)}
-.oscuro .btn{color:var(--crema);border-color:rgba(250,247,241,.5)}
-.oscuro .btn--naranja{background:var(--crema);border-color:var(--crema);color:var(--teal)}.oscuro .btn--naranja:hover{background:var(--superficie);border-color:var(--superficie)}
-.oscuro .ficha,.oscuro .ficha li{border-color:var(--hair-oscura)}.oscuro .ficha li span:first-child{color:rgba(250,247,241,.7)}.oscuro .ficha li span:last-child{color:var(--crema)}.oscuro .dato{color:var(--ambar);border-color:var(--ambar)}.oscuro .cita{color:var(--crema);border-color:var(--ambar)}.oscuro .cita small{color:var(--ambar)}
+.oscuro .eyebrow{color:color-mix(in oklab, var(--crema) 70%, transparent)}.oscuro .suave,.tinta .suave{color:rgba(250,247,241,.6)}
+.oscuro .btn,.tinta .btn{color:var(--crema);border-color:color-mix(in oklab, var(--crema) 50%, transparent)}
+.oscuro .btn:hover,.tinta .btn:hover{border-color:var(--crema);background:color-mix(in oklab, var(--crema) 8%, transparent)}
+/* El primario sobre oscuro es crema con texto teal — también sobre tinta. Antes
+   sobre tinta era ámbar con texto marrón («Asegurar mi lugar», el cierre de
+   /merida) y se leía como una advertencia, no como el botón de la página. */
+.oscuro .btn--naranja,.tinta .btn--naranja{background:var(--crema);border-color:var(--crema);color:var(--teal)}
+.oscuro .btn--naranja:hover,.tinta .btn--naranja:hover{background:var(--superficie);border-color:var(--superficie)}
+.oscuro .ficha,.oscuro .ficha li{border-color:var(--hair-oscura)}.oscuro .ficha li span:first-child{color:rgba(250,247,241,.7)}.oscuro .ficha li span:last-child{color:var(--crema)}.oscuro .dato{color:var(--ambar);border-color:var(--ambar)}.oscuro .cita{color:var(--crema);border-color:var(--hair-oscura)}.oscuro .cita small{color:color-mix(in oklab, var(--crema) 70%, transparent)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s7);align-items:start}
 .grid-2.centro{align-items:center}
 .hairline{height:1px;background:var(--hair);border:0}
@@ -134,8 +150,8 @@ a,button{-webkit-tap-highlight-color:transparent}
 .hd__menu i::before,.hd__menu i::after{content:'';width:22px;height:1px;background:currentColor;transition:transform .4s var(--ease)}
 .hd__menu:hover i::before{transform:translateX(3px)}
 .hd__nav{display:none}
-.hd__wa{display:inline-flex;align-items:center;gap:10px;height:42px;padding:0 20px;border:1px solid var(--hd-acento,var(--teal));border-radius:999px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--hd-acento,var(--teal));white-space:nowrap;transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease)}
-.hd__wa svg{width:16px;height:16px}
+.hd__wa{display:inline-flex;align-items:center;gap:12px;min-height:40px;padding:12px 20px;border:1px solid var(--hd-acento,var(--teal));border-radius:2px;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;line-height:1;color:var(--hd-acento,var(--teal));white-space:nowrap;transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease)}
+.hd__wa svg{width:14px;height:14px;flex:none}
 .hd__wa:hover{background:var(--hd-acento,var(--teal));color:var(--hd-bg,var(--crema))}
 /* Sobre sección oscura: texto crema, acento ocre claro. */
 .hd.claro{--hd-fg:var(--crema);--hd-acento:var(--ambar)}
@@ -223,7 +239,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 .hero-sub{margin-top:var(--s4);font-size:clamp(18px,1.5vw,21px);line-height:1.6;color:var(--gris);max-width:40ch}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:var(--s5)}
 .hero-micro{margin-top:var(--s4);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}
-.hero-micro span+span::before{content:'·';margin:0 .8em;color:var(--naranja-texto)}
+.hero-micro span+span::before{content:'·';margin:0 .8em;color:var(--gris-claro)}
 .foto{border-radius:12px;overflow:hidden;background:var(--calido);position:relative}
 .foto img{width:100%;height:100%;object-fit:cover}
 .hero .foto{aspect-ratio:4/5;max-height:78vh}
@@ -237,41 +253,61 @@ a,button{-webkit-tap-highlight-color:transparent}
    necesite (hoy el taller; mañana un curso). data-ahora en el <section>. */
 .ahora{background:var(--teal);color:var(--crema);padding:var(--s5) 0}
 .ahora__row{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s5);align-items:center}
-.ahora__pill{font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--tinta);background:var(--ambar);padding:8px 14px;border-radius:999px;white-space:nowrap}
+.ahora__pill{font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);background:color-mix(in oklab, var(--crema) 70%, transparent);padding:8px 14px;border-radius:999px;white-space:nowrap}
 .ahora__t{font-family:var(--display);font-weight:400;font-size:clamp(20px,2vw,26px);line-height:1.2;color:var(--crema)}
-.ahora__meta{margin-top:6px;font-size:14px;color:rgba(250,247,241,.7)}.ahora .link{color:var(--ambar)}.ahora .dato{color:var(--ambar);border-color:var(--ambar)}
-.ahora__meta span+span::before{content:'·';margin:0 .6em;color:var(--ambar)}
+.ahora__meta{margin-top:6px;font-size:14px;color:rgba(250,247,241,.7)}.ahora .link{color:var(--crema)}.ahora .link:hover{color:var(--crema)}.ahora .dato{color:color-mix(in oklab, var(--crema) 70%, transparent);border-color:color-mix(in oklab, var(--crema) 70%, transparent)}
+.ahora__meta span+span::before{content:'·';margin:0 .6em;color:rgba(250,247,241,.7)}
 
 /* ── Ficha · filas con hairline (como la de Bernardo en Omnia) ──────── */
 .ficha{list-style:none;border-top:1px solid var(--hair);margin-top:var(--s5)}
 .ficha li{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:16px 0;border-bottom:1px solid var(--hair);font-size:16px}
-.ficha li span:first-child{font-family:var(--display);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);padding-top:4px}
+/* La clave de la ficha, con su ícono delante (orden #07, H). A 24 px el ícono
+   pesa lo mismo que el rótulo y no lo tapa. */
+.ficha li span:first-child{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);padding-top:4px}
+.ficha li span:first-child img{flex:none}
 .ficha li span:last-child{color:var(--tinta)}
-.cita{border-left:1px solid var(--naranja);padding:6px 0 6px 24px;font-family:var(--display);font-weight:300;font-size:clamp(20px,1.9vw,26px);line-height:1.4;color:var(--tinta);max-width:32ch}
-.cita small{display:block;margin-top:12px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--naranja-texto)}
+.cita{border-left:1px solid var(--hair);padding:6px 0 6px 24px;font-family:var(--display);font-weight:300;font-size:clamp(20px,1.9vw,26px);line-height:1.4;color:var(--tinta);max-width:32ch}
+.cita small{display:block;margin-top:12px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}
 .bloque-cita{background:var(--calido);border-radius:12px;padding:clamp(28px,4vw,48px);font-family:var(--display);font-weight:300;font-size:clamp(21px,2.2vw,30px);line-height:1.4;color:var(--tinta);max-width:52ch}
+/* ── La cita con la fotografía adentro (orden #07, decisión 5) ────────────
+   La foto del chico estaba de fondo de la sección entera, velada al 94 %: a esa
+   opacidad no es una imagen, es una mancha, y el velo lo exigía el texto que
+   tenía encima. Acá pasa a ser el fondo de **una sola tarjeta** —la de la cita—
+   con velo teal: la foto se ve de verdad y el único texto encima es una frase
+   grande en crema, que aguanta mucho menos velo. ─────────────────────────── */
+.bloque-cita--foto{position:relative;isolation:isolate;overflow:hidden;background:var(--teal);color:var(--crema);max-width:none;min-height:320px;display:flex;align-items:center}
+.bloque-cita--foto>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:-2}
+.bloque-cita--foto::before{content:'';position:absolute;inset:0;z-index:-1;background:color-mix(in oklab, var(--teal) 78%, transparent)}
 .bloque-cita.teal{background:var(--teal-suave)}
 
 /* ── Lista numerada con hairlines ───────────────────────────────────── */
 .lista{list-style:none;border-top:1px solid var(--hair);margin-top:var(--s6)}
 .lista li{display:grid;grid-template-columns:64px 1fr 1.2fr;gap:var(--s4);padding:26px 0;border-bottom:1px solid var(--hair);align-items:baseline;transition:padding-left .4s var(--ease)}
 .lista li:hover{padding-left:8px}
-.lista .n{font-family:var(--display);font-size:12px;font-weight:500;color:var(--naranja-texto);letter-spacing:.1em}
+.lista .n{font-family:var(--display);font-size:12px;font-weight:500;color:var(--gris);letter-spacing:.1em;font-variant-numeric:tabular-nums}
+/* El ícono y el número comparten la primera celda, y el ícono va FUERA del
+   `span.n`: adentro, el barrido de contraste promedia el ícono como si fuera el
+   fondo del número —midió un fondo verdoso que no existe— y además un ícono
+   dentro del elemento que dice «01» no es lo que ese elemento es. */
+.lista__marca{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.lista__marca img{flex:none}
 .lista h3{font-family:var(--display);font-weight:400;font-size:clamp(20px,1.9vw,26px);line-height:1.25;color:var(--tinta)}
-.lista h3 a{display:inline-flex;align-items:center;gap:10px;transition:color .4s}.lista h3 a:hover{color:var(--naranja-texto)}.lista h3 .btn-arrow{font-size:.8em;color:var(--naranja-texto)}
+.lista h3 a{display:inline-flex;align-items:center;gap:10px;transition:color .4s}.lista h3 a:hover{color:var(--naranja-texto)}.lista h3 .btn-arrow{font-size:.8em;color:currentColor}
 .lista p{font-size:16px;line-height:1.7;color:var(--gris);max-width:48ch}
 .lista--2{--cols:64px 1fr}.lista--2 li{grid-template-columns:64px 1fr}
-.oscuro .lista{border-color:var(--hair-oscura)}.oscuro .lista li{border-color:var(--hair-oscura)}.oscuro .lista h3{color:var(--crema)}.oscuro .lista p{color:rgba(250,247,241,.75)}.oscuro .lista .n{color:var(--ambar)}
+.oscuro .lista{border-color:var(--hair-oscura)}.oscuro .lista li{border-color:var(--hair-oscura)}.oscuro .lista h3{color:var(--crema)}.oscuro .lista p{color:rgba(250,247,241,.75)}.oscuro .lista .n{color:color-mix(in oklab, var(--crema) 70%, transparent)}
 
 /* ── Pasos · número en círculo + línea (512) ────────────────────────── */
 .pasos{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s5);margin-top:var(--s7)}
 .paso{display:flex;flex-direction:column;gap:var(--s3)}
 .paso__head{display:flex;align-items:center;gap:16px}
-.paso__num{font-family:var(--display);font-weight:500;font-size:12px;color:var(--naranja-texto);letter-spacing:.06em;border:1px solid var(--naranja);width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;flex:none}
-.paso__line{flex:1;height:1px;background:var(--naranja);margin-right:calc(var(--s5) * -1)}
+/* El número, sin el círculo naranja que lo envolvía: en una línea de tiempo el
+   círculo compite con el ícono que tiene al lado (orden #07, A). */
+.paso__num{font-family:var(--display);font-weight:500;font-size:12px;color:var(--gris);letter-spacing:.06em;flex:none;font-variant-numeric:tabular-nums}
+.paso__line{flex:1;height:1px;background:var(--hair);margin-right:calc(var(--s5) * -1)}
 .paso:last-child .paso__line{display:none}
 .paso h3{font-family:var(--display);font-weight:400;font-size:clamp(19px,1.6vw,23px);line-height:1.25;color:var(--tinta)}
-.paso h3 b{display:block;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--naranja-texto);margin-bottom:8px}
+.paso h3 b{display:block;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
 .paso p{font-size:15.5px;line-height:1.7;color:var(--gris)}
 .paso p+p{margin-top:8px}
 .receso{margin-top:var(--s5);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)}
@@ -283,8 +319,8 @@ a,button{-webkit-tap-highlight-color:transparent}
 
 /* ── Tres · lo que te llevas ────────────────────────────────────────── */
 .tres{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s5);margin-top:var(--s6)}
-.tres div{border-top:1px solid var(--naranja);padding-top:20px}
-.tres .n{font-family:var(--display);font-size:12px;font-weight:500;color:var(--naranja-texto);letter-spacing:.1em}
+.tres div{border-top:1px solid var(--hair);padding-top:20px}
+.tres .n{font-family:var(--display);font-size:12px;font-weight:500;color:var(--gris);letter-spacing:.1em;font-variant-numeric:tabular-nums}
 .tres h3{margin-top:10px;font-family:var(--display);font-weight:400;font-size:clamp(20px,1.8vw,25px);line-height:1.25;color:var(--tinta)}
 .tres p{margin-top:10px;font-size:16px;line-height:1.7;color:var(--gris)}
 
@@ -292,42 +328,64 @@ a,button{-webkit-tap-highlight-color:transparent}
 .testimonios{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);margin-top:var(--s6)}
 .testimonio{border-top:1px solid var(--hair);padding-top:24px}
 .testimonio p{font-family:var(--display);font-weight:300;font-size:clamp(19px,1.7vw,24px);line-height:1.45;color:var(--tinta)}
-.testimonio small{display:block;margin-top:16px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--naranja-texto)}
+.testimonio small{display:block;margin-top:16px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}
 
 /* ── Inversión · un solo plan, como los de 512 ──────────────────────── */
 .plan{border:1px solid var(--hair);background:var(--superficie);border-radius:12px;padding:clamp(28px,4vw,48px);display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);margin-top:var(--s6)}
-.plan .nombre{font-family:var(--display);font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:500;color:var(--naranja-texto)}
+.plan .nombre{font-family:var(--display);font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:500;color:var(--gris)}
 .plan .precio{margin-top:var(--s4);font-family:var(--display);font-weight:300;font-size:clamp(52px,6vw,88px);letter-spacing:-.02em;color:var(--tinta);line-height:1;display:flex;align-items:baseline;gap:12px}
 .plan .precio small{font-size:14px;letter-spacing:.2em;font-weight:500;color:var(--gris);text-transform:uppercase}
 .plan .por{font-size:15px;color:var(--gris);margin-top:10px}
 .incluye{list-style:none;border-top:1px solid var(--hair)}
-.incluye li{padding:14px 0;border-bottom:1px solid var(--hair);font-size:16px;color:var(--tinta);padding-left:20px;position:relative}
-.incluye li::before{content:'';position:absolute;left:0;top:1.35em;width:8px;height:1px;background:var(--naranja)}
-.garantia{margin-top:var(--s4);font-size:15px;line-height:1.7;color:var(--gris);border-left:1px solid var(--naranja);padding-left:18px}
+/* Sin la rayita de antes (orden #07, A): la lista se sostiene con sus propias
+   hairlines, como la ficha. Ocho guiones de acento en una lista de ocho no
+   acentúan nada. */
+.incluye li{padding:14px 0;border-bottom:1px solid var(--hair);font-size:16px;color:var(--tinta)}
+.garantia{margin-top:var(--s4);font-size:15px;line-height:1.7;color:var(--gris);border-left:1px solid var(--hair);padding-left:18px}
 .garantia b{font-weight:600;color:var(--tinta)}
 
 /* ── Preguntas · ¿Te suena? ─────────────────────────────────────────── */
-.preguntas{list-style:none;border-top:1px solid var(--hair);margin-top:var(--s6);max-width:70ch}
-.preguntas li{padding:20px 0;border-bottom:1px solid var(--hair);font-family:var(--display);font-weight:300;font-size:clamp(19px,1.8vw,25px);line-height:1.35;color:var(--tinta);display:grid;grid-template-columns:48px 1fr;gap:16px;align-items:baseline}
-.preguntas li span{font-size:12px;font-weight:500;color:var(--naranja-texto);letter-spacing:.1em}
+/* A 1440 la lista ocupaba la mitad izquierda y la derecha quedaba vacía: media
+   pantalla en blanco (orden #07, F). En dos columnas el bloque respira y la
+   sección deja de parecer sin terminar. El `border-top` se mueve a cada ítem
+   porque con dos columnas una línea sola arriba no cierra nada. */
+.preguntas{list-style:none;margin-top:var(--s6)}
+@media (min-width:900px){.preguntas{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--s7)}}
+.preguntas li{padding:20px 0;border-top:1px solid var(--hair);font-family:var(--display);font-weight:300;font-size:clamp(19px,1.8vw,25px);line-height:1.35;color:var(--tinta);display:grid;grid-template-columns:48px 1fr;gap:16px;align-items:baseline}
+.preguntas li span{font-size:12px;font-weight:500;color:var(--gris);letter-spacing:.1em;font-variant-numeric:tabular-nums}
 
 /* ── Libros ─────────────────────────────────────────────────────────── */
 .libros{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);margin-top:var(--s6)}
 .libro{display:grid;grid-template-columns:150px 1fr;gap:var(--s4);align-items:center;border-top:1px solid var(--hair);padding-top:var(--s4)}
 .tapa{aspect-ratio:2/3;border-radius:6px;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:var(--crema);font-family:var(--display)}
-.tapa.naranja{background:var(--naranja-texto)}.tapa.navy{background:var(--navy)}
+.tapa.navy{background:var(--navy)}
+/* La portada real de «Construyendo Familias Fuertes» (orden #07, decisión 4).
+   Misma caja que el lomo dibujado del otro libro para que la fila no se
+   descuadre; la foto la llena con `cover`. */
+.tapa--foto{padding:0;overflow:hidden;background:var(--hair);border-radius:6px}
+.tapa--foto img{width:100%;height:100%;object-fit:cover;display:block}
 .tapa small{font-size:9px;letter-spacing:.2em;text-transform:uppercase;opacity:.8}
 .tapa b{display:block;font-weight:500;font-size:14px;line-height:1.25;margin-top:6px}
 .libro h3{font-family:var(--display);font-weight:400;font-size:clamp(20px,1.8vw,25px);line-height:1.25;color:var(--tinta)}
 .libro p{margin-top:10px;font-size:15.5px;line-height:1.7;color:var(--gris)}
 .sello{margin-top:var(--s6);display:flex;align-items:center;gap:20px;color:var(--gris);font-size:14px}
-.sello img{width:150px;height:auto;opacity:.9}
+/* 200 px y a plena opacidad: el logo venía de un raster con sombra horneada,
+   mostrado a 150 px y al 90 %. Ahora es el original recortado, sin sombra. */
+.sello img{width:200px;height:auto}
 
 /* ── Contacto ───────────────────────────────────────────────────────── */
 .contacto{display:grid;grid-template-columns:1fr 1fr;gap:var(--s7);align-items:start}
 .contacto .grande{font-family:var(--display);font-weight:300;font-size:clamp(24px,2.6vw,36px);line-height:1.25;color:inherit}
-.contacto .grande a{border-bottom:1px solid var(--naranja);transition:color .4s}
-.contacto .grande a:hover{color:var(--naranja-texto)}
+/* ── Los enlaces del contacto, sin subrayado en reposo (orden #07, C) ─────
+   Eran cuatro subrayados naranjas de 1px bajo texto de 36 px. Dirección: «eso
+   no es ni cerca de premium», y no alcanzaba con cambiarle el color a la línea.
+
+   La jerarquía ya la da el tamaño —36 px contra los 17 del resto del bloque— y
+   no hace falta marcar que son enlaces, porque **todo el bloque es de
+   contacto**. El borde queda declarado en transparente y no se agrega en hover:
+   así el renglón no salta cuando aparece. */
+.contacto .grande a{border-bottom:1px solid transparent;padding-bottom:3px;transition:border-color .32s var(--ease),color .32s var(--ease)}
+.contacto .grande a:hover,.contacto .grande a:focus-visible{border-color:color-mix(in oklab, var(--crema) 45%, transparent)}
 
 /* ── Cierre ─────────────────────────────────────────────────────────── */
 .cierre{text-align:center;padding:clamp(110px,16vh,180px) 0}
@@ -422,7 +480,10 @@ a,button{-webkit-tap-highlight-color:transparent}
   :root{--header-h:64px}
   .hd__menu span,.hd__wa span{display:none}.hd__wa{padding:0 13px;width:42px;justify-content:center}.hd__inner{column-gap:12px}
   .marca b{font-size:12px;letter-spacing:.24em}
-  .btn{padding:15px 22px}
+  /* A este ancho «Escribir por WhatsApp» en versalitas con .18em no entra en
+     una línea: el botón toma la columna entera en vez de partirse en dos. */
+  .btn{padding:16px 22px;width:100%}
+  .hero-cta,.cta-row{flex-direction:column;align-items:stretch}
   .pasos,.hechos{grid-template-columns:1fr}
   .ficha li{grid-template-columns:1fr;gap:4px}
   .libro{grid-template-columns:110px 1fr}
@@ -438,4 +499,8 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* ── Legal · ancho de lectura de privacidad y términos (#02). El enlace
    dentro del texto usa el subrayado ocre de la sección de contacto. ──── */
 .legal .body,.legal .lead,.legal .small{max-width:56ch}
-.legal a{border-bottom:1px solid var(--naranja)}
+/* En los legales el subrayado SÍ se queda: es texto corrido y ahí un enlace sin
+   marcar no se distingue. Lo que se va es el naranja — un filete de acento en un
+   aviso de privacidad no acentúa nada, y el barrido de la #07 lo cazaría. Sigue
+   el color del texto. */
+.legal a{border-bottom:1px solid currentColor}

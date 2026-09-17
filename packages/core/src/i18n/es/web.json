@@ -37,6 +37,7 @@
       "youtube": "YouTube",
       "spotify": "Podcast en Spotify",
       "facebook": "Facebook",
+      "instagram": "Instagram",
       "whatsapp": "WhatsApp · {{telefono}}",
       "copyright": "© 2026 · Armando Duarte",
       "contacto": "Contacto",
@@ -130,6 +131,7 @@
       "titulo2": "para tener en casa.",
       "tapaAutor": "Armando Duarte",
       "unoTapa": "Construyendo Familias Fuertes",
+      "unoPortadaAlt": "Portada de Construyendo Familias Fuertes",
       "unoTitulo": "Construyendo Familias Fuertes",
       "unoTexto": "El libro que da nombre a todo. Cómo se construye una familia que sostiene, desde la pareja hasta los hijos.",
       "unoCta": "Comprar en San Pablo",
@@ -158,6 +160,7 @@
       "youtube": "YouTube",
       "spotify": "Spotify",
       "facebook": "Facebook",
+      "instagram": "Instagram",
       "base": "Mérida, Yucatán · México"
     }
   },

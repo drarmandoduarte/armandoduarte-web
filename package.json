@@ -2,7 +2,7 @@
   "name": "codice",
   "private": true,
   "version": "0.0.1",
-  "description": "C\u00f3dice \u2014 la plataforma del Dr. Armando Duarte: consultorio, academia y asistente. Su primer contenido es la web p\u00fablica.",
+  "description": "Códice — la plataforma del Dr. Armando Duarte: consultorio, academia y asistente. Su primer contenido es la web pública.",
   "scripts": {
     "dev": "pnpm --filter @codice/web dev",
     "build": "pnpm -r build",
@@ -14,6 +14,7 @@
     "check:estilo": "node scripts/check-estilo.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:secretos": "node scripts/check-secretos.mjs",
+    "check:acento": "node apps/web/check/acento.mjs",
     "qa:instalar": "playwright install chromium"
   },
   "packageManager": "pnpm@10.4.0",

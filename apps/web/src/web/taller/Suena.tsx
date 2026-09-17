@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Foto } from '../comun/Foto';
 import { Icono } from '../comun/Icono';
 import { Seccion } from '../comun/Seccion';
 
@@ -11,17 +10,18 @@ import { Seccion } from '../comun/Seccion';
  * a tres columnas en el mismo cambio. Cuando Armando dé la fecha, vuelve la
  * celda y el CSS vuelve a cuatro.
  *
- * ── La fotografía de fondo (orden #05, D) ────────────────────────────────
- * Lucía la pidió sobre el bloque «¿El niño dulce que criaste se volvió un
- * desconocido?», que es esta sección. La tabla de la orden lo rotulaba
- * «(Porque)», pero el título entrecomillado es el de acá: manda el título, que
- * es lo que ella tenía delante cuando comentó la captura.
+ * ── La fotografía cambió de lugar (orden #07, decisión 5) ────────────────
+ * La #05 la puso de fondo de **toda la sección**, velada al 94 %. A esa
+ * opacidad no es una imagen: es una mancha detrás del texto, y el velo tenía
+ * que ser así de alto porque encima había ocho bloques de texto chico que
+ * necesitaban 4,5:1 cada uno.
  *
- * El velo es **blanco y no crema**, que es lo que la orden decía. El motivo es
- * el otro renglón de la misma orden: «no se toca el ritmo de fondos». Esta
- * sección es la blanca, entre el hero crema y el cálido de «Por qué»; un velo
- * crema encima la habría vuelto crema y habría dejado tres secciones seguidas
- * del mismo color. El velo tiñe la foto, no la sección.
+ * Ahora es el fondo de **una sola tarjeta**, la de la cita, con velo teal. Ahí
+ * el único texto encima es una frase de 30 px en crema, que aguanta mucho menos
+ * velo — así que la foto se ve de verdad. La sección vuelve a ser blanca limpia,
+ * como el resto.
+ *
+ * Es el mismo archivo de Lucía; cambió dónde se usa, no cuál.
  */
 export function Suena() {
   const { t } = useTranslation();
@@ -31,16 +31,7 @@ export function Suena() {
     ['03', t('taller.suena.tresTitulo'), t('taller.suena.tresTexto')],
   ];
   return (
-    <Seccion id="suena" tono="blanco" clase="con-fondo">
-      <div className="fondo-foto" aria-hidden="true">
-        <Foto
-          nombre="porque-fondo"
-          alt=""
-          ancho={1200}
-          alto={1800}
-          tamanos="100vw"
-        />
-      </div>
+    <Seccion id="suena" tono="blanco">
       <div className="hechos reveal">
         <div>
           <Icono nombre="horario" ancho={40} alto={39} />
@@ -72,7 +63,17 @@ export function Suena() {
           ))}
         </ol>
       </div>
-      <blockquote className="bloque-cita u-mt-7 reveal">{t('taller.suena.cita')}</blockquote>
+      <blockquote className="bloque-cita bloque-cita--foto u-mt-7 reveal">
+        <img
+          src="img/fotos/porque-fondo.webp"
+          width={1200}
+          height={1800}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+        />
+        <span>{t('taller.suena.cita')}</span>
+      </blockquote>
     </Seccion>
   );
 }

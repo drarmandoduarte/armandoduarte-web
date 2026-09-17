@@ -27,6 +27,8 @@ export function Contacto() {
             <a href={CANALES.spotify} target="_blank" rel="noopener">{t('inicio.contacto.spotify')}</a>
             {' · '}
             <a href={CANALES.facebook} target="_blank" rel="noopener">{t('inicio.contacto.facebook')}</a>
+            {' · '}
+            <a href={CANALES.instagram} target="_blank" rel="noopener">{t('inicio.contacto.instagram')}</a>
           </p>
           <p className="small u-mt-5">{t('inicio.contacto.base')}</p>
         </div>
