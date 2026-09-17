@@ -20,7 +20,8 @@ usa.
 | #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | **cerrada** (PR #12, mergeado el 17/9/2026) |
 | #08 | La apertura: sacar el `noindex` sin abrir la puerta de atrás | **cerrada** (PR #14, mergeado el 17/9/2026) |
 | #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | **abierta y sin mergear** (PR #16) — se remide sobre la #11 y ahí dirección decide |
-| #11 | `Cache-Control` para `/assets/` | en curso (rama `web/11-cache-assets`) |
+| #10 | La CSP, mientras todavía es fácil | en curso (rama `web/10-csp`) |
+| #11 | `Cache-Control` para `/assets/` | **cerrada** (PR #17, mergeado el 17/9/2026) |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -307,12 +308,66 @@ Lo que estos tests **no** comprueban, declarado: que Vercel aplique las
 cabeceras. Eso se mide con `curl` contra producción después del merge y va al
 informe, igual que la #08 hizo con el `has` por host.
 
-### 6. Content-Security-Policy
+### 6. Content-Security-Policy · **CERRADO en la #10**
 
-No hay CSP todavía, igual que en el sitio estático. Con el port desapareció el
-`<script>` en línea que la complicaba —todo el JavaScript es un archivo con su
-hash, y desde la #02 es **uno solo de 1,8 KB**—, así que el día que se escriba es
-más fácil que antes. Va junto con la apertura del dominio.
+Se escribió mientras era corta: un solo JS propio, cero scripts en línea, cero
+terceros. Va en los dos `vercel.json`, sin condición de host:
+
+```
+default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self';
+font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none';
+base-uri 'none'; object-src 'none'; upgrade-insecure-requests
+```
+
+**Dos cosas salieron distintas de como la orden las había escrito**, las dos
+medidas:
+
+- **`img-src` NO lleva `data:`.** La orden lo incluía «porque el favicon SVG y
+  algún recurso embebido lo usan» y mandaba verificarlo. Se verificó: **no hay
+  ni una `data:` URI** en el HTML publicado ni en el CSS compilado. El favicon
+  es un archivo. Se sacó, como la propia orden indicaba para ese caso.
+- **`style-src 'self'` rompía la web, y no se arregló con una excepción.** La
+  web tenía **siete `style=` inline** —tres anchos de foto y cuatro márgenes— y
+  la CSP los bloquea: medido, la foto de «Quién soy» quedaba en
+  `max-width:none`. En vez de agregar `'unsafe-inline'`, los siete se movieron a
+  `index.css`. La política se queda **sin una sola excepción**, que era el
+  argumento entero de la orden.
+
+  Y el traslado dejó su propia lección: el primer intento usó la escala
+  `u-mt-*`, que **tiene la misma especificidad** que `.ficha` y `.sello` y por
+  lo tanto pierde por orden de archivo. El guardián de fidelidad lo cazó con la
+  portada 56 px más alta. Las siete reglas cuelgan del `id` de su sección, que
+  gana siempre — que es lo que el `style=` hacía.
+
+**El WhatsApp no necesitó nada**, y se comprobó clickeando y no razonando:
+`wa.me` con `target="_blank"` es **navegación**, no carga de recurso, y ninguna
+directiva de esta política la gobierna.
+
+De paso, `e2e/servidor.mjs` pasó a **leer las cabeceras del `vercel.json` de la
+raíz** en vez de servir sólo el contenido. Así el guardián mide la política que
+se va a publicar y no una copia; es la regla que la #07 ya aplicó con
+`check/acento.mjs`.
+
+#### Lo que va a exigir cada cosa que venga
+
+Escrito ahora para que cada excepción futura sea una decisión consciente y no un
+`unsafe-inline` puesto a las tres de la mañana para destrabar un deploy:
+
+| lo que venga | qué va a pedir |
+|---|---|
+| analítica (Plausible, GA…) | su dominio en `script-src` **y** en `connect-src` |
+| el consultorio | el proyecto de Supabase en `connect-src` (REST y WebSocket) |
+| video de cursos (Mux, D9) | `media-src` y `frame-src` del reproductor |
+| Google Meet / Calendar embebidos (D8) | `frame-src` de Google |
+| pagos (Paddle) | `script-src` y `frame-src` de Paddle — su checkout es un iframe |
+| cualquier formulario | `form-action`, que hoy está en `'none'` **a propósito**: la web no tiene ninguno, y el día que tenga uno esta línea lo va a romper ruidosamente, que es lo que queremos |
+| fuentes de Google | nada: **no se hace**. Las fuentes son locales por regla (`CLAUDE.md`) |
+
+**Reportes de violaciones a un tercero: no.** Sería mandar datos de visitantes a
+un servicio externo y es una decisión de privacidad con su propia orden.
+
+Lo que los tests **no** comprueban, declarado: que Vercel sirva la cabecera. Eso
+se mide con `curl` contra el preview y contra producción, y está en el informe.
 
 ### 7. Dos documentos del mismo design system · **de dirección**
 

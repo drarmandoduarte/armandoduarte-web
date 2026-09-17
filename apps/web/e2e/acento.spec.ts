@@ -3,7 +3,7 @@ import { PUERTO_PORT } from '../playwright.config';
 // @ts-expect-error -- `check/acento.mjs` es JavaScript sin tipos a propósito: es
 // una herramienta de consola que además se importa acá. Tiparla obligaría a
 // compilarla, y entonces dejaría de poder correrse con `node` a secas.
-import { PAGINAS, PERMITIDO, RECOLECTAR } from '../check/acento.mjs';
+import { PAGINAS, PERMITIDO, QUIETAR, RECOLECTAR } from '../check/acento.mjs';
 
 /**
  * El acento, dentro de la gate — orden Códice #07, y decisión de dirección del
@@ -37,8 +37,13 @@ for (const [nombre, ruta, piso] of PAGINAS as [string, string, number][]) {
     await page.goto(`http://127.0.0.1:${PUERTO_PORT}${ruta}`, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
     /* Todo revelado y sin transiciones: un bloque a mitad del fundido tiene un
-       color que el diseño no tiene, y acá se compara por igualdad exacta. */
-    await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
+       color que el diseño no tiene, y acá se compara por igualdad exacta.
+
+       Va por CSSOM y no con `addStyleTag`, y también se importa en vez de
+       copiarse: desde la #10 el servidor de QA sirve la CSP de verdad, y
+       `style-src 'self'` bloquea una hoja en línea. El guardián se rompía a sí
+       mismo. */
+    await QUIETAR(page);
     await page.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
     await page.waitForTimeout(250);
 

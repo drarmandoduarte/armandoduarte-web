@@ -54,7 +54,7 @@ export function Suena() {
           </h2>
           <p className="body u-mt-4 reveal" data-d="2">{t('taller.suena.cuerpo')}</p>
         </div>
-        <ol className="lista lista--2 reveal" data-d="2" style={{ marginTop: 0 }}>
+        <ol className="lista lista--2 reveal" data-d="2">
           {sintomas.map(([n, titulo, texto]) => (
             <li key={n}>
               <span className="n">{n}</span>
