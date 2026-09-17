@@ -20,7 +20,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 29 |
+| `@codice/web` | 39 |
 | `@codice/navegador` | 26 |
 
 ## De dónde salen estos números
@@ -34,6 +34,37 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #11
+
+`@codice/web` sube de 29 a **39**. Diez tests nuevos en
+`src/el-cache-no-se-va-del-vercel-json.test.ts`, y existen por el motivo de
+siempre: **la mutación no tiraba nada.** Antes de tocar el archivo se borró del
+`vercel.json` la regla entera de `/fuentes/(.*)` —los 200 KB de tipografía que
+dejarían de cachearse en cada visita— y `pnpm test` salió **verde, 29 de 29**.
+Ninguna comprobación del repo miraba una cabecera de caché. Es el hallazgo de la
+#08 repetido en el mismo archivo, un año de caché más abajo.
+
+Son diez y no uno porque hay cinco maneras distintas de romperlo, y dos archivos
+donde romperlo: que falte una de las tres reglas, que le saquen el `immutable`,
+que la condicionen a un host —dejando al dominio propio sin caché y al preview
+con ella, al revés de lo que parece—, que alguien le ponga `Cache-Control` a
+`/(.*)`, y que un archivo sin hash aterrice en `/assets/`.
+
+Las dos últimas merecen su renglón:
+
+- **(3) `Cache-Control` sobre `/(.*)` es irreversible.** Alcanzaría al HTML, que
+  no lleva hash: el navegador de cada visitante que la reciba **deja de pedir la
+  página hasta 2027** y no hay despliegue que lo arregle. Es el único test del
+  repo cuyo defecto no se puede deshacer desde el repo.
+- **(4) todo lo de `/assets/` lleva hash en el nombre.** Es lo que hace *segura*
+  la regla nueva, y es lo único de las tres carpetas que se puede comprobar
+  contra la salida: `/fuentes/` y `/img/` llevan nombres estables a propósito y
+  su seguridad es una decisión declarada, no una propiedad del archivo.
+
+Y uno de paridad, el (5): la raíz y `apps/web/` tienen que declarar las mismas
+reglas. El guardián del `noindex` ya decía que no pueden contradecirse; ahora
+también lo dice un test en vez de un comentario.
 
 ## Lo que movió la orden #08
 

@@ -19,6 +19,8 @@ usa.
 | #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
 | #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | **cerrada** (PR #12, mergeado el 17/9/2026) |
 | #08 | La apertura: sacar el `noindex` sin abrir la puerta de atrás | **cerrada** (PR #14, mergeado el 17/9/2026) |
+| #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | **abierta y sin mergear** (PR #16) — se remide sobre la #11 y ahí dirección decide |
+| #11 | `Cache-Control` para `/assets/` | en curso (rama `web/11-cache-assets`) |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -269,6 +271,41 @@ contrato de `@codice/ui`.
 Dos caminos que se midieron y **empeoraron**, para que nadie los vuelva a
 intentar: mover los `<link rel="preload" as="image">` que React inyecta al
 `<head>` (86/86/87) y quitarlos del todo (70, LCP 5,78 s — hacen falta).
+
+### 5d. `/assets/` se servía sin `Cache-Control` · **CERRADO en la #11**
+
+`/fuentes/(.*)` y `/img/(.*)` llevaban `public, max-age=31536000, immutable`
+desde el sitio estático; `/assets/(.*)` —donde viven la hoja de CSS y el script
+de comportamiento— **no llevaba ninguna**. Dirección lo confirmó sobre
+producción: salían con `max-age=0, must-revalidate`, o sea revalidando en cada
+visita.
+
+Lo encontró la **#09**, que se apoyaba en el beneficio de caché para justificar
+partir el CSS en dos y descubrió que ese beneficio no existía. La #11 lo
+arregla primero; la #09 queda abierta esperando a remedirse encima.
+
+La regla va en los **dos** `vercel.json` —el de la raíz, que es el que Vercel
+lee, y el de `apps/web/`, que es su referencia escrita— con el mismo valor que
+las otras dos carpetas. Es segura porque los tres archivos de `/assets/` llevan
+**hash del contenido en el nombre**: un contenido nuevo es un nombre nuevo, así
+que el navegador no puede quedarse con una versión vieja. Eso ya no es una
+suposición: lo afirma un test que lee `dist/assets` y exige el hash en cada
+nombre.
+
+**Y el hallazgo que hace que esta orden chica traiga diez tests: nadie vigilaba
+ninguna cabecera de caché.** Antes de tocar nada se borró del `vercel.json` la
+regla entera de `/fuentes/` —los 200 KB de tipografía que dejarían de
+cachearse— y `pnpm test` salió **verde, 29 de 29**. Es el mismo hallazgo de la
+#08 con el `noindex`, en el mismo archivo.
+
+De paso quedó atajada la mitad irreversible, que es la que da miedo: un
+`immutable` sobre `/(.*)` alcanzaría al HTML, y el HTML **no** lleva hash. Cada
+visitante que recibiera esa cabecera dejaría de pedir la página hasta 2027, y no
+hay despliegue que lo saque de ahí. La afirmación (3) existe sólo para eso.
+
+Lo que estos tests **no** comprueban, declarado: que Vercel aplique las
+cabeceras. Eso se mide con `curl` contra producción después del merge y va al
+informe, igual que la #08 hizo con el `has` por host.
 
 ### 6. Content-Security-Policy
 
