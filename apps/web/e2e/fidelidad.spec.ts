@@ -16,7 +16,8 @@ import { PUERTO_PORT } from '../playwright.config';
  *       quedó apuntando al mensaje —o al teléfono— equivocado: invisible en la
  *       captura, y lo que le llega a alguien por teléfono;
  *   d · **el `<head>`**. Caza lo que solo se ve en Google y en la vista previa de
- *       WhatsApp: título, descripción, canónica e imagen de compartir.
+ *       WhatsApp: título, descripción, canónica e imagen de compartir; y desde
+ *       el rescate de la #09, **las hojas de estilo enlazadas, en orden**.
  *
  * Ninguna de las cuatro sobra: cada una caza algo que las otras tres dejan pasar.
  *
@@ -169,6 +170,23 @@ const enlaces = (page: Page) =>
  * que mañana apunta a otro dominio sin que nada lo note. Las cinco dicen dónde
  * vive esta página para Google y para WhatsApp — que es justo lo que la apertura
  * puso en juego.
+ *
+ * ── Y `hojas`, rescatado de la #09 ──────────────────────────────────────
+ * La #09 le agregó un `<link rel="stylesheet">` al `<head>` de las cuatro
+ * páginas **y este guardián siguió en verde**, porque su lista no miraba las
+ * hojas. Es exactamente el modo de falso verde de la #06: no alcanza con que un
+ * guardián exista, tiene que estar mirando lo que la orden movió.
+ *
+ * Aquella división no entró —se midió y no convenía, ver `docs/tareas.md` §
+ * 5b—, pero **la ceguera no dependía de la división**: cualquier orden futura
+ * que agregue, quite o reordene una hoja de estilo pasaría igual de callada. Así
+ * que la lista se amplía, y se declara: ahora incluye **las hojas enlazadas, en
+ * orden**.
+ *
+ * El hash del nombre se reemplaza por `<hash>` **a propósito**: cambia en cada
+ * build que toque el CSS, y una captura que se reescribe sola en cada orden deja
+ * de decir nada. Lo que se vigila es cuántas hojas hay y en qué orden, que es la
+ * decisión; el hash es ruido.
  */
 const cabeza = (page: Page) => page.evaluate(() => ({
   title: document.title,
@@ -176,6 +194,8 @@ const cabeza = (page: Page) => page.evaluate(() => ({
   canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? null,
   ogUrl: document.querySelector('meta[property="og:url"]')?.getAttribute('content') ?? null,
   ogImage: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? null,
+  hojas: [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')]
+    .map((l) => new URL(l.href).pathname.replace(/-[A-Za-z0-9_-]{8}\.css$/, '-<hash>.css')),
 }));
 
 for (const { nombre, ruta } of PAGINAS) {

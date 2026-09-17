@@ -20,7 +20,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 39 |
+| `@codice/web` | 43 |
 | `@codice/navegador` | 29 |
 
 ## De dónde salen estos números
@@ -34,6 +34,34 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que rescató la #09, que NO se mergeó
+
+`@codice/web` sube de 39 a **43**. La división del CSS **se midió y no convenía**
+—el porqué, con los números, en `docs/tareas.md` § 5b— pero dos cosas que
+aparecieron trabajándola no dependían de que la división entrara:
+
+**Cuatro tests en `src/el-css-publicado-trae-lo-suyo.test.ts`.** Se cortó a
+propósito el `@import` de `packages/ui/styles.css` —de donde salen los
+`@font-face` y los tokens— y **el build salió verde**. Nada miraba qué hay
+adentro de la hoja que se publica. Se habría visto en las capturas de fidelidad,
+pero como un rojo de píxeles que no dice la causa: doce comprobaciones en rojo y
+alguien buscando media hora de dónde salió.
+
+**Y `@codice/navegador` no se mueve, pero su guardián sí mira más.** La lista de
+`cabeza()` en `fidelidad.spec.ts` pasó a incluir **las hojas de estilo
+enlazadas, en orden**. El motivo: la #09 agregó un `<link rel="stylesheet">` al
+`<head>` de las cuatro páginas y **las doce comprobaciones siguieron en verde**.
+La ceguera no dependía de la división — cualquier orden futura que agregue,
+quite o reordene una hoja pasaría igual de callada. Mismo número de tests,
+lista más ancha, y las cuatro `*-cabeza.json` actualizadas.
+
+Y una lección del propio test, que se deja escrita porque es un modo de falso
+verde nuevo para esta casa: la afirmación (2) buscaba `--crema` a secas y **pasó
+en verde con el `@import` de los tokens cortado**, porque `var(--crema)`
+contiene esa cadena. Estaba encontrando el **uso** y dando por presente la
+**definición**. Ahora busca `--crema:`, con los dos puntos. Lo destapó la
+mutación, no la lectura.
 
 ## Lo que movió la orden #10
 
