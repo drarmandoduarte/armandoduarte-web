@@ -76,11 +76,15 @@ module.exports = {
         claro: 'var(--gris-claro)',
       },
 
-      ocre: {
-        DEFAULT: 'var(--ocre)',
-        medio: 'var(--ocre-medio)',
-        suave: 'var(--ocre-suave)',
+      /* La paleta CFF (orden #05). `ocre` ya no existe en la web: el naranja
+         del manual se parte en dos —el exacto para líneas e íconos, y el
+         oscurecido al mínimo medido para todo lo que es texto—. */
+      naranja: {
+        DEFAULT: 'var(--naranja)',
+        texto: 'var(--naranja-texto)',
+        suave: 'var(--naranja-suave)',
       },
+      ambar: 'var(--ambar)',
       teal: {
         DEFAULT: 'var(--teal)',
         medio: 'var(--teal-medio)',

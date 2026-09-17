@@ -4,9 +4,11 @@
  * ── Qué cuida ──────────────────────────────────────────────────────────────
  * Que `codice-tokens.json` siga describiendo **la web que existe** y no la que
  * alguien recuerda. El JSON es un documento: se lee, se cita en las órdenes y
- * nadie lo ejecuta, así que envejece sin avisar. Este archivo lo ata a la única
- * fuente que no miente —`estilo.css` del sitio estático, que es lo que el
- * navegador dibuja hoy— y a la regla de que un color no se escribe dos veces.
+ * nadie lo ejecuta, así que envejece sin avisar. Este archivo lo ata a dos cosas
+ * que no se pueden falsear: **el contraste en aritmética** —cada par con su
+ * número al lado, y los tres que NO llegan afirmados como igualdad para que
+ * nadie los arregle en silencio— y la regla de que un color no se escribe dos
+ * veces.
  *
  * ── El piso va primero, y por qué ─────────────────────────────────────────
  * La comprobación central es «este valor aparece textualmente en el CSS». Si el
@@ -17,21 +19,16 @@
  * piso va ANTES de la afirmación que sostiene— y acá se paga sola: sin ella, un
  * `ESTATICO_DIR` mal puesto se lee como «los tokens no coinciden».
  *
- * ── Dónde está el sitio estático ──────────────────────────────────────────
- * En `qa/referencia/` de este mismo repo, versionado, desde la orden #04 —antes
- * era un repo de al lado—. `ESTATICO_DIR` sigue pudiendo apuntar a otro lado,
- * pero por omisión no hace falta. **No se saltea si falta**: un guardián que se
- * saltea cuando no encuentra su insumo es un guardián que se apaga solo el día
- * que más falta hace.
+ * ── Lo que se retiró en la #05 ────────────────────────────────────────────
+ * La comparación contra `estilo.css` del sitio estático. El motivo está escrito
+ * abajo, donde estaba el bloque.
  */
 import { describe, expect, it } from 'vitest';
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
-const RAIZ = join(AQUI, '..', '..');
-const ESTATICO = process.env.ESTATICO_DIR || join(RAIZ, 'qa', 'referencia');
 
 const tokens = JSON.parse(readFileSync(join(AQUI, 'codice-tokens.json'), 'utf8'));
 
@@ -72,8 +69,8 @@ function contraste(hexA, hexB) {
 
 describe('los tokens de Códice', () => {
   it('la versión del documento es la que esta orden dejó', () => {
-    expect(tokens.$meta.version).toBe('1.1.1');
-    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.1.1');
+    expect(tokens.$meta.version).toBe('1.2.0');
+    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.0');
   });
 
   /*
@@ -106,6 +103,42 @@ describe('los tokens de Códice', () => {
       ['ink.primary sobre brand.ochre.mid',        C.ink.primary.value, C.brand.ochre.mid],
     ];
 
+    /*
+     * ── Y los pares de la paleta CFF (orden #05) ──────────────────────────
+     *
+     * Los de arriba siguen siendo ciertos y siguen valiendo: describen el ocre
+     * y el teal de D6, que es lo que **la app** va a usar. Lo que la orden #05
+     * cambió es a cuál mira **la web**, así que sus pares se agregan, no se
+     * reemplazan. Borrar los de arriba sería dejar de vigilar la paleta de la
+     * app el día que alguien la toque.
+     *
+     * Dos umbrales distintos y por eso dos listas. El de 4,5 es el de texto
+     * normal; el de 3 es el que la WCAG da para texto grande (≥ 24 px) y para
+     * lo que no es texto —íconos, líneas, aros—. Escribir los dos grupos con el
+     * mismo número habría sido más corto y habría prohibido el naranja del
+     * manual en los íconos, que es exactamente lo que la orden vino a poner.
+     */
+    const PARES_CFF_45 = [
+      ['cff.orangeText sobre background.cream',       C.cff.orangeText.value, C.background.cream.value],
+      ['cff.orangeText sobre background.surfaceWarm', C.cff.orangeText.value, C.background.surfaceWarm.value],
+      ['cff.orangeText sobre background.surface',     C.cff.orangeText.value, C.background.surface.value],
+      ['background.cream sobre cff.orangeText',       C.background.cream.value, C.cff.orangeText.value],
+      ['background.cream sobre cff.tealDark',         C.background.cream.value, C.cff.tealDark.value],
+      ['cff.amber sobre ink.primary',                 C.cff.amber.value, C.ink.primary.value],
+      ['ink.primary sobre cff.amber',                 C.ink.primary.value, C.cff.amber.value],
+    ];
+
+    /* Solo para ≥ 24 px, íconos y líneas. Ninguno de estos tres puede usarse
+       como texto chico, y el comentario es la mitad del guardián: sin él, el
+       número 3 se lee como «acá alcanza con menos» en vez de «acá el texto es
+       grande». Dónde se usa cada uno está en `codice-tokens.css`. */
+    const PARES_CFF_3 = [
+      ['cff.orange sobre background.cream',      C.cff.orange.value, C.background.cream.value],
+      ['cff.orange sobre background.surface',    C.cff.orange.value, C.background.surface.value],
+      ['cff.tealLight sobre background.cream',   C.cff.tealLight.value, C.background.cream.value],
+      ['cff.tealLight sobre background.surface', C.cff.tealLight.value, C.background.surface.value],
+    ];
+
     it('piso · la fórmula sabe medir lo que ya se sabe', () => {
       /* Negro sobre blanco es 21:1 y un color contra sí mismo es 1:1. Sin este
          piso, una fórmula rota que devolviera siempre 21 pondría todo en verde. */
@@ -116,7 +149,7 @@ describe('los tokens de Códice', () => {
       expect(Number(contraste('#7A7267', '#F3EBDD').toFixed(2))).toBe(4);
     });
 
-    for (const [nombre, fg, bg] of PARES) {
+    for (const [nombre, fg, bg] of [...PARES, ...PARES_CFF_45]) {
       it(`${nombre} ≥ 4,5`, () => {
         expect(
           Number(contraste(fg, bg).toFixed(2)),
@@ -125,51 +158,86 @@ describe('los tokens de Códice', () => {
         ).toBeGreaterThanOrEqual(4.5);
       });
     }
-  });
 
-  describe('la sección `web` describe el CSS que el navegador dibuja hoy', () => {
-    /* EL PISO, PRIMERO. Ver la cabecera: sin esto, el rojo de abajo miente. */
-    const rutaCss = join(ESTATICO, 'estilo.css');
-    let css = '';
-    let bytes = 0;
-    try {
-      bytes = statSync(rutaCss).size;
-      css = readFileSync(rutaCss, 'utf8');
-    } catch {
-      /* se cae en el piso, con el nombre del archivo a la vista */
-    }
-
-    it(`piso · se leyó ${rutaCss}`, () => {
-      expect(
-        bytes,
-        `no se pudo leer ${rutaCss}. Es la especificación del port: sin él este guardián no `
-        + 'compara nada. Vive en `qa/referencia/` de este repo y se versiona con él.',
-      ).toBeGreaterThan(10_000);
-      expect(css.length).toBeGreaterThan(10_000);
-    });
-
-    for (const [nombre, escala] of Object.entries(tokens.web.typography.display)) {
-      it(`display ${nombre}: «${escala.size}» está textualmente en estilo.css`, () => {
-        expect(css).toContain(escala.size);
+    for (const [nombre, fg, bg] of PARES_CFF_3) {
+      it(`${nombre} ≥ 3 · solo para ≥ 24 px, íconos y líneas`, () => {
+        expect(
+          Number(contraste(fg, bg).toFixed(2)),
+          `${fg} sobre ${bg} no llega a 3:1, que es el umbral de la WCAG para texto grande y para `
+          + 'lo que no es texto. Por debajo de eso no se puede usar ni siquiera en un ícono.',
+        ).toBeGreaterThanOrEqual(3);
       });
     }
 
-    it('lead y script también', () => {
-      expect(css).toContain(tokens.web.typography.lead.size);
-      expect(css).toContain(tokens.web.typography.script.size);
+    /*
+     * El que NO pasa, escrito acá para que no se lo pueda olvidar.
+     *
+     * El ámbar sobre el teal da 2,81 y el umbral es 4,5: son los rótulos, los
+     * enlaces y las flechas de las secciones teal, y es el pendiente 4c. La #05
+     * lo movió de 2,51 a 2,81 sin querer —cambió la paleta, no el contraste— y
+     * lo dejó igual de lejos de AA.
+     *
+     * Está afirmado como igualdad y no como «menor que» a propósito: el día que
+     * alguien lo arregle, este test se pone rojo y lo obliga a venir hasta acá a
+     * borrar la excepción. Una excepción que se arregla sola en silencio vuelve
+     * a aparecer a los seis meses.
+     */
+    /*
+     * El teal claro sobre el teal oscuro: 2,56, y no llega ni al 3.
+     *
+     * La orden #05 lo daba por bueno —«acento sobre teal oscuro»— y medido no lo
+     * es: ni como texto grande, ni como ícono, ni como línea. Hoy no se usa así
+     * en ningún lado (`--teal-medio` no aparece ni una vez en `index.css`), o
+     * sea que no hay nada que arreglar; lo que hay es algo que impedir.
+     *
+     * Por eso está escrito como afirmación y no como comentario: el día que
+     * alguien ponga un ícono teal sobre una sección teal, va a venir a leer esto
+     * antes que a descubrirlo en Lighthouse. Sobre teal oscuro el acento que sí
+     * pasa es el crema (7,74), que es el que la hoja usa.
+     */
+    it('el teal claro NO sirve sobre el teal oscuro: 2,56', () => {
+      expect(
+        Number(contraste(C.cff.tealLight.value, C.cff.tealDark.value).toFixed(2)),
+        'si esto cambió, alguien movió uno de los dos teales del manual.',
+      ).toBe(2.56);
     });
 
-    it('el aire de sección, el hero y el arco también', () => {
-      expect(css).toContain(tokens.web.section.paddingBlock);
-      expect(css).toContain(tokens.web.hero.minHeight);
-      expect(css).toContain(tokens.web.foto.arco.borderRadius);
+    /* Y tampoco sobre el cálido: 2,73. Los íconos teal van sobre crema (3,03) y
+       sobre blanco (3,24), que son las dos secciones donde la #05 los puso. */
+    it('el teal claro NO sirve sobre el cálido: 2,73', () => {
+      expect(Number(contraste(C.cff.tealLight.value, C.background.surfaceWarm.value).toFixed(2))).toBe(2.73);
     });
 
-    it('el header mide lo que dice medir, arriba y abajo de los 600px', () => {
-      expect(css).toContain(`--header-h:${tokens.web.header.height.default}`);
-      expect(css).toContain(`--header-h:${tokens.web.header.height.compact}`);
+    it('pendiente 4c · cff.amber sobre cff.tealDark sigue en 2,81 y no cumple AA', () => {
+      expect(
+        Number(contraste(C.cff.amber.value, C.cff.tealDark.value).toFixed(2)),
+        'si este número cambió, el pendiente 4c se movió: se actualiza acá y en `docs/tareas.md`, '
+        + 'que es donde dirección lo lee.',
+      ).toBe(2.81);
     });
   });
+
+  /*
+   * ── Acá vivía la comparación contra `estilo.css` del sitio estático ──────
+   *
+   * **Retirados por D24: la referencia del port cumplió su propósito en la #04.**
+   *
+   * Ocho comprobaciones ataban la sección `web` de este JSON al CSS del sitio
+   * estático: que cada `clamp()` de la escala display, el aire de sección, el
+   * alto del hero, el radio del arco y las dos alturas del header estuvieran
+   * **textualmente** en `qa/referencia/estilo.css`. Tenían razón de ser mientras
+   * el estático fuera la especificación de la web; desde la #05 la web tiene
+   * paleta, íconos y fotografías propias, y el estático es historia. Un guardián
+   * que compara contra algo que ya no es verdad no vigila: hace ruido, y el
+   * ruido se termina apagando.
+   *
+   * Lo que sigue vigilando que este JSON no envejezca es lo de arriba y lo de
+   * abajo: el contraste en aritmética —treinta afirmaciones con sus valores al
+   * lado— y que ningún color se escriba dos veces. Lo que ya no se afirma es que
+   * la tipografía del documento coincida con la del CSS; si eso hace falta otra
+   * vez, se ata a `apps/web/src/index.css`, que es lo que el navegador dibuja
+   * hoy, y no a una carpeta que dice «referencia» en el nombre.
+   */
 
   describe('ningún color se escribe dos veces', () => {
     const hexDeColor = new Set(

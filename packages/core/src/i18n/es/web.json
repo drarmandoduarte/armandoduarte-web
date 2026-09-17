@@ -36,7 +36,7 @@
       "youtube": "YouTube",
       "spotify": "Podcast en Spotify",
       "facebook": "Facebook",
-      "whatsapp": "WhatsApp · +52 55 5501 5641",
+      "whatsapp": "WhatsApp · {{telefono}}",
       "copyright": "© 2026 · Armando Duarte",
       "contacto": "Contacto",
       "privacidadCorta": "Privacidad",
@@ -50,7 +50,6 @@
       "arco": "Hola, quiero ejercer mis derechos ARCO."
     }
   },
-
   "inicio": {
     "head": {
       "title": "Armando Duarte · Consultoría familiar, talleres y libros · Mérida",
@@ -154,14 +153,13 @@
       "eyebrow": "Contacto",
       "titulo1": "Escríbeme.",
       "titulo2": "Te responde mi equipo, y yo.",
-      "whatsapp": "WhatsApp · +52 55 5501 5641",
+      "whatsapp": "WhatsApp · {{telefono}}",
       "youtube": "YouTube",
       "spotify": "Spotify",
       "facebook": "Facebook",
       "base": "Mérida, Yucatán · México"
     }
   },
-
   "taller": {
     "head": {
       "title": "Taller para padres de adolescentes en Mérida · El arte de amar a tu adolescente · Armando Duarte",
@@ -206,7 +204,8 @@
       "titulo1": "Las estrategias del pasado",
       "titulo2": "ya no funcionan.",
       "cuerpo1": "Cuando nuestros hijos son pequeños ejercemos el rol de gobernadores: un control directo sobre su entorno. En la adolescencia, mantener ese control por imposición o ultimátum solo activa su cerebro impulsivo y desencadena un ciclo coercitivo destructivo.",
-      "cuerpo2": "Para acompañarle no necesitas más disciplina autoritaria ni permisividad distante. Necesitas evolucionar hacia el rol de guía consciente."
+      "cuerpo2": "Para acompañarle no necesitas más disciplina autoritaria ni permisividad distante. Necesitas evolucionar hacia el rol de guía consciente.",
+      "fotoAlt": "Una madre sentada en la cama, con la cabeza apoyada en las manos"
     },
     "programa": {
       "eyebrow": "El programa",
@@ -243,10 +242,13 @@
       "titulo": "Lo que te llevas.",
       "unoTitulo": "Claridad",
       "unoTexto": "Entenderás qué le ocurre a tu hijo en cada estallido o retraimiento.",
+      "unoFotoAlt": "Una madre y sus dos hijos sentados en el sofá, con los ojos cerrados",
       "dosTitulo": "Palabras precisas",
       "dosTexto": "Sabrás qué decir y qué callar para mantener abiertos los canales de comunicación.",
+      "dosFotoAlt": "Una madre abraza a su hija adolescente",
       "tresTitulo": "Serenidad con firmeza",
       "tresTexto": "Mantendrás la calma sin caer en gritos, culpas ni desgaste.",
+      "tresFotoAlt": "Una madre y su hija pequeña conversan recostadas en el sofá",
       "cta": "Reservar mi lugar"
     },
     "facilitador": {
@@ -311,7 +313,6 @@
       "ctaConocer": "Conocer a Armando"
     }
   },
-
   "privacidad": {
     "head": {
       "title": "Aviso de privacidad · Armando Duarte",
@@ -322,7 +323,7 @@
     "lead": "Este aviso explica qué datos personales se recaban a través de este sitio, para qué se usan y cómo puedes controlarlos. Está redactado conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).",
     "responsableTitulo": "Responsable",
     "responsableAntes": "El responsable del tratamiento de tus datos personales es Armando Duarte, con domicilio en Mérida, Yucatán, México. Para cualquier asunto relacionado con este aviso puedes escribirnos por WhatsApp al ",
-    "responsableEnlace": "+52 55 5501 5641",
+    "responsableEnlace": "+52 462 199 3143",
     "responsableDespues": ".",
     "datosTitulo": "Qué datos se recaban",
     "datosTexto": "Este sitio no tiene formularios: no hay ningún campo donde dejes tus datos. Los únicos datos personales que llegan son los que tú escribes cuando inicias una conversación por WhatsApp desde alguno de los botones de la página: tu nombre, tu número de teléfono y lo que decidas contar en el mensaje.",
@@ -337,12 +338,11 @@
     "arcoTitulo": "Tus derechos ARCO",
     "arcoTexto": "Tienes derecho a acceder a tus datos personales, a rectificarlos si son inexactos, a cancelarlos cuando consideres que no son necesarios y a oponerte a su uso para fines específicos. También puedes revocar en cualquier momento el consentimiento que hayas dado.",
     "arcoEjercerAntes": "Para ejercer cualquiera de estos derechos, escríbenos por WhatsApp al ",
-    "arcoEjercerEnlace": "+52 55 5501 5641",
+    "arcoEjercerEnlace": "+52 462 199 3143",
     "arcoEjercerDespues": " indicando tu nombre y qué derecho quieres ejercer. La respuesta llega en un plazo máximo de 20 días hábiles, como marca la ley.",
     "cambiosTitulo": "Cambios a este aviso",
     "cambiosTexto": "Si este aviso cambia, la versión nueva se publica en esta misma página. Última actualización: 12 de septiembre de 2026."
   },
-
   "terminos": {
     "head": {
       "title": "Términos de uso · Armando Duarte",

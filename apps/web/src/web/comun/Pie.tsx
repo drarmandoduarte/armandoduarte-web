@@ -10,8 +10,12 @@ import { CANALES } from './canales';
  * El `aria-hidden` de la firma es del original y es correcto: «Construyendo
  * familias fuertes» ya está dicho en el `aria-label` de la marca, y un lector
  * de pantalla que lo lea dos veces seguidas suena a error.
+ *
+ * El `telefono` llega desde `Marco` (orden #05, E). Es lo único que hace que el
+ * pie del taller lleve el número de Mérida y el de las otras tres el de Gaby,
+ * siendo el mismo componente: el pie no elige, obedece a la página.
  */
-export function Pie() {
+export function Pie({ telefono, visible }: { telefono: string; visible: string }) {
   const { t } = useTranslation();
   return (
     <footer className="ft" role="contentinfo">
@@ -26,7 +30,7 @@ export function Pie() {
             <h3>{t('comun.pie.explorar')}</h3>
             <a href="/#quien">{t('comun.nav.quien')}</a>
             <a href="/#hago">{t('comun.nav.hago')}</a>
-            <a href="/taller">{t('comun.nav.taller')}</a>
+            <a href="/merida">{t('comun.nav.taller')}</a>
             <a href="/#libros">{t('comun.nav.libros')}</a>
             <a href="/#programa">{t('comun.nav.programa')}</a>
             <a href="/#contacto">{t('comun.nav.contacto')}</a>
@@ -41,8 +45,8 @@ export function Pie() {
             <a href={CANALES.youtube} target="_blank" rel="noopener">{t('comun.pie.youtube')}</a>
             <a href={CANALES.spotify} target="_blank" rel="noopener">{t('comun.pie.spotify')}</a>
             <a href={CANALES.facebook} target="_blank" rel="noopener">{t('comun.pie.facebook')}</a>
-            <a href={enlaceWhatsApp(t('comun.mensajes.general'))} target="_blank" rel="noopener">
-              {t('comun.pie.whatsapp')}
+            <a href={enlaceWhatsApp(telefono, t('comun.mensajes.general'))} target="_blank" rel="noopener">
+              {t('comun.pie.whatsapp', { telefono: visible })}
             </a>
           </div>
         </div>

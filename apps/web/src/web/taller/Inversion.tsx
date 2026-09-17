@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { TELEFONO_TALLER } from '@codice/core';
 import { BotonWhatsApp } from '../comun/BotonWhatsApp';
 import { Seccion } from '../comun/Seccion';
 
@@ -24,9 +25,10 @@ export function Inversion() {
           <p className="por">{t('taller.inversion.por')}</p>
           <div className="hero-cta">
             <BotonWhatsApp
+              telefono={TELEFONO_TALLER}
               mensaje={t('comun.mensajes.asegurar')}
               texto={t('taller.inversion.cta')}
-              clase="btn btn--ocre"
+              clase="btn btn--naranja"
             />
           </div>
         </div>

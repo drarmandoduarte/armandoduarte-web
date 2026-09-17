@@ -16,9 +16,15 @@ apps/web/test-results/
 apps/web/playwright-report/
 apps/web/.playwright-report.json
 
-# Las capturas de referencia del guardián de fidelidad. NO se versionan, y es la
-# mitad de cómo funciona: se reescriben en cada corrida **desde el sitio
-# estático**, que es la fuente. Una captura guardada en el repo envejece —y el
-# día que envejezca, el guardián estaría comparando el port contra una foto
-# vieja de sí mismo en vez de contra la web que existe.
-apps/web/e2e/*-snapshots/
+# Las capturas del guardián de fidelidad **SÍ se versionan** desde la orden #05
+# (D24): son la referencia, no un producto de la corrida. Antes se reescribían
+# en cada corrida desde el sitio estático y por eso estaban acá; desde que la web
+# cambia a pedido del cliente, el estático dejó de ser contra qué comparar.
+#
+# Lo que evita que una captura guardada envejezca no es no guardarla: es que solo
+# se actualice con `--update-snapshots` y que el PR que lo haga diga la frase
+# «capturas actualizadas por la orden #NN» con la lista de qué cambió. Está
+# explicado en `apps/web/e2e/fidelidad.spec.ts`.
+#
+# Lo que sigue sin versionarse es la carpeta vieja, por si alguien la regenera:
+apps/web/e2e/*.spec.ts-snapshots/

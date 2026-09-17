@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Retrato } from '../comun/Retrato';
 import { Seccion } from '../comun/Seccion';
 
 /** Quién soy: la foto libre a la izquierda, la ficha y la cita a la derecha. */
@@ -8,7 +9,7 @@ export function Quien() {
     <Seccion id="quien" contenedor={false}>
       <div className="container grid-2 centro">
         <figure className="foto foto--libre reveal" style={{ maxWidth: '520px' }}>
-          <img src="img/armando-parado-crema.jpg" width={1094} height={1750} alt={t('inicio.quien.fotoAlt')} loading="lazy" />
+          <Retrato cual="de-pie" alt={t('inicio.quien.fotoAlt')} tamanos="(max-width:900px) 92vw, 520px" />
         </figure>
         <div>
           <span className="eyebrow reveal">{t('inicio.quien.eyebrow')}</span>

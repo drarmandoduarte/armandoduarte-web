@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { enlaceWhatsApp } from '@codice/core';
+import { TELEFONO_GABY, TELEFONO_GABY_VISIBLE, enlaceWhatsApp } from '@codice/core';
 import { CANALES } from '../comun/canales';
 import { Seccion } from '../comun/Seccion';
 
@@ -17,8 +17,8 @@ export function Contacto() {
         </div>
         <div className="reveal" data-d="2">
           <p className="grande">
-            <a href={enlaceWhatsApp(t('comun.mensajes.general'))} target="_blank" rel="noopener">
-              {t('inicio.contacto.whatsapp')}
+            <a href={enlaceWhatsApp(TELEFONO_GABY, t('comun.mensajes.general'))} target="_blank" rel="noopener">
+              {t('inicio.contacto.whatsapp', { telefono: TELEFONO_GABY_VISIBLE })}
             </a>
           </p>
           <p className="grande u-mt-4">

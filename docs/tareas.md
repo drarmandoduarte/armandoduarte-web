@@ -15,6 +15,7 @@ usa.
 | #02 | La web pública no se hidrata | cerrada (rama `codice/02-sin-hidratar`, sobre `01c-fidelidad`) |
 | #03 | Contraste a AA, con el número delante | cerrada (rama `codice/03-contraste`, sobre `02-sin-hidratar`) |
 | #04 | El monorepo entra al repo de Armando | en curso (rama `codice/04-entra-al-repo`, sobre `main` de `armandoduarte-web`) |
+| #05 | La devolución de Lucía y de Armando: paleta CFF, íconos, fotos, dos teléfonos y `/merida` | en curso (rama `web/05-devolucion`, sobre `main`) |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -107,12 +108,36 @@ El sitio estático **conserva el defecto** y es correcto que lo conserve: ahora 
 `qa/referencia/`, la referencia del guardián de fidelidad, y la diferencia está
 declarada en `apps/web/e2e/cambios-visibles.ts`. Tocarlo sería mover la vara.
 
-### 4c. El ocre medio sobre teal no llega a AA: **2,51** · **de dirección**
+### 4c. El acento sobre teal no llega a AA: **2,81** · **de dirección**
 
-Los rótulos, enlaces y flechas de las secciones teal. Llegar a 4,5 exige un ocre
-`#D6C2A4` —un arena pálido— que ya no es el ámbar de la marca: es una decisión de
-paleta, no de contraste, y por eso la #03 no la tomó. Con su número y sus
-alternativas en `docs/informes/03/LEEME.md`, punto D.
+Los rótulos, enlaces y flechas de las secciones teal. Era el ocre medio sobre el
+teal de D6 y daba **2,51**; desde la #05 es el **ámbar del manual CFF sobre el
+teal del manual** y da **2,81**. Mejoró sin acercarse: el umbral es 4,5.
+
+Sigue siendo lo mismo que era, y por eso sigue abierto: llegar a 4,5 sobre ese
+teal exige un acento tan pálido que deja de ser el ámbar de la marca. **Es una
+decisión de paleta, no de contraste**, y ahora además es una decisión sobre el
+manual del cliente, así que se consulta con Lucía antes que con nadie.
+
+Lo afirma en aritmética `packages/ui/tokens.test.mjs`, escrito como igualdad
+—`toBe(2.81)`— y no como «menor que»: el día que alguien lo arregle, el test se
+pone rojo y lo obliga a venir hasta acá a borrar la excepción.
+
+Los otros tres pares que tampoco llegan, medidos en la misma corrida y todos
+**mejores** que antes de la #05, salvo el primero:
+
+| dónde | antes | ahora |
+|---|--:|--:|
+| el rótulo del menú, al 50 % de opacidad | 1,62 | **1,46** |
+| el ámbar sobre el velo del menú (`a.pr`) | 4,05 | **4,27** |
+| la tapa del libro (`small` al 80 %) | 3,54 | **3,72** |
+
+El primero empeoró y es honesto decirlo: el rótulo del overlay hereda el color de
+acento, que pasó de ocre a naranja de texto. Los dos están igual de lejos del
+umbral —1,6 y 1,5 sobre 4,5— porque el problema de ese rótulo no es el color sino
+el `opacity:.5` escrito en línea en `MenuMovil.tsx`. Se arregla sacando esa
+opacidad, no cambiando la paleta; no se tocó porque es una decisión de diseño y
+la orden #05 no la pide.
 
 ### 5. Performance: el bundle costaba 17 puntos · **cerrado en la #02**
 
@@ -152,6 +177,20 @@ por separado. Eso toca el contrato de `@codice/ui` —«un solo import y el prod
 tiene la marca»— y lo van a heredar el consultorio, la academia y el asistente:
 no es una decisión de una orden de la web. Queda medido y anotado.
 
+**La #05 le puso un segundo caso al mismo pendiente.** `terminos` bajó de 99 a 98
+—tres corridas de cada lado, sin una sola excepción— y la causa está aislada:
+`terminos.html` pesa **exactamente lo mismo** en las dos ramas (6.299 bytes, byte
+por byte, porque lo único que cambió en esa página es el teléfono del pie y los
+dos números tienen los mismos dígitos). La única variable es la hoja, que creció
+de 28.237 a **29.601 bytes** con las reglas de los íconos y las fotografías.
+`terminos` no usa ninguna y las baja igual, porque la web sirve una hoja para las
+cuatro páginas.
+
+O sea que partir el CSS ya no es sólo «el punto que le falta a la portada»:
+es también lo que hace que una orden que agrega una sección le cueste un punto a
+una página que no la tiene. Sigue siendo decisión de dirección y sigue tocando el
+contrato de `@codice/ui`.
+
 Dos caminos que se midieron y **empeoraron**, para que nadie los vuelva a
 intentar: mover los `<link rel="preload" as="image">` que React inyecta al
 `<head>` (86/86/87) y quitarlos del todo (70, LCP 5,78 s — hacen falta).
@@ -170,6 +209,12 @@ más fácil que antes. Va junto con la apertura del dominio.
 system y ya no lo son: el de Marca venía en **1.0.0** y sin la sección `web` que
 la #01 le agregó al del repo. La #03 le aplicó los tres colores nuevos y su
 changelog, así que los colores coinciden otra vez, pero el resto no.
+
+La **#05 los separó más**: `packages/ui/codice-tokens.json` pasó a 1.2.0 con la
+sección `color.cff` entera —los cinco colores del manual de Construyendo
+Familias Fuertes más el naranja de texto derivado— y el de `Marca/` no la tiene.
+Ahora no es que difieran en el detalle: difieren en **cuál es la paleta de la
+web**.
 
 Dos verdades esperando a no coincidir. O el de Marca pasa a ser una exportación
 del de `packages/ui` —que es lo que el `CLAUDE.md` del repo llama fuente de
@@ -207,3 +252,89 @@ Mientras tanto rige la regla sin excepciones: nada secreto entra al repo. Lo
 vigila `pnpm check:secretos`, que está en la gate y falla nombrando archivo y
 línea. Si una orden futura parece pedir lo contrario, está mal escrita: se frena
 y se pregunta.
+
+### 10. `qa/referencia/` ~~sigue leyéndolo tres tests~~ · **cerrado en la #05**
+
+Dirección lo resolvió el mismo día que se abrió: **los tres se retiran**. El
+motivo, con sus palabras: «comparan contra una referencia que D24 declaró
+historia; un guardián que vigila contra lo que ya no es verdad no es vigilancia,
+es ruido que un día se ignora».
+
+Qué se fue, con su número:
+
+| test | qué se retiró | tests |
+|---|---|--:|
+| `packages/ui/tokens.test.mjs` | el bloque que ataba la sección `web` del JSON a `estilo.css` | −8 |
+| `apps/web/src/el-css-esta-entero.test.ts` | el archivo entero: comparaba regla por regla en las dos direcciones | −4 |
+| `apps/web/e2e/comportamiento.spec.ts` | **sólo la mitad comparativa** (la segunda pestaña y los `toEqual`) | −0 |
+
+El tercero es el que merece la aclaración. Sus dos tests ya afirmaban **cada
+estado contra su valor literal** y encima comparaban contra el estático; se fue
+la comparación y se quedaron los literales, que son los que cazan un menú muerto.
+El `toEqual` nunca lo hizo: dos páginas rotas igual se parecen muchísimo. Por eso
+`@codice/navegador` sigue en 14 y no baja.
+
+De paso se fue el segundo servidor de `playwright.config.ts`, `ESTATICO_DIR` y el
+`existsSync` que frenaba la corrida si faltaba la carpeta. **Hoy ningún test lee
+`qa/referencia/`**, que es lo que la D24 decía y ahora es cierto.
+
+### 11. Tres JPG viejos de Armando ~~quedaron sin usar~~ · **cerrado en la #05**
+
+Borrados de `public/img/` los tres que ya no usaba nadie —`armando-parado.jpg`,
+`armando-retrato.jpg` y `armando-sentado.jpg`, 528 KB—. Los nueve originales
+siguen en `qa/referencia/img/`, que es el sitio tal como se publicó el 12/9.
+
+### 13. El guardián de fidelidad estuvo ciego a un cambio de color · **encontrado y arreglado en la #05**
+
+Queda escrito porque es el modo de falso verde más caro que se pagó en este repo
+y porque la frase que lo tapaba llevaba cuatro órdenes escrita como si fuera
+cierta.
+
+`fidelidad.spec.ts` decía desde la #01: «queda el `threshold` por píxel que trae
+Playwright (0,2 en YIQ), que tolera el antialias de una máquina a otra **sin
+tolerar un color distinto**». La segunda mitad es falsa.
+
+Se descubrió cuando dirección eligió que «se construyen» quedara en teal en vez
+de tinta: se cambió el color, se recompiló, y **las doce comprobaciones pasaron
+en verde** con el titular de la portada pintado de otro color. `--update-snapshots`
+tampoco reescribió un solo archivo. Con la hoja de vuelta en tinta también
+pasaban: el guardián estaba ciego a los dos lados del cambio.
+
+Medido con la métrica de pixelmatch que Playwright usa —`maxDelta = 35215 ×
+threshold²`—:
+
+| par de colores | delta | tope con 0,2 | |
+|---|--:|--:|---|
+| tinta `#2E2B25` → teal `#005761` | 1.253 | 1.409 | **no se contaba** |
+| naranja `#BF3F06` → teal `#005761` | 7.356 | 1.409 | se contaba |
+| antialias típico (±2 por canal) | 2 | 1.409 | no se cuenta |
+
+La mutación de control de la #01 caía muy por encima del tope —por eso el
+guardián parecía funcionar y nadie dudó de la frase— y este cambio caía justo por
+debajo. Un presupuesto de «cero píxeles diferentes» no vale nada si la definición
+de «diferente» deja pasar dos colores de marca distintos.
+
+**Arreglado con `threshold: 0.05`**, que baja el tope a 88: el cambio de color se
+cuenta con 14× de margen y el antialias sigue absorbido con 44×. No se puso en 0
+porque ahí cualquier variación de un punto en el borde de una letra contaría y el
+guardián se pondría rojo solo. Comprobado: con la captura vieja y la página nueva
+da **9.807 píxeles** de diferencia, y dos corridas limpias seguidas pasan en
+verde, o sea que el dibujado es determinista en esta máquina a ese umbral.
+
+La lección, que vale más que el número: **una mutación que pasa holgada no prueba
+que el guardián sirva para cambios chicos.** La de la #01 movía 7.356 de delta
+sobre un tope de 1.409 y dejó creer que cualquier color distinto se cazaba. Si
+una comprobación tiene un umbral, la mutación que la valida tiene que caer
+**cerca** del umbral, no lejos.
+
+### 12. Los tres íconos de la franja de hechos no llegan a 2× · **de Lucía**
+
+La orden pide servir los íconos «a 2× del tamaño en que se muestran». Seis de los
+ocho lo cumplen de sobra. Los tres de la franja de hechos —`sesion.png` (67 px),
+`horario.png` (71 px) y `lugar.png` (76 px)— se muestran a 40 px, así que a 2×
+harían falta 80 y quedan entre 1,68× y 1,90×.
+
+**No se escalaron**: agrandar un PNG no agrega información, solo peso. Se sirven
+como llegaron. En una pantalla de densidad doble la diferencia entre 1,7× y 2× en
+un ícono plano de dos colores es difícil de ver, así que no es un defecto — es un
+pedido chico para la próxima tanda: los mismos tres a 160 px de lado.

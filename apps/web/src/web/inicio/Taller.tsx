@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { TELEFONO_GABY } from '@codice/core';
 import { BotonWhatsApp } from '../comun/BotonWhatsApp';
 import { Seccion } from '../comun/Seccion';
 
@@ -19,10 +20,14 @@ export function Taller() {
           </h2>
           <p className="lead u-mt-4 reveal" data-d="2">{t('inicio.taller.lead')}</p>
           <div className="hero-cta reveal" data-d="3">
-            <a href="/taller" className="btn btn--ocre">
+            <a href="/merida" className="btn btn--naranja">
               {t('inicio.taller.ctaPrograma')} <span className="btn-arrow">→</span>
             </a>
-            <BotonWhatsApp mensaje={t('comun.mensajes.reservar')} texto={t('inicio.taller.ctaWhatsapp')} />
+            <BotonWhatsApp
+              telefono={TELEFONO_GABY}
+              mensaje={t('comun.mensajes.reservar')}
+              texto={t('inicio.taller.ctaWhatsapp')}
+            />
           </div>
         </div>
         <ul className="ficha reveal" data-d="2" style={{ marginTop: 0 }}>

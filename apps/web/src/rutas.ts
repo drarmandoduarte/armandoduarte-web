@@ -10,7 +10,19 @@
  * menos, sin ruido.
  *
  * `archivo` es el nombre que el prerender le da en `dist/`, y sale de
- * `cleanUrls` de Vercel: `/taller` se sirve desde `taller.html`.
+ * `cleanUrls` de Vercel: `/merida` se sirve desde `merida.html`.
+ *
+ * ── Por qué `/merida` y no `/taller` (orden #05, F) ──────────────────────
+ * Lo pidió Armando: «que como elemento distintivo del URL diga .merida, vamos a
+ * ir teniendo eventos en otras ciudades y las distinguiremos con el nombre de la
+ * ciudad». Dirección lo leyó como **ruta** y no como subdominio: un
+ * `merida.armandoduarte.com` pediría un registro DNS por evento, y hoy ni
+ * siquiera está apuntado el dominio. Con la ruta, la segunda ciudad es copiar
+ * esta página y agregar un renglón acá.
+ *
+ * `pagina` sigue diciendo `taller` a propósito: es la clave de i18n y la
+ * identidad del contenido, que no cambió. Lo que cambió es la dirección postal.
+ * El día que haya `/guadalajara`, va a ser otra `pagina`, no otra ruta de ésta.
  */
 export interface Ruta {
   /** El camino tal como lo pide el navegador. */
@@ -23,7 +35,7 @@ export interface Ruta {
 
 export const RUTAS: readonly Ruta[] = [
   { ruta: '/', archivo: 'index.html', pagina: 'inicio' },
-  { ruta: '/taller', archivo: 'taller.html', pagina: 'taller' },
+  { ruta: '/merida', archivo: 'merida.html', pagina: 'taller' },
   { ruta: '/privacidad', archivo: 'privacidad.html', pagina: 'privacidad' },
   { ruta: '/terminos', archivo: 'terminos.html', pagina: 'terminos' },
 ] as const;

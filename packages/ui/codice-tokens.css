@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   Códice · tokens como variables CSS · v1.1.1
+   Códice · tokens como variables CSS · v1.2.0
    Fuente: packages/ui/codice-tokens.json. Si un valor cambia, cambia allá
    primero — el JSON es el documento y esto es su forma ejecutable.
 
@@ -8,7 +8,7 @@
    --ocre, --teal… Podrían haber sido --bg, --text, --primary como en Omnia, y
    entonces el port de la web habría sido una TRADUCCIÓN —cada regla reescrita,
    cada error posible— en vez de una sustitución. La orden #01 lo pide así por
-   eso: lo único que esta orden puede permitirse cambiar es dónde vive el
+   eso: lo único que esa orden podía permitirse cambiar es dónde vive el
    valor, nunca cuál es.
 
    ── Ningún hex vive fuera de este archivo ────────────────────────────────
@@ -25,32 +25,94 @@
    No son los candidatos que la orden proponía de memoria (#6F675C, #6B6358):
    ésos llegaban a 5,21 y 5,53 sobre crema, o sea más oscuros de lo necesario.
    El criterio es el mínimo, y el mínimo se mide.
+
+   ── v1.2.0 · la paleta CFF (orden Códice #05) ────────────────────────────
+   La web adopta **la paleta del manual de Construyendo Familias Fuertes**, que
+   es la marca del cliente. No solo el naranja que pidió Lucía: los cinco. Poner
+   sus íconos —que vienen en el teal claro y el naranja del manual— sobre las
+   secciones del teal de D6 sería tener dos teales conviviendo, y eso se nota.
+
+   Los cinco, medidos del archivo de marca y confirmados píxel a píxel contra
+   los ocho PNG que mandó Lucía:
+
+     navy #001B4A · teal oscuro #005761 · teal claro #3D9CA4
+     naranja #DF4907 · ámbar #DA8100
+
+   Los íconos son de un solo color plano cada uno, con alfa real: los cuatro
+   teales son exactamente #3D9CA4 y los cuatro naranjas exactamente #DF4907.
+   La orden transcribía #3E9CA4 y #DE4907, leídos de la **foto** del manual
+   (un JPEG); mandan los PNG, que son la exportación sin pérdida. Es un punto
+   de 255 en un canal —invisible— pero de esto depende que una línea del CSS
+   sea el mismo naranja que el ícono que tiene al lado, y ésa era la intención.
+
+   El manual **no trae neutros**: crema, cálido, tinta y gris se quedan como
+   están. Son la base sobre la que ese manual se imprime y ya están medidos a AA.
+
+   ── Lo que le pasó al ocre ───────────────────────────────────────────────
+   `--ocre` y `--ocre-medio` **dejan de existir en la web**: no se les cambia el
+   valor, se los reemplaza. Un token llamado «ocre» que pinta naranja es una
+   mentira que dura hasta que alguien la lee. El ocre sigue vivo en el JSON,
+   bajo `color.brand.ochre`, para las citas de libro de la app (D6).
+
+   En su lugar entran tres, y son tres y no uno por una razón medida:
+
+     --naranja        #DF4907  el del manual, exacto. Líneas, rayitas, íconos,
+                               titulares grandes. Sobre crema da 3,86 — pasa el
+                               umbral de 3:1 que rige para lo que no es texto
+                               chico, y no llega a 4,5.
+     --naranja-texto  #BF3F06  el mismo naranja oscurecido lo mínimo medido
+                               hasta llegar a 4,5:1 sobre los tres fondos
+                               claros. Botones, rótulos, enlaces, texto chico.
+     --ambar          #DA8100  el ámbar del manual, para acentos sobre oscuro.
+
+   ── De dónde sale #BF3F06, porque no es el que la orden esperaba ─────────
+   La orden proponía «cerca de #C44006». Medido, **#C44006 da 4,34 sobre el
+   cálido**: no llega. El fondo que manda es el cálido (#F3EBDD), no el crema —
+   la misma lección de la #03, otra vez.
+
+   Se oscureció el naranja del manual en pasos de 0,1 % conservando la relación
+   entre canales (el mismo tono, menos luz) hasta el primero que pasa en los tres:
+
+     #BF3F06   crema 5,00 · cálido 4,51 · blanco 5,34   ← éste
+     #C03F06   crema 5,02 · cálido 4,49 · blanco 5,36   ← un paso más claro, no llega
+
+   4,51 sobre el cálido es, casualmente, el mismo margen exacto con el que el
+   ocre de la #03 pasaba. Mismo criterio, mismo mínimo.
+
+   ── Lo que el cambio de paleta mejora, y lo que no ──────────────────────
+     crema sobre teal      7,30 → 7,74   las secciones oscuras ganan contraste
+     ámbar sobre tinta     4,53 → 4,78   el botón y la píldora sobre tinta
+     ámbar sobre teal      2,51 → 2,81   sigue sin llegar: es el pendiente 4c,
+                                         y sigue siendo decisión de dirección.
    ═══════════════════════════════════════════════════════════════════════ */
 :root{
-  /* ── Fondos ─────────────────────────────────────────────────────────── */
+  /* ── Fondos · no son del manual CFF: son la base sobre la que se imprime ─ */
   --crema:#FAF7F1;          /* color.background.cream · el fondo por defecto */
   --superficie:#FFFFFF;     /* color.background.surface · la sección blanca */
   --calido:#F3EBDD;         /* color.background.surfaceWarm · la sección cálida */
 
-  /* ── Tinta ──────────────────────────────────────────────────────────── */
+  /* ── Tinta · tampoco del manual, y tampoco se toca ──────────────────── */
   --tinta:#2E2B25;          /* color.ink.primary · nunca negro puro */
   --gris:#716A60;           /* color.ink.muted · contraste AA (#03) */
   --gris-claro:#A89F92;
 
-  /* ── Marca ──────────────────────────────────────────────────────────── */
-  --ocre:#866539;           /* color.brand.ochre · primario · contraste AA (#03) */
-  --ocre-medio:#B18C54;     /* color.brand.ochre.mid · el acento sobre fondo oscuro · contraste AA (#03) */
-  --teal:#33585C;           /* color.brand.teal · acento de titulares */
-  --teal-medio:#527E82;     /* color.brand.teal.mid */
-  --navy:#2F3A4E;           /* color.support.navy · la tapa del segundo libro */
+  /* ── Marca · la paleta del manual CFF (#05) ─────────────────────────── */
+  --naranja:#DF4907;        /* color.cff.orange · el del manual, exacto · 3,86 sobre crema */
+  --naranja-texto:#BF3F06;  /* color.cff.orangeText · el mínimo medido a 4,5 · 4,51 sobre cálido */
+  --ambar:#DA8100;          /* color.cff.amber · acento sobre oscuro · 4,78 sobre tinta */
+  --teal:#005761;           /* color.cff.tealDark · fondo de las secciones teal · crema encima 7,74 */
+  --teal-medio:#3D9CA4;     /* color.cff.tealLight · SOLO ≥ 24 px o íconos, y SOLO sobre crema (3,03)
+                               o blanco (3,24). Sobre cálido da 2,73 y sobre el teal oscuro 2,56:
+                               ahí no sirve ni para un ícono. Lo afirma `tokens.test.mjs`. */
+  --navy:#001B4A;           /* color.cff.navy · la tapa del segundo libro */
 
   /* ── Hairlines · casi no existen; el aire separa ─────────────────────── */
   --hair:#EAE4D8;           /* color.border.hairline */
   --hair-hover:#D8CFBE;     /* color.border.hairlineHover */
   --hair-oscura:rgba(250,247,241,.16);  /* la hairline sobre fondo oscuro: crema al 16 % */
 
-  /* ── Mezclas ────────────────────────────────────────────────────────── */
-  --ocre-suave:color-mix(in oklab, var(--ocre) 7%, var(--crema));
+  /* ── Mezclas · se recalculan solas sobre los valores nuevos ─────────── */
+  --naranja-suave:color-mix(in oklab, var(--naranja) 7%, var(--crema));
   --teal-suave:color-mix(in oklab, var(--teal) 8%, var(--crema));
 
   /* ── Familias ───────────────────────────────────────────────────────── */

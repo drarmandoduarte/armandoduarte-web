@@ -69,14 +69,21 @@ export default defineConfig({
   test: {
     exclude: ['**/node_modules/**', '**/dist/**', 'e2e/**'],
     /*
-     * `index.css` se puede leer desde un test.
+     * `index.css` se puede leer desde un test, y hoy no lo lee ninguno.
      *
-     * Vitest viene con `css: false`, y eso no significa «no apliques estilos»:
-     * significa que toda importación de un `.css` devuelve cadena vacía, `?raw`
-     * incluido. Un test que lea el CSS así pasa en verde sin haber mirado nada,
-     * que es peor que no tenerlo. El guardián del port —`el-css-esta-entero`—
-     * necesita el archivo de verdad. El `include` va SIN `$`: el id que Vitest
-     * evalúa trae la consulta pegada (`…/index.css?raw`).
+     * Estaba acá para `el-css-esta-entero`, el guardián que comparaba la hoja
+     * portada contra la del sitio estático — **retirado por D24: la referencia
+     * del port cumplió su propósito en la #04**.
+     *
+     * La línea se queda porque lo que arregla es una trampa de Vitest, no una
+     * necesidad de aquel test: Vitest viene con `css: false`, y eso no significa
+     * «no apliques estilos», significa que **toda** importación de un `.css`
+     * devuelve cadena vacía, `?raw` incluido y sin avisar. Un test que lea el CSS
+     * sin esto pasa en verde habiendo mirado nada, que es peor que no tenerlo. El
+     * día que haga falta volver a leer la hoja, la trampa ya está desarmada.
+     *
+     * El `include` va SIN `$`: el id que Vitest evalúa trae la consulta pegada
+     * (`…/index.css?raw`).
      */
     css: { include: [/index\.css/] },
   },

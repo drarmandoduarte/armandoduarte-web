@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { enlaceWhatsApp } from '@codice/core';
+import { TELEFONO_GABY, enlaceWhatsApp } from '@codice/core';
 import { CANALES } from '../comun/canales';
 import { Legal } from './Legal';
 
@@ -14,7 +14,7 @@ import { Legal } from './Legal';
  */
 export function Privacidad() {
   const { t } = useTranslation();
-  const arco = enlaceWhatsApp(t('comun.mensajes.arco'));
+  const arco = enlaceWhatsApp(TELEFONO_GABY, t('comun.mensajes.arco'));
   const telefono = t('privacidad.responsableEnlace');
 
   return (

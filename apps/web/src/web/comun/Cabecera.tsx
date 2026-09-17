@@ -24,7 +24,7 @@ import { MenuMovil } from './MenuMovil';
  * feliz: es lo que el guardián de fidelidad mide, y los `id` (`hd`, `abrir`,
  * `cerrar`, `ov`) son el contrato con el script.
  */
-export function Cabecera({ mensaje }: { mensaje: string }) {
+export function Cabecera({ telefono, mensaje }: { telefono: string; mensaje: string }) {
   const { t } = useTranslation();
 
   return (
@@ -50,7 +50,7 @@ export function Cabecera({ mensaje }: { mensaje: string }) {
           </div>
           <div className="hd__end">
             <a
-              href={enlaceWhatsApp(mensaje)}
+              href={enlaceWhatsApp(telefono, mensaje)}
               className="hd__wa"
               target="_blank"
               rel="noopener"
@@ -62,7 +62,7 @@ export function Cabecera({ mensaje }: { mensaje: string }) {
         </div>
       </header>
 
-      <MenuMovil mensaje={mensaje} />
+      <MenuMovil telefono={telefono} mensaje={mensaje} />
     </>
   );
 }

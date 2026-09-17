@@ -1,15 +1,28 @@
 {
   "$meta": {
     "name": "Códice — Design System (App Dr. Armando)",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "tagline": "Construyendo familias fuertes",
-    "generated": "2026-09-13",
+    "generated": "2026-09-16",
     "philosophy": "Quiet luxury con la atmósfera del set de grabación del doctor: luz ámbar de tarde, orden, cercanía sin ruido. Restraint editorial, whitespace generoso, tipografía por encima de imagen, sin sombras, sin degradados, motion invisible.",
     "modes": [
       "light"
     ],
     "density": "comfortable",
     "changelog": [
+      {
+        "version": "1.2.0",
+        "date": "2026-09-16",
+        "orden": "Códice #05",
+        "cambios": [
+          "Paleta CFF, orden #05. **La web pública** adopta la paleta del manual de Construyendo Familias Fuertes, que es la marca del cliente: `color.cff` trae los cinco colores del manual —navy #001B4A, teal oscuro #005761, teal claro #3D9CA4, naranja #DF4907, ámbar #DA8100— y `codice-tokens.css` los usa. Es la devolución de Lucía Duarte del 16/9, bajo D23.",
+          "Los cinco se midieron del archivo de marca y se confirmaron píxel a píxel contra los ocho íconos PNG que mandó Lucía: son de un solo color plano con alfa real, exactamente #3D9CA4 y #DF4907. La orden transcribía #3E9CA4 y #DE4907, leídos de la foto (JPEG) del manual; mandan los PNG, que son la exportación sin pérdida.",
+          "`color.cff.orangeText` #BF3F06 es el naranja del manual oscurecido **lo mínimo medido** —pasos de 0,1 % conservando la relación entre canales— hasta llegar a 4,5:1 sobre los tres fondos claros: crema 5,00 · cálido 4,51 · blanco 5,34. Un paso más claro (#C03F06) da 4,49 sobre el cálido y no llega. El #C44006 que la orden esperaba da 4,34: el fondo que manda vuelve a ser el cálido, no el crema.",
+          "`color.brand.ochre` y `color.brand.teal` **no cambian**: son los de D6 y siguen siendo los de la app. Lo que cambió es a cuál mira la web. `color.support.navy` tampoco: el navy del manual vive en `color.cff.navy`.",
+          "El manual no trae neutros, así que crema, cálido, tinta y gris se quedan como estaban. Son la base sobre la que ese manual se imprime y ya estaban medidos a AA en la #03.",
+          "Lo que el cambio mejora, medido: crema sobre teal 7,30 → 7,74 y ámbar sobre tinta 4,53 → 4,78. Lo que no: ámbar sobre teal 2,51 → 2,81, que sigue sin llegar a AA y sigue siendo el pendiente 4c, decisión de dirección."
+        ]
+      },
       {
         "version": "1.1.1",
         "date": "2026-09-13",
@@ -69,12 +82,46 @@
       "ochre": {
         "value": "#866539",
         "mid": "#B18C54",
-        "role": "Primario. Wordmark, CTAs, nav activa, marcadores, citas de libro. La luz ámbar de sus videos."
+        "role": "Primario. Wordmark, CTAs, nav activa, marcadores, citas de libro. La luz ámbar de sus videos.",
+        "note": "app: citas de libro (D6); la web usa CFF desde la #05."
       },
       "teal": {
         "value": "#33585C",
         "mid": "#527E82",
-        "role": "Acento. Links, focus, citas de video, CTAs secundarias, rigor. La tapa de su libro insignia."
+        "role": "Acento. Links, focus, citas de video, CTAs secundarias, rigor. La tapa de su libro insignia.",
+        "note": "app (D6); la web usa `color.cff.tealDark` desde la #05."
+      }
+    },
+    "cff": {
+      "$description": "La paleta del manual de marca de Construyendo Familias Fuertes. Es la marca del CLIENTE, y desde la orden #05 es la que usa la web pública (armandoduarte.com). La app —consultorio, academia, asistente— sigue con `color.brand` de D6 hasta que dirección diga otra cosa. El manual no trae neutros: crema, cálido, tinta y gris salen de `color.background` y `color.ink`.",
+      "navy": {
+        "value": "#001B4A",
+        "role": "La tapa del segundo libro. Disponible para el pie si algún día se quiere."
+      },
+      "tealDark": {
+        "value": "#005761",
+        "role": "Fondo de las secciones teal (Ahora, Sobre el facilitador, Reservar) y el header teñido sobre ellas.",
+        "contrast": "crema encima: 7,74:1. Reemplaza al #33585C de D6, que daba 7,30."
+      },
+      "tealLight": {
+        "value": "#3D9CA4",
+        "role": "Acento sobre teal oscuro, íconos teal, titulares grandes.",
+        "contrast": "3,03:1 sobre crema y 2,73 sobre cálido: sirve para ≥ 24 px y para íconos, NUNCA para texto chico."
+      },
+      "orange": {
+        "value": "#DF4907",
+        "role": "Íconos, líneas, rayitas de subrayado, conectores, titulares ≥ 24 px.",
+        "contrast": "3,86:1 sobre crema. Pasa el umbral de 3:1 de lo que no es texto chico; no llega a 4,5."
+      },
+      "orangeText": {
+        "value": "#BF3F06",
+        "role": "Botones, rótulos, enlaces y todo el texto chico que antes era ocre.",
+        "contrast": "crema 5,00 · cálido 4,51 · blanco 5,34. Es el mismo naranja oscurecido lo mínimo medido hasta AA; un paso más claro (#C03F06) da 4,49 sobre el cálido."
+      },
+      "amber": {
+        "value": "#DA8100",
+        "role": "Acento sobre fondos oscuros: rótulos y enlaces sobre teal y sobre tinta.",
+        "contrast": "sobre tinta 4,78:1 (pasa). Sobre teal 2,81:1 (NO pasa) — es el pendiente 4c, decisión de dirección."
       }
     },
     "support": {
@@ -88,7 +135,8 @@
       },
       "navy": {
         "value": "#2F3A4E",
-        "role": "Raro. Segundo libro (Padres Digitalmente Responsables)."
+        "role": "Raro. Segundo libro (Padres Digitalmente Responsables).",
+        "note": "app (D6); la web usa `color.cff.navy` desde la #05."
       }
     },
     "border": {

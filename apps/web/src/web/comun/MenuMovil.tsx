@@ -12,17 +12,17 @@ import { enlaceWhatsApp } from '@codice/core';
  *
  * Los enlaces salen con `/#seccion` —no con el `<Link>` del router— porque eso
  * es lo que el sitio estático tiene y lo que hace que el ancla funcione igual
- * desde `/taller` que desde `/`: el navegador navega y después salta. El
+ * desde `/merida` que desde `/`: el navegador navega y después salta. El
  * guardián de fidelidad compara los `href` en orden, así que acá no se
  * improvisa.
  */
-export function MenuMovil({ mensaje }: { mensaje: string }) {
+export function MenuMovil({ telefono, mensaje }: { telefono: string; mensaje: string }) {
   const { t } = useTranslation();
 
   const destinos = [
     ['/#quien', t('comun.nav.quien')],
     ['/#hago', t('comun.nav.hago')],
-    ['/taller', t('comun.nav.taller')],
+    ['/merida', t('comun.nav.taller')],
     ['/#libros', t('comun.nav.libros')],
     ['/#programa', t('comun.nav.programa')],
     ['/#contacto', t('comun.nav.contacto')],
@@ -53,7 +53,7 @@ export function MenuMovil({ mensaje }: { mensaje: string }) {
         </nav>
         <div className="ov__foot">
           <span>{t('comun.marca.sitio')}</span>
-          <a className="pr" href={enlaceWhatsApp(mensaje)} target="_blank" rel="noopener">
+          <a className="pr" href={enlaceWhatsApp(telefono, mensaje)} target="_blank" rel="noopener">
             {t('comun.menu.escribir')}
           </a>
         </div>
