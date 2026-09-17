@@ -19,8 +19,8 @@ usa.
 | #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
 | #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | **cerrada** (PR #12, mergeado el 17/9/2026) |
 | #08 | La apertura: sacar el `noindex` sin abrir la puerta de atrás | **cerrada** (PR #14, mergeado el 17/9/2026) |
-| #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | **abierta y sin mergear** (PR #16) — se remide sobre la #11 y ahí dirección decide |
-| #10 | La CSP, mientras todavía es fácil | en curso (rama `web/10-csp`) |
+| #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | **cerrada sin mergear** — se midió y no convenía (PR #16 cerrado). Lo que valía se rescató en la rama `web/09b-rescate` |
+| #10 | La CSP, mientras todavía es fácil | **cerrada** (PR #18, mergeado el 17/9/2026) |
 | #11 | `Cache-Control` para `/assets/` | **cerrada** (PR #17, mergeado el 17/9/2026) |
 
 ## Reglas de la casa, con el caso que las obligó
@@ -235,7 +235,7 @@ Dirección decidió **no hidratar la web pública**. React sigue siendo la fuent
 Accesibilidad (96/96/96/95), SEO (100/100/66/66) y prácticas recomendadas (100)
 quedaron idénticas a la #01 y al estático.
 
-### 5b. El punto que falta en el inicio · **de dirección, y chico**
+### 5b. El punto que falta en el inicio · **CERRADO en la #09: se midió y no convenía**
 
 El inicio da **86 contra los 87 del estático**, reproducible: cinco corridas
 pareadas dieron 86 y 87 sin una sola excepción. El mismo sitio estático servido
@@ -272,6 +272,101 @@ contrato de `@codice/ui`.
 Dos caminos que se midieron y **empeoraron**, para que nadie los vuelva a
 intentar: mover los `<link rel="preload" as="image">` que React inyecta al
 `<head>` (86/86/87) y quitarlos del todo (70, LCP 5,78 s — hacen falta).
+
+---
+
+#### La #09 lo hizo, lo midió, y NO entró
+
+**Está construido y funciona; lo que no está es el beneficio.** La rama
+`web/09-css-en-dos` (PR #16) partió el CSS en dos hojas y pasó la gate entera.
+Dirección decidió **no mergearla** después de medir. Conviene leer por qué,
+porque el trabajo no se tiró: se tiró la conclusión.
+
+**El punto que perseguía ya no existía.** El «86 contra 87» de arriba es de
+**antes de la #05**, que subió la portada a 95 cambiando las fotos. El pendiente
+quedó escrito con el número viejo y nadie lo revisó. Medido hoy con el método de
+la casa —Lighthouse 13.4.1 móvil, local sobre `dist/` servido por
+`e2e/servidor.mjs`, **cinco corridas pareadas por página, mismo puerto, se cita
+la peor**— y repetido **dos veces con días de por medio**, el puntaje es
+**idéntico de los dos lados**:
+
+| página | main | con la división |
+|---|--:|--:|
+| inicio | 95 | 95 |
+| taller | 95 | 95 |
+| privacidad | 98 | 98 |
+| terminos | 98 | 98 |
+
+Accesibilidad 100 en las cuatro de los dos lados; SEO y prácticas recomendadas
+sin mover.
+
+**El costo sí se mide, y está abajo del puntaje.** Medianas de LCP, en ms:
+
+| página | main → división | |
+|---|---|---|
+| inicio | 2.554 → 2.628 / 2.702 | **+72 a +148 ms** |
+| taller | 2.556 → 2.702 | **+74 a +146 ms** |
+| privacidad | 1.803 → 1.803 | = |
+| terminos | 1.953 → 1.803 | −150 ms |
+
+O sea: **las dos páginas que tienen foto de portada empeoran; las dos legales,
+cuyo LCP es texto, mejoran o no se mueven.** Y eso **desmiente la hipótesis** con
+la que se escribió este pendiente. Decía que «25 KB de hoja por delante retrasan
+a la foto»: si fuera por bytes, partir la hoja no cambiaría nada —los bytes son
+los mismos, 31.353 contra 31.352— y sin embargo la foto llega más tarde. Lo que
+la retrasa no es **el peso** de lo que va delante sino **cuántos pedidos de
+prioridad `VeryHigh` hay antes que ella**: pasan de uno a dos, y la imagen —que
+es `High`— espera detrás de los dos. Es mejor hallazgo que el punto que se iba a
+buscar.
+
+Del FCP no se dice nada, y es a propósito: la primera tanda lo mostró mejorando
+y la segunda empeorando, en los mismos valores cuantizados. Era ruido.
+
+#### Y el beneficio de caché, medido donde Lighthouse no llega
+
+Lighthouse **siempre carga en frío**, así que no puede medir lo único que
+justificaba la división. Se midió aparte: contexto persistente, enlace
+estrangulado a 1,6 Mbit/s, mismo puerto, **visita 1 → deploy que cambia un color
+→ visita 2** (entrando por otra página, porque una navegación a la misma URL
+tiene semántica de recarga). Tres corridas por lado, idénticas las tres:
+
+| | bytes que viajan en la 2.ª visita | LCP de la 2.ª visita |
+|---|--:|--:|
+| main, una hoja | **32.200** | 528 ms |
+| con la división | **29.490** | 508 ms |
+
+El ahorro es **2.710 bytes** —la hoja de fuentes, servida de caché— y **20 ms**.
+
+**No paga.** Veinte milisegundos, y sólo para alguien que **vuelve** y sólo
+**después de un deploy que tocó el CSS**, contra 72–148 ms en **cada primera
+visita** a las dos páginas que importan comercialmente. Para un sitio al que se
+llega desde Google, las primeras visitas son casi todas.
+
+#### Qué queda de todo esto
+
+- **Lo que se rescató**, en la rama `web/09b-rescate`: el guardián de fidelidad
+  pasa a mirar **las hojas de estilo enlazadas** —estuvo verde con un `<link>`
+  nuevo en las cuatro páginas, y esa ceguera no dependía de la división— y entra
+  `src/el-css-publicado-trae-lo-suyo.test.ts`, porque cortar el `@import` de
+  `packages/ui/styles.css` dejaba el build **en verde** con la web sin
+  tipografías.
+- **Lo que no se rescató, y por qué**: los tests de paralelo y de prioridades no
+  tienen sentido con una hoja sola, y los cuatro del salto de texto son del
+  pendiente 5c, que dirección decidió tratar en su propia orden.
+- **El guardián de la #02** —«ningún otro `.js` en `dist/assets`»— **no hacía
+  falta rescatarlo**: en `main` nunca se rompió. Se rompió y se restauró dentro
+  de la rama de la #09, que no entra.
+- **El contrato de `@codice/ui` sigue siendo un solo import.** `CLAUDE.md` no
+  cambia.
+- **El punto de `terminos`** —el segundo caso de este pendiente, donde una orden
+  que agrega una sección le cuesta un punto a una página que no la usa— **sigue
+  abierto**. Partir por página era lo que la #09 dejaba afuera explícitamente, y
+  ahora se sabe que partir por frecuencia de cambio no lo arregla. Si dirección
+  lo quiere, es su propia orden y su propia medición.
+
+**Un pendiente cerrado con «se midió y no convenía» vale tanto como uno cerrado
+con código.** Lo que no vale es dejarlo abierto con una hipótesis que ya se sabe
+falsa.
 
 ### 5d. `/assets/` se servía sin `Cache-Control` · **CERRADO en la #11**
 
