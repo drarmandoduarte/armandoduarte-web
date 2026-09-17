@@ -3,5 +3,9 @@
   "description": "Términos de uso del sitio armandoduarte.com: qué es, cómo se reservan talleres y sesiones, y quién es dueño del contenido.",
   "canonical": "https://armandoduarte.com/terminos",
   "ogUrl": null,
-  "ogImage": null
+  "ogImage": null,
+  "hojas": [
+    "/assets/fuentes-<hash>.css",
+    "/assets/style-<hash>.css"
+  ]
 }

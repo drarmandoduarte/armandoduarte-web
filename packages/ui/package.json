@@ -7,7 +7,8 @@
   "main": "index.js",
   "exports": {
     ".": "./index.js",
-    "./styles.css": "./styles.css",
+    "./fuentes": "./fuentes/fonts.css",
+    "./styles": "./styles.css",
     "./tokens.css": "./codice-tokens.css",
     "./tokens.json": "./codice-tokens.json"
   },

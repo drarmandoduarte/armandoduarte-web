@@ -19,6 +19,7 @@ usa.
 | #06 | El cromo a nivel 512: menú, header, foco y pie | **cerrada** (PR #10, mergeado el 17/9/2026) |
 | #07 | Pasada premium del contenido: botones, el naranja, contacto y `/merida` | **cerrada** (PR #12, mergeado el 17/9/2026) |
 | #08 | La apertura: sacar el `noindex` sin abrir la puerta de atrás | **cerrada** (PR #14, mergeado el 17/9/2026) |
+| #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | en curso (rama `web/09-css-en-dos`) |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -232,7 +233,7 @@ Dirección decidió **no hidratar la web pública**. React sigue siendo la fuent
 Accesibilidad (96/96/96/95), SEO (100/100/66/66) y prácticas recomendadas (100)
 quedaron idénticas a la #01 y al estático.
 
-### 5b. El punto que falta en el inicio · **de dirección, y chico**
+### 5b. El punto que falta en el inicio · **CERRADO en la #09, y el punto ya no existía**
 
 El inicio da **86 contra los 87 del estático**, reproducible: cinco corridas
 pareadas dieron 86 y 87 sin una sola excepción. El mismo sitio estático servido
@@ -269,6 +270,136 @@ contrato de `@codice/ui`.
 Dos caminos que se midieron y **empeoraron**, para que nadie los vuelva a
 intentar: mover los `<link rel="preload" as="image">` que React inyecta al
 `<head>` (86/86/87) y quitarlos del todo (70, LCP 5,78 s — hacen falta).
+
+---
+
+#### Lo que hizo la #09, y lo que encontró
+
+**La división se hizo y es correcta; el punto que perseguía ya no existía.** Las
+dos cosas van juntas y conviene leerlas en ese orden.
+
+**El contrato de `@codice/ui` pasó a dos entradas** —`@codice/ui/fuentes` y
+`@codice/ui/styles`— y la web sirve dos hojas, como el sitio estático:
+`assets/fuentes-<hash>.css` (2.711 bytes, los ocho `@font-face`) y
+`assets/style-<hash>.css` (28.642 bytes, tokens y CSS de la web). Sumadas dan
+**un byte más** que la hoja única que reemplazan (31.353 contra 31.352).
+
+**El punto ya no estaba.** El «86 contra 87» de arriba es de **antes de la
+#05**: esa orden subió la portada a 95 cambiando las fotos, y este pendiente
+quedó escrito con el número viejo. Medido hoy con el método de la casa
+—Lighthouse 13.4.1 móvil, local sobre `dist/` servido por `e2e/servidor.mjs`,
+**cinco corridas pareadas por página, mismo puerto, se cita la peor**—:
+
+| página | main | #09 | |
+|---|--:|--:|---|
+| inicio | 95 | **95** | = |
+| taller | 95 | **95** | = |
+| privacidad | 98 | **98** | = |
+| terminos | 98 | **98** | = |
+
+Accesibilidad **100** en las cuatro de los dos lados; SEO y prácticas
+recomendadas, sin mover. Las veinte corridas de cada lado:
+
+```
+inicio      main [96, 95, 96, 95, 96]   #09 [95, 96, 95, 96, 95]
+taller      main [95, 95, 95, 96, 95]   #09 [95, 95, 95, 95, 95]
+privacidad  main [98, 98, 98, 98, 98]   #09 [98, 98, 98, 98, 98]
+terminos    main [98, 99, 98, 98, 98]   #09 [98, 98, 99, 98, 99]
+```
+
+**Y abajo del puntaje sí se movió algo, en las dos direcciones.** Medianas de
+las cinco corridas, en milisegundos:
+
+| página | FCP main → #09 | LCP main → #09 |
+|---|---|---|
+| inicio | 1.953 → **1.819** ↓ | 2.554 → **2.702** ↑ |
+| taller | 1.953 → **1.952** = | 2.628 → **2.702** ↑ |
+| privacidad | 1.802 → **1.654** ↓ | 1.803 → **1.803** = |
+| terminos | 1.802 → **1.802** = | 1.953 → **1.803** ↓ |
+
+O sea: **el FCP mejora o queda igual en las cuatro**, y el LCP se parte según
+qué elemento sea el LCP de la página. En las dos legales, donde el LCP es
+texto, mejora o no se mueve; en las dos que tienen foto de portada, empeora unos
+**150 ms**.
+
+Eso **desmiente la hipótesis** con la que se escribió este pendiente. Decía que
+«25 KB de hoja por delante retrasan a la foto»: si fuera por bytes, partir la
+hoja no tendría por qué cambiar nada —los bytes son los mismos— y sin embargo la
+foto llega más tarde. Lo que la retrasa no es el peso de lo que va delante sino
+**cuántos pedidos de prioridad `VeryHigh` hay antes que ella**: ahora son dos en
+vez de uno, y la imagen —que es `High`— espera detrás de los dos. El puntaje no
+lo nota porque el LCP de la portada está lejos de cualquier umbral.
+
+**El segundo caso —el punto de `terminos`— sigue abierto y la #09 no lo toca a
+propósito.** `terminos` sigue bajando la hoja de estilos entera, con las reglas
+de íconos y fotos que no usa: partir por página era explícitamente lo que la
+orden dejaba afuera. Si dirección quiere ese punto, es su propia orden.
+
+**CLS: no se movió, y no era cero.** La orden pedía comprobar que «CLS sigue en
+0». Medido, el número es idéntico de los dos lados hasta el cuarto decimal
+—Lighthouse: 0,0008 · 0,0002 · 0,0531 · 0,0068— y con un `PerformanceObserver` a
+precisión completa, idéntico **hasta el último dígito** (tres corridas de cada
+lado). O sea que el criterio de la orden se cumple: la división no movió el CLS
+ni un milímetro. Lo que no era cierto era la premisa: las cuatro páginas ya
+tenían un salto de texto chiquito al cambiar la tipografía del sistema por la
+buena, y `/privacidad` tiene el mayor (0,053). **Eso es anterior a esta orden y
+queda anotado como pendiente 5c.**
+
+**Lo que sí se compró, y es por lo que se mergeó igual.** La división por
+frecuencia de cambio es correcta por sí misma: una orden que toca un color ya no
+le cambia el hash a los 2,7 KB de `@font-face`. El puntaje no mejoró y se dice
+así, sin maquillarlo.
+
+Una cosa más, de dirección, que salió de esto: **`/assets/` no tiene regla de
+`Cache-Control` en `vercel.json`** —la tienen `/fuentes/` y `/img/`—, así que hoy
+las dos hojas se revalidan en cada visita en vez de servirse de caché. El
+beneficio de la división es real igual (una revalidación con 304 contra bajar
+2,7 KB), pero con un `immutable` sobre `/assets/` sería el que la orden
+describe. No se tocó porque la #09 decía «el `vercel.json` no se toca»: queda
+como **pendiente 5d**.
+
+### 5c. Las cuatro páginas tienen un salto de texto al cargar la tipografía · **de dirección**
+
+Encontrado midiendo la #09, y **es anterior a ella**: los números son idénticos
+en `main` y en la rama. Con el enlace estrangulado de Lighthouse móvil, al
+cambiar la tipografía del sistema por la buena el texto se corre un poco:
+
+| página | CLS (Lighthouse, 5 corridas, idéntico los 5) |
+|---|--:|
+| inicio | 0,0008 |
+| taller | 0,0002 |
+| privacidad | **0,0531** |
+| terminos | 0,0068 |
+
+Ninguno acerca al umbral de Lighthouse (0,1) ni cuesta un punto, así que **no es
+urgente**. Se anota porque es de las cosas que crecen solas: cada sección nueva
+de texto agrega su parte, y el día que uno de estos pase de 0,1 la página pierde
+puntos sin que nada haya cambiado ese día.
+
+El arreglo estándar es `size-adjust` / `ascent-override` en los `@font-face`,
+para que la tipografía de respaldo ocupe lo mismo que la buena. Es una decisión
+sobre `packages/ui/fuentes/`, o sea sobre el design system, y por eso sube.
+
+Lo vigilan cuatro tests desde la #09 (`e2e/dos-hojas.spec.ts`), escritos **como
+igualdad y no como «menor que»**: el día que alguien lo arregle, se ponen rojos y
+lo obligan a venir hasta acá a borrar la excepción.
+
+### 5d. `/assets/` no tiene `Cache-Control` en `vercel.json` · **de dirección**
+
+`/fuentes/(.*)` y `/img/(.*)` llevan `public, max-age=31536000, immutable` desde
+el sitio estático; `/assets/(.*)` —donde viven las dos hojas de CSS y el script
+de comportamiento— **no lleva ninguna**, así que Vercel los sirve con
+revalidación en cada visita.
+
+Los tres archivos de `/assets/` llevan hash en el nombre, que es justo la
+condición que hace segura la regla `immutable`: un contenido nuevo es un nombre
+nuevo. Es un renglón en los dos `vercel.json` y lo vigilarían las doce
+comprobaciones que la #08 ya escribió para ese archivo.
+
+Queda de dirección porque toca `vercel.json` —que la #09 tenía prohibido tocar—
+y porque es la mitad que le falta al argumento de la división de la #09: separar
+lo que casi nunca cambia de lo que cambia siempre sirve **si el navegador
+después puede guardarlo**.
 
 ### 6. Content-Security-Policy
 

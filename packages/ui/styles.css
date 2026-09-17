@@ -1,4 +1,7 @@
-/* La hoja que importa `apps/web`. Un solo import y el producto tiene la marca:
-   las fuentes (locales, nunca CDN) y los tokens. Nada más vive acá. */
-@import "./fuentes/fonts.css";
+/* La hoja de **estilos** de Códice: los tokens, y nada más.
+   Es una de las dos entradas del paquete (orden Códice #09).
+
+   Las fuentes ya NO se importan acá, y no es un olvido: viven en
+   `@codice/ui/fuentes` y se sirven en su propia hoja. El criterio está escrito
+   en `LEEME.md` — lo que casi nunca cambia, aparte de lo que cambia siempre. */
 @import "./codice-tokens.css";

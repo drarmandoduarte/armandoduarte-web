@@ -18,8 +18,17 @@
  * fuente, se le quita el `<script>` que solo sirve en `vite dev`, y se le ponen
  * las dos cosas que el navegador sí baja en producción:
  *
- *   · el `<link rel="stylesheet">` del CSS compilado —el mismo de siempre—, y
+ *   · los `<link rel="stylesheet">` del CSS compilado, y
  *   · **un** `<script defer>` de ≤ 3 KB con los tres comportamientos.
+ *
+ * ── Lo que cambió en la #09 ──────────────────────────────────────────────
+ * Los `<link>` del CSS pasaron de uno a **dos**: primero la hoja de fuentes
+ * —`assets/fuentes-<hash>.css`, que compila `scripts/hoja-de-fuentes.mjs`— y
+ * después la de estilos. Es el contrato nuevo de `@codice/ui` (dos entradas) y
+ * es la forma que tenía el sitio estático: `fuentes/local.css` y `estilo.css`.
+ *
+ * El orden entre los dos no es de gusto: un `@font-face` tiene que estar
+ * declarado cuando se aplica la regla que lo usa.
  *
  * React sigue dibujando el HTML: acá, en Node, con `renderToString`. Lo que
  * desapareció es el React del navegador. La página no se hidrata.
@@ -71,12 +80,11 @@ function elUnico(extension, comoEmpieza = '') {
 }
 
 const js = elUnico('.js', 'comportamiento-');
-const css = elUnico('.css');
 
 /*
  * Y lo que NO puede estar: cualquier otro `.js`.
  *
- * Es el guardián de la decisión de esta orden, puesto donde no se puede saltear.
+ * Es el guardián de la decisión de la #02, puesto donde no se puede saltear.
  * El día que alguien vuelva a poner `index.html` como entrada del build —o que
  * un import arrastre React al grafo de `entrada-navegador.ts`— van a aparecer
  * más chunks en `dist/assets`, y esto se cae acá, antes de publicar, en vez de
@@ -89,6 +97,31 @@ if (otrosJs.length) {
     + 'La web pública sirve UN script y no se hidrata; más de uno significa que algo volvió a compilar la app.',
   );
 }
+
+/*
+ * Las dos hojas, y exactamente dos — orden Códice #09.
+ *
+ * La de fuentes se busca **por nombre** (`fuentes-`), que es la clave de la
+ * entrada en `scripts/hoja-de-fuentes.mjs`, o sea un nombre que este repo
+ * eligió. La de estilos es «la otra», y se busca así a propósito: su
+ * `style-<hash>.css` se lo pone Vite —no sale de ninguna línea de este repo— y
+ * atarse a ese nombre sería atarse a un detalle interno de la herramienta.
+ *
+ * Que sean dos y no tres es el guardián de esta orden, puesto donde no se puede
+ * saltear. Se enlazan por nombre: una tercera hoja —un `cssCodeSplit` que
+ * volvió a `true`, una entrada que nadie declaró— no llegaría al navegador, y
+ * la página saldría sin esas reglas. Callado, y sólo en producción.
+ */
+const cssFuentes = elUnico('.css', 'fuentes-');
+const todasCss = readdirSync(ASSETS).filter((n) => n.endsWith('.css'));
+if (todasCss.length !== 2) {
+  morir(
+    `esperaba exactamente dos hojas en dist/assets —fuentes y estilos— y hay ${todasCss.length}`
+    + `${todasCss.length ? ` (${todasCss.join(', ')})` : ''}. `
+    + 'El HTML las enlaza a las dos por nombre: la que sobre no llega al navegador, y la que falte se lleva sus reglas.',
+  );
+}
+const cssEstilos = `/assets/${todasCss.find((n) => `/assets/${n}` !== cssFuentes)}`;
 
 /*
  * La plantilla es `index.html` —el archivo fuente, el mismo que sirve `vite
@@ -133,7 +166,7 @@ if (scriptsDeDev.length !== 1) {
  */
 const plantilla = plantillaCruda
   .replace(scriptsDeDev[0][0], '')
-  .replace('</head>', `<link rel="stylesheet" href="${css}">\n</head>`)
+  .replace('</head>', `<link rel="stylesheet" href="${cssFuentes}">\n<link rel="stylesheet" href="${cssEstilos}">\n</head>`)
   .replace('</body>', `<script defer src="${js}"></script>\n</body>`);
 
 const vite = await createServer({
@@ -161,7 +194,7 @@ try {
     writeFileSync(join(DIST, archivo), html);
     console.log(`prerender: ${archivo.padEnd(16)} ${ruta.padEnd(12)} ${(Buffer.byteLength(html, 'utf8') / 1024).toFixed(1)} KB`);
   }
-  console.log(`prerender: sin hidratar · css ${css} · script ${js}`);
+  console.log(`prerender: sin hidratar · css ${cssFuentes} + ${cssEstilos} · script ${js}`);
 } finally {
   await vite.close();
 }

@@ -20,8 +20,8 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 29 |
-| `@codice/navegador` | 26 |
+| `@codice/web` | 33 |
+| `@codice/navegador` | 33 |
 
 ## De dónde salen estos números
 
@@ -34,6 +34,52 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #09
+
+`@codice/navegador` sube de 26 a **33** y `@codice/web` de 29 a **33**. Once
+tests nuevos, y ninguno mide el número de Lighthouse: ése vive en el informe con
+su método. Lo que vigilan es el **mecanismo** que la orden compró.
+
+**Cuatro en `@codice/web`** (`src/el-css-va-en-dos-hojas.test.ts`), y existen
+por el motivo más caro: **la mutación de la orden no tiraba nada.** Se devolvió
+el `@import "./fuentes/fonts.css"` a `packages/ui/styles.css` —o sea el modo
+exacto en que esta decisión se deshace— y el build salió **verde**: el prerender
+seguía viendo dos hojas y el guardián de fidelidad seguía viendo dos `<link>`.
+La web quedaba peor que antes de la orden, con los ocho `@font-face` viajando
+dos veces, y nada lo decía. Miran **qué hay adentro de cada hoja**, que es la
+decisión: los ocho `@font-face` de un lado, cero del otro, y ningún token ni
+regla de la web del lado de las fuentes. Son baratos —leen tres archivos de
+`dist/`, sin Chromium— y por eso corren antes que los siete de abajo.
+
+**Siete en `@codice/navegador`** (`e2e/dos-hojas.spec.ts`):
+
+- **Uno de piso**, y va primero por la regla de la casa: que las cuatro páginas
+  enlacen **dos** hojas y que la de fuentes vaya primero. Los tres de abajo
+  miran la portada; sin este, `/terminos` podría quedarse con una sola hoja sin
+  que nada lo dijera — y `/terminos` es justo el segundo caso del pendiente 5b.
+- **Uno de paralelo**: que las dos empiecen a bajar antes de que termine
+  cualquiera. Es *la* afirmación de la orden. Si el navegador las pide en fila
+  —un `@import` que descubre la segunda leyendo la primera, o un JavaScript que
+  la agrega— partir el CSS no sirvió de nada, y desde afuera se ve idéntico.
+- **Uno de prioridades**: las dos hojas en `VeryHigh` y la foto del hero en
+  `High`. Se lee por CDP porque la prioridad **no está en la API de Playwright**:
+  es `request.initialPriority` de `Network.requestWillBeSent`.
+- **Cuatro del salto de texto**, uno por página, con el enlace estrangulado en
+  los mismos 1,6 Mbit/s de Lighthouse móvil. Son la trampa de la orden: separar
+  las fuentes puede hacer que el primer cuadro se pinte con la tipografía del
+  sistema y salte al llegar la buena, o sea ganar LCP perdiendo CLS.
+
+Los cuatro números del salto están escritos **como igualdad y no como «menor
+que»**, igual que el contraste de `packages/ui/tokens.test.mjs`, y por el mismo
+motivo: el día que alguien lo arregle o lo empeore, el test obliga a venir a
+mover el número a mano con su medición al lado.
+
+Y algo que esta orden encontró de paso, que es de la familia del pendiente 13:
+**el guardián de fidelidad se quedó en verde con un `<link>` nuevo en el
+`<head>` de las cuatro páginas.** Su lista no miraba las hojas de estilo. Ahora
+sí —`cabeza()` devuelve las hojas enlazadas, en orden, con el hash normalizado—
+así que volver a fusionarlas reescribe cuatro capturas y aparece en el diff.
 
 ## Lo que movió la orden #08
 

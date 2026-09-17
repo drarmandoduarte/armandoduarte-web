@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender.mjs",
+    "build": "vite build && node scripts/hoja-de-fuentes.mjs && node scripts/prerender.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json",

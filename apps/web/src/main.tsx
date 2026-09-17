@@ -29,7 +29,8 @@
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import { BrowserRouter } from 'react-router';
-import '@codice/ui/styles.css';
+import '@codice/ui/fuentes';
+import '@codice/ui/styles';
 import './index.css';
 import './i18n';
 import { App } from './App';

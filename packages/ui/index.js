@@ -15,7 +15,8 @@
  * pantalla que la hereda.
  *
  * Lo que este paquete sí da hoy, y es lo que importa: los **tokens**
- * (`@codice/ui/styles.css`) y las **fuentes locales**. Se consumen por CSS, no
- * por JavaScript.
+ * (`@codice/ui/styles`) y las **fuentes locales** (`@codice/ui/fuentes`). Se
+ * consumen por CSS, no por JavaScript, y son **dos** entradas desde la orden
+ * #09: el porqué de la división está en `LEEME.md`.
  */
 export {};

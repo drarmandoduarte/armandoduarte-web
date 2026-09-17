@@ -63,6 +63,22 @@ Los nombres de las variables son los que la web pública ya usaba (`--crema`,
 `--tinta`, `--ocre`, `--teal`…) y no los de Omnia: así el port de la web fue
 sustituir y no traducir.
 
+**`@codice/ui` se importa con DOS entradas, y en este orden** (orden #09):
+
+```ts
+import '@codice/ui/fuentes';   // solo los @font-face — casi nunca cambian
+import '@codice/ui/styles';    // los tokens — cambian en casi cada orden
+```
+
+Hasta la #08 era una sola —«un solo import y el producto tiene la marca»— y el
+caso que lo tumbó está medido en `docs/tareas.md` § 5b: con una hoja sola,
+**una orden que agrega una sección le cuesta un punto de Lighthouse a una página
+que no la tiene**, porque las cuatro páginas bajan las reglas de todas. La
+división no es «partir en dos pedazos»: es separar lo que casi nunca cambia de
+lo que cambia siempre, que es lo único que hace que la caché sirva. El porqué
+entero, y el detalle de cómo se compila la hoja de fuentes en producción, están
+en `packages/ui/LEEME.md`.
+
 ## Nombres
 
 - Paquetes: `@codice/<pieza>` — `web`, `core`, `ui`, `config`, `prompts`, `db`.

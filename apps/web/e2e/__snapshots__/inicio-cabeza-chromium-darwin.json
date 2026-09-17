@@ -3,5 +3,9 @@
   "description": "Doctor en Liderazgo, autor de Construyendo Familias Fuertes. Consultoría familiar, talleres para padres y conferencias. Mérida, Yucatán.",
   "canonical": "https://armandoduarte.com/",
   "ogUrl": "https://armandoduarte.com/",
-  "ogImage": "https://armandoduarte.com/img/og-home.jpg"
+  "ogImage": "https://armandoduarte.com/img/og-home.jpg",
+  "hojas": [
+    "/assets/fuentes-<hash>.css",
+    "/assets/style-<hash>.css"
+  ]
 }
