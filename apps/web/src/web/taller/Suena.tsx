@@ -80,15 +80,53 @@ export function Suena() {
           sección e informa un contraste que no existe, porque entre ese blanco y
           el texto hay una fotografía. */}
       <div className="suena-fondo con-fondo">
+        {/* ── La foto, en dos tamaños desde la orden #14 (D) ──────────────────
+            La #12 dejó anotado que a 1440 esta foto se muestra reescalada ×1,8:
+            el archivo tiene 1200 px de ancho y `width:150%` sobre un contenedor
+            de 1440 la pide a 2160. Dirección consiguió la **misma** foto a 1800
+            (Pexels 6345445, Karola G — el número va sin numeral a propósito:
+            `check:tokens` lee un `#` seguido de siete dígitos como un color y
+            se pone rojo, y lo hizo), así que el reescalado desaparece en
+            escritorio sin que el móvil baje un byte de más.
+
+            ── Por qué `<source media>` y no un `srcset` con `sizes` ──────────
+            Un `srcset`/`sizes` elige multiplicando el ancho de presentación por
+            el **DPR** del aparato. Un teléfono de 375 px con pantalla 3× pide el
+            equivalente a 1125 px y se llevaría la de 1800 — justo lo que la
+            orden prohíbe («el móvil no baja un byte más»). La `media` de un
+            `<source>` mira el **ancho de ventana** y nada más, así que el corte
+            cae donde dice la orden: 1200 hasta 1100 px, 1800 por encima. Medido
+            a 375/3× en el informe: sigue bajando los mismos 73.380 B.
+
+            El corte en 1101 no es arbitrario: es el mismo quiebre donde el CSS
+            deja de estirar la foto al 150 % (`@media (max-width:900px)` la
+            devuelve al 100 %, y el pie de la #14 parte en 1100). Un corte propio
+            sería un tercer número que mantener.
+
+            Y el `<img>` de abajo pasa a ser el **JPG**: hasta acá el `src` era el
+            `.webp`, así que un navegador sin WebP no veía ninguna foto —el JPG
+            estaba en el repo sin que nadie lo pidiera—. Ahora es el respaldo que
+            siempre debió ser, y es el de 1200: quien no entiende WebP tampoco
+            necesita la versión grande. */}
         <div className="fondo-foto fondo-foto--sin-velo">
-          <img
-            src="img/fotos/porque-fondo.webp"
-            width={1200}
-            height={1800}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-          />
+          <picture>
+            <source
+              type="image/webp"
+              media="(min-width: 1101px)"
+              srcSet="img/fotos/porque-fondo-1800.webp"
+              width={1800}
+              height={2700}
+            />
+            <source type="image/webp" srcSet="img/fotos/porque-fondo.webp" />
+            <img
+              src="img/fotos/porque-fondo.jpg"
+              width={1200}
+              height={1800}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+            />
+          </picture>
         </div>
         <div className="container suena-fondo__grid">
           <div className="suena__panel reveal">
