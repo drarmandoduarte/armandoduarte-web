@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { CLAVE_MENSAJE_RESERVA } from '@codice/core';
 import { Marco } from '../comun/Marco';
 import { Hero } from './Hero';
 import { Suena } from './Suena';
@@ -21,7 +22,7 @@ import { Reservar } from './Reservar';
 export function Taller() {
   const { t } = useTranslation();
   return (
-    <Marco pagina="taller" mensaje={t('comun.mensajes.reservar')}>
+    <Marco pagina="taller" mensaje={t(CLAVE_MENSAJE_RESERVA)}>
       <Hero />
       <Suena />
       <Porque />

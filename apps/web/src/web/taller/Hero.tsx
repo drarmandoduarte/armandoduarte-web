@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { TELEFONO_TALLER } from '@codice/core';
+import { CLAVE_MENSAJE_RESERVA, TELEFONO_TALLER } from '@codice/core';
 import { BotonWhatsApp } from '../comun/BotonWhatsApp';
 import { FotoArco } from '../comun/FotoArco';
 import { Icono } from '../comun/Icono';
@@ -45,9 +45,13 @@ export function Hero() {
           </h1>
           <p className="hero-sub">{t('taller.hero.sub')}</p>
           <div className="hero-cta">
+            {/* El mensaje sale de `CLAVE_MENSAJE_RESERVA` (#14): el enlace de
+                reservar se elegía acá y otra vez en `Taller.tsx`, y con el del pie
+                habrían sido tres. `BotonWhatsApp` sigue recibiendo número y texto
+                por separado porque dibuja, no decide. */}
             <BotonWhatsApp
               telefono={TELEFONO_TALLER}
-              mensaje={t('comun.mensajes.reservar')}
+              mensaje={t(CLAVE_MENSAJE_RESERVA)}
               texto={t('taller.hero.ctaReservar')}
               clase="btn btn--naranja"
             />
