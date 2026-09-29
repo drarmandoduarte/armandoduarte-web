@@ -22,9 +22,47 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
 | `@codice/web` | 58 |
-| `@codice/familia` | 46 |
-| `@codice/api` | 48 |
+| `@codice/familia` | 51 |
+| `@codice/api` | 62 |
 | `@codice/navegador` | 35 |
+
+## Lo que trae el 0-bis de la #15 — `@codice/api` 48 → 62 y `@codice/familia` 46 → 51
+
+Catorce tests nuevos en `@codice/api` y cinco en `@codice/familia`, y los
+diecinueve existen por el mismo motivo: **los 48 de esta API estaban en verde
+sobre cuatro consultas que no habrían funcionado nunca**, porque los 48 le
+hablaban a un doble de `SupabaseService` en vez de a una base.
+
+**Nueve** en `src/las-consultas-corren-contra-la-base.spec.ts`. Levantan el banco
+PGlite de `@codice/db` —las siete migraciones, la `007` incluida— y le corren por
+encima `rolDe`, `personaDe` y los tres métodos de `RespaldoController` **sin
+tocarlos**: lo único reemplazado es a quién le hablan. Un traductor convierte la
+misma cadena de `.from().select().eq()` en SQL y la ejecuta como `authenticated`
+o como `service_role`. Las tres mutaciones, cada una vista en rojo:
+
+| mutación | qué cae |
+|---|---|
+| `miembros.user_id` → `persona_id` | los dos de `rolDe`: «promise rejected UnauthorizedException» (42703 atrapado) |
+| `totp_backup_codes.used_at` → `usado_en` | los cuatro de respaldo, empezando por «No pudimos contar tus códigos» |
+| `generar` con el token de la persona en vez de `service_role` | tres, con «No pudimos reemplazar tus códigos» (42501) |
+
+**Cinco** en `src/el-token-se-verifica-de-verdad.spec.ts`, y la parte que importa
+es contra qué corren: **`dist/funcion.cjs`**, el empaquetado, no el fuente. Un
+JWKS de verdad en un servidor HTTP efímero, una clave ES256 generada en el test y
+publicada en la ruta exacta que arma `SupabaseService`. Es lo único que ejercita a
+la vez el `fetch` del runtime, el `jose` que esbuild metió adentro y la URL que
+sale de `SUPABASE_URL` — los tres sospechosos del 401 del 29/9, y ninguno de los
+tres existe en `src/`. Se vio en rojo sin pedirlo: el primer intento corrió contra
+un empaquetado de cinco minutos antes y el caso del `sub` faltante falló diciendo
+«Token inválido o vencido» en vez del mensaje propio, que es exactamente la
+diferencia que el arreglo introduce.
+
+**Cinco** en `apps/familia/src/comun/decision-de-pantalla.test.ts`: que un
+`/api/yo` que no contesta dé `error` y nunca `enrolar`. La mutación es borrar el
+renglón que lo atrapa, y el rojo dice la frase del incidente: *expected 'enrolar'
+to be 'error'*. Van con su otra mitad al lado —el mismo estado, con respuesta del
+servidor, sí da `enrolar`—, porque si no el test podría estar pasando sobre un
+estado que no producía `enrolar` de todos modos.
 
 ## Lo que movió la orden #16 — `@codice/navegador` sube a 33
 
