@@ -44,8 +44,14 @@
  * que el `width`/`height` existe para evitar—. Salen del archivo, medidos, no
  * de la orden.
  */
+/* `de-pie` cambió de forma en la #19 (B): 1400×**2321** donde era 2614. El
+   archivo publicado tenía ~300 px de degradado a transparente por abajo —el
+   alfa caía desde la fila ~2330 hasta 0 en la 2614—, así que la caja tocaba el
+   borde de la sección (medido: 0 px, cierto) y lo que tocaba era **aire**. La
+   #12 midió la caja; Lucía miraba los píxeles. El recorte nuevo corta en la
+   2320, la última fila completamente opaca. */
 const RECORTES = {
-  'de-pie': { ancho: 1400, alto: 2614 },
+  'de-pie': { ancho: 1400, alto: 2321 },
   'medio-cuerpo': { ancho: 1400, alto: 1690 },
 } as const;
 

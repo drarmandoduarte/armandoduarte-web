@@ -13,36 +13,41 @@ import { Seccion } from '../comun/Seccion';
  * único que esta orden dibujó — en el estilo de los otros tres: círculo de
  * `--teal-medio`, glifo blanco de trazo 5, sobre el mismo lienzo de 96.
  *
- * ── La fotografía vuelve a ser el fondo, y esta vez sin velo (orden #12, C) ─
- * Es el tercer lugar donde vive esta foto, así que conviene el relato entero:
+ * ── La fotografía de fondo, cuarta vez y esta vez como la pidió Lucía ───
+ * Conviene el relato entero, porque cada vuelta corrigió a la anterior:
  *
- *   · **#05** — fondo de toda la sección con un velo crema. Al 88 % daba **14
- *     pares bajo AA** —medido sobre el píxel dibujado— y hubo que subirlo a
- *     94 %, donde la foto ya no es una imagen sino una textura. El problema no
- *     era el velo: era que encima había ocho bloques de texto chico, y cada uno
- *     necesita 4,5:1 contra lo que tenga detrás.
- *   · **#07** — se la movió a la tarjeta de la cita, donde el único texto encima
- *     es una frase de 30 px en crema. Ahí la foto se ve, porque aguanta mucho
- *     menos velo.
- *   · **#12** — Lucía la quiere otra vez de fondo de la sección, entera. Se hace
- *     (D23), y lo que cambia es **cómo se resuelve el contraste**: ya no con un
- *     velo uniforme —que es lo que se midió y no funciona— sino dándole al texto
- *     su propio suelo. El bloque de texto va sobre un panel de crema opaco al
- *     92 % con desenfoque, en la columna izquierda; la foto se ve entera a la
- *     derecha y por debajo. Es lo que 512 hace con su hero: la imagen es fondo,
- *     el texto tiene piso.
+ *   · **#05** — fondo de toda la sección con un velo crema uniforme. Al 88 %
+ *     daba **14 pares bajo AA** —medido sobre el píxel dibujado— y hubo que
+ *     subirlo a 94 %, donde la foto ya no es una imagen sino una textura. El
+ *     problema no era el velo: era que encima había ocho bloques de texto
+ *     chico, y cada uno necesita 4,5:1 contra lo que tenga detrás.
+ *   · **#07** — se la movió a la tarjeta de la cita, donde el único texto
+ *     encima es una frase de 30 px en crema. Ahí la foto se ve, porque aguanta
+ *     mucho menos velo.
+ *   · **#12** — Lucía la quiso otra vez de fondo. Se hizo, pero **se cambió la
+ *     maqueta**: el texto pasó a un panel angosto a la izquierda, los tres
+ *     puntos se apilaron debajo del título, y la foto se estiró al 150 % a la
+ *     derecha. A 1440 se veía **el pelo y la frente del chico**, nada más.
+ *     Lucía no pidió eso: pidió la sección como estaba, con la foto detrás.
+ *   · **#19** — vuelve la maqueta de antes de la #12 (dos columnas: título y
+ *     párrafo a la izquierda, los tres puntos a la derecha; la cita abajo en
+ *     tarjeta cálida a lo ancho) y la foto vuelve a ser el fondo de **toda** la
+ *     sección, sin estirar: `object-fit: cover` y nada más, para que el rostro
+ *     se vea entero.
  *
- * Y la tarjeta de la cita vuelve a ser cálida sin foto, como era antes de la #07.
+ * ── Y el velo se midió, no se eligió ────────────────────────────────────
+ * La orden #19 fija el orden de las pruebas y con cuál quedarse: el primero que
+ * dé **0 pares bajo AA** a 1440, 900 y 375 con la foto cargada. El número que
+ * quedó está escrito en `index.css`, al lado de la regla, con lo que se probó
+ * antes.
  *
- * ── Por qué la foto empieza DEBAJO de la franja de hechos ────────────────
- * Porque la franja es lo único de esta sección que sigue siendo texto chico
- * suelto: rótulos de 11 px en `--gris` y valores de 17–21 px, sin panel. Ponerla
- * sobre la fotografía sería repetir exacto el defecto que la #05 pagó con 14
- * pares bajo AA, y la orden #12 nombra la franja y «¿Te suena?» como dos cosas
- * distintas (su sección A habla de «la franja de tres hechos»; la C, de «la
- * sección "¿Te suena?"»). Así que la foto es el fondo de «¿Te suena?», a sangre
- * de lado a lado, desde la hairline de la franja hasta el final de la sección.
- * **Queda declarado en el informe de la #12 como la lectura que se eligió.**
+ * ── La franja de hechos ahora TAMBIÉN va sobre la foto ───────────────────
+ * En la #12 la foto arrancaba debajo de la franja, y el informe lo declaró como
+ * la lectura elegida: la franja es texto chico suelto (rótulos de 11 px) y
+ * ponerlo sobre fotografía era repetir el defecto que la #05 pagó con 14 pares.
+ * La #19 dice «toda la sección», así que la franja entra — y lo que la sostiene
+ * no es una opinión sino la medición: si los rótulos de 11 px no pasan con el
+ * velo en degradado, entra el suelo local del punto (ii) de la orden.
  */
 export function Suena() {
   const { t } = useTranslation();
@@ -52,7 +57,54 @@ export function Suena() {
     ['03', t('taller.suena.tresTitulo'), t('taller.suena.tresTexto')],
   ];
   return (
-    <Seccion id="suena" tono="blanco" contenedor={false}>
+    /* `con-fondo` es lo que hace que `check/contraste.mjs` mida el píxel
+       realmente dibujado detrás de cada línea en vez del color declarado: sin
+       esa clase el barrido sube por los padres, encuentra el blanco de la
+       sección e informa un contraste que no existe, porque entre ese blanco y
+       el texto hay una fotografía. */
+    <Seccion id="suena" tono="blanco" clase="suena-fondo con-fondo" contenedor={false}>
+      {/* ── La foto, en dos tamaños desde la orden #14 (D) ──────────────────
+          El archivo de 1200 se sirve hasta 1100 px de ventana y el de 1800 por
+          encima. Es `<source media>` y no `srcset`/`sizes` a propósito: aquél
+          elige multiplicando el ancho de presentación por el DPR, así que un
+          teléfono de 375 px con pantalla 3× se llevaría la de 1800 — justo lo
+          que la #14 prohíbe. La `media` mira el ancho de ventana y nada más.
+
+          El `<img>` es el **JPG**: es el respaldo de quien no entiende WebP, y
+          es el de 1200 porque quien no entiende WebP tampoco necesita la grande. */}
+      <div className="fondo-foto fondo-foto--suena">
+        <picture>
+          <source
+            type="image/webp"
+            media="(min-width: 1101px)"
+            srcSet="img/fotos/porque-fondo-1800.webp"
+            width={1800}
+            height={2700}
+          />
+          <source type="image/webp" srcSet="img/fotos/porque-fondo.webp" />
+          <img
+            src="img/fotos/porque-fondo.jpg"
+            width={1200}
+            height={1800}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            /* Decorativa y por debajo del pliegue. Dicho con honestidad: esto
+               **no** recuperó el punto. Medido en `/merida` móvil, la foto de
+               fondo cuesta 0,2 s de LCP (2,5 → 2,7 s) y baja performance de 96
+               a 95, y con `fetchPriority="low"` sigue en 95 — el costo es de
+               **pintado**, no de descarga: a 375 el bloque mide 375×2242 y la
+               foto se dibuja a 1495×2242. Lo comprobado: apagando la foto, 96
+               y 2,5 s. Quedan las dos banderas igual porque son correctas para
+               una imagen decorativa bajo el pliegue; lo que no hacen es
+               arreglar esto. El punto está en el informe como decisión de
+               dirección: es el precio de lo que pidió Lucía. */
+            decoding="async"
+            fetchPriority="low"
+          />
+        </picture>
+      </div>
+
       <div className="container">
         <div className="hechos reveal">
           <div>
@@ -72,82 +124,30 @@ export function Suena() {
             <span>{t('taller.hechos.modalidadClave')}</span><b>{t('taller.hechos.modalidadValor')}</b>
           </div>
         </div>
-      </div>
 
-      {/* `con-fondo` es lo que hace que `check/contraste.mjs` mida el píxel
-          realmente dibujado detrás de cada línea en vez del color declarado: sin
-          esa clase el barrido sube por los padres, encuentra el blanco de la
-          sección e informa un contraste que no existe, porque entre ese blanco y
-          el texto hay una fotografía. */}
-      <div className="suena-fondo con-fondo">
-        {/* ── La foto, en dos tamaños desde la orden #14 (D) ──────────────────
-            La #12 dejó anotado que a 1440 esta foto se muestra reescalada ×1,8:
-            el archivo tiene 1200 px de ancho y `width:150%` sobre un contenedor
-            de 1440 la pide a 2160. Dirección consiguió la **misma** foto a 1800
-            (Pexels 6345445, Karola G — el número va sin numeral a propósito:
-            `check:tokens` lee un `#` seguido de siete dígitos como un color y
-            se pone rojo, y lo hizo), así que el reescalado desaparece en
-            escritorio sin que el móvil baje un byte de más.
-
-            ── Por qué `<source media>` y no un `srcset` con `sizes` ──────────
-            Un `srcset`/`sizes` elige multiplicando el ancho de presentación por
-            el **DPR** del aparato. Un teléfono de 375 px con pantalla 3× pide el
-            equivalente a 1125 px y se llevaría la de 1800 — justo lo que la
-            orden prohíbe («el móvil no baja un byte más»). La `media` de un
-            `<source>` mira el **ancho de ventana** y nada más, así que el corte
-            cae donde dice la orden: 1200 hasta 1100 px, 1800 por encima. Medido
-            a 375/3× en el informe: sigue bajando los mismos 73.380 B.
-
-            El corte en 1101 no es arbitrario: es el mismo quiebre donde el CSS
-            deja de estirar la foto al 150 % (`@media (max-width:900px)` la
-            devuelve al 100 %, y el pie de la #14 parte en 1100). Un corte propio
-            sería un tercer número que mantener.
-
-            Y el `<img>` de abajo pasa a ser el **JPG**: hasta acá el `src` era el
-            `.webp`, así que un navegador sin WebP no veía ninguna foto —el JPG
-            estaba en el repo sin que nadie lo pidiera—. Ahora es el respaldo que
-            siempre debió ser, y es el de 1200: quien no entiende WebP tampoco
-            necesita la versión grande. */}
-        <div className="fondo-foto fondo-foto--sin-velo">
-          <picture>
-            <source
-              type="image/webp"
-              media="(min-width: 1101px)"
-              srcSet="img/fotos/porque-fondo-1800.webp"
-              width={1800}
-              height={2700}
-            />
-            <source type="image/webp" srcSet="img/fotos/porque-fondo.webp" />
-            <img
-              src="img/fotos/porque-fondo.jpg"
-              width={1200}
-              height={1800}
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-            />
-          </picture>
-        </div>
-        <div className="container suena-fondo__grid">
-          <div className="suena__panel reveal">
-            <span className="eyebrow">{t('taller.suena.eyebrow')}</span>
-            <h2 className="display-m u-mt-4">
+        {/* La maqueta de antes de la #12, recuperada de `4b592d2^`: dos
+            columnas —título y párrafo | los tres puntos— y la cita abajo. */}
+        <div className="grid-2 u-mt-8">
+          <div className="suena__suelo">
+            <span className="eyebrow reveal">{t('taller.suena.eyebrow')}</span>
+            <h2 className="display-m u-mt-4 reveal" data-d="1">
               {t('taller.suena.titulo1')}<br /><span className="suave">{t('taller.suena.titulo2')}</span>
             </h2>
-            <p className="body u-mt-4">{t('taller.suena.cuerpo')}</p>
-            <ol className="lista lista--2">
-              {sintomas.map(([n, titulo, texto]) => (
-                <li key={n}>
-                  <span className="n">{n}</span>
-                  <div><h3>{titulo}</h3><p>{texto}</p></div>
-                </li>
-              ))}
-            </ol>
+            <p className="body u-mt-4 reveal" data-d="2">{t('taller.suena.cuerpo')}</p>
           </div>
-          <blockquote className="bloque-cita u-mt-7 reveal">
-            {t('taller.suena.cita')}
-          </blockquote>
+          <ol className="lista lista--2 reveal" data-d="2">
+            {sintomas.map(([n, titulo, texto]) => (
+              <li key={n} className="suena__suelo">
+                <span className="n">{n}</span>
+                <div><h3>{titulo}</h3><p>{texto}</p></div>
+              </li>
+            ))}
+          </ol>
         </div>
+
+        <blockquote className="bloque-cita bloque-cita--ancha u-mt-7 reveal">
+          {t('taller.suena.cita')}
+        </blockquote>
       </div>
     </Seccion>
   );
