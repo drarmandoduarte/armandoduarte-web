@@ -179,6 +179,52 @@ ver «Padres / digitalmente / responsables», que son tres renglones de una pala
 y es un título de verdad mal partido. Es un renglón de código en
 `check/renglones.mjs`; el porqué de las dos opciones está en el informe de la #16.
 
+### Un test de la API que no toca la base no prueba una consulta
+
+Un doble de `SupabaseService` contesta igual de bien a `persona_id` que a
+`user_id`. Lo que el doble no puede decir nunca es si la pregunta existe: si la
+tabla está, si la columna se llama así, si el rol tiene el `grant`. Entonces: una
+consulta que la app manda a la base **se prueba contra una base**. El banco PGlite
+de `@codice/db` ya levanta Postgres de verdad con las migraciones del repo puestas
+en 1,5 segundos, así que el costo de la regla es un `import`.
+
+**El caso, del 29/9/2026.** Con la migración `007` ya corrida y los permisos
+puestos, `GET /api/yo` seguía devolviendo `403 AAL2_REQUIRED` a una clienta con
+token válido. La consulta era ésta:
+
+```
+supabase.service.ts:126       .eq('persona_id', personaId)     sobre `miembros`
+001_personas_y_miembros.sql   create table public.miembros (user_id uuid …)
+```
+
+`42703 column miembros.persona_id does not exist`. El middleware lo atrapaba en
+silencio —por diseño: no autentica—, el pedido seguía sin `profile`, el guard
+fallaba cerrado y le pedía un autenticador a una mamá que se había inscrito a un
+taller. Lo mismo en las tres consultas de `respaldo`: `persona_id` por `user_id`,
+`usado_en` por `used_at`, y las escrituras hechas con el token de la persona
+cuando la `005` las había reservado para `service_role`. **Ninguna de esas cuatro
+consultas habría funcionado nunca**, y los 48 tests de `@codice/api` estaban en
+verde, porque los 48 le hablaban a un doble.
+
+Es el mismo perfil que la casa ya pagó tres veces —el `X-Robots-Tag` de la #08, el
+`Cache-Control` de la #11, el `exports` de la #15— y la forma es siempre la misma:
+**la herramienta que podía verlo no se ejecuta contra lo que falla.** Acá las tres
+que estaban puestas (vitest con dobles, `tsc --noEmit`, el build) tienen en común
+que ninguna abre una conexión.
+
+Lo que la regla NO pide: levantar Supabase, ni tener red, ni probar PostgREST. El
+traductor de `apps/api/src/las-consultas-corren-contra-la-base.spec.ts` convierte
+la misma cadena de `.from().select().eq()` que escribe la app en SQL y la corre
+contra el banco, como `authenticated` o como `service_role`. Lo que no entiende,
+lo tira: un traductor que adivina se prueba a sí mismo.
+
+Y de yapa, la mitad que se ve poco: **la respuesta de la base viajaba sin su
+código.** El `catch` del middleware convertía `42703` en «sin perfil» y el de
+`getUserFromToken` convertía cualquier error de `jose` en un 401 pelado. Dos horas
+de las tres que costó esto fueron para averiguar un número que la base había dicho
+desde el principio. Un `catch` que descarta el código del error está tirando la
+única parte del mensaje que sirve.
+
 ## Pendientes abiertos
 
 ### 0. Tres guardianes estuvieron rotos desde la #10 y nadie se enteró · **encontrado y arreglado en la #12**

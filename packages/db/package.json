@@ -4,6 +4,17 @@
   "version": "0.0.1",
   "type": "module",
   "description": "El esquema de Códice y su banco de pruebas: un Postgres real, en proceso, que corre las migraciones del repo sin tocar Supabase.",
+  "//": [
+    "`main` apunta al FUENTE, como `@codice/core`, y eso acá es correcto: este",
+    "paquete no se despliega. Nadie lo importa desde la función de Vercel —lo",
+    "importa `apps/api` como devDependency, y solo desde un `.spec.ts`—, así que",
+    "no entra en el cierre que `apps/familia/src/la-api-llega-compilada.test.ts`",
+    "recorre. El día que un `src/` de producción importe `@codice/db`, ese",
+    "barrido lo va a incluir y se va a poner rojo pidiendo un compilado: es",
+    "exactamente el día en que hace falta."
+  ],
+  "main": "src/banco.ts",
+  "types": "src/banco.ts",
   "scripts": {
     "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json",
     "typecheck": "tsc --noEmit"

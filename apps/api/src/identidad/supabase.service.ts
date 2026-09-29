@@ -87,11 +87,40 @@ export class SupabaseService {
       this.ultimoCamino = 'jwks';
       return { id };
     } catch (error) {
+      /* Lo que este método ya decidió adentro del `try` sale tal cual: un
+         `sub` vacío no es un error de `jose` y no tiene que disfrazarse de uno. */
+      if (error instanceof UnauthorizedException) throw error;
+
       /* Firma inválida y «este proyecto no publica JWKS» se distinguen por el
          código de `jose`: solo el segundo justifica el respaldo. Cualquier otra
          cosa es un token que no vale, y se rechaza. */
-      if (!esProyectoSinJwks(error)) throw new UnauthorizedException('Token inválido o vencido.');
-      this.logger.warn('El proyecto no publica JWKS: se valida con auth.getUser()');
+      if (!esProyectoSinJwks(error)) {
+        /* ── El renglón que costó tres horas (orden #15, punto 1) ──────────
+           El 29/9 a las 12:29 la función devolvió `401 Token inválido o
+           vencido` sobre un token que era válido, y el log de Vercel de esa
+           invocación decía «External APIs: No outgoing requests»: `jose` había
+           tirado **antes de salir a buscar el JWKS**. Qué error era no se supo,
+           porque este `catch` lo convertía en un 401 pelado y lo tiraba a la
+           basura. Dos de las tres horas que costó el incidente se fueron en
+           averiguar algo que la biblioteca ya había dicho.
+
+           Va `nombre · código · mensaje` de `jose`, y **nunca el token**: el
+           token es la credencial, y un log con credenciales adentro es peor
+           que no tener log. Los mensajes de `jose` no lo incluyen. */
+        this.logger.warn(`El token no pasó la verificación: ${describir(error)}`);
+        throw new UnauthorizedException('Token inválido o vencido.');
+      }
+      /* El mensaje dice lo que se sabe y no más: `ERR_JWKS_NO_MATCHING_KEY`
+         significa «ninguna clave del juego sirve para este token», y eso pasa
+         tanto si el proyecto firma con secreto compartido como si el token lo
+         firmó un desconocido. Los dos terminan igual —`auth.getUser()` rechaza
+         al segundo— pero el desconocido cuesta un viaje de red. Estrechar el
+         respaldo a «el JWKS vino vacío» es una decisión de dirección y está en
+         el informe de la #15; no se decide acá. */
+      this.logger.warn(
+        `El JWKS no tiene clave para este token (${describir(error)}): se prueba con auth.getUser(), `
+        + 'que es también el camino si el proyecto firma con secreto compartido',
+      );
     }
 
     const { data, error } = await this.clienteConToken(token).auth.getUser(token);
@@ -120,10 +149,16 @@ export class SupabaseService {
    * cliente no es un rol guardado, es la ausencia de membresía.
    */
   async rolDe(token: string, personaId: string): Promise<'dueno' | 'equipo' | 'cliente'> {
-    const { data, error } = await this.clienteConToken(token)
+    const { data, error } = await this.comoElUsuario(token)
       .from('miembros')
       .select('rol, activo')
-      .eq('persona_id', personaId)
+      /* `user_id`, no `persona_id`: la columna se llama así desde la migración
+         `001` (`miembros.user_id`, que además es su clave primaria). Acá decía
+         `persona_id` y Postgres contestaba `42703 column miembros.persona_id
+         does not exist`; el middleware se lo tragaba, el pedido seguía sin
+         `profile` y el guard le exigía `aal2` a todo el mundo. Un cliente no
+         podía entrar de ninguna forma. */
+      .eq('user_id', personaId)
       .eq('activo', true)
       .maybeSingle();
 
@@ -137,7 +172,7 @@ export class SupabaseService {
 
   /** La persona que corresponde a este usuario, con su propio token. */
   async personaDe(token: string, personaId: string) {
-    const { data, error } = await this.clienteConToken(token)
+    const { data, error } = await this.comoElUsuario(token)
       .from('personas')
       .select('id, nombre, apellido, whatsapp, pais, zona_horaria')
       .eq('id', personaId)
@@ -155,6 +190,29 @@ export class SupabaseService {
   /** El cliente con el token del usuario, para lo que se rige por RLS. */
   comoElUsuario(token: string): SupabaseClient {
     return this.clienteConToken(token);
+  }
+
+  /**
+   * El cliente `service_role`, para lo que **el esquema no le deja hacer a la
+   * persona**. Salta la RLS, así que cada consulta que lo use filtra por el
+   * `user_id` que salió del token validado, nunca por uno que venga en el
+   * cuerpo del pedido.
+   *
+   * ── Por qué existe, y quién lo decidió ──────────────────────────────────
+   * No lo decide este archivo: lo decidió la migración `005`, que escribió
+   * `revoke insert, update, delete on public.totp_backup_codes from anon,
+   * authenticated` con el comentario «Escritura (generar / consumir /
+   * regenerar): SOLO backend con `service_role`», y lo confirmó la `007`, que a
+   * `authenticated` le da **select y nada más** sobre esa tabla.
+   *
+   * `respaldo` estaba escrito contra el esquema contrario —generaba, borraba y
+   * quemaba códigos con el token de la persona—, así que aunque los nombres de
+   * columna hubieran estado bien habría chocado igual, con `42501` en vez de
+   * `42703`. Se descubrió al correr sus consultas contra el banco:
+   * `src/las-consultas-corren-contra-la-base.spec.ts`.
+   */
+  comoElServicio(): SupabaseClient {
+    return this.clienteAdministrador();
   }
 }
 
@@ -175,7 +233,20 @@ export function variableObligatoria(nombre: string): string {
   return valor;
 }
 
-/** ¿El error de `jose` dice que este proyecto no publica JWKS? */
+/**
+ * `nombre · código · mensaje` de un error, para el log.
+ *
+ * **No lleva la pila y no lleva el error crudo**: la pila de `jose` incluye la
+ * URL del JWKS y no aporta nada acá, y un `JSON.stringify` del error es la
+ * forma más fácil de meter sin querer algo que no se quería.
+ */
+function describir(error: unknown): string {
+  const e = error as { name?: unknown; code?: unknown; message?: unknown };
+  const texto = (v: unknown) => (typeof v === 'string' && v.trim() !== '' ? v : '—');
+  return `${texto(e?.name)} · ${texto(e?.code)} · ${texto(e?.message)}`;
+}
+
+/** ¿El error de `jose` deja abierta la posibilidad de que el proyecto firme con secreto compartido? */
 function esProyectoSinJwks(error: unknown): boolean {
   const codigo = (error as { code?: unknown })?.code;
   return codigo === 'ERR_JWKS_NO_MATCHING_KEY' || codigo === 'ERR_JWKS_INVALID' || codigo === 'ERR_JWKS_TIMEOUT';

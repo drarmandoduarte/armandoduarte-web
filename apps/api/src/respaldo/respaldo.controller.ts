@@ -18,6 +18,19 @@ import {
  * La lógica —generar, hashear con scrypt, verificar en tiempo constante— es del
  * núcleo del kit y no se toca. Lo de esta app es **dónde se guardan**, que en
  * Cenit era otra tabla con otro nombre.
+ *
+ * ── Y «otro nombre» era más literal de lo que este archivo creía ─────────
+ * Las tres consultas de acá estaban escritas contra el esquema de Cenit y no
+ * contra el de la `005`: `persona_id` donde la columna es `user_id`, `usado_en`
+ * donde es `used_at`, y las escrituras con el token de la persona cuando la
+ * migración las reservó para `service_role`. Ninguna habría funcionado nunca, y
+ * los tests de esta app estaban todos en verde **porque ninguno tocaba la
+ * base**. La regla que salió de ahí está en `docs/tareas.md`; quien las corre
+ * ahora contra el banco de `@codice/db` es
+ * `src/las-consultas-corren-contra-la-base.spec.ts`.
+ *
+ * Las columnas de `public.totp_backup_codes` (migración `005`, y son éstas y no
+ * otras): `id`, `user_id`, `code_hash`, `used_at`, `generated_at`.
  */
 
 class CodigoDto {
@@ -46,8 +59,8 @@ export class RespaldoController {
       .comoElUsuario(token)
       .from('totp_backup_codes')
       .select('id', { count: 'exact', head: true })
-      .eq('persona_id', usuario.id)
-      .is('usado_en', null);
+      .eq('user_id', usuario.id)
+      .is('used_at', null);
     if (error) throw new BadRequestException('No pudimos contar tus códigos.');
     return { quedan: count ?? 0, de: BACKUP_CODE_COUNT };
   }
@@ -69,12 +82,17 @@ export class RespaldoController {
     const usuario = await usuarioDelPedido(pedido, token, this.supabase);
     const codigos = Array.from({ length: BACKUP_CODE_COUNT }, () => generateBackupCode());
 
-    const cliente = this.supabase.comoElUsuario(token);
-    const borrado = await cliente.from('totp_backup_codes').delete().eq('persona_id', usuario.id);
+    /* `service_role` y no el token de la persona: la `005` revocó
+       insert/update/delete de `authenticated` sobre esta tabla y la `007` le dio
+       select y nada más. Con el token propio esto es `42501`, no una cuestión de
+       estilo. El filtro por `usuario.id` —que sale del token validado, nunca del
+       cuerpo del pedido— es lo que reemplaza a la RLS que acá se saltea. */
+    const cliente = this.supabase.comoElServicio();
+    const borrado = await cliente.from('totp_backup_codes').delete().eq('user_id', usuario.id);
     if (borrado.error) throw new BadRequestException('No pudimos reemplazar tus códigos.');
 
     const insercion = await cliente.from('totp_backup_codes').insert(
-      codigos.map((codigo) => ({ persona_id: usuario.id, code_hash: hashBackupCode(codigo) })),
+      codigos.map((codigo) => ({ user_id: usuario.id, code_hash: hashBackupCode(codigo) })),
     );
     if (insercion.error) throw new BadRequestException('No pudimos guardar tus códigos.');
 
@@ -102,13 +120,19 @@ export class RespaldoController {
   async usar(@Req() pedido: unknown, @Body() cuerpo: CodigoDto) {
     const token = tokenDelPedido(pedido);
     const usuario = await usuarioDelPedido(pedido, token, this.supabase);
+
+    /* Leer, con el token de la persona: la `007` le da `select` y la RLS de la
+       `005` le deja ver **solo los suyos**, así que la consulta la prueba la
+       base. Quemar, con `service_role`: el `update` es de los tres verbos que la
+       `005` le revocó. Dos clientes en un método es la forma que tiene el
+       esquema, no una decisión de acá. */
     const cliente = this.supabase.comoElUsuario(token);
 
     const { data, error } = await cliente
       .from('totp_backup_codes')
       .select('id, code_hash')
-      .eq('persona_id', usuario.id)
-      .is('usado_en', null);
+      .eq('user_id', usuario.id)
+      .is('used_at', null);
     if (error) throw new BadRequestException('No pudimos verificar tu código.');
 
     /* Se recorren TODOS y recién al final se decide, aunque el primero
@@ -121,14 +145,18 @@ export class RespaldoController {
     }
     if (!encontrado) throw new BadRequestException('Ese código no es válido o ya se usó.');
 
-    const quemado = await cliente
+    const quemado = await this.supabase
+      .comoElServicio()
       .from('totp_backup_codes')
-      .update({ usado_en: new Date().toISOString() })
+      .update({ used_at: new Date().toISOString() })
       .eq('id', encontrado)
-      .is('usado_en', null)
+      /* El `user_id` va aunque el `id` ya sea único: con `service_role` no hay
+         RLS detrás, y un filtro de más cuesta nada. */
+      .eq('user_id', usuario.id)
+      .is('used_at', null)
       .select('id');
     /* Si el `update` no tocó ninguna fila, otro pedido lo quemó primero: el
-       código ya se usó y esta llamada no vale. La condición `is('usado_en',
+       código ya se usó y esta llamada no vale. La condición `is('used_at',
        null)` es lo que hace que la carrera se resuelva en la base y no acá. */
     if (quemado.error || (quemado.data ?? []).length === 0) {
       throw new BadRequestException('Ese código no es válido o ya se usó.');

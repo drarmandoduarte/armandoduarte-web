@@ -28,8 +28,11 @@
  * que más importa de la orden #13.
  *
  * ── Lo que el banco NO prueba, dicho para que no se lea como «todo» ───────
- *   · **`service_role`.** Lleva `bypassrls` y probarla sería probar que
- *     `bypassrls` bypassea. Es el rol de la API y su freno está en la API.
+ *   · **La RLS de `service_role`.** Lleva `bypassrls` y probar eso sería probar
+ *     que `bypassrls` bypassea. Lo que sí se prueba con ese rol desde la
+ *     corrección de la #15 es lo otro: que las consultas de la API **existan**
+ *     —tabla, columna y permiso—, que es lo único que `bypassrls` no tapa. Para
+ *     eso está `comoServicio()`.
  *   · **Storage de verdad.** No se sube un archivo: se prueban las policies sobre
  *     `storage.objects`, que son filas como cualquier otra. El tope de 5 MB y los
  *     tres tipos MIME los aplica el servicio de Storage, no una policy; acá se
@@ -71,6 +74,17 @@ export interface Banco {
   como<T>(usuarioId: string, aal: Aal, hacer: () => Promise<T>): Promise<T>;
   /** Lo mismo, sin sesión: el rol `anon`, que es con el que se ve la web. */
   comoAnonimo<T>(hacer: () => Promise<T>): Promise<T>;
+  /**
+   * Lo mismo con el rol `service_role`, que es el de la API cuando usa la clave
+   * de administrador.
+   *
+   * **No sirve para probar RLS** —lleva `bypassrls`— y por eso el banco no lo
+   * tuvo hasta la corrección de la #15. Sirve para lo que `bypassrls` NO tapa:
+   * que la tabla exista, que la columna exista y que el `grant` esté puesto. Un
+   * `42703` se lo come igual que cualquiera, y ése fue el defecto que llegó a
+   * producción: `totp_backup_codes.persona_id`, que no existe.
+   */
+  comoServicio<T>(hacer: () => Promise<T>): Promise<T>;
   cierre(): Promise<void>;
 }
 
@@ -159,7 +173,10 @@ export async function levantarBanco(): Promise<Banco> {
 
   const comoAnonimo = <T>(hacer: () => Promise<T>) => conSesion(null, 'anon', hacer);
 
-  return { sql, como, comoAnonimo, cierre: () => db.close() };
+  const comoServicio = <T>(hacer: () => Promise<T>) =>
+    conSesion(JSON.stringify({ role: 'service_role' }), 'service_role', hacer);
+
+  return { sql, como, comoAnonimo, comoServicio, cierre: () => db.close() };
 }
 
 /* ── Sembrado ──────────────────────────────────────────────────────────────── */
