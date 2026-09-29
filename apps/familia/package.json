@@ -12,6 +12,7 @@
     "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json"
   },
   "dependencies": {
+    "@codice/api": "workspace:*",
     "@codice/core": "workspace:*",
     "@codice/ui": "workspace:*",
     "@supabase/supabase-js": "^2.117.0",

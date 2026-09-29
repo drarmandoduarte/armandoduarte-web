@@ -22,13 +22,58 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 83 |
 | `@codice/web` | 51 |
-| `@codice/familia` | 31 |
+| `@codice/familia` | 40 |
+| `@codice/api` | 48 |
 | `@codice/navegador` | 29 |
+
+## Lo que trae la orden #15 — `@codice/api` nace con 48
+
+Seis archivos, y **cinco de los seis vienen del kit** (`tests-por-app/`), que es
+la carpeta que el `LEEME.md` del kit manda «copiar y adaptar». Lo adaptado son
+las rutas y los nombres de esta app; lo que afirman es del kit.
+
+| archivo | cuántos | qué vigila |
+|---|--:|---|
+| `aal2-cobertura.spec.ts` | 8 | el inventario REAL de rutas de Nest contra la lista de excepciones |
+| `aal2.guard.spec.ts` | 13 | el guard, unidad por unidad (del kit, casi sin tocar) |
+| `paso-reciente.spec.ts` | 9 | qué rutas piden un código reciente, y qué pasa con un `aal2` viejo |
+| `roles-clasificados.spec.ts` | 8 | los roles de la base contra `seguridad-512.config.ts` |
+| `guardian-del-kit.spec.ts` | 2 | que `check-seguridad-512.mjs` exista y dé verde |
+| `aal2-comportamiento.spec.ts` | 13 | el guard **ejecutado** sobre las seis rutas de verdad |
+
+El último **no se adaptó: se reescribió**, y el motivo va escrito arriba de
+todo en el archivo. El del kit está armado contra `TeamController.invite`,
+`MeController.updateProfile` y `POST /team/:id/reset-2fa`, que no existen acá ni
+van a existir; cambiarle los nombres habría dejado un test que *parece* probar
+algo. Tampoco está entre los que el `LEEME.md` enumera para adaptar (nombra
+cobertura, roles, el guard, paso reciente y el guardián). Se copió la idea
+—preguntarle al guard lo mismo que le pregunta Nest, con la ruta real— y los
+casos son los de esta app.
+
+### Y uno del núcleo que NO corre, dicho en voz alta
+
+`src/seguridad-512/nucleo/usuario-del-pedido.spec.ts` viene del kit **byte por
+byte y con su huella**, y no se puede ejecutar acá: importa
+`../../auth/auth.guard`, `../../auth/profiles.repository` y
+`../../shared/supabase.service`, que son tres archivos de Cenit. Es un defecto
+del kit v1.1.0 —`nucleo/` se copia byte por byte a cualquier app y este archivo
+no es portable— y se arregla en el kit, no acá.
+
+**No se editó**: la huella sigue siendo la del kit y el guardián compara 19 de
+19. Lo que se hizo es excluirlo del corredor, en `apps/api/vitest.config.ts`,
+con el motivo escrito — porque un test que no corre no grita, se calla.
+
+**Y la vigilancia que perdía se recuperó**: lo que ese archivo afirma —que el
+token se valida UNA sola vez por pedido— lo afirman ahora dos tests de
+`aal2-comportamiento.spec.ts`, escritos contra las piezas de esta app: dos
+pasadas del guard sobre el mismo pedido hacen **una** validación, y un token
+distinto en el mismo pedido hace **dos**. No es la misma prueba; es la misma
+propiedad, probada donde se puede probar.
 
 ## Lo que trae la orden #15 — `@codice/familia` nace con 31
 
-`apps/familia` entra a esta tabla el día que existe, con **31 tests medidos** en
-cinco archivos. La mayoría no son nuestros y ése es el punto:
+`apps/familia` entra a esta tabla el día que existe, con **40 tests medidos** en
+seis archivos. La mayoría no son nuestros y ése es el punto:
 
 | archivo | cuántos | de quién |
 |---|--:|---|
@@ -37,6 +82,7 @@ cinco archivos. La mayoría no son nuestros y ése es el punto:
 | `seguridad-512/nucleo/aparato.test.ts` | 6 | **del kit**, byte por byte |
 | `seguridad-512/nucleo/modo-instalado.test.ts` | 4 | **del kit**, byte por byte |
 | `sin-base-desde-el-navegador.test.ts` | 3 | de esta app |
+| `cabeceras.test.ts` | 9 | de esta app |
 
 **Veintiocho de los treinta y uno vienen del Kit de Seguridad 512 y no se
 escribieron acá**: viajan dentro de `nucleo/`, con su huella en
@@ -45,10 +91,27 @@ alguien los edita dentro de la app. Entran al piso igual que cualquier otro: si
 un archivo del núcleo desaparece del glob, la cuenta baja y el guardián de
 guardianes lo dice — que es una segunda red debajo de la de las huellas.
 
-Los tres propios son el barrido de `.from(` / `.rpc(` / `.storage`: el piso de
-archivos, el cero, y el auto-examen que comprueba que `soloCodigo()` sepa
-distinguir el código de la prosa. Sin el tercero, los otros dos podrían salir
-verdes sobre archivos que el limpiador dejó en blanco.
+Los propios son doce. Tres son el barrido de `.from(` / `.rpc(` / `.storage`: el
+piso de archivos, el cero, y el auto-examen que comprueba que `soloCodigo()`
+sepa distinguir el código de la prosa —sin el tercero, los otros dos podrían
+salir verdes sobre archivos que el limpiador dejó en blanco—.
+
+Los otros nueve son las **cabeceras** (`cabeceras.test.ts`), y existen por el
+motivo de siempre: una cabecera que se cae no rompe nada visible. La app carga
+igual, las pantallas se ven igual y Lighthouse no dice una palabra; lo único que
+cambia es que la política que impide que un script ajeno corra en la pantalla de
+entrada ya no está. Es el mismo perfil de defecto que el `X-Robots-Tag` de la #08
+y el `Cache-Control` de la #11, y las dos veces se descubrió que **ninguna
+comprobación miraba el `vercel.json`**.
+
+Vigilan que las cinco cabeceras de seguridad sean las mismas de la web pública,
+que el `noindex` vaya **sin condición de host** —allá está condicionado porque el
+dominio propio sí se indexa; acá la condición sería un agujero—, que la CSP no
+tenga `unsafe-inline` en ninguna directiva, que `connect-src` nombre a Supabase y
+a nadie más (`https:` a secas dejaría hablar con cualquier servidor del mundo),
+que `/api/*` vaya a la función y el resto al `index.html`, y que la API nunca se
+cachee: una respuesta de `/api/yo` guardada por un intermediario es la sesión de
+una persona servida a otra.
 
 ## Lo que trae la orden #13 — `@codice/db` nace con 83
 

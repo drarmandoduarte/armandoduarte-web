@@ -45,6 +45,7 @@ const SUITES = [
   ['@codice/db', 'packages/db'],
   ['@codice/web', 'apps/web'],
   ['@codice/familia', 'apps/familia'],
+  ['@codice/api', 'apps/api'],
 ];
 
 /**

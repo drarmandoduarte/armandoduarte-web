@@ -1,0 +1,10 @@
+# Mi espacio es privado. No hay nada acá que un buscador deba indexar: es la
+# puerta de la familia de Armando Duarte, no una página.
+#
+# Esto es el cinturón, no el cierre: el que manda es el `X-Robots-Tag:
+# noindex, nofollow` que `vercel.json` pone en TODAS las respuestas, incluidas
+# las que no son HTML. Un `robots.txt` pide que no se rastree; la cabecera dice
+# que no se indexe, y son dos cosas distintas — una URL que nunca se rastreó
+# igual se puede indexar si alguien la enlaza.
+User-agent: *
+Disallow: /

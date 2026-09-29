@@ -1,0 +1,20 @@
+{
+  "extends": "../../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
+    "types": [
+      "node",
+      "reflect-metadata"
+    ]
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/seguridad-512/nucleo/usuario-del-pedido.spec.ts"
+  ]
+}
