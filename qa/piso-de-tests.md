@@ -22,9 +22,45 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 83 |
 | `@codice/web` | 51 |
-| `@codice/familia` | 40 |
+| `@codice/familia` | 46 |
 | `@codice/api` | 48 |
 | `@codice/navegador` | 29 |
+
+## Lo que arregló F.4 — `@codice/familia` sube de 40 a 46
+
+Seis tests en `src/la-api-llega-compilada.test.ts`, y existen porque **la #15
+pasó la gate entera en verde y se cayó al desplegarse**: `apps/api/package.json`
+exportaba `./src/index.ts`, Vercel no compila las dependencias del workspace, y
+toda `/api/*` devolvió 500 con `ERR_MODULE_NOT_FOUND`. Las tres herramientas que
+podían haberlo dicho —vitest, `tsc --noEmit`, el build de la pantalla— tienen en
+común que **ninguna arranca la función**.
+
+Son seis porque hay seis maneras de volver a romperlo, y cada una se probó
+apagándola y viéndola en rojo antes de darla por buena:
+
+| lo que vigila | la mutación que lo puso en rojo |
+|---|---|
+| el piso: el cierre se calculó sobre la entrada real | — (es el piso de los otros cinco) |
+| ningún paquete del cierre resuelve a un `.ts` | devolver `"exports": "./src/index.ts"` |
+| el `.js` existe compilado y hay un `build` que lo hace | borrar `apps/api/dist` |
+| el `vercel.json` lo compila antes que la pantalla | sacar `--filter @codice/api build` del `buildCommand` |
+| el compilado es CommonJS y conserva `design:paramtypes` | devolver `"type": "module"`; y apagar `emitDecoratorMetadata` |
+| el lector de manifiestos distingue fuente de compilado | — (el autoexamen que hace valer a los dos primeros) |
+
+El cierre **se recorre, no se escribe**: el test arranca en
+`apps/familia/api/index.ts`, junta los `@codice/*` que importa de verdad —sin
+leer los comentarios, que nombran `@codice/api` una docena de veces— y sigue
+hacia adentro. Una lista escrita a mano se desactualiza en silencio; el día que
+`@codice/api` importe `@codice/core`, el barrido lo incluye solo y se pone rojo
+el mismo día, porque `@codice/core` todavía exporta su fuente.
+
+Y el quinto merece su renglón: **`design:paramtypes` es el motivo por el que
+este paquete se compila con `tsc` y no se empaqueta con esbuild.** La orden
+dejaba elegir entre las dos salidas y sólo una sirve — esbuild no sabe emitir
+metadatos de decoradores, así que `RolMiddleware`, que recibe `SupabaseService`
+por el tipo del constructor y nada más, arrancaría sin nada que inyectar. Ese
+fallo no se ve en el build: se ve en ejecución, en vivo, que es exactamente
+donde ya nos mordió una vez.
 
 ## Lo que trae la orden #15 — `@codice/api` nace con 48
 

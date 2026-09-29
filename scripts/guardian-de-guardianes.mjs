@@ -285,6 +285,19 @@ function main() {
    */
   compilarLaWeb();
 
+  /*
+   * Y la API, compilada también acá, por un motivo que costó un despliegue.
+   *
+   * `apps/familia/src/la-api-llega-compilada.test.ts` mira el `dist/` de
+   * `@codice/api`: que exista, que sea CommonJS y que conserve los metadatos de
+   * los decoradores. Si el build fuera después, ese test leería el `dist/` de la
+   * corrida anterior —verde sobre una medición vieja— y en un repo recién
+   * clonado no leería nada. Es el mismo argumento de `compilarLaWeb()`, aplicado
+   * al paquete que el 29/9/2026 se desplegó sin compilar y devolvió 500 en toda
+   * `/api/*`.
+   */
+  compilarLaApi();
+
   for (const [, dir] of SUITES) rmSync(join(RAIZ, dir, REPORTE), { force: true });
 
   let salidaDeLasSuites = 0;
@@ -396,6 +409,16 @@ function compilarLaWeb() {
  *
  * Mide sobre el `dist/` que dejó `compilarLaWeb()` al empezar la corrida.
  */
+/**
+ * Compila `@codice/api` al `dist/` que la función de Vercel va a recibir.
+ *
+ * Va acá y no en `compilarLaWeb()` porque son dos apps distintas y el rojo tiene
+ * que decir cuál: un `tsc` que falla en la API no es «la web no compila».
+ */
+function compilarLaApi() {
+  execFileSync('pnpm', ['--filter', '@codice/api', 'build'], { cwd: RAIZ, stdio: 'inherit' });
+}
+
 function revisarLaFidelidad() {
   const salida = join(RAIZ, REPORTE_NAVEGADOR);
   rmSync(salida, { force: true });

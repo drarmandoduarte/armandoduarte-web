@@ -2,14 +2,39 @@
   "name": "@codice/api",
   "private": true,
   "version": "0.0.1",
-  "type": "module",
+  "//": [
+    "Este manifiesto es el que rompió el despliegue de la #15, así que las tres",
+    "decisiones van escritas acá:",
+    "",
+    "1. NO hay `\"type\": \"module\"`. `tsconfig.build.json` emite CommonJS, y el",
+    "   `type` del paquete es lo que Node consulta para decidir cómo leer un",
+    "   `.js`. Con `module` puesto, el build compilaría bien y se caería recién",
+    "   al invocarse. `scripts/sellar-dist.mjs` lo vuelve a decir dentro de",
+    "   `dist/`, por si alguien lo devuelve acá.",
+    "",
+    "2. `exports.default` apunta a `dist/index.js`, nunca al `.ts`. Vercel",
+    "   compila la entrada de la función (`apps/familia/api/index.ts`) pero NO",
+    "   las dependencias del workspace: lo que resuelva este campo viaja al",
+    "   servidor tal cual. Un `.ts` acá es un ERR_MODULE_NOT_FOUND en vivo, que",
+    "   es exactamente lo que pasó el 29/9. Lo vigila",
+    "   `apps/familia/src/la-api-llega-compilada.test.ts`.",
+    "",
+    "3. `types` sí apunta al fuente, y a propósito: TypeScript lee esa condición",
+    "   y ninguna otra herramienta lo hace. Así `pnpm typecheck` funciona sobre",
+    "   un repo recién clonado, sin build previo, y sigue midiendo el fuente —",
+    "   que es donde está la verdad — en vez de un `.d.ts` que puede ser de ayer."
+  ],
   "description": "La API de Mi espacio. NestJS, servida como función de Vercel junto a apps/familia.",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "types": "src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/sellar-dist.mjs",
     "typecheck": "tsc --noEmit",
     "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json"
   },

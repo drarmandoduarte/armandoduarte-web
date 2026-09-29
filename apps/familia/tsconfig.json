@@ -1,4 +1,20 @@
 {
+  "//": [
+    "`api` entra al `include` desde el arreglo de F.4, y es la mitad barata de",
+    "lo que falló: `api/index.ts` es la entrada que Vercel compila y hasta el",
+    "29/9/2026 **no la typechequeaba nadie** —el include era sólo `src`—. El",
+    "archivo del que depende todo el despliegue era el único sin revisar.",
+    "",
+    "`experimentalDecorators` viene con eso: al incluir la función, el programa",
+    "arrastra los tipos de `@codice/api`, que es NestJS y usa decoradores",
+    "legacy. Esta app no escribe un solo decorador; la bandera está para poder",
+    "LEER los de la API, no para usarlos acá."
+  ],
   "extends": "../../packages/config/tsconfig.base.json",
-  "include": ["src"]
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
+  },
+  "include": ["src", "api"]
 }
