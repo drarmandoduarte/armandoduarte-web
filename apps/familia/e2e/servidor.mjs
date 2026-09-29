@@ -78,15 +78,39 @@ const TIPOS = {
  * pagó.
  */
 const VERCEL = join(dirname(fileURLToPath(import.meta.url)), '..', 'vercel.json');
-const REGLAS = (JSON.parse(readFileSync(VERCEL, 'utf8')).headers ?? [])
+const CONFIG = JSON.parse(readFileSync(VERCEL, 'utf8'));
+
+/** `/(.*)` → /^\/.*$/. Un source que no se sepa traducir detiene el servidor. */
+const traducir = (source) => {
+  if (!/^\/(\(\.\*\)|[A-Za-z0-9/_-]*(\(\.\*\))?)$/.test(source)) {
+    console.error(`servidor: no sé traducir el source ${source} de vercel.json.`);
+    process.exit(1);
+  }
+  return new RegExp(`^${source.replace(/\(\.\*\)/g, '.*')}$`);
+};
+
+const REGLAS = (CONFIG.headers ?? [])
   .filter((r) => !r.has)
-  .map((r) => {
-    if (!/^\/(\(\.\*\)|[A-Za-z0-9/_-]*(\(\.\*\))?)$/.test(r.source)) {
-      console.error(`servidor: no sé traducir el source ${r.source} de vercel.json.`);
-      process.exit(1);
-    }
-    return { re: new RegExp(`^${r.source.replace(/\(\.\*\)/g, '.*')}$`), headers: r.headers };
-  });
+  .map((r) => ({ re: traducir(r.source), headers: r.headers }));
+
+/**
+ * Los rewrites, **leídos del `vercel.json`** y no inventados acá.
+ *
+ * ── Lo que costó tenerlos escritos a mano ───────────────────────────────
+ * Hasta el 29/9/2026 este servidor mandaba al `index.html` cualquier ruta que
+ * no fuera un archivo, por su cuenta, sin mirar el `vercel.json`. El comentario
+ * que lo acompañaba decía, palabra por palabra, que sin eso «`/mi-espacio` da
+ * 404 en QA y anda en producción — la peor clase de diferencia entre los dos».
+ * Pasó al revés: el `vercel.json` tenía un rewrite con negación adelantada que
+ * **Vercel no matchea**, acá andaba igual porque el fallback era propio, y
+ * `/entrar` devolvía 404 en el preview con todos los guardianes en verde.
+ *
+ * Un servidor de pruebas más indulgente que el de verdad no es un servidor de
+ * pruebas: es una segunda verdad. Ahora aplica los rewrites del archivo, en
+ * orden, y si el archivo se rompe QA se rompe con él — que es exactamente lo
+ * que se quiere.
+ */
+const REWRITES = (CONFIG.rewrites ?? []).map((r) => ({ re: traducir(r.source), destination: r.destination }));
 
 const cabecerasDe = (ruta) => Object.fromEntries(
   REGLAS.filter((r) => r.re.test(ruta)).flatMap((r) => r.headers.map((h) => [h.key, h.value])),
@@ -121,14 +145,17 @@ createServer((req, res) => {
     return;
   }
 
-  /* El `rewrite` de SPA del `vercel.json`: cualquier ruta que no sea un archivo
-     devuelve el `index.html`, y el navegador decide qué pantalla es. Sin esto,
-     `/mi-espacio` da 404 en QA y anda en producción — la peor clase de
-     diferencia entre los dos. */
-  const indice = join(carpeta, 'index.html');
-  if (existsSync(indice)) {
-    res.writeHead(200, { 'Content-Type': TIPOS['.html'], ...cabecerasDe(limpio) });
-    createReadStream(indice).pipe(res);
+  /* Los rewrites del `vercel.json`, en orden y gana el primero — como Vercel.
+     El de abajo manda al `index.html` todo lo que no sea un archivo, y el
+     navegador decide qué pantalla es. */
+  const rewrite = REWRITES.find((r) => r.re.test(limpio));
+  const destino = rewrite && join(carpeta, rewrite.destination);
+  if (destino && existsSync(destino) && statSync(destino).isFile()) {
+    res.writeHead(200, {
+      'Content-Type': TIPOS[extname(destino)] ?? 'application/octet-stream',
+      ...cabecerasDe(limpio),
+    });
+    createReadStream(destino).pipe(res);
     return;
   }
 

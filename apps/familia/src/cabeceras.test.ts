@@ -18,6 +18,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { RUTAS } from './rutas';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG = JSON.parse(readFileSync(join(APP, 'vercel.json'), 'utf8')) as {
@@ -105,11 +106,49 @@ describe('las cabeceras de Mi espacio', () => {
     expect(csp()['base-uri']).toEqual(["'none'"]);
   });
 
-  it('(6) `/api/*` va a la función y el resto al index (SPA)', () => {
+  it('(6) `/api/*` va a la función y el resto al index, POR ORDEN y sin negaciones', () => {
+    /* ── Lo que este test decía antes, y por qué estaba en verde sobre un 404 ──
+       Hasta el 29/9/2026 acá se afirmaba `/((?!api/).*)`, la forma con negación
+       adelantada que se lee en medio internet. El test pasaba —el `vercel.json`
+       decía eso— y en el preview de Vercel **ese rewrite no matcheaba nunca**:
+       `/entrar` y `/cualquier-cosa` devolvían 404 mientras `/api/(.*)`, sin
+       negación, andaba. Vercel no compila el `source` como una expresión
+       regular cualquiera. El test miraba la forma del archivo y no lo que la
+       forma hace, que es el defecto de la casa repetido una vez más.
+
+       Ahora la regla es el ORDEN, que Vercel sí respeta: gana el primero que
+       matchea. `/api/(.*)` arriba se lleva la API; el comodín de abajo se queda
+       con todo lo demás. Los archivos de verdad (`/assets/…`) no llegan hasta
+       acá: el sistema de archivos se revisa antes que los rewrites. */
     expect(CONFIG.rewrites).toEqual([
       { source: '/api/(.*)', destination: '/api' },
-      { source: '/((?!api/).*)', destination: '/index.html' },
+      { source: '/(.*)', destination: '/index.html' },
     ]);
+
+    /* Y la regla escrita como regla, no como igualdad, para que valga también
+       para el rewrite que alguien agregue mañana. */
+    const conNegacion = CONFIG.rewrites.filter((r) => r.source.includes('(?!'));
+    expect(
+      conNegacion.map((r) => r.source),
+      'un `source` con negación adelantada no matchea en Vercel: la ruta cae en 404 y el archivo '
+      + 'se lee perfecto. Lo que separa la API del resto es el orden, no la negación.',
+    ).toEqual([]);
+
+    /* Que el comodín vaya ÚLTIMO, o se comería la API. */
+    expect(
+      CONFIG.rewrites.at(-1),
+      'el comodín tiene que ser el último rewrite: arriba de `/api/(.*)` mandaría la API al index.',
+    ).toEqual({ source: '/(.*)', destination: '/index.html' });
+
+    /* Y que cubra las rutas que la app declara de verdad, no una lista suelta:
+       el día que nazca `/ajustes`, `RUTAS` lo sabe y esto lo comprueba. */
+    const comodin = new RegExp(`^${CONFIG.rewrites.at(-1)?.source.replace('(.*)', '.*')}$`);
+    const sinCubrir = Object.values(RUTAS).filter((ruta) => !comodin.test(ruta));
+    expect(
+      sinCubrir,
+      'hay rutas de `src/rutas.ts` que ningún rewrite manda al index: en Vercel son un 404, y en el '
+      + 'servidor de QA andan — la peor clase de diferencia entre los dos.',
+    ).toEqual([]);
   });
 
   it('(7) la API no se cachea nunca', () => {

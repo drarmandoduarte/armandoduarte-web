@@ -75,6 +75,29 @@ próximo. Y la regla vive en un solo archivo —`scripts/se-puede-requerir.mjs`�
 que usan el build y el test, porque dos copias serían dos verdades y el día que
 no coincidieran mandaría la del servidor.
 
+### Y el 404 que los seis no vieron, que vale escribirlo
+
+Con la API ya en 200, `/entrar` seguía dando **404** en el preview. El
+`vercel.json` decía `"source": "/((?!api/).*)"` —la negación adelantada que se
+lee en medio internet— y **Vercel no la matchea**: `/entrar`, `/mi-espacio` y
+`/cualquier-cosa` caían en el 404 de la plataforma mientras `/api/(.*)`, sin
+negación, andaba.
+
+Nada lo vio, y por dos motivos que son el mismo:
+
+- `cabeceras.test.ts` (6) afirmaba el rewrite **con un `toEqual` contra el texto
+  del archivo**. Estaba en verde sobre un 404. Ahora afirma el orden, prohíbe la
+  negación y comprueba que el comodín cubra las rutas de `src/rutas.ts`.
+- `e2e/servidor.mjs` **inventaba el fallback de SPA** en vez de leer el
+  `vercel.json`, con un comentario que decía, palabra por palabra, que sin él
+  «`/mi-espacio` da 404 en QA y anda en producción — la peor clase de diferencia
+  entre los dos». Pasó al revés. Ahora aplica los rewrites del archivo, en orden,
+  y con la negación puesta **no arranca**: dice que no sabe traducir ese source.
+
+El guardián que sí lo habría cazado ya existía —`e2e/f4-en-vivo.spec.ts` pide
+`GET /entrar` y espera 200— y nunca se había corrido, porque necesita un preview
+de verdad. Se corrió.
+
 ## Lo que trae la orden #15 — `@codice/api` nace con 48
 
 Seis archivos, y **cinco de los seis vienen del kit** (`tests-por-app/`), que es
