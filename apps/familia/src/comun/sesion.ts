@@ -2,7 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../supabase';
 import { api, ErrorDeApi, type Yo } from './api';
-import { decidirReto, type Decision } from '../seguridad-512/nucleo/decidir-reto';
+import {
+  decidirPantalla,
+  type DecisionDePantalla,
+  type RespuestaDeYo,
+} from './decision-de-pantalla';
 import {
   useAalWindow,
   markInactivityLogout,
@@ -21,12 +25,16 @@ import {
  *
  * Es también por qué el orden de las reglas no está escrito acá: está adentro
  * de `decidir-reto.ts`, con su motivo, y repetirlo sería tener dos verdades.
+ *
+ * Lo único que esta app le agrega es **qué pasa cuando `/api/yo` no contesta**,
+ * y tampoco está escrito acá: está en `decision-de-pantalla.ts`, con el caso del
+ * 29/9 pegado. Este hook solo guarda cuál de las tres cosas pasó.
  */
 export interface EstadoDeSesion {
   cargando: boolean;
   sesion: Session | null;
   yo: Yo | null;
-  decision: Decision | null;
+  decision: DecisionDePantalla | null;
   /** Vuelve a preguntar `/api/yo` y a recalcular. */
   recargar: () => Promise<void>;
   salir: (motivo?: 'inactividad' | 'deliberada') => Promise<void>;
@@ -38,6 +46,7 @@ export function useSesion(): EstadoDeSesion {
   const [cargando, setCargando] = useState(true);
   const [sesion, setSesion] = useState<Session | null>(null);
   const [yo, setYo] = useState<Yo | null>(null);
+  const [respuestaDeYo, setRespuestaDeYo] = useState<RespuestaDeYo>('no-contesto');
   const [nivelPosible, setNivelPosible] = useState<'aal1' | 'aal2'>('aal1');
   const { expired, markVerified, clearWindow } = useAalWindow();
 
@@ -53,20 +62,28 @@ export function useSesion(): EstadoDeSesion {
     setSesion(data.session);
     if (!data.session) {
       setYo(null);
+      setRespuestaDeYo('no-contesto');
       setCargando(false);
       return;
     }
     await leerNiveles();
     try {
       setYo(await api<Yo>('yo'));
+      setRespuestaDeYo('respondio');
     } catch (error) {
+      setYo(null);
       /* `AAL2_REQUIRED` no es un fallo: es el servidor diciendo que esta cuenta
          es de equipo y todavía no pasó el segundo paso. La pantalla lo resuelve
-         con `decidirReto`, que para eso mira el nivel de la sesión. Se deja
-         `yo` en null y se sigue: el rol lo va a traer el `/api/yo` de después
-         del reto. */
-      if (!(error instanceof ErrorDeApi) || error.codigo !== 'AAL2_REQUIRED') throw error;
-      setYo(null);
+         con `decidirReto`, que para eso mira el nivel de la sesión. El rol lo va
+         a traer el `/api/yo` de después del reto.
+
+         Cualquier otra cosa —un 500, un 401, la red caída— es **no saber quién
+         es**, y antes se relanzaba: la excepción no la atrapaba nadie (el hook
+         se llama con `void recargar()`), `yo` quedaba en null y la pantalla
+         terminaba pidiéndole un autenticador a quien no lo necesita. Ahora se
+         guarda y `decidirPantalla` lo convierte en un error visible. */
+      const esSegundoPaso = error instanceof ErrorDeApi && error.codigo === 'AAL2_REQUIRED';
+      setRespuestaDeYo(esSegundoPaso ? 'falta-el-segundo-paso' : 'no-contesto');
     } finally {
       setCargando(false);
     }
@@ -76,7 +93,10 @@ export function useSesion(): EstadoDeSesion {
     void recargar();
     const { data } = supabase.auth.onAuthStateChange((_evento, nueva) => {
       setSesion(nueva);
-      if (!nueva) setYo(null);
+      if (!nueva) {
+        setYo(null);
+        setRespuestaDeYo('no-contesto');
+      }
     });
     return () => data.subscription.unsubscribe();
   }, [recargar]);
@@ -91,6 +111,7 @@ export function useSesion(): EstadoDeSesion {
       clearWindow();
       await supabase.auth.signOut();
       setYo(null);
+      setRespuestaDeYo('no-contesto');
     },
     [clearWindow],
   );
@@ -98,8 +119,8 @@ export function useSesion(): EstadoDeSesion {
   const nivelActual: 'aal1' | 'aal2' =
     sesion?.access_token && leerAal(sesion.access_token) === 'aal2' ? 'aal2' : 'aal1';
 
-  const decision: Decision | null = sesion
-    ? decidirReto({ nivelActual, nivelPosible, rol: yo?.rol, ventanaVencida: expired })
+  const decision: DecisionDePantalla | null = sesion
+    ? decidirPantalla({ nivelActual, nivelPosible, rol: yo?.rol, ventanaVencida: expired, respuestaDeYo })
     : null;
 
   return { cargando, sesion, yo, decision, recargar, salir, marcarVerificado: markVerified };

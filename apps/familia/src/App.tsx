@@ -72,6 +72,32 @@ export function App() {
     );
   }
 
+  /* ── Antes que cualquier pantalla del flujo, y después de los códigos ──
+     Si `/api/yo` no contestó, no se sabe quién es quien está del otro lado: no
+     corresponde ni enrolar, ni el reto, ni Mi espacio. Va después de
+     `codigosNuevos` a propósito —esos se ven una sola vez y no se pueden volver
+     a pedir— y antes de todo lo demás.
+
+     Quién decide es `decidirPantalla()`, que para eso es una función pura y
+     está probada con tabla; acá solo se pinta lo que decidió. */
+  if (decision === 'error') {
+    return (
+      <Pantalla>
+        <h1 className="titulo">{t('comun.noConfirmamos')}</h1>
+        <div className="seccion">
+          <button type="button" className="btn btn--ancho" onClick={() => void recargar()}>
+            {t('comun.reintentar')}
+          </button>
+        </div>
+        <div className="seccion">
+          <button type="button" className="btn btn--ancho" onClick={() => void salir('deliberada')}>
+            {t('comun.cerrarSesion')}
+          </button>
+        </div>
+      </Pantalla>
+    );
+  }
+
   if (decision === 'enrolar') {
     return (
       <Enrolar

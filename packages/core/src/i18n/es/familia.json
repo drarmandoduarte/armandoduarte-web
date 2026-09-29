@@ -8,6 +8,8 @@
     "cancelar": "Cancelar",
     "cerrarSesion": "Cerrar sesión",
     "errorGenerico": "Algo no salió bien. Vuelve a intentarlo.",
+    "noConfirmamos": "No pudimos confirmar tu cuenta. Vuelve a intentarlo.",
+    "reintentar": "Volver a intentar",
     "errorDeRed": "No pudimos conectarnos. Revisa tu conexión y vuelve a intentarlo."
   },
   "entrar": {
