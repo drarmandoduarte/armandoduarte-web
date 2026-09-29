@@ -41,11 +41,56 @@ import { fileURLToPath } from 'node:url';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-const CARPETAS = ['apps/web/src', 'packages/core/src', 'packages/ui/components'];
+/* ── Las carpetas, y la de la #15 ─────────────────────────────────────────
+   `apps/familia/src` entra con Mi espacio (orden #15, A): sus textos salen de
+   `referencia-cenit`, que está escrita en voseo rioplatense —«Escribí»,
+   «ignorá»—, y la orden dice que se reescriben y no se copian. Este guardián es
+   el que decide si se reescribieron de verdad.
+
+   `apps/api/src` también, aunque hoy casi no tenga texto: los mensajes de error
+   de la API los lee una persona, y un «no podés» que se escapa en un `throw` se
+   ve en la pantalla igual que uno de un componente. */
+const CARPETAS = [
+  'apps/web/src',
+  'apps/familia/src',
+  'apps/api/src',
+  'packages/core/src',
+  'packages/ui/components',
+];
 const EXTENSIONES = ['.ts', '.tsx', '.js', '.jsx', '.json'];
 /* Solo se audita el castellano. Cuando entren en/pt (D13), sus carpetas quedan
    fuera: en francés «vos» es «tus», y en portugués «está» no es lo mismo. */
-const FUERA = ['/i18n/en/', '/i18n/pt/'];
+/**
+ * Lo que este barrido NO mira, con su motivo.
+ *
+ * ── Los otros idiomas ──────────────────────────────────────────────────
+ * `en/` y `pt/` no son español y el patrón daría falsos positivos.
+ *
+ * ── Y el núcleo del Kit de Seguridad 512 (orden #15) ────────────────────
+ * `seguridad-512/nucleo/` **no es de esta app**: viaja del kit byte por byte,
+ * con su SHA-256 en `seguridad-512/HUELLAS.txt`, y `check-seguridad-512.mjs` se
+ * pone rojo si alguien lo edita acá adentro. Las dos reglas chocaban de frente
+ * —«la interfaz habla tuteo» contra «el núcleo no se toca»— y **el kit manda**:
+ * está escrito así en su `LEEME.md` y en la orden de la noche.
+ *
+ * Lo que el barrido encontró antes de que esta línea existiera, y que NO se
+ * puede arreglar desde este repo, queda dicho acá para que no se pierda:
+ *
+ *   · `nucleo/aal2.guard.ts:147` — «**Volvé** a ingresar el código de tu
+ *     autenticador para hacer esto.» Éste **lo lee una persona**: es el
+ *     `message` del 403 con código `PASO_RECIENTE_REQUERIDO`. En una app
+ *     mexicana está mal escrito.
+ *   · `nucleo/sin-segundo-paso.decorator.ts:28` — «**escribí** por qué esta
+ *     ruta no puede pedir 2FA». Éste lo lee quien programa, no un cliente: es
+ *     el `Error` que tira el decorador si alguien lo usa sin razón.
+ *
+ * El primero se arregla **en el kit** (sube `VERSION`, se regeneran las huellas,
+ * sale un kit nuevo para todas las apps), y eso lo decide Dirección de 512, no
+ * este repo. Mientras tanto la app no lo muestra: `apps/familia` traduce los
+ * **códigos** de error del kit a sus propios textos y nunca pinta el `message`
+ * que viene del servidor. Anotado en el informe de la #15.
+ */
+const FUERA = ['/i18n/en/', '/i18n/pt/', '/seguridad-512/nucleo/'];
 
 const VOSEO = [
   'tenés', 'podés', 'querés', 'sabés', 'ponés', 'aceptás', 'cargás',

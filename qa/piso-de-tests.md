@@ -22,7 +22,33 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 83 |
 | `@codice/web` | 51 |
+| `@codice/familia` | 31 |
 | `@codice/navegador` | 29 |
+
+## Lo que trae la orden #15 — `@codice/familia` nace con 31
+
+`apps/familia` entra a esta tabla el día que existe, con **31 tests medidos** en
+cinco archivos. La mayoría no son nuestros y ése es el punto:
+
+| archivo | cuántos | de quién |
+|---|--:|---|
+| `seguridad-512/nucleo/useAalWindow.test.tsx` | 9 | **del kit**, byte por byte |
+| `seguridad-512/nucleo/decidir-reto.test.ts` | 9 | **del kit**, byte por byte |
+| `seguridad-512/nucleo/aparato.test.ts` | 6 | **del kit**, byte por byte |
+| `seguridad-512/nucleo/modo-instalado.test.ts` | 4 | **del kit**, byte por byte |
+| `sin-base-desde-el-navegador.test.ts` | 3 | de esta app |
+
+**Veintiocho de los treinta y uno vienen del Kit de Seguridad 512 y no se
+escribieron acá**: viajan dentro de `nucleo/`, con su huella en
+`seguridad-512/HUELLAS.txt`, y `scripts/check-seguridad-512.mjs` se pone rojo si
+alguien los edita dentro de la app. Entran al piso igual que cualquier otro: si
+un archivo del núcleo desaparece del glob, la cuenta baja y el guardián de
+guardianes lo dice — que es una segunda red debajo de la de las huellas.
+
+Los tres propios son el barrido de `.from(` / `.rpc(` / `.storage`: el piso de
+archivos, el cero, y el auto-examen que comprueba que `soloCodigo()` sepa
+distinguir el código de la prosa. Sin el tercero, los otros dos podrían salir
+verdes sobre archivos que el limpiador dejó en blanco.
 
 ## Lo que trae la orden #13 — `@codice/db` nace con 83
 

@@ -14,6 +14,7 @@
     "check:estilo": "node scripts/check-estilo.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:secretos": "node scripts/check-secretos.mjs",
+    "check:seguridad": "node scripts/check-seguridad-512.mjs",
     "check:acento": "node apps/web/check/acento.mjs",
     "qa:instalar": "playwright install chromium"
   },

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Mi espacio es privado: no se indexa. La cabecera de verdad la pone
+         `vercel.json` (X-Robots-Tag) porque un meta no alcanza para lo que no
+         es HTML; esto es el cinturón. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <!-- No hay `theme-color`: `check:tokens` lo caza. Un `<meta>` no puede leer
+         `var(--crema)`, así que el único modo de ponerlo sería escribir el hex
+         a mano, y en esta casa ningún color vive fuera de
+         `packages/ui/codice-tokens.css`. Cuesta la barra teñida del navegador
+         en el celular; el día que el design system exponga ese valor de otra
+         forma, entra. Anotado en el informe de la #15. -->
+    <title>Mi espacio · Armando Duarte</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="module" src="/src/main.tsx"></script>
+  </head>
+  <body>
+    <div id="raiz"></div>
+  </body>
+</html>

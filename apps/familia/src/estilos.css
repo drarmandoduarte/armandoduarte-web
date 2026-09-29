@@ -1,0 +1,156 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Mi espacio · el CSS de `apps/familia` — orden Códice #15, A
+   ═══════════════════════════════════════════════════════════════════════
+
+   ── Ni un hex acá ────────────────────────────────────────────────────────
+   Todo sale de `@codice/ui/codice-tokens.css`, que se importa antes (fuentes y
+   tokens primero, el CSS de la app después: el contrato de la #09). Lo vigila
+   `check:tokens`, que barre `apps/` entero.
+
+   ── Y ni un color de Cenit, del kit ni de 512 ───────────────────────────
+   Lo dice la orden y vale repetirlo acá porque la tentación es real: las
+   pantallas de `referencia-cenit` vienen con su paleta y copiarlas enteras es
+   más rápido que rehacerlas. **Esta app es de Armando Duarte**, así que el
+   crema, la tinta y el naranja son los de la web pública. De Cenit se toma el
+   flujo, no el aspecto.
+
+   ── La anatomía de los botones es la de la web (512) ────────────────────
+   Versalitas de 11 px, `letter-spacing` .18em, borde de hairline, radio 2 px.
+   Se repite en vez de importarse porque `apps/web/src/index.css` es de la web
+   pública y meter mano ahí para que la use otra app es exactamente lo que la
+   #16 evitó con `.hero__grid--taller`. El día que un tercer producto necesite
+   el mismo botón, sube a `packages/ui/components` con su test — que es la regla
+   escrita en el `LEEME.md` de esa carpeta.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--lectura);
+  font-size:17px;
+  line-height:1.7;
+  background:var(--crema);
+  color:var(--tinta);
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--naranja-texto);color:var(--crema)}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img,svg{display:block;max-width:100%}
+
+/* El foco, igual que en la web (#06, E): el color del texto, 2 px, offset 3.
+   `:focus-visible` y no `:focus`, para que el dedo y el mouse no lo enciendan. */
+:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:2px}
+
+/* ── El lienzo ───────────────────────────────────────────────────────────
+   Mi espacio no tiene cabecera fija ni pie: es una pantalla a la vez, centrada,
+   con el ancho de una columna de lectura. Nada de lo que la web pública
+   necesita —menú, overlay, velo— existe acá, y no se trae «por consistencia». */
+.lienzo{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px 48px}
+.lienzo--ancho{justify-content:flex-start;padding-top:48px}
+.tarjeta{width:100%;max-width:440px}
+.tarjeta--ancha{max-width:620px}
+
+.marca{
+  font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--gris);display:block;margin-bottom:28px;text-align:center;
+}
+
+.titulo{font-family:var(--display);font-weight:300;font-size:clamp(28px,4.4vw,38px);line-height:1.12;letter-spacing:-.01em;color:var(--tinta)}
+.bajada{margin-top:12px;font-size:16px;line-height:1.6;color:var(--gris)}
+.subtitulo{font-family:var(--display);font-weight:500;font-size:15px;letter-spacing:.02em;color:var(--tinta)}
+.nota{font-size:14px;line-height:1.55;color:var(--gris)}
+
+/* ── Campos ──────────────────────────────────────────────────────────────
+   El borde es una hairline y el foco lo engorda: el mismo gesto que los
+   botones. `font-size:16px` como mínimo en el campo de correo no es estética —
+   abajo de 16 px iOS hace zoom al enfocar y descuadra la pantalla. */
+.campo{display:block;margin-top:20px}
+.campo__rotulo{display:block;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
+.campo__entrada{
+  width:100%;font-family:var(--lectura);font-size:16px;line-height:1.4;padding:14px 16px;
+  color:var(--tinta);background:var(--superficie);
+  border:1px solid var(--hair);border-radius:2px;
+  transition:border-color .3s var(--ease);
+}
+.campo__entrada:hover{border-color:var(--hair-hover)}
+.campo__entrada:focus{outline:none;border-color:var(--tinta)}
+.campo__entrada[aria-invalid='true']{border-color:var(--naranja-texto)}
+.campo__ayuda{margin-top:6px;font-size:13px;line-height:1.5;color:var(--gris)}
+
+/* El campo del código: seis dígitos, monoespaciados por tabulación de cifras y
+   muy separados. No son seis cajitas: una sola entrada se pega, se autocompleta
+   desde el SMS/correo y funciona con lector de pantalla sin trucos. */
+.codigo{
+  font-family:var(--display);font-size:30px;font-weight:500;letter-spacing:.32em;
+  text-align:center;padding:16px 12px;font-variant-numeric:tabular-nums;
+}
+
+.error{margin-top:12px;font-size:14px;line-height:1.5;color:var(--naranja-texto)}
+.aviso{
+  margin-bottom:24px;padding:14px 16px;font-size:14px;line-height:1.55;
+  color:var(--tinta);background:var(--calido);border-left:2px solid var(--hair-hover);border-radius:2px;
+}
+.exito{margin-top:12px;font-size:14px;line-height:1.5;color:var(--teal)}
+
+/* ── Botones · la anatomía de 512 ────────────────────────────────────────
+   El naranja es UNO por pantalla: el botón que hace avanzar. Todo lo demás es
+   contorno o enlace. Lo vigila `check:acento`. */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;line-height:1;padding:18px 28px;min-height:52px;
+  border:1px solid color-mix(in oklab, var(--tinta) 40%, transparent);border-radius:2px;
+  background:transparent;color:var(--tinta);text-decoration:none;
+  transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease);
+}
+.btn:hover:not(:disabled){border-color:var(--tinta);background:color-mix(in oklab, var(--tinta) 4%, transparent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn--naranja{background:var(--naranja-texto);border-color:var(--naranja-texto);color:var(--crema)}
+.btn--naranja:hover:not(:disabled){background:var(--naranja);border-color:var(--naranja)}
+.btn--ancho{width:100%}
+.btn svg{width:16px;height:16px;flex:none}
+
+.enlace{
+  display:inline-block;font-size:14px;line-height:1.5;color:var(--gris);
+  text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;
+  transition:color .3s var(--ease);
+}
+.enlace:hover{color:var(--tinta)}
+
+.fila{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.fila--suelta{margin-top:16px;align-items:center}
+
+/* El separador del «o», antes de Google. */
+.separador{display:flex;align-items:center;gap:16px;margin:24px 0}
+.separador::before,.separador::after{content:'';flex:1;height:1px;background:var(--hair)}
+.separador span{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}
+
+/* ── El QR y la clave a mano ─────────────────────────────────────────────
+   El QR va sobre blanco puro y con margen propio: un QR sobre el crema de la
+   marca pierde contraste de lectura para la cámara, y ése es el único lugar de
+   esta app donde el color lo decide una máquina y no una persona. */
+.qr{margin:20px auto 0;padding:16px;width:fit-content;background:var(--superficie);border:1px solid var(--hair);border-radius:2px}
+.qr img,.qr svg{width:200px;height:200px}
+.clave-a-mano{
+  margin-top:8px;padding:12px 14px;font-family:var(--display);font-size:14px;
+  letter-spacing:.14em;word-break:break-all;color:var(--tinta);
+  background:var(--calido);border-radius:2px;
+}
+
+/* ── Los diez códigos de respaldo ───────────────────────────────────────── */
+.codigos{
+  margin-top:20px;padding:20px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px 20px;
+  background:var(--calido);border-radius:2px;
+  font-family:var(--display);font-size:15px;letter-spacing:.1em;font-variant-numeric:tabular-nums;
+}
+@media (max-width:420px){.codigos{grid-template-columns:1fr}}
+
+.seccion{margin-top:40px;padding-top:28px;border-top:1px solid var(--hair)}
+.lista-datos{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.lista-datos div{display:flex;justify-content:space-between;gap:16px;font-size:15px}
+.lista-datos dt{color:var(--gris)}
+.lista-datos dd{color:var(--tinta);text-align:right}
+
+/* Solo para lectores de pantalla: los rótulos que el diseño no dibuja. */
+.solo-lectura{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
