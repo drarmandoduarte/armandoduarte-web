@@ -20,11 +20,150 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/db` | 83 |
-| `@codice/web` | 51 |
+| `@codice/db` | 87 |
+| `@codice/web` | 58 |
 | `@codice/familia` | 46 |
 | `@codice/api` | 48 |
-| `@codice/navegador` | 29 |
+| `@codice/navegador` | 35 |
+
+## Lo que movió la orden #16 — `@codice/navegador` sube a 33
+
+Cuatro tests nuevos en `e2e/renglones.spec.ts`, uno por ruta, y cada uno mide los
+**cuatro anchos** que pide la orden (1440, 900, 390, 375): dieciséis mediciones en
+cuatro tests. Van agrupados por ruta y no como dieciséis tests porque así hacen
+una navegación cada uno en vez de cuatro — **2,4 s medidos** sobre una gate que ya
+levanta Chromium. Un rojo igual dice ruta, ancho, título y renglón, porque las
+cuatro mediciones se acumulan antes de comparar.
+
+Lo que vigilan es la regla que dirección sacó del hero de `/merida`: *ningún
+título termina ni se parte en un renglón de una palabra ni de menos de seis
+caracteres.* Es de las que se deshacen solas —alguien alarga un texto, tres
+órdenes después otro angosta una columna— y contra la deriva no sirve una
+herramienta que hay que acordarse de correr. Ninguna otra comprobación de la casa
+mide **cómo se parte** un título: las capturas de fidelidad lo verían, pero
+dirían «cambió», no «quedó mal», y solo después de que alguien aprobara la captura
+nueva.
+
+La lógica **no se duplica**: el spec importa `RUTAS`, `ANCHOS`, `PISO`,
+`EXCEPCIONES`, `RECOLECTAR` y `DE_MAS` de `apps/web/check/renglones.mjs`, que es
+el mismo archivo que corre por consola con `pnpm check:renglones`. Es el reparto
+que la #07 ya usó con `acento.mjs`, por el mismo motivo: dos copias de la lista de
+excepciones serían dos verdades que un día no coinciden.
+
+Y una nota que vale más escrita que callada, porque es un falso positivo con muy
+buena cara: la primera versión del barrido agrupaba las palabras por `top`
+redondeado y **denunció cuatro renglones huérfanos que no existían**. Las fichas
+de «Ahora» tienen `h3 a{display:inline-flex;align-items:center}` con la flecha a
+`.8em`, así que la flecha va al lado del texto con otro `top`. Se llegó a
+«arreglar» la página con un espacio duro antes de la flecha, y el arreglo no
+cambió nada — un ítem de flex con `flex-wrap:nowrap` no se puede ir de renglón. Lo
+que estaba mal era la medición. Ahora agrupa por **solape vertical**, que tolera
+tamaños de letra distintos y sigue separando dos renglones de verdad.
+
+## Lo que trae la corrección de la #15 — `@codice/db` 83 → 87
+
+Cuatro tests en `src/los-permisos-estan-puestos.test.ts`, y existen porque **el
+banco regalaba permisos**.
+
+`supabase-base.sql` reproducía lo que Supabase da cuando se le deja exponer las
+tablas nuevas automáticamente (`grant all on tables` por default privilege). El
+proyecto `armandoduarte-familia` se creó con esa opción en **no**, que es la
+decisión correcta, y Supabase lo implementa quitando `select, insert, update,
+delete` de esos defaults. Resultado: las diez tablas nacían **sin un solo
+permiso** en producción y con los cuatro verbos acá.
+
+Lo que costó: un cliente con token válido pedía `/api/yo`, el `select` sobre
+`miembros` contestaba `42501 permission denied`, el middleware lo atrapaba en
+silencio —por diseño: no autentica—, el guard fallaba cerrado y la pantalla lo
+mandaba a enrolar un autenticador. **Un cliente no podía entrar de ninguna
+forma, y los 83 tests estaban en verde.**
+
+La distinción que ninguna comprobación de esta casa sabía hacer: **42501 no es
+RLS**. La RLS devuelve cero filas; la falta de `grant` levanta un error.
+
+| mutación | qué cae |
+|---|---|
+| quitar `grant select` de `miembros` | «esperado: [select, insert, update] · tiene: [insert, update]» |
+| dar `delete` a `authenticated` en `inscripciones` | el de los verbos **y** el que dice «delete en ninguna de las diez» |
+| **quitar el revoke del banco** (volver a regalar) | el PISO: «el banco le está dando select sobre personas a anon sin que ninguna migración lo pida» |
+
+La tercera es la que sostiene a las otras dos, y por eso va primero en el
+archivo: sin ella, los dos tests de abajo miden la generosidad de PGlite.
+
+### Y cuatro de los 83 cambiaron de afirmación
+
+No se aflojaron: **se endurecieron**, porque con los permisos reales el freno
+que corta es otro y es el de más afuera.
+
+| test | antes | ahora |
+|---|---|---|
+| `anon` no lee `datos_de_cobro` | cero filas (RLS) | `permission denied` (no tiene `select`) |
+| `anon` no ve las ocho tablas | ocho ceros (RLS) | ocho `permission denied` |
+| nadie borra cursos | la fila sigue ahí | `permission denied` **y** la fila sigue ahí |
+| un miembro se desactiva, no se borra | la fila sigue ahí | `permission denied` **y** la fila sigue ahí |
+
+Los dos últimos afirman **las dos mitades**: el permiso, porque es el que decide
+hoy, y la fila, porque el día que alguien devuelva el `grant` —un renglón en un
+diff— el segundo freno tiene que seguir ahí y decirlo.
+
+## Lo que trae la orden #19 — `@codice/web` 51 → 58 y `@codice/navegador` 33 → 35
+
+Nueve tests, y los nueve existen porque **la #12 se auditó contra el texto de la
+orden en vez de contra lo que mandó el cliente**, y el PASA dio por buenas dos
+cosas que no lo estaban. La corrección de esa auditoría dejó la doctrina
+escrita; esto es su forma ejecutable.
+
+### `src/armando-no-flota.test.ts` — 3, y miran los PÍXELES
+
+La #12 (E) midió `bottom` de la imagen contra `bottom` de la sección: **0 px a
+1440, 900 y 375**, y era cierto. Pero el archivo tenía **~300 px de degradado a
+transparente** abajo, así que lo que tocaba el borde era aire. **Se midió la
+caja, no lo que se ve.**
+
+Este archivo lee el PNG —con `zlib` y nada más, sin dependencias nuevas— y mira
+la última fila. Medido: el recorte nuevo tiene **319 de 560 píxeles opacos**
+(57 %) con alfa máxima 255; el publicado tenía **0**, alfa máxima **0**. El
+tramo contiguo mayor es 163 px (29 %) y no 57 % porque la última fila son **los
+dos zapatos** y entre ellos hay aire: por eso van las dos medidas, el total y el
+tramo.
+
+| mutación | qué cae |
+|---|---|
+| volver al `de-pie-560.png` viejo | alfa máxima 0 ≠ 255, y la relación del archivo deja de ser la declarada |
+| dejar `Retrato.tsx` en 1400×2614 | la relación declarada no coincide con la del archivo |
+
+### `e2e/armando-al-borde.spec.ts` — 2, y miran la CAJA
+
+La otra mitad, y **en un archivo aparte a propósito**: un archivo opaco colgado
+a 40 px del borde flota igual, y una caja al borde con el archivo viejo adentro
+también. La regla de la casa es probar cada mitad por separado, porque un piso
+que sobrevive porque la otra lo sostiene no está sosteniendo nada.
+
+Mide los **dos** lugares que usan el mismo recorte, `/merida#facilitador` y
+`/#quien`. Y ahí apareció lo que la orden mandaba mirar: con el archivo nuevo la
+portada quedaba **peor que antes** —el mismo hueco cortaba a Armando a media
+pierna con un borde duro y 149 px de crema debajo—. Antes no se notaba porque el
+degradado se desvanecía justo ahí. O sea que aquel degradado tapaba dos
+problemas, no uno. La portada pasa a apoyarse igual que el taller.
+
+### `src/lo-que-mando-armando.test.ts` — 4, contra el insumo y no contra otro i18n
+
+Compara los cinco núcleos, la sede y el horario contra
+`03 Producto/web/insumos/2026-09-28-taller-merida/LEEME.md`, carácter por
+carácter. **No** contra otro string de i18n: una copia es una segunda verdad que
+coincide justo hasta el día que importa.
+
+El modo de falla que caza no es un error de tipeo, es una **mejora**: alguien le
+quita «de la vida» al núcleo 1 porque queda mejor. Probablemente tenga razón —y
+no le toca a la web decidirlo. Las dos mutaciones caen con el texto de Armando y
+el publicado uno debajo del otro.
+
+### Y una que no suma tests pero vale el renglón
+
+Al quitar el punto de «ADOLESCENTE» (#19, C), `check:renglones` **se puso rojo
+solo**: su excepción nombraba «ADOLESCENTE.» y dejó de excusar ningún renglón,
+así que la denunció como permiso que sobra. Nadie tuvo que acordarse de ir a
+tocarla. Es exactamente para lo que esa comprobación existe.
 
 ## Lo que arregló F.4 — `@codice/familia` sube de 40 a 46
 

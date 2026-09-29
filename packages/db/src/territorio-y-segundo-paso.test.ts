@@ -201,19 +201,27 @@ describe('miembros', () => {
 
     expect(await quienVe(s.diana, 'aal2')).toEqual(['Diana']);
 
-    /* ── Un `delete` sin policy NO levanta error: borra cero filas ──────────
-       Lo descubrió este test la primera vez que corrió. La RLS **filtra** en
-       select, update y delete —la fila no existe para esa sesión, así que no hay
-       nada que borrar— y solo levanta excepción cuando un `with check` de insert
-       o de update no se cumple. Así que «nadie borra» no se afirma esperando un
-       error: se afirma **mirando que la fila siga ahí**. Escrito porque un
-       `expect(reventar(...)).toMatch(...)` sobre un delete pasa en verde el día
-       que alguien agregue la policy que lo permite. */
-    await banco.como(s.armando, 'aal2', () => banco.sql(
-      `delete from public.miembros where user_id = $1`, [s.diana]));
+    /* ── «Nadie borra»: dos frenos, y se afirman los dos ───────────────────
+       El primero lo descubrió este test la primera vez que corrió: un `delete`
+       sin policy **no levanta error**. La RLS filtra en select, update y delete
+       —la fila no existe para esa sesión, así que no hay nada que borrar— y solo
+       levanta excepción cuando un `with check` de insert o update no se cumple.
+       Por eso «nadie borra» se afirmaba mirando que la fila siguiera ahí: un
+       `expect(reventar(...))` sobre el delete habría pasado en verde el día que
+       alguien agregara la policy.
+
+       Desde la **007** hay un freno más afuera, y es el que corta hoy: a
+       `authenticated` no se le da `delete` en **ninguna** tabla, así que el
+       intento muere en el permiso. Se afirman los dos —el de afuera porque es
+       el que decide, el de adentro porque tiene que seguir ahí el día que
+       alguien devuelva el `grant`—, que es la regla de la casa: cada mitad se
+       prueba por separado. */
+    const e = await reventar(() => banco.como(s.armando, 'aal2', () => banco.sql(
+      `delete from public.miembros where user_id = $1`, [s.diana])));
+    expect(e, '`authenticated` no tiene `delete` en ninguna tabla (migración 007)').toMatch(/permission denied/i);
     const [sigue] = await banco.sql<{ n: string }>(
       `select count(*) as n from public.miembros where user_id = $1`, [s.diana]);
-    expect(Number(sigue.n)).toBe(1);
+    expect(Number(sigue.n), 'y la fila sigue ahí: el segundo freno es la falta de policy de delete').toBe(1);
 
     // Se deja como estaba: los demás tests de este archivo ya corrieron, pero
     // dejar el banco torcido para el próximo que lo lea es una trampa.

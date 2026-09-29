@@ -22,11 +22,19 @@ import { fileURLToPath } from 'node:url';
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LOCALES = join(RAIZ, 'packages/core/src/i18n');
 const FUENTE = 'es';
-/* Medido, no estimado: son las claves que la orden #01 dejó. Con 120 —el
-   mínimo que pedía la orden— se podían borrar tres de las cuatro páginas y este
-   guardián seguía verde; está comprobado corriéndolo. Sube con el texto nuevo,
-   en un renglón que se lee. */
-const PISO_DE_CLAVES = 284;
+/* Medido, no estimado: son las claves que hay hoy. Con 120 —el mínimo que pedía
+   la orden #01— se podían borrar tres de las cuatro páginas y este guardián
+   seguía verde; está comprobado corriéndolo. Sube con el texto nuevo, en un
+   renglón que se lee.
+
+   ── 284 → 300, por la orden #16 (pie 3) ────────────────────────────────
+   El 284 era el de la #01 y quedó **dieciséis claves atrás**: entre la #05 y la
+   #14 el texto creció y nadie subió el piso, así que se podían borrar dieciséis
+   claves —una sección entera— y este guardián salía verde. Un piso que quedó
+   atrás no vigila nada. Son las 300 que hay hoy, contadas sobre el JSON; la #16
+   no agregó ni quitó ninguna (movió el contenido de `taller.hero.titulo1` y
+   `titulo2`, que siguen siendo dos claves). */
+const PISO_DE_CLAVES = 300;
 
 const destinos = readdirSync(LOCALES).filter(
   (e) => e !== FUENTE && !e.startsWith('.') && statSync(join(LOCALES, e)).isDirectory(),

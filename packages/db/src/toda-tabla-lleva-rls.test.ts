@@ -58,8 +58,28 @@ describe('el censo de RLS', () => {
   });
 });
 
+/**
+ * Las migraciones que **todavía no corrió dirección**, con su motivo.
+ *
+ * ── Por qué una lista y no una regla ────────────────────────────────────
+ * Es la misma forma que `qa/skips-permitidos.md`: una fila con su razón, que
+ * alguien tiene que escribir y alguien tiene que borrar. Una regla del tipo «la
+ * última puede estar pendiente» se cumpliría sola para siempre y dejaría de
+ * decir nada; una fila obliga a venir dos veces —al escribirla y al sacarla— y
+ * las dos veces se ven en un diff.
+ *
+ * **Y sobra tan rojo como falta**: si una de acá ya dice su fecha, el test de
+ * abajo se pone rojo pidiendo que se borre la fila. Un permiso que sobra es una
+ * mentira con formato de tabla.
+ */
+const PENDIENTES: Record<string, string> = {
+  '007_permisos.sql':
+    'los GRANT que el proyecto no da solo (corrección de la #15, punto 0). La corre dirección '
+    + 'en `armandoduarte-familia` y completa su cabecera; hasta entonces un cliente no entra.',
+};
+
 describe('las migraciones', () => {
-  it('son seis, numeradas de tres dígitos y en orden', async () => {
+  it('son siete, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -67,6 +87,7 @@ describe('las migraciones', () => {
       '004_datos_de_cobro_y_auditoria.sql',
       '005_seguridad_512.sql',
       '006_storage_comprobantes.sql',
+      '007_permisos.sql',
     ]);
   });
 
@@ -81,16 +102,106 @@ describe('las migraciones', () => {
     }
   });
 
-  it('ninguna se aplicó todavía: las seis dicen «APLICADA: —»', async () => {
-    /* Esta afirmación **tiene fecha de vencimiento a propósito**: el día que
-       Germán corra las migraciones y complete las cabeceras, este test se pone
-       rojo y obliga a venir a actualizarlo. Es el recordatorio más barato de que
-       el estado del repo y el de la base tienen que coincidir. */
+  it('las corridas están aplicadas y dicen dónde, cuándo y desde qué commit; las pendientes, declaradas', async () => {
+    /* ── La fecha de vencimiento se cumplió, y por eso este test cambió ──────
+       Hasta el 29/9/2026 esta afirmación era la contraria: «ninguna se aplicó
+       todavía; las seis dicen APLICADA: —», con un comentario que decía que el
+       día que se corrieran se iba a poner rojo y obligar a alguien a venir. Pasó
+       exactamente eso, y se lo vio en rojo antes de tocarlo:
+
+         × ninguna se aplicó todavía: las seis dicen «APLICADA: —»
+           AssertionError: expected [] to have a length of 6 but got +0
+
+       Lo que NO se hizo es aflojar la afirmación para devolverla a verde. Un test
+       que se actualiza para volver a pasar sin cambiar lo que dice es un test
+       apagado con cara de test. Éste cambió de afirmación porque cambió el mundo:
+       ahora vigila que la cabecera **siga contando la verdad**, que es lo que a
+       partir de hoy se puede perder en silencio.
+
+       ── Qué vigila ahora, y por qué cada parte ────────────────────────────
+       Las tres cosas que hacen falta para poder reconstruir qué hay en la base
+       mirando solo el repo: **dónde** se corrió, **cuándo**, y **desde qué
+       commit**. La tercera es la que más vale: es la que permite saber qué SQL
+       exacto se ejecutó, porque el archivo de hoy puede no ser el de aquel día.
+
+       Y el commit se compara **entre las seis**, no contra una copia escrita acá:
+       las seis se corrieron en la misma sesión, así que si una dice otro commit,
+       o alguien la rehízo o alguien copió mal la cabecera. Comparar contra un
+       `fd93eab` escrito en este archivo sería vigilar la copia y no el hecho —la
+       lección de la #06 con el token duplicado—. */
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
-    const pendientes = migracionesEnOrden().filter((a) =>
-      /^-- APLICADA: —\s*$/m.test(readFileSync(join(import.meta.dirname, '..', 'migrations', a), 'utf8')));
-    expect(pendientes).toHaveLength(6);
+    const leer = (a: string) =>
+      readFileSync(join(import.meta.dirname, '..', 'migrations', a), 'utf8');
+
+    /* EL PISO, PRIMERO: sin esto, «ninguna quedó en —» sobre una lista vacía de
+       migraciones se lee igual que sobre las siete en orden. */
+    const archivos = migracionesEnOrden();
+    expect(archivos.length, 'el barrido no encontró las migraciones').toBeGreaterThanOrEqual(7);
+
+    const pendiente = (a: string) => a in PENDIENTES;
+    const corridas = archivos.filter((a) => !pendiente(a));
+
+    const sinAplicar = corridas.filter((a) => /^-- APLICADA: —\s*$/m.test(leer(a)));
+    expect(
+      sinAplicar,
+      'estas migraciones siguen diciendo «APLICADA: —» y no están en PENDIENTES. O se corrieron y '
+      + 'falta completar la cabecera, o falta declararlas como pendientes con su motivo.',
+    ).toEqual([]);
+
+    /* Y al revés, que es la mitad que se olvida: una fila de PENDIENTES que ya
+       dice su fecha es una fila que sobra, y hay que venir a borrarla. */
+    const yaCorridas = Object.keys(PENDIENTES)
+      .filter((a) => archivos.includes(a) && !/^-- APLICADA: —\s*$/m.test(leer(a)));
+    expect(
+      yaCorridas,
+      'estas migraciones están declaradas como pendientes y su cabecera ya dice cuándo se '
+      + 'corrieron: se borra la fila de PENDIENTES. Una lista de excepciones que no se limpia se '
+      + 'convierte en una lista de mentiras.',
+    ).toEqual([]);
+
+    /* Y que las declaradas existan: una fila que nombra un archivo que no está
+       tapa el hueco que debería denunciar. */
+    const fantasmas = Object.keys(PENDIENTES).filter((a) => !archivos.includes(a));
+    expect(fantasmas, 'PENDIENTES nombra migraciones que no existen').toEqual([]);
+
+    const cabeceras = corridas.map((a) => {
+      const texto = leer(a);
+      const linea = texto.match(/^-- APLICADA: (.+)$/m)?.[1] ?? '';
+      const bloque = texto.slice(texto.indexOf('-- APLICADA:'), texto.indexOf('-- APLICADA:') + 400);
+      return {
+        archivo: a,
+        proyecto: /armandoduarte-familia/.test(bloque),
+        fecha: /\b29\/9\/2026 02:34\b/.test(linea),
+        commit: bloque.match(/\bdesde ([0-9a-f]{7,40})\b/)?.[1] ?? null,
+        /* Cada una dice con qué nombre quedó guardada en el editor SQL, y ese
+           nombre es el suyo: es lo que permite encontrarla allá sin adivinar. */
+        guardadaComoSuNombre: bloque.includes(`\`${a.replace(/\.sql$/, '')}\``),
+      };
+    });
+
+    expect(
+      cabeceras.filter((c) => !c.proyecto).map((c) => c.archivo),
+      'la cabecera no nombra el proyecto donde se corrió',
+    ).toEqual([]);
+    expect(
+      cabeceras.filter((c) => !c.fecha).map((c) => c.archivo),
+      'la cabecera no lleva la fecha y la hora en que se corrió',
+    ).toEqual([]);
+    expect(
+      cabeceras.filter((c) => !c.commit).map((c) => c.archivo),
+      'la cabecera no dice desde qué commit se corrió, que es lo que permite saber qué SQL se ejecutó',
+    ).toEqual([]);
+    expect(
+      cabeceras.filter((c) => !c.guardadaComoSuNombre).map((c) => c.archivo),
+      'la cabecera no dice con qué nombre quedó guardada en el editor SQL, o dice el de otra',
+    ).toEqual([]);
+
+    /* Las seis, el mismo commit: se corrieron en una sola sesión. */
+    expect(
+      [...new Set(cabeceras.map((c) => c.commit))],
+      'las seis se corrieron en la misma sesión y desde el mismo commit: si hay dos, una cabecera miente',
+    ).toHaveLength(1);
   });
 });
 

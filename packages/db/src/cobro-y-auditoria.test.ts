@@ -30,11 +30,20 @@ describe('(10) datos de cobro', () => {
     });
   });
 
-  it('`anon` NO lee nada — es la promesa de la #12 H escrita en una policy que falta', async () => {
-    await banco.comoAnonimo(async () => {
-      const filas = await banco.sql(`select * from public.datos_de_cobro`);
-      expect(filas).toHaveLength(0);
-    });
+  it('`anon` NO lee nada — y desde la 007 ni siquiera puede preguntar', async () => {
+    /* ── Esto cambió de mecanismo con la 007, y el cambio es a mejor ────────
+       Antes `anon` hacía el `select`, la RLS lo filtraba y volvían **cero
+       filas**. Ahora ni llega a la RLS: no tiene `select` sobre la tabla y
+       Postgres corta con `42501 permission denied`.
+
+       Se afirma el mecanismo nuevo y no «cero filas o error» a propósito. Un
+       `toHaveLength(0)` seguiría pasando el día que alguien le diera `select` a
+       `anon` —volvería a cero filas por la RLS— y esta tabla es la cuenta donde
+       entra la plata: el freno que queremos es el de más afuera. Si alguien
+       abre el permiso, este test se pone rojo. */
+    const e = await reventar(() => banco.comoAnonimo(
+      () => banco.sql(`select * from public.datos_de_cobro`)));
+    expect(e, 'a `anon` no se le da `select` sobre datos_de_cobro (migración 007)').toMatch(/permission denied/i);
     // El piso, al lado del cero: la fila existe.
     const [f] = await banco.sql<{ n: string }>(`select count(*) as n from public.datos_de_cobro`);
     expect(num(f.n)).toBe(1);

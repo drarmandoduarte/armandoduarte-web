@@ -1,4 +1,12 @@
 /* La hoja que importa `apps/web`. Un solo import y el producto tiene la marca:
-   las fuentes (locales, nunca CDN) y los tokens. Nada más vive acá. */
+   las fuentes (locales, nunca CDN), los tokens y el comportamiento tipográfico.
+   Nada más vive acá.
+
+   Los tres son `@import` y no un archivo solo porque cada uno se puede leer por
+   separado: el JSON manda en los tokens, las fuentes son un inventario y
+   `tipografia.css` es una decisión de la #16 con su motivo escrito. Que la
+   cadena esté entera lo vigila `apps/web/src/el-css-publicado-trae-lo-suyo.test.ts`
+   sobre la hoja que se publica: se cortó a propósito y el build salía verde. */
 @import "./fuentes/fonts.css";
 @import "./codice-tokens.css";
+@import "./tipografia.css";

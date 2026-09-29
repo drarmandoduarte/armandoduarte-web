@@ -79,14 +79,46 @@ export async function levantarBanco(): Promise<Banco> {
   const db = new PGlite();
   await db.exec(readFileSync(BASE, 'utf8'));
 
+  /*
+   * ── Y acá el banco aprende lo que le faltó, que costó un despliegue ──────
+   *
+   * `supabase-base.sql` reproduce lo que Supabase da **cuando se le deja
+   * exponer las tablas nuevas automáticamente**: `grant all on tables` por
+   * default privilege, y la RLS como único freno. El proyecto
+   * `armandoduarte-familia` se creó con esa opción en **no** —que es la
+   * decisión correcta— y Supabase lo implementa quitando `select, insert,
+   * update, delete` de esos defaults.
+   *
+   * Resultado: en producción las diez tablas nacían sin un solo permiso, acá
+   * nacían con los cuatro, y los 83 tests de la #13 pasaban en verde sobre una
+   * base que no se parecía a la de verdad. Un cliente con token válido recibía
+   * `42501 permission denied for table miembros` y la pantalla lo mandaba a
+   * enrolar un autenticador. **El banco no probaba nada sobre permisos porque
+   * el banco los regalaba.**
+   *
+   * Esto se corre ANTES de las migraciones a propósito: así alcanza a todo lo
+   * que ellas creen, igual que en el proyecto. Lo que cada rol puede hacer a
+   * partir de acá lo dice la `007`, tabla por tabla y verbo por verbo, y
+   * `los-permisos-estan-puestos.test.ts` lo afirma uno por uno.
+   */
+  await db.exec(`
+    alter default privileges in schema public
+      revoke select, insert, update, delete on tables from anon, authenticated, service_role;
+    alter default privileges in schema public
+      revoke usage, select, update on sequences from anon, authenticated, service_role;
+    alter default privileges in schema public
+      revoke execute on functions from anon, authenticated, service_role;
+  `);
+
   const archivos = migracionesEnOrden();
   /* Un piso, y va antes de correr nada: si el glob se rompe —una carpeta que se
      mueve, un renombre— `readdirSync` devuelve `[]`, las migraciones «corren»
      sin error y los tests fallan después hablando de tablas que no existen. Con
      esto, el rojo dice la causa. */
-  if (archivos.length < 6) {
+  if (archivos.length < 7) {
     throw new Error(
-      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y la orden #13 dejó 6. `
+      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 7 `
+      + '(seis de la #13 y la 007 de permisos). '
       + 'O el glob no las ve, o alguien las movió: no se corrió nada.',
     );
   }

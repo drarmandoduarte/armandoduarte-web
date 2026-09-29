@@ -7,7 +7,10 @@
 -- ORDEN QUE LA APROBÓ: Códice #13 (Mi espacio, PR 1), aprobada por dirección el
 -- 29/9/2026.
 --
--- APLICADA: —
+-- APLICADA: 29/9/2026 02:34 (UY), en `armandoduarte-familia`, desde fd93eab.
+--   Corrida por el CEO con autorización de Germán; verificada contra la base
+--   (10 tablas con RLS, 39 policies en `public`, 3 en `storage`, bucket
+--   `comprobantes` privado). Guardada en el editor SQL como `005_seguridad_512`.
 --
 -- ── DE DÓNDE VIENEN Y QUÉ SE CAMBIÓ ───────────────────────────────────────
 -- Copiadas de `512 web solutions/Kit de Seguridad/v1/referencia-cenit/migraciones/`:
