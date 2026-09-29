@@ -22,7 +22,11 @@ usa.
 | #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | **cerrada sin mergear** — se midió y no convenía (PR #16 cerrado). Lo que valía entró aparte: **PR #19, mergeado el 17/9/2026** (rama `web/09b-rescate`, ya borrada) |
 | #10 | La CSP, mientras todavía es fácil | **cerrada** (PR #18, mergeado el 17/9/2026) |
 | #11 | `Cache-Control` para `/assets/` | **cerrada** (PR #17, mergeado el 17/9/2026) |
-| #12 | El taller con fecha: lo que pidieron Armando y Lucía el 28/9 | rama `web/12-taller-con-fecha` |
+| #12 | El taller con fecha: lo que pidieron Armando y Lucía el 28/9 | **cerrada** (PR #22, mergeado el 29/9/2026) |
+| #13 | Mi espacio: la base nace | **cerrada** (PR #24, mergeado el 29/9/2026). Las seis migraciones **corridas** en `armandoduarte-familia` el 29/9 a las 02:34 |
+| #14 | Talleres tiene su columna en el pie | **cerrada** (PR #23, mergeado el 29/9/2026) |
+| #15 | Mi espacio: la puerta | rama `mi-espacio/02-la-puerta` |
+| #16 | Títulos sin renglones huérfanos | rama `web/16-titulos` |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -120,6 +124,60 @@ comprobación vive en el barrido y se afirma en las dos puertas —la consola y
 **Si alguna vez se quiere volver atrás**: se borra la fila de `PERMITIDO`, la
 regla `.hero-taller__palabra` de `index.css` y las dos claves
 `taller.hero.titulo2Palabra` / `titulo2` vuelven a ser una sola.
+
+#### Y lo que la #16 decidió al lado de esta excepción: **el teal se va**
+
+**Orden #16, A — decidido por dirección el 29/9/2026.** El titular tenía **tres**
+colores: «El arte de amar» en `--tinta`, «a tu» en `--teal` y «ADOLESCENTE.» en
+`--naranja-texto`. Ahora tiene **dos**: se fue el `<span className="acento">` que
+pintaba «a tu» de teal.
+
+El motivo no es de contraste —el teal sobre crema da 7,74:1 y pasaba de sobra—
+sino de jerarquía: con la palabra del final en naranja, el teal del medio **ya no
+marcaba nada y competía con el acento**. Tres colores en un titular de tres
+renglones es un color por renglón, que es lo mismo que ninguno.
+
+**La excepción de la #12 no se toca**: sigue siendo un elemento, con tope 1, y
+`check/acento.mjs` sigue permitiendo exactamente `#inicio h1 .hero-taller__palabra`.
+Lo que la #16 le quitó es el vecino, no el permiso.
+
+**Cómo se vuelve atrás**: se devuelve el `<span className="acento">` alrededor de
+«a tu» en `apps/web/src/web/taller/Hero.tsx`. Es un renglón, y no toca ni el
+barrido del acento ni los tokens.
+
+### Un título no se parte en un renglón de una palabra — y hay catorce esperando decisión
+
+**Orden #16 — la regla que dirección sacó del hero de `/merida`:** *ningún título
+termina ni se parte en un renglón de una o dos palabras cortas, a ningún ancho.*
+La vuelve comprobable `apps/web/check/renglones.mjs`, que corre en la gate sobre
+las cuatro rutas por cuatro anchos y cae si un renglón de un `h1`, `h2` o `h3`
+tiene una sola palabra o menos de seis caracteres.
+
+Lo que hay que saber de esta regla es que **nace con catorce excepciones pendientes
+de dirección**, y están en una lista aparte de la única aprobada
+(«ADOLESCENTE.»). El barrido las encontró en la portada y en `/merida` y ninguna
+se puede arreglar sin cambiar un texto, un tamaño o el ancho de una columna — y la
+orden es explícita: eso no lo decide Rodolfo. Son tres clases de cosa:
+
+| qué | dónde | cómo se cierra |
+|---|---|---|
+| un `<br>` declarado cuyo primer renglón quedó de una palabra | «Construyendo» (`#programa`), «Escríbeme.» (`#contacto`) | moviendo dónde cae el `<br>` — es mover texto |
+| una palabra larga que cae sola al final de un título que envuelve | «desconocido?», «silencio.», «adolescencia», «Comprender», «cambios», «responsables», «digitalmente», «Padres», «y yo.», «Construyendo» del libro | acortando el texto, bajando el tamaño o ensanchando la columna |
+| un título que no cabe de ninguna manera | el cierre de `#reservar`: **siete** renglones a 375 px | con menos palabras o menos tamaño — `text-wrap: balance` de Chromium deja de trabajar arriba de seis renglones |
+
+La lista completa, con la ruta y el ancho de cada una, está en
+`apps/web/check/renglones.mjs` (`PENDIENTES`) y en `docs/informes/16/LEEME.md`.
+**Cada fila se borra el día que dirección resuelve la suya**, y el día que se
+borren todas la regla queda con una sola excepción.
+
+**Y hay una decisión de dirección abierta sobre la regla misma**, que conviene
+tomar antes de resolver las catorce: la orden la escribió como «una sola palabra **o**
+menos de 6 caracteres», y así está implementada. Escrita como «menos de 6
+caracteres» a secas, la lista de pendientes baja de catorce a **una** («y yo.») y la
+mutación de la orden sigue cayendo —«a tu» son cuatro caracteres—, pero deja de
+ver «Padres / digitalmente / responsables», que son tres renglones de una palabra
+y es un título de verdad mal partido. Es un renglón de código en
+`check/renglones.mjs`; el porqué de las dos opciones está en el informe de la #16.
 
 ## Pendientes abiertos
 

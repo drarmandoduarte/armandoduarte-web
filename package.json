@@ -15,6 +15,7 @@
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:secretos": "node scripts/check-secretos.mjs",
     "check:acento": "node apps/web/check/acento.mjs",
+    "check:renglones": "node apps/web/check/renglones.mjs",
     "qa:instalar": "playwright install chromium"
   },
   "packageManager": "pnpm@10.4.0",
