@@ -12,11 +12,15 @@
     "   al invocarse. `scripts/sellar-dist.mjs` lo vuelve a decir dentro de",
     "   `dist/`, por si alguien lo devuelve acá.",
     "",
-    "2. `exports.default` apunta a `dist/index.js`, nunca al `.ts`. Vercel",
-    "   compila la entrada de la función (`apps/familia/api/index.ts`) pero NO",
-    "   las dependencias del workspace: lo que resuelva este campo viaja al",
-    "   servidor tal cual. Un `.ts` acá es un ERR_MODULE_NOT_FOUND en vivo, que",
-    "   es exactamente lo que pasó el 29/9. Lo vigila",
+    "2. `exports.default` apunta a `dist/funcion.cjs`, el empaquetado, nunca",
+    "   al `.ts`. Vercel compila la entrada de la función",
+    "   (`apps/familia/api/index.ts`) pero NO las dependencias del",
+    "   workspace: lo que resuelva este campo viaja al servidor tal cual. Un",
+    "   `.ts` acá es un ERR_MODULE_NOT_FOUND en vivo, que es lo que pasó el",
+    "   29/9. Y el empaquetado en vez del `dist/index.js` de `tsc` porque",
+    "   `jose@6` es ESM puro: requerirlo desde CommonJS da ERR_REQUIRE_ESM,",
+    "   que fue la segunda caída del mismo día. `scripts/empaquetar-funcion.mjs`",
+    "   lo explica entero. Lo vigila",
     "   `apps/familia/src/la-api-llega-compilada.test.ts`.",
     "",
     "3. `types` sí apunta al fuente, y a propósito: TypeScript lee esa condición",
@@ -25,16 +29,16 @@
     "   que es donde está la verdad — en vez de un `.d.ts` que puede ser de ayer."
   ],
   "description": "La API de Mi espacio. NestJS, servida como función de Vercel junto a apps/familia.",
-  "main": "dist/index.js",
+  "main": "dist/funcion.cjs",
   "types": "src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
-      "default": "./dist/index.js"
+      "default": "./dist/funcion.cjs"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node scripts/sellar-dist.mjs",
+    "build": "tsc -p tsconfig.build.json && node scripts/sellar-dist.mjs && node scripts/empaquetar-funcion.mjs",
     "typecheck": "tsc --noEmit",
     "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json"
   },
@@ -55,6 +59,7 @@
     "@nestjs/testing": "^11.0.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
     "typescript": "^5.6.3",
     "vitest": "^4.1.10"
   }

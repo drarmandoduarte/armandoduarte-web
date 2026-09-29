@@ -47,6 +47,12 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+/* La regla de «¿Node puede requerir esto?» se importa del build y no se copia:
+   es la misma que decide qué entra al empaquetado. Dos copias serían dos
+   verdades, y el día que no coincidieran mandaría la del servidor. El camino es
+   relativo y feo porque es un módulo de build, que no tiene alias de tsconfig
+   ni lo tendría a buen precio. */
+import { sePuedeRequerir } from '../../api/scripts/se-puede-requerir.mjs';
 
 const APP = dirname(dirname(fileURLToPath(import.meta.url)));
 const RAIZ = dirname(dirname(APP));
@@ -268,10 +274,11 @@ describe('la función de Vercel recibe JavaScript, no TypeScript', () => {
     ).toEqual([]);
   });
 
-  it('el compilado conserva los metadatos de los decoradores, o NestJS no inyecta nada', () => {
+  it('el empaquetado conserva los metadatos de los decoradores y no requiere ESM puro', () => {
     const api = CIERRE.find((p) => p.nombre === '@codice/api');
     expect(api, 'sin @codice/api en el cierre no hay nada que mirar acá').toBeDefined();
-    const dist = join((api as Paquete).dir, 'dist');
+    const dir = (api as Paquete).dir;
+    const dist = join(dir, 'dist');
 
     /* (1) CommonJS de verdad. El núcleo del kit se copia byte por byte y trae
        imports sin extensión (`./roles`), que Node ESM se niega a resolver. Si
@@ -286,20 +293,54 @@ describe('la función de Vercel recibe JavaScript, no TypeScript', () => {
       + 'se va a leer como ESM.',
     ).not.toBe('module');
 
-    /* (2) `emitDecoratorMetadata` sobrevivió. Es lo que la orden pide verificar
-       y no se ve de ninguna otra forma: sin `design:paramtypes`, Nest arranca
-       igual y se cae al construir el primer provider con dependencias — en
-       ejecución, no en el build. Es también el motivo por el que este paquete se
-       compila con `tsc` y no se empaqueta con esbuild, que no sabe emitirlos. */
-    const middleware = join(dist, 'identidad', 'rol.middleware.js');
-    expect(existsSync(middleware), 'no está `dist/identidad/rol.middleware.js`: el build cambió de forma.').toBe(true);
-    const compilado = readFileSync(middleware, 'utf8');
+    /* (2) `emitDecoratorMetadata` sobrevivió a las dos pasadas. Es lo que la
+       orden pide verificar y no se ve de ninguna otra forma: sin
+       `design:paramtypes`, Nest arranca igual y se cae al construir el primer
+       provider con dependencias — en ejecución, no en el build. Es también el
+       motivo por el que `tsc` va primero y esbuild después: esbuild no sabe
+       emitir estos metadatos, así que empaquetar el fuente directo dejaría un
+       build verde y una función muerta. */
+    const empaquetado = join(dist, 'funcion.cjs');
+    expect(existsSync(empaquetado), 'no está `dist/funcion.cjs`: el empaquetado no corrió. Corré `pnpm build`.').toBe(true);
+    const codigo = readFileSync(empaquetado, 'utf8');
     expect(
-      compilado,
-      'el compilado perdió `design:paramtypes`. `RolMiddleware` recibe `SupabaseService` por el tipo '
-      + 'del constructor y nada más: sin metadatos, Nest no sabe qué inyectarle.',
+      codigo,
+      'el empaquetado perdió `design:paramtypes`. `RolMiddleware` recibe `SupabaseService` por el '
+      + 'tipo del constructor y nada más: sin metadatos, Nest no sabe qué inyectarle.',
     ).toContain('design:paramtypes');
-    expect(compilado).toContain('SupabaseService');
+    expect(codigo).toContain('SupabaseService');
+
+    /* (3) Y nada de lo que quedó AFUERA del empaquetado es ESM puro.
+       `jose@6` no publica CommonJS, y el `require("jose")` que emitía `tsc`
+       tiró la función entera con ERR_REQUIRE_ESM el 29/9/2026 —la segunda
+       caída del mismo día, después del `.ts`—. La comprobación no busca `jose`
+       por su nombre: le pregunta a cada paquete que el empaquetado todavía
+       requiere si Node lo puede requerir, con la misma regla que usó el build
+       para decidirlo. Un nombre escrito acá sólo cazaría a éste; la regla caza
+       al próximo. */
+    const requeridos = [...codigo.matchAll(/require\(["']([^"'.][^"']*)["']\)/g)]
+      .map(([, nombre]) => nombre)
+      .filter((nombre) => !nombre.startsWith('node:'));
+    const esmPuro: string[] = [];
+    for (const nombre of [...new Set(requeridos)]) {
+      let manifiesto: Record<string, unknown> | null = null;
+      try {
+        manifiesto = JSON.parse(readFileSync(join(dir, 'node_modules', nombre, 'package.json'), 'utf8'));
+      } catch {
+        /* Sin manifiesto legible no se puede afirmar nada, y afirmar de menos
+           es mejor que afirmar de más: se lista aparte en vez de aprobarse. */
+        esmPuro.push(`${nombre}: no se pudo leer su package.json para saber si se puede requerir`);
+        continue;
+      }
+      if (!sePuedeRequerir(manifiesto)) esmPuro.push(`${nombre}: es ESM puro y quedó como require()`);
+    }
+    expect(
+      esmPuro,
+      'El empaquetado dejó afuera algo que Node no puede `require()`. `scripts/empaquetar-funcion.mjs` '
+      + 'mete adentro lo que no se puede requerir y deja afuera el resto: si esto está en rojo, o la '
+      + 'regla dejó de coincidir con la realidad, o una dependencia cambió de formato. El síntoma en '
+      + 'vivo es ERR_REQUIRE_ESM y un 500 en toda /api/*.',
+    ).toEqual([]);
   });
 
   it('y el lector de manifiestos distingue el fuente del compilado', () => {
@@ -320,5 +361,13 @@ describe('la función de Vercel recibe JavaScript, no TypeScript', () => {
     expect(paquetesImportados("// habla de '@codice/core' en un comentario")).toEqual([]);
     expect(paquetesImportados("/* from '@codice/core' en un bloque */")).toEqual([]);
     expect(paquetesImportados("const a = require('@codice/ui/styles.css');")).toEqual(['@codice/ui']);
+
+    /* Y la regla del empaquetado, contra los dos manifiestos de verdad que hay
+       en disco: si `sePuedeRequerir()` devolviera siempre `true`, el (3) de
+       arriba saldría verde sobre el mismo `jose` que tiró la función. */
+    const manifiesto = (nombre: string) =>
+      JSON.parse(readFileSync(join(RAIZ, 'apps', 'api', 'node_modules', nombre, 'package.json'), 'utf8'));
+    expect(sePuedeRequerir(manifiesto('jose')), '`jose@6` es ESM puro y la regla tiene que decirlo').toBe(false);
+    expect(sePuedeRequerir(manifiesto('express')), '`express` se puede requerir y la regla tiene que decirlo').toBe(true);
   });
 });

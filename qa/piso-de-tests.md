@@ -44,8 +44,8 @@ apagándola y viéndola en rojo antes de darla por buena:
 | ningún paquete del cierre resuelve a un `.ts` | devolver `"exports": "./src/index.ts"` |
 | el `.js` existe compilado y hay un `build` que lo hace | borrar `apps/api/dist` |
 | el `vercel.json` lo compila antes que la pantalla | sacar `--filter @codice/api build` del `buildCommand` |
-| el compilado es CommonJS y conserva `design:paramtypes` | devolver `"type": "module"`; y apagar `emitDecoratorMetadata` |
-| el lector de manifiestos distingue fuente de compilado | — (el autoexamen que hace valer a los dos primeros) |
+| el empaquetado es CommonJS, conserva `design:paramtypes` y no deja un `require()` de ESM puro | devolver `"type": "module"`; apagar `emitDecoratorMetadata`; y dejar `jose` afuera del empaquetado |
+| el lector de manifiestos y la regla de «¿se puede requerir?» | — (el autoexamen: afloja la regla y este test cae antes que los otros) |
 
 El cierre **se recorre, no se escribe**: el test arranca en
 `apps/familia/api/index.ts`, junta los `@codice/*` que importa de verdad —sin
@@ -54,13 +54,26 @@ hacia adentro. Una lista escrita a mano se desactualiza en silencio; el día que
 `@codice/api` importe `@codice/core`, el barrido lo incluye solo y se pone rojo
 el mismo día, porque `@codice/core` todavía exporta su fuente.
 
-Y el quinto merece su renglón: **`design:paramtypes` es el motivo por el que
-este paquete se compila con `tsc` y no se empaqueta con esbuild.** La orden
-dejaba elegir entre las dos salidas y sólo una sirve — esbuild no sabe emitir
-metadatos de decoradores, así que `RolMiddleware`, que recibe `SupabaseService`
-por el tipo del constructor y nada más, arrancaría sin nada que inyectar. Ese
-fallo no se ve en el build: se ve en ejecución, en vivo, que es exactamente
-donde ya nos mordió una vez.
+Y el quinto merece su renglón, porque es el que aprendió de la **segunda**
+caída del mismo día. Arreglado el `.ts`, el preview volvió a dar 500 con
+`ERR_REQUIRE_ESM` sobre `jose@6`, que no publica CommonJS. De ahí salieron las
+dos mitades del build —y la orden dejaba elegir entre ellas cuando en realidad
+hacen falta las dos—:
+
+- **`tsc` primero**, porque es el único que emite `emitDecoratorMetadata`.
+  `RolMiddleware` recibe `SupabaseService` por el tipo del constructor y por
+  nada más; sin esos metadatos Nest arranca igual y se cae al inyectar, en
+  ejecución. esbuild no sabe emitirlos.
+- **esbuild después**, sobre el JavaScript ya compilado, porque es el único que
+  puede meter adentro un paquete ESM puro. Ahí no hay decorador que emitir: ya
+  están resueltos como llamadas a `__metadata()`.
+
+Qué entra y qué queda afuera **no es una lista**: `scripts/empaquetar-funcion.mjs`
+le pregunta a cada dependencia, leyendo su `package.json`, si Node la puede
+requerir. Una lista de nombres cazaría a `jose` y a nadie más; la regla caza al
+próximo. Y la regla vive en un solo archivo —`scripts/se-puede-requerir.mjs`—
+que usan el build y el test, porque dos copias serían dos verdades y el día que
+no coincidieran mandaría la del servidor.
 
 ## Lo que trae la orden #15 — `@codice/api` nace con 48
 
