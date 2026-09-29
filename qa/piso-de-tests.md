@@ -20,8 +20,41 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
+| `@codice/db` | 83 |
 | `@codice/web` | 51 |
 | `@codice/navegador` | 29 |
+
+## Lo que trae la orden #13 — `@codice/db` nace con 83
+
+`packages/db` entra a esta tabla el día que existe, que es la regla que su propio
+`README.md` dejó escrita en la #01: «cuando haya esquema, nace con su
+`package.json` y con su piso». **83 tests, medidos contra la corrida real**, en
+seis archivos que se corresponden con lo que cada uno vigila:
+
+| archivo | cuántos | qué afirma |
+|---|--:|---|
+| `territorio-y-segundo-paso.test.ts` | 15 | D11 y el kit S3: quién ve a quién, y con qué `aal` |
+| `el-catalogo-se-ve-sin-entrar.test.ts` | 10 | lo único que `anon` alcanza, y lo que no |
+| `inscripciones-y-el-libro.test.ts` | 24 | el camino entero de una inscripción, y el libro insert-only |
+| `cobro-y-auditoria.test.ts` | 14 | la cuenta que no está en la web, y el registro append-only |
+| `comprobantes.test.ts` | 12 | las policies del bucket privado |
+| `toda-tabla-lleva-rls.test.ts` | 8 | el censo, que cae si alguien crea una tabla sin RLS |
+
+El último merece su renglón: **es el único que no mira una regla, mira que las
+reglas existan.** Una tabla sin `enable row level security` no se ve distinta
+desde ninguna pantalla —devuelve todo a todos— y es el defecto más barato de
+cometer en la migración 007. Va con su piso (las diez tablas que la #13 deja) y
+con una tabla de mentira que se crea, se caza y se borra dentro del propio test:
+un censo que nunca encontró nada no es un censo.
+
+Y `@codice/db` no corre contra un Postgres simulado: corre en uno **de verdad**
+—PGlite, en proceso—, con el entorno de Supabase encima y las seis migraciones
+aplicadas en orden, sin tocar una coma. Lo que el banco **no** prueba está escrito
+en `src/banco.ts` y se repite acá porque un alcance que no está escrito se lee
+como «todo»: `service_role` (lleva `bypassrls`; probarlo sería probar que
+bypassea), la subida real de un archivo a Storage —se prueban las policies, que
+son filas— y la versión exacta de Postgres, que en PGlite es más nueva que la del
+proyecto.
 
 ## De dónde salen estos números
 
