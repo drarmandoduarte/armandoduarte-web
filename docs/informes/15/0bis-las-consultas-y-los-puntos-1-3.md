@@ -186,3 +186,34 @@ cuesta un viaje de red por intento). Los dos terminan bien —`getUser()` rechaz
 segundo—, así que **no bloquea nada**. Estrechar el respaldo a «el JWKS vino
 vacío» es media hora y una orden chica. Mientras tanto el log dice lo que se sabe
 y no más.
+
+---
+
+## Anexo · F.4 tercera corrida — la cookie del preview
+
+`api()` salía con `credentials: 'omit'`. El argumento escrito al lado era
+correcto **sobre nuestras cookies** —la autenticación viaja en el header
+`Authorization`, no en una cookie— pero no somos los únicos que ponen una: los
+previews de Vercel están detrás de *Vercel Authentication*, que protege el
+despliegue con la suya. El navegador la tenía —por eso la pantalla cargaba— y
+cada `fetch` llegaba al borde sin ella y volvía **503**. La app se veía y no
+funcionaba, y la causa no estaba en la API.
+
+Ahora `credentials: 'same-origin'`. No `'include'`: el pedido es a `/api/…`, el
+mismo origen que la pantalla, y `'same-origin'` es exactamente eso — las cookies
+van al propio origen y no en un pedido cruzado, que es la superficie que el
+comentario viejo quería evitar y que sigue sin hacer falta.
+
+**Y la superficie de CSRF no cambia**, que es lo que había que comprobar antes de
+tocarlo: la API no autoriza con cookies. Un pedido de otro sitio que llegue con la
+cookie de Vercel pero sin el header `Authorization` es un 401 del guard, igual que
+antes.
+
+Tres tests en `apps/familia/src/comun/api-manda-la-cookie-del-preview.test.ts`.
+Mutación: volver a `'omit'` y caen dos de los tres, «expected 'omit' to be
+'same-origin'». El tercero va aparte a propósito —que el token siga en el header—
+porque un lector apurado de este cambio podría entender que ahora la sesión viaja
+en cookie, y no.
+
+`@codice/familia` 51 → **54**. Gate: **352 declarados**, 0 saltados, ninguna suite
+bajo su piso.

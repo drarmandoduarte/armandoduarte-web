@@ -61,9 +61,29 @@ async function tokenActual(): Promise<string | null> {
 /**
  * Llama a la API con la sesión puesta.
  *
- * `credentials: 'omit'` a propósito: la autenticación viaja en el header
+ * ── `credentials: 'same-origin'`, y el caso que lo obligó ───────────────
+ * Acá decía `'omit'`, con este argumento: la autenticación viaja en el header
  * `Authorization` y no en una cookie, así que mandar cookies solo agrandaría la
- * superficie (CSRF) sin que nada las use.
+ * superficie (CSRF) sin que nada las use. El argumento sigue siendo correcto
+ * **sobre nuestras cookies**. El problema es que no somos los únicos que ponen
+ * una.
+ *
+ * **F.4, tercera corrida, 29/9/2026.** Los previews de Vercel están detrás de
+ * *Vercel Authentication*, que protege el despliegue con una cookie de su
+ * dominio. El navegador la tiene —por eso la pantalla carga—, pero cada `fetch`
+ * de esta función salía con `omit`, llegaba al borde **sin** esa cookie y volvía
+ * **503**. O sea: la app se veía y no funcionaba, y la causa no estaba en la
+ * API. Sin esto, F.4 no se puede correr nunca contra un preview.
+ *
+ * Por qué `'same-origin'` y no `'include'`: el `fetch` es a `/api/…`, mismo
+ * origen que la pantalla, y `'same-origin'` es exactamente eso — las cookies
+ * van cuando el destino es nuestro propio origen y no en un pedido cruzado. Con
+ * `'include'` viajarían también hacia afuera, que es la superficie que el
+ * comentario viejo quería evitar y que sigue sin hacer falta.
+ *
+ * Y la superficie de CSRF **no cambia**: la API no autoriza con cookies. Un
+ * pedido de otro sitio que llegue con la cookie de Vercel pero sin el header
+ * `Authorization` es un 401 del `Aal2Guard`, igual que antes.
  */
 export async function api<T>(
   ruta: string,
@@ -74,7 +94,7 @@ export async function api<T>(
 
   const respuesta = await fetch(`/api/${ruta}`, {
     method: opciones.metodo ?? 'GET',
-    credentials: 'omit',
+    credentials: 'same-origin',
     headers: {
       Authorization: `Bearer ${token}`,
       ...(opciones.cuerpo === undefined ? {} : { 'Content-Type': 'application/json' }),

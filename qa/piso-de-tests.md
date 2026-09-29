@@ -22,9 +22,27 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
 | `@codice/web` | 58 |
-| `@codice/familia` | 51 |
+| `@codice/familia` | 54 |
 | `@codice/api` | 62 |
 | `@codice/navegador` | 35 |
+
+## Lo que trajo F.4 tercera corrida — `@codice/familia` 51 → 54
+
+Tres tests en `src/comun/api-manda-la-cookie-del-preview.test.ts`. Existen porque
+la pantalla cargaba y **ninguna llamada funcionaba**: los previews de Vercel están
+detrás de *Vercel Authentication*, que protege el despliegue con una cookie, y
+`api()` salía con `credentials: 'omit'`, llegaba al borde sin ella y volvía 503.
+
+Es el modo de falla de siempre —una opción de transporte que nadie mira hasta que
+está publicada, como el `X-Robots-Tag` de la #08 o el `exports` de la #15— y acá
+costaba más que un 503 suelto: **sin esto F.4 no se puede correr nunca contra un
+preview**, y F.4 es lo que dice si la #15 sirve.
+
+Mutación: volver a `'omit'` y caen dos de los tres, diciendo «expected 'omit' to
+be 'same-origin'». El tercero es la otra mitad y va aparte a propósito: que el
+token siga yendo en el header `Authorization`. La cookie es del borde de Vercel,
+no de nuestra autenticación, y un lector apurado de este cambio podría entender lo
+contrario.
 
 ## Lo que trae el 0-bis de la #15 — `@codice/api` 48 → 62 y `@codice/familia` 46 → 51
 
