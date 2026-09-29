@@ -123,14 +123,23 @@ export const PISO = { inicio: 14, merida: 18, privacidad: 8, terminos: 8 };
  */
 export const APROBADAS = [
   /* ── La excepción declarada de la #12, que la #16 no cambia ───────────────
-     «ADOLESCENTE.» va en su propio renglón y en `--naranja-texto`: lo pidió
+     «ADOLESCENTE» va en su propio renglón y en `--naranja-texto`: lo pidió
      Lucía el 28/9 y entra por D23. Es una palabra sola por diseño.
 
-     La #16 le quitó el vecino: hasta esta orden el `<h1>` tenía **dos**
-     renglones huérfanos, «a tu» y «ADOLESCENTE.», y solo el segundo estaba
+     La #16 le quitó el vecino: hasta aquella orden el `<h1>` tenía **dos**
+     renglones huérfanos, «a tu» y «ADOLESCENTE», y solo el segundo estaba
      decidido. Ahora «a tu» viaja pegado a «amar» y este archivo cae si vuelve a
-     quedarse solo — eso es la mutación de la orden. */
-  ['#inicio h1', 'ADOLESCENTE.', 'la excepción declarada de la #12: la palabra que pidió Lucía, en su renglón y en naranja', 1],
+     quedarse solo — eso es la mutación de aquella orden.
+
+     ── Y la #19 le quitó el punto, que es por lo que esta fila se tocó ──────
+     La captura de Lucía dice «ADOLESCENTE» sin punto. El punto es estilo de la
+     casa en los títulos, pero acá cierra una palabra sola en mayúsculas y
+     naranja, y no lo pidió nadie (#19, C). Al quitarlo, **este guardián se puso
+     rojo solo**: la excepción nombraba «ADOLESCENTE.» y dejó de excusar ningún
+     renglón, así que la denunció como permiso que sobra. Es exactamente para lo
+     que esa comprobación existe —un permiso que sobra es una mentira con
+     formato de tabla— y vale dejarlo escrito: nadie tuvo que acordarse. */
+  ['#inicio h1', 'ADOLESCENTE', 'la excepción declarada de la #12 y sin punto desde la #19: la palabra que pidió Lucía, en su renglón y en naranja', 1],
 ];
 
 /**

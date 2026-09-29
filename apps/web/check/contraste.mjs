@@ -94,7 +94,11 @@ import { writeFileSync } from 'node:fs';
 const BASE = process.argv[2] || 'http://127.0.0.1:4180';
 const SALIDA = process.argv[3] || '/tmp/pares.json';
 const PAGINAS = [['inicio','/'],['taller','/merida'],['privacidad','/privacidad'],['terminos','/terminos']];
-const ANCHOS = [1440, 390];
+/* La orden #19 (E) pide las tres de su sección A —1440, 900 y 375— y la casa
+   venía midiendo a 390. Se suman, no se cambian: 390 es el ancho con el que se
+   midieron todas las órdenes anteriores y quitarlo dejaría sin vigilar lo que
+   esas mediciones afirmaron. */
+const ANCHOS = [1440, 900, 390, 375];
 
 const RECOLECTAR = () => {
   /* Los colores se resuelven con un lienzo y no con una expresión regular.

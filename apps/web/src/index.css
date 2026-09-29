@@ -365,10 +365,21 @@ a,button{-webkit-tap-highlight-color:transparent}
    le quitara el padding a la sección entera, el texto también quedaría pegado
    al borde. Se verifica midiendo: `bottom` de la imagen = `bottom` de la
    sección, ±1 px, a 1440 y a 375. ─────────────────────────────────────────── */
-#facilitador .grid-2.centro{align-items:end}
-#facilitador .foto--libre{align-self:end;margin-bottom:0}
-#facilitador{padding-bottom:0}
-#facilitador .grid-2>div:last-child{padding-bottom:clamp(88px,12vh,140px)}
+/* ── Armando apoyado en la orilla, en los DOS lugares (orden #19, B) ─────
+   Hasta la #19 esto era sólo de `#facilitador`, porque era ahí donde Lucía lo
+   había marcado. Con el recorte nuevo —que termina en los zapatos y no en un
+   degradado— la portada quedaba **peor que antes**: el mismo hueco de 520 px
+   cortaba a Armando a media pierna con un borde duro y 149 px de crema debajo.
+   Antes no se notaba porque el archivo se desvanecía justo ahí; o sea que el
+   degradado estaba tapando dos problemas, no uno.
+
+   La sección cede su `padding` de abajo a la columna de texto y la figura se
+   apoya: el corte del archivo pasa a ser el borde de la sección, que es donde
+   un corte no se lee como un corte. ─────────────────────────────────────── */
+#facilitador .grid-2.centro,#quien .grid-2.centro{align-items:end}
+#facilitador .foto--libre,#quien .foto--libre{align-self:end;margin-bottom:0}
+#facilitador,#quien{padding-bottom:0}
+#facilitador .grid-2>div:last-child,#quien .grid-2>div:last-child{padding-bottom:clamp(88px,12vh,140px)}
 #porque .foto-tarjeta{max-width:480px}
 #programa .sello{margin-top:var(--s5)}
 #programa .lista--2{margin-top:0}
@@ -601,31 +612,103 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* ── Fotografía en tarjeta (orden #05, D) ────────────────────────────────
    El mismo radio de 12 px que el resto de las tarjetas de la casa. El fondo
    cálido se ve mientras la imagen carga, en vez de un hueco blanco. ─────── */
-/* ── «¿Te suena?» · la foto de fondo y el panel de texto (orden #12, C) ───
-   El bloque va a sangre de lado a lado —por eso `Seccion` se dibuja sin
-   contenedor y el contenedor entra adentro— y arranca debajo de la franja de
-   hechos, que es el único texto chico suelto que queda en esta sección. El
-   margen negativo de abajo lo lleva hasta el borde inferior de la sección: lo
-   que se ve es una fotografía que ocupa la sección entera.
+/* ── «¿Te suena?» · la maqueta de Lucía (orden #19-bis, A) ───────────────
+   Cuarta vuelta de esta sección, y la primera hecha **con su captura en la
+   mano**. El relato completo está en `Suena.tsx`; acá va lo que decide el CSS.
 
-   La foto se dibuja al 150 % del ancho del bloque a propósito. Con `cover` a
-   ancho exacto el recorte es **vertical** —la foto es 2:3 y el bloque es
-   apaisado, así que el ancho entra entero— y ahí `object-position` en X no
-   mueve nada: el chico queda en el 48 % del ancho, o sea justo detrás del
-   panel. Agrandándola hay de dónde correrla, y el rostro cae en el 72 % del
-   bloque, que es la banda que el panel no tapa. El eje Y sí es `object-
-   position` puro y elige la franja: 26 % deja la cara y los hombros. ─────── */
-.suena-fondo{position:relative;margin-top:var(--s8);padding-top:var(--s8);padding-bottom:clamp(88px,12vh,140px);margin-bottom:calc(clamp(88px,12vh,140px) * -1)}
-.suena-fondo__grid{display:grid;grid-template-columns:minmax(0,58%) 1fr;align-items:start}
-.suena-fondo__grid>*{grid-column:1}
-.suena-fondo .fondo-foto img{width:150%;max-width:none;object-position:50% 26%}
-/* El panel: crema al 92 % con desenfoque. El 92 % sale de la medición, no del
-   gusto —el barrido de contraste sobre el píxel dibujado dice si alcanza— y
-   sube de a 2 hasta el primero que pase. El número que quedó va en el informe. */
-.suena__panel{background:color-mix(in oklab, var(--crema) 92%, transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:12px;padding:clamp(28px,4vw,48px)}
-.suena__panel .lista{border-top-color:var(--hair-hover)}
-.suena__panel .lista li{border-bottom-color:var(--hair-hover)}
-.suena-fondo .bloque-cita{max-width:52ch}
+   ── Lo que el PR #28 entregó y el CEO rechazó ────────────────────────────
+   Dos columnas correctas, foto de fondo correcta, contraste en 0 — y **la cara
+   del chico no se veía**. Estaba entera en el lienzo y tapada por los suelos:
+   crema al 90 % con desenfoque encima del rostro. El informe la midió sobre el
+   lienzo; una mamá la mira en la pantalla. Los suelos resolvían el contraste
+   escondiendo justo lo que Lucía pedía mostrar.
+
+   ── Entonces: NADA encima de la foto ─────────────────────────────────────
+   Se van los suelos, vuelven las hairlines del `ol`, y el contraste se resuelve
+   donde no tapa nada: **subiendo el velo** y **oscureciendo el texto**. Es al
+   revés de la #12 —que apagó la foto— y al revés del #28 —que la tapó—: el velo
+   uniforme sí deja ver la cara, porque no tiene borde.
+
+   ── El velo, medido desde el 82 % que se ve en su captura ────────────────
+   PRUEBAS-82%
+   ────────────────────────────────────────────────────────────────────────── */
+.suena-fondo{position:relative}
+/* ── Dónde queda el chico, medido y no supuesto ──────────────────────────
+   A 1440 la foto es 2:3 y la sección es apaisada: `cover` llena el ancho
+   exacto, **sobra 0 px en X** y `object-position` horizontal no mueve nada. El
+   chico está en el 47 % de su propia foto y ahí se queda — que es justo donde
+   Lucía lo quiere, **centrado entre las dos columnas**. El único eje con juego
+   es el vertical, y elige la franja del rostro: con 30 % la cabeza entra entera
+   y los ojos quedan por encima del párrafo.
+
+   (El recorte `2026-09-29-porque-fondo-derecha`, que corre al chico al 70 %,
+   NO entra: dirección lo dejó guardado por si Lucía cambia de idea.) */
+.fondo-foto--suena img{object-position:50% 34%}
+.fondo-foto--suena::after{background:color-mix(in oklab, var(--crema) 86%, transparent)}
+
+/* ── El texto de esta sección, más oscuro que en el resto de la web ──────
+   Los cuatro pares que fallaron con el degradado eran **gris sobre foto**. El
+   gris (`--gris`, 716A60) da 4,99 sobre crema plano y se cae apenas hay una fotografía
+   debajo; la tinta da 13,19 y aguanta cualquier velo. No es una excepción de
+   estilo: es que acá el fondo no es un color, es una imagen. */
+.suena-fondo .lista .n,.suena-fondo .lista p{color:var(--tinta)}
+.suena-fondo .eyebrow{color:var(--tinta)}
+
+/* ── El eyebrow: ni ámbar ni naranja, y los dos números están acá ────────
+   (Los hex de abajo van **sin numeral** a propósito: `check:tokens` lee un `#`
+   seguido de seis dígitos como un color escrito a mano y se pone rojo —y lo
+   hizo—. Es la misma convención que la nota de Pexels en `Suena.tsx`.) 
+   La orden pedía `--ambar` (DA8100) «si pasa AA a 12 px, si no `--naranja-texto`
+   y se declara». Se midieron los dos y **no pasa ninguno sobre la fotografía**:
+
+     `--ambar`         DA8100  → **2,76** sobre crema · 2,49 sobre cálido
+     `--naranja-texto` BF3F06  → 5,00 sobre crema plano, pero **4,33–4,38**
+                                 sobre el velo al 86 %, contra los 4,5 de AA
+
+   El ámbar del manual es un acento *sobre oscuro* (4,78 sobre tinta) y acá el
+   fondo es claro; el naranja-texto se cae en cuanto hay una foto debajo. La
+   salida que la orden no previó, y que es la única que deja las dos cosas en
+   pie —0 pares **y** la cara visible—, es **tinta**: el eyebrow pierde el color
+   y el velo se queda ocho puntos más abajo.
+
+   Lo que se pierde está dicho para que dirección pueda revertirlo con un dato:
+   en la captura de Lucía el eyebrow es ámbar. Para tenerlo habría que **subir
+   el velo al 94 %** (y perder la foto, que es lo que se rechazó dos veces),
+   **agrandar el eyebrow** a ≥ 18,7 px en negrita —ahí el umbral baja a 3:1— o
+   **agregar un token** de naranja más oscuro al design system. Las tres son
+   decisiones de dirección, no de esta orden.
+
+   Y por lo mismo **los números NO van en naranja**: serían un segundo acento en
+   la misma sección, y `check:acento` —que solo excusa `.eyebrow`— se pondría
+   rojo con razón. Van en tinta, con el resto del texto secundario. */
+
+/* ── La cita: tarjeta cálida translúcida, a lo ancho ─────────────────────
+   Como en la captura de Lucía: se ve la remera del chico detrás. El 80 % y el
+   `blur(6px)` son los de la orden, y se miden igual que todo lo demás. Sin
+   barra lateral. */
+.bloque-cita--ancha{max-width:none;background:color-mix(in oklab, var(--calido) 80%, transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--tinta);border-left:0;padding:28px}
+
+/* ── Y la sección entera dentro de 100 vh a escritorio (regla de la #20 A) ─
+   La franja de hechos incluida. Los números salen de la orden: paddings
+   verticales a `clamp(40px,5vh,64px)`, el `gap` de la grilla a `--s5`, la
+   franja compacta —ícono y rótulo en la misma línea, que es lo que la hace
+   bajar de tres renglones a dos— y la cita con 28 px. Lo medido está en el
+   informe; si algo sobra, también. */
+@media (min-width:1101px){
+  .suena-fondo{padding-top:clamp(40px,5vh,64px);padding-bottom:clamp(40px,5vh,64px)}
+  .suena-fondo .grid-2{gap:var(--s5);margin-top:var(--s5)}
+  .suena-fondo .lista{margin-top:var(--s4)}
+  .suena-fondo .lista li{padding:16px 0}
+  .suena-fondo .bloque-cita{margin-top:var(--s5)}
+  .suena-fondo .hechos{padding-block:clamp(14px,1.8vh,20px);margin-top:var(--s4)}
+  /* La franja compacta: el ícono a la izquierda y las dos líneas a su derecha,
+     en vez de ícono arriba / rótulo / valor en tres renglones. Son ~46 px por
+     celda y es lo que hace que la sección entre en la ventana. */
+  .suena-fondo .hechos>div{display:grid;grid-template-columns:40px 1fr;column-gap:12px;align-items:center}
+  .suena-fondo .hechos>div>svg,.suena-fondo .hechos>div>img{grid-row:1 / span 2;align-self:center}
+  .suena-fondo .hechos div span{grid-column:2;align-self:end}
+  .suena-fondo .hechos div b{grid-column:2;margin-top:2px;align-self:start}
+}
 
 .foto-tarjeta{border-radius:12px;overflow:hidden;background:var(--calido)}
 .foto-tarjeta img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
@@ -649,24 +732,22 @@ a,button{-webkit-tap-highlight-color:transparent}
      que es donde estaba, no hay orilla que tocar: la de arriba la ocupa el
      rótulo. El padding inferior se lo queda la figura en 0 y el aire entre las
      dos mitades lo pone el `gap`. */
-  #facilitador .foto--libre{order:2;margin-top:0}
-  #facilitador .grid-2>div:last-child{order:1;padding-bottom:0}
+  #facilitador .foto--libre,#quien .foto--libre{order:2;margin-top:0}
+  #facilitador .grid-2>div:last-child,#quien .grid-2>div:last-child{order:1;padding-bottom:0}
   .ahora__row{grid-template-columns:1fr;gap:14px}
   .hechos{grid-template-columns:repeat(2,1fr)}
   .tres,.testimonios,.libros,.contacto{grid-template-columns:1fr}
-  /* A 900 px o menos la foto **no** va detrás del panel: va arriba, apilada,
-     como un bloque propio. Detrás no funcionaría —el texto ocupa todo el ancho,
-     así que el panel taparía la foto entera— y el chico quedaría fuera de
-     cuadro. Es lo que la orden #12 (C) pide declarar para 375. */
+  /* A 900 y a 375 la foto sigue **detrás** (orden #19, A.4): apilarla es el
+     último recurso y habría que declararlo. El velo es el mismo uniforme que
+     a escritorio; lo que cambia es el encuadre, porque acá sí sobra ancho. */
   .fondo-foto img{object-position:62% 18%}
-  .suena-fondo__grid{grid-template-columns:1fr}
-  .suena-fondo .fondo-foto{position:static;height:min(72vw,420px);margin-bottom:var(--s5)}
-  .suena-fondo .fondo-foto img{width:100%;height:100%;object-position:58% 32%}
-  .suena-fondo{padding-top:var(--s6)}
+  .fondo-foto--suena img{object-position:50% 26%}
   .plan{grid-template-columns:1fr;gap:var(--s5)}
 }
 @media (max-width:700px){.pasos{grid-template-columns:1fr}.ft__grid{grid-template-columns:1fr}}
 @media (max-width:600px){
+  /* Acá la foto sobra 1120 px en X: el rostro entra en el tercio derecho. */
+  .fondo-foto--suena img{object-position:40% 26%}
   :root{--header-h:64px}
   .hd__menu span,.hd__wa span{display:none}.hd__wa{padding:0 13px;width:42px;justify-content:center}.hd__inner{column-gap:12px}
   .marca b{font-size:12px;letter-spacing:.24em}

@@ -44,8 +44,23 @@
  * que el `width`/`height` existe para evitar—. Salen del archivo, medidos, no
  * de la orden.
  */
+/* `de-pie` cambió de forma en la #19 (B): 1400×**2526** donde era 2614.
+   El archivo publicado tenía un degradado a transparente por abajo, así que la
+   caja tocaba el borde de la sección (medido: 0 px, cierto) y lo que tocaba era
+   **aire**: la #12 midió la caja, Lucía miraba los píxeles.
+
+   El número pasó por dos manos y vale decirlo: la v1 del insumo cortaba en la
+   **2320** porque se midió mal el degradado —el archivo era opaco hasta la
+   **2532** y solo se desvanecía en las últimas ~70 filas—, y ese recorte tiró
+   212 px de pierna sin necesidad. La v2 sale del PNG con alfa de Lucía y corta
+   en la última fila opaca de verdad.
+
+   Y la foto **termina en los muslos en todas las fuentes que existen**: no hay
+   rodillas ni zapatos que recuperar. Por eso la regla es que el corte del
+   archivo coincida con el borde inferior de la sección — así no se lee como un
+   corte, se lee como un apoyo. */
 const RECORTES = {
-  'de-pie': { ancho: 1400, alto: 2614 },
+  'de-pie': { ancho: 1400, alto: 2526 },
   'medio-cuerpo': { ancho: 1400, alto: 1690 },
 } as const;
 

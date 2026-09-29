@@ -21,8 +21,8 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
-| `@codice/web` | 51 |
-| `@codice/navegador` | 33 |
+| `@codice/web` | 58 |
+| `@codice/navegador` | 35 |
 
 ## Lo que movió la orden #16 — `@codice/navegador` sube a 33
 
@@ -103,6 +103,66 @@ que corta es otro y es el de más afuera.
 Los dos últimos afirman **las dos mitades**: el permiso, porque es el que decide
 hoy, y la fila, porque el día que alguien devuelva el `grant` —un renglón en un
 diff— el segundo freno tiene que seguir ahí y decirlo.
+
+## Lo que trae la orden #19 — `@codice/web` 51 → 58 y `@codice/navegador` 33 → 35
+
+Nueve tests, y los nueve existen porque **la #12 se auditó contra el texto de la
+orden en vez de contra lo que mandó el cliente**, y el PASA dio por buenas dos
+cosas que no lo estaban. La corrección de esa auditoría dejó la doctrina
+escrita; esto es su forma ejecutable.
+
+### `src/armando-no-flota.test.ts` — 3, y miran los PÍXELES
+
+La #12 (E) midió `bottom` de la imagen contra `bottom` de la sección: **0 px a
+1440, 900 y 375**, y era cierto. Pero el archivo tenía **~300 px de degradado a
+transparente** abajo, así que lo que tocaba el borde era aire. **Se midió la
+caja, no lo que se ve.**
+
+Este archivo lee el PNG —con `zlib` y nada más, sin dependencias nuevas— y mira
+la última fila. Medido: el recorte nuevo tiene **319 de 560 píxeles opacos**
+(57 %) con alfa máxima 255; el publicado tenía **0**, alfa máxima **0**. El
+tramo contiguo mayor es 163 px (29 %) y no 57 % porque la última fila son **los
+dos zapatos** y entre ellos hay aire: por eso van las dos medidas, el total y el
+tramo.
+
+| mutación | qué cae |
+|---|---|
+| volver al `de-pie-560.png` viejo | alfa máxima 0 ≠ 255, y la relación del archivo deja de ser la declarada |
+| dejar `Retrato.tsx` en 1400×2614 | la relación declarada no coincide con la del archivo |
+
+### `e2e/armando-al-borde.spec.ts` — 2, y miran la CAJA
+
+La otra mitad, y **en un archivo aparte a propósito**: un archivo opaco colgado
+a 40 px del borde flota igual, y una caja al borde con el archivo viejo adentro
+también. La regla de la casa es probar cada mitad por separado, porque un piso
+que sobrevive porque la otra lo sostiene no está sosteniendo nada.
+
+Mide los **dos** lugares que usan el mismo recorte, `/merida#facilitador` y
+`/#quien`. Y ahí apareció lo que la orden mandaba mirar: con el archivo nuevo la
+portada quedaba **peor que antes** —el mismo hueco cortaba a Armando a media
+pierna con un borde duro y 149 px de crema debajo—. Antes no se notaba porque el
+degradado se desvanecía justo ahí. O sea que aquel degradado tapaba dos
+problemas, no uno. La portada pasa a apoyarse igual que el taller.
+
+### `src/lo-que-mando-armando.test.ts` — 4, contra el insumo y no contra otro i18n
+
+Compara los cinco núcleos, la sede y el horario contra
+`03 Producto/web/insumos/2026-09-28-taller-merida/LEEME.md`, carácter por
+carácter. **No** contra otro string de i18n: una copia es una segunda verdad que
+coincide justo hasta el día que importa.
+
+El modo de falla que caza no es un error de tipeo, es una **mejora**: alguien le
+quita «de la vida» al núcleo 1 porque queda mejor. Probablemente tenga razón —y
+no le toca a la web decidirlo. Las dos mutaciones caen con el texto de Armando y
+el publicado uno debajo del otro.
+
+### Y una que no suma tests pero vale el renglón
+
+Al quitar el punto de «ADOLESCENTE» (#19, C), `check:renglones` **se puso rojo
+solo**: su excepción nombraba «ADOLESCENTE.» y dejó de excusar ningún renglón,
+así que la denunció como permiso que sobra. Nadie tuvo que acordarse de ir a
+tocarla. Es exactamente para lo que esa comprobación existe.
+
 
 ## Lo que trae la orden #13 — `@codice/db` nace con 83
 
