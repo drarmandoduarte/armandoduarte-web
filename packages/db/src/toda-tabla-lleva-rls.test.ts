@@ -81,16 +81,87 @@ describe('las migraciones', () => {
     }
   });
 
-  it('ninguna se aplicó todavía: las seis dicen «APLICADA: —»', async () => {
-    /* Esta afirmación **tiene fecha de vencimiento a propósito**: el día que
-       Germán corra las migraciones y complete las cabeceras, este test se pone
-       rojo y obliga a venir a actualizarlo. Es el recordatorio más barato de que
-       el estado del repo y el de la base tienen que coincidir. */
+  it('las seis están aplicadas, y dicen dónde, cuándo y desde qué commit', async () => {
+    /* ── La fecha de vencimiento se cumplió, y por eso este test cambió ──────
+       Hasta el 29/9/2026 esta afirmación era la contraria: «ninguna se aplicó
+       todavía; las seis dicen APLICADA: —», con un comentario que decía que el
+       día que se corrieran se iba a poner rojo y obligar a alguien a venir. Pasó
+       exactamente eso, y se lo vio en rojo antes de tocarlo:
+
+         × ninguna se aplicó todavía: las seis dicen «APLICADA: —»
+           AssertionError: expected [] to have a length of 6 but got +0
+
+       Lo que NO se hizo es aflojar la afirmación para devolverla a verde. Un test
+       que se actualiza para volver a pasar sin cambiar lo que dice es un test
+       apagado con cara de test. Éste cambió de afirmación porque cambió el mundo:
+       ahora vigila que la cabecera **siga contando la verdad**, que es lo que a
+       partir de hoy se puede perder en silencio.
+
+       ── Qué vigila ahora, y por qué cada parte ────────────────────────────
+       Las tres cosas que hacen falta para poder reconstruir qué hay en la base
+       mirando solo el repo: **dónde** se corrió, **cuándo**, y **desde qué
+       commit**. La tercera es la que más vale: es la que permite saber qué SQL
+       exacto se ejecutó, porque el archivo de hoy puede no ser el de aquel día.
+
+       Y el commit se compara **entre las seis**, no contra una copia escrita acá:
+       las seis se corrieron en la misma sesión, así que si una dice otro commit,
+       o alguien la rehízo o alguien copió mal la cabecera. Comparar contra un
+       `fd93eab` escrito en este archivo sería vigilar la copia y no el hecho —la
+       lección de la #06 con el token duplicado—. */
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
-    const pendientes = migracionesEnOrden().filter((a) =>
-      /^-- APLICADA: —\s*$/m.test(readFileSync(join(import.meta.dirname, '..', 'migrations', a), 'utf8')));
-    expect(pendientes).toHaveLength(6);
+    const leer = (a: string) =>
+      readFileSync(join(import.meta.dirname, '..', 'migrations', a), 'utf8');
+
+    /* EL PISO, PRIMERO: sin esto, «ninguna quedó en —» sobre una lista vacía de
+       migraciones se lee igual que sobre las seis en orden. */
+    const archivos = migracionesEnOrden();
+    expect(archivos, 'el barrido no encontró las seis migraciones').toHaveLength(6);
+
+    const sinAplicar = archivos.filter((a) => /^-- APLICADA: —\s*$/m.test(leer(a)));
+    expect(
+      sinAplicar,
+      'estas migraciones siguen diciendo «APLICADA: —» y la base dice que se corrieron el '
+      + '29/9/2026 02:34. El repo y la base tienen que decir lo mismo.',
+    ).toEqual([]);
+
+    const cabeceras = archivos.map((a) => {
+      const texto = leer(a);
+      const linea = texto.match(/^-- APLICADA: (.+)$/m)?.[1] ?? '';
+      const bloque = texto.slice(texto.indexOf('-- APLICADA:'), texto.indexOf('-- APLICADA:') + 400);
+      return {
+        archivo: a,
+        proyecto: /armandoduarte-familia/.test(bloque),
+        fecha: /\b29\/9\/2026 02:34\b/.test(linea),
+        commit: bloque.match(/\bdesde ([0-9a-f]{7,40})\b/)?.[1] ?? null,
+        /* Cada una dice con qué nombre quedó guardada en el editor SQL, y ese
+           nombre es el suyo: es lo que permite encontrarla allá sin adivinar. */
+        guardadaComoSuNombre: bloque.includes(`\`${a.replace(/\.sql$/, '')}\``),
+      };
+    });
+
+    expect(
+      cabeceras.filter((c) => !c.proyecto).map((c) => c.archivo),
+      'la cabecera no nombra el proyecto donde se corrió',
+    ).toEqual([]);
+    expect(
+      cabeceras.filter((c) => !c.fecha).map((c) => c.archivo),
+      'la cabecera no lleva la fecha y la hora en que se corrió',
+    ).toEqual([]);
+    expect(
+      cabeceras.filter((c) => !c.commit).map((c) => c.archivo),
+      'la cabecera no dice desde qué commit se corrió, que es lo que permite saber qué SQL se ejecutó',
+    ).toEqual([]);
+    expect(
+      cabeceras.filter((c) => !c.guardadaComoSuNombre).map((c) => c.archivo),
+      'la cabecera no dice con qué nombre quedó guardada en el editor SQL, o dice el de otra',
+    ).toEqual([]);
+
+    /* Las seis, el mismo commit: se corrieron en una sola sesión. */
+    expect(
+      [...new Set(cabeceras.map((c) => c.commit))],
+      'las seis se corrieron en la misma sesión y desde el mismo commit: si hay dos, una cabecera miente',
+    ).toHaveLength(1);
   });
 });
 

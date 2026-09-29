@@ -8,7 +8,10 @@
 -- ORDEN QUE LA APROBÓ: Códice #13 (Mi espacio, PR 1), aprobada por dirección el
 -- 29/9/2026. Especificación: `03 Producto/mi-espacio/especificacion-v1.md` §3.
 --
--- APLICADA: —
+-- APLICADA: 29/9/2026 02:34 (UY), en `armandoduarte-familia`, desde fd93eab.
+--   Corrida por el CEO con autorización de Germán; verificada contra la base
+--   (10 tablas con RLS, 39 policies en `public`, 3 en `storage`, bucket
+--   `comprobantes` privado). Guardada en el editor SQL como `003_inscripciones_y_libro`.
 --
 -- ── LA REGLA DE LA CASA · Omnia #74: el libro anota, no opina ──────────────
 -- `inscripciones` **no tiene columna estado**, y eso no es una omisión: es lo que
