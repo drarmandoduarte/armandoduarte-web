@@ -58,8 +58,28 @@ describe('el censo de RLS', () => {
   });
 });
 
+/**
+ * Las migraciones que **todavía no corrió dirección**, con su motivo.
+ *
+ * ── Por qué una lista y no una regla ────────────────────────────────────
+ * Es la misma forma que `qa/skips-permitidos.md`: una fila con su razón, que
+ * alguien tiene que escribir y alguien tiene que borrar. Una regla del tipo «la
+ * última puede estar pendiente» se cumpliría sola para siempre y dejaría de
+ * decir nada; una fila obliga a venir dos veces —al escribirla y al sacarla— y
+ * las dos veces se ven en un diff.
+ *
+ * **Y sobra tan rojo como falta**: si una de acá ya dice su fecha, el test de
+ * abajo se pone rojo pidiendo que se borre la fila. Un permiso que sobra es una
+ * mentira con formato de tabla.
+ */
+const PENDIENTES: Record<string, string> = {
+  '007_permisos.sql':
+    'los GRANT que el proyecto no da solo (corrección de la #15, punto 0). La corre dirección '
+    + 'en `armandoduarte-familia` y completa su cabecera; hasta entonces un cliente no entra.',
+};
+
 describe('las migraciones', () => {
-  it('son seis, numeradas de tres dígitos y en orden', async () => {
+  it('son siete, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -67,6 +87,7 @@ describe('las migraciones', () => {
       '004_datos_de_cobro_y_auditoria.sql',
       '005_seguridad_512.sql',
       '006_storage_comprobantes.sql',
+      '007_permisos.sql',
     ]);
   });
 
@@ -81,7 +102,7 @@ describe('las migraciones', () => {
     }
   });
 
-  it('las seis están aplicadas, y dicen dónde, cuándo y desde qué commit', async () => {
+  it('las corridas están aplicadas y dicen dónde, cuándo y desde qué commit; las pendientes, declaradas', async () => {
     /* ── La fecha de vencimiento se cumplió, y por eso este test cambió ──────
        Hasta el 29/9/2026 esta afirmación era la contraria: «ninguna se aplicó
        todavía; las seis dicen APLICADA: —», con un comentario que decía que el
@@ -114,18 +135,37 @@ describe('las migraciones', () => {
       readFileSync(join(import.meta.dirname, '..', 'migrations', a), 'utf8');
 
     /* EL PISO, PRIMERO: sin esto, «ninguna quedó en —» sobre una lista vacía de
-       migraciones se lee igual que sobre las seis en orden. */
+       migraciones se lee igual que sobre las siete en orden. */
     const archivos = migracionesEnOrden();
-    expect(archivos, 'el barrido no encontró las seis migraciones').toHaveLength(6);
+    expect(archivos.length, 'el barrido no encontró las migraciones').toBeGreaterThanOrEqual(7);
 
-    const sinAplicar = archivos.filter((a) => /^-- APLICADA: —\s*$/m.test(leer(a)));
+    const pendiente = (a: string) => a in PENDIENTES;
+    const corridas = archivos.filter((a) => !pendiente(a));
+
+    const sinAplicar = corridas.filter((a) => /^-- APLICADA: —\s*$/m.test(leer(a)));
     expect(
       sinAplicar,
-      'estas migraciones siguen diciendo «APLICADA: —» y la base dice que se corrieron el '
-      + '29/9/2026 02:34. El repo y la base tienen que decir lo mismo.',
+      'estas migraciones siguen diciendo «APLICADA: —» y no están en PENDIENTES. O se corrieron y '
+      + 'falta completar la cabecera, o falta declararlas como pendientes con su motivo.',
     ).toEqual([]);
 
-    const cabeceras = archivos.map((a) => {
+    /* Y al revés, que es la mitad que se olvida: una fila de PENDIENTES que ya
+       dice su fecha es una fila que sobra, y hay que venir a borrarla. */
+    const yaCorridas = Object.keys(PENDIENTES)
+      .filter((a) => archivos.includes(a) && !/^-- APLICADA: —\s*$/m.test(leer(a)));
+    expect(
+      yaCorridas,
+      'estas migraciones están declaradas como pendientes y su cabecera ya dice cuándo se '
+      + 'corrieron: se borra la fila de PENDIENTES. Una lista de excepciones que no se limpia se '
+      + 'convierte en una lista de mentiras.',
+    ).toEqual([]);
+
+    /* Y que las declaradas existan: una fila que nombra un archivo que no está
+       tapa el hueco que debería denunciar. */
+    const fantasmas = Object.keys(PENDIENTES).filter((a) => !archivos.includes(a));
+    expect(fantasmas, 'PENDIENTES nombra migraciones que no existen').toEqual([]);
+
+    const cabeceras = corridas.map((a) => {
       const texto = leer(a);
       const linea = texto.match(/^-- APLICADA: (.+)$/m)?.[1] ?? '';
       const bloque = texto.slice(texto.indexOf('-- APLICADA:'), texto.indexOf('-- APLICADA:') + 400);

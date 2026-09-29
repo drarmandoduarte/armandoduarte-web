@@ -7,7 +7,8 @@ con su RLS y sus tests, y nada más**: ni API, ni pantalla, ni kit.
 migrations/          las seis migraciones, inmutables una vez aplicadas
 supabase-base.sql    el entorno de Supabase para el banco — NO es una migración
 src/banco.ts         un Postgres de verdad, en proceso, con las migraciones puestas
-src/*.test.ts        83 tests que afirman fila por fila qué ve cada sesión
+src/*.test.ts        87 tests: 83 que afirman fila por fila qué ve cada sesión
+                     y 4 que afirman los permisos de tabla, verbo por verbo
 ```
 
 ---
@@ -79,6 +80,7 @@ autorización de Germán.
 | 004 | `004_datos_de_cobro_y_auditoria.sql` | la cuenta a la que se transfiere y el registro append-only | **29/9/2026 02:34** |
 | 005 | `005_seguridad_512.sql` | `totp_backup_codes` y `security_devices`, del kit | **29/9/2026 02:34** |
 | 006 | `006_storage_comprobantes.sql` | el bucket privado `comprobantes` y sus policies | **29/9/2026 02:34** |
+| 007 | `007_permisos.sql` | los `grant` de tabla, secuencia y función que el proyecto no da solo | **pendiente** |
 
 Las seis quedaron guardadas en el editor SQL de Supabase con el nombre de su
 archivo (`001_personas_y_miembros` … `006_storage_comprobantes`).
