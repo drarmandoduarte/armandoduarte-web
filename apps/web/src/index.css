@@ -612,81 +612,103 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* ── Fotografía en tarjeta (orden #05, D) ────────────────────────────────
    El mismo radio de 12 px que el resto de las tarjetas de la casa. El fondo
    cálido se ve mientras la imagen carga, en vez de un hueco blanco. ─────── */
-/* ── «¿Te suena?» · la foto de fondo de TODA la sección (orden #19, A) ────
-   Lucía pidió la sección como estaba —dos columnas y la cita abajo— con la foto
-   del chico de fondo, entera y suave. La #12 entregó otra cosa: panel angosto,
-   puntos apilados y la foto estirada al 150 %, donde a 1440 se veía el pelo y
-   nada más. Esto la devuelve.
+/* ── «¿Te suena?» · la maqueta de Lucía (orden #19-bis, A) ───────────────
+   Cuarta vuelta de esta sección, y la primera hecha **con su captura en la
+   mano**. El relato completo está en `Suena.tsx`; acá va lo que decide el CSS.
 
-   ── La foto NO se estira ─────────────────────────────────────────────────
-   `cover` y punto. La #12 la ponía al 150 % para poder correr al chico hacia la
-   derecha con `object-position` en X, porque con ancho exacto el recorte es
-   **vertical** —la foto es 2:3, el bloque es apaisado— y el eje X no mueve
-   nada. El precio de esa maniobra fue el rostro: agrandada ×1,5 sobre 1440, la
-   cara se va de cuadro y queda la frente. La orden #19 lo dice sin vueltas:
-   «sin escalar más allá del cover», «a 1440 tiene que verse el rostro
-   completo». Así que el único eje que se elige es Y, y se elige la franja del
-   rostro. Lo que NO se puede hacer sin estirar está en el informe.
+   ── Lo que el PR #28 entregó y el CEO rechazó ────────────────────────────
+   Dos columnas correctas, foto de fondo correcta, contraste en 0 — y **la cara
+   del chico no se veía**. Estaba entera en el lienzo y tapada por los suelos:
+   crema al 90 % con desenfoque encima del rostro. El informe la midió sobre el
+   lienzo; una mamá la mira en la pantalla. Los suelos resolvían el contraste
+   escondiendo justo lo que Lucía pedía mostrar.
 
-   ── El velo, medido y no elegido ─────────────────────────────────────────
-   La orden fija el orden de las pruebas y con cuál quedarse: el primero que dé
-   0 pares bajo AA a 1440, 900 y 375 con la foto cargada. Lo probado, en orden,
-   con `check/contraste.mjs` sobre el píxel dibujado:
-   (pendiente de medir)
+   ── Entonces: NADA encima de la foto ─────────────────────────────────────
+   Se van los suelos, vuelven las hairlines del `ol`, y el contraste se resuelve
+   donde no tapa nada: **subiendo el velo** y **oscureciendo el texto**. Es al
+   revés de la #12 —que apagó la foto— y al revés del #28 —que la tapó—: el velo
+   uniforme sí deja ver la cara, porque no tiene borde.
+
+   ── El velo, medido desde el 82 % que se ve en su captura ────────────────
+   PRUEBAS-82%
    ────────────────────────────────────────────────────────────────────────── */
-.suena-fondo{position:relative;margin-top:var(--s8);padding-top:var(--s8);padding-bottom:clamp(88px,12vh,140px);margin-bottom:calc(clamp(88px,12vh,140px) * -1)}
+.suena-fondo{position:relative}
 /* ── Dónde queda el chico, medido y no supuesto ──────────────────────────
-   La orden pide la cara «entera y visible en el tercio derecho». Lo primero se
-   puede; lo segundo **no**, y la aritmética lo dice sin lugar a interpretación.
-   Medido sobre la página dibujada:
+   A 1440 la foto es 2:3 y la sección es apaisada: `cover` llena el ancho
+   exacto, **sobra 0 px en X** y `object-position` horizontal no mueve nada. El
+   chico está en el 47 % de su propia foto y ahí se queda — que es justo donde
+   Lucía lo quiere, **centrado entre las dos columnas**. El único eje con juego
+   es el vertical, y elige la franja del rostro: con 30 % la cabeza entra entera
+   y los ojos quedan por encima del párrafo.
 
-     1440: sección 1440×1317 · fuente 1800×2700 · cover ×0,800 → 1440×2160
-           **sobra 0 px en X**  → `object-position` horizontal no mueve NADA
-      900: sección  900×1655 · fuente 1200×1800 · cover ×0,919 → 1103×1655
-           sobra 203 px en X    → el rostro llega, como mucho, al 58 %
-      375: sección  375×2242 · fuente 1200×1800 · cover ×1,246 → 1495×2242
-           sobra 1120 px en X   → acá sí entra en el tercio derecho
+   (El recorte `2026-09-29-porque-fondo-derecha`, que corre al chico al 70 %,
+   NO entra: dirección lo dejó guardado por si Lucía cambia de idea.) */
+.fondo-foto--suena img{object-position:50% 34%}
+.fondo-foto--suena::after{background:color-mix(in oklab, var(--crema) 86%, transparent)}
 
-   A 1440 la foto es 2:3 y la sección es apaisada, así que `cover` llena el
-   ancho exacto y el único eje con juego es el vertical. El chico está en el
-   47 % de su propia foto y ahí se queda. Correrlo exigiría estirarla, que es
-   justo lo que la #12 hizo (×1,5) y lo que la #19 prohíbe con todas las letras
-   —fue lo que dejó el rostro fuera de cuadro—. Queda en el informe como lo que
-   necesita decisión: o la captura de Lucía para igualarla, o un recorte nuevo
-   de la fuente con el chico en su tercio derecho.
+/* ── El texto de esta sección, más oscuro que en el resto de la web ──────
+   Los cuatro pares que fallaron con el degradado eran **gris sobre foto**. El
+   gris (`--gris`, 716A60) da 4,99 sobre crema plano y se cae apenas hay una fotografía
+   debajo; la tinta da 13,19 y aguanta cualquier velo. No es una excepción de
+   estilo: es que acá el fondo no es un color, es una imagen. */
+.suena-fondo .lista .n,.suena-fondo .lista p{color:var(--tinta)}
+.suena-fondo .eyebrow{color:var(--tinta)}
 
-   Lo que sí se cumple, que es el criterio duro de la orden: **a 1440 se ve el
-   rostro completo**, no el pelo. ───────────────────────────────────────── */
-.fondo-foto--suena img{object-position:50% 30%}
-/* El velo en degradado horizontal: cerrado sobre la columna de texto, abierto
-   desde el 34 % en adelante, que es **donde está el chico** —no en el borde
-   derecho, donde no hay nada que mostrar—. Un velo uniforme ya se midió dos
-   veces y las dos perdió (#05: 14 pares al 88 %; al 94 % la foto deja de ser
-   una imagen). */
-.fondo-foto--suena::after{background:linear-gradient(to right,
-  color-mix(in oklab, var(--crema) 94%, transparent) 0%,
-  color-mix(in oklab, var(--crema) 94%, transparent) 30%,
-  color-mix(in oklab, var(--crema) 72%, transparent) 55%,
-  color-mix(in oklab, var(--crema) 72%, transparent) 100%)}
-/* ── El suelo local, que es el punto (ii) de la orden ────────────────────
-   El (i) —velo en degradado 94 % → 78 %— dejó **4 pares bajo AA**: el eyebrow
-   de 12 px, el número de cada punto y dos párrafos de 16 px, todos entre 4,18 y
-   4,49. Subir el degradado habría apagado otra vez la foto, que es lo que la
-   #05 ya pagó dos veces. Así que cada bloque de texto se lleva su propio piso y
-   la fotografía se queda como está.
+/* ── El eyebrow: ni ámbar ni naranja, y los dos números están acá ────────
+   (Los hex de abajo van **sin numeral** a propósito: `check:tokens` lee un `#`
+   seguido de seis dígitos como un color escrito a mano y se pone rojo —y lo
+   hizo—. Es la misma convención que la nota de Pexels en `Suena.tsx`.) 
+   La orden pedía `--ambar` (DA8100) «si pasa AA a 12 px, si no `--naranja-texto`
+   y se declara». Se midieron los dos y **no pasa ninguno sobre la fotografía**:
 
-   Los números son los de la orden: `--crema` al 90 %, desenfoque de 10 px,
-   24 px de aire, esquinas de 2 px. La maqueta no cambia — es un fondo, no una
-   columna nueva. ───────────────────────────────────────────────────────── */
-.suena__suelo{background:color-mix(in oklab, var(--crema) 90%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:2px;padding:24px}
-/* El `ol` ya separa los puntos con hairlines; con suelo propio cada uno, la
-   línea de arriba del primero sobraría —quedaría flotando sobre el piso—. */
-.suena-fondo .lista{border-top:0}
-.suena-fondo .lista li{border-bottom:0;margin-bottom:var(--s3)}
-.suena-fondo .lista li:last-child{margin-bottom:0}
-/* La cita, a lo ancho y cálida: como antes de la #07, que se la había llevado a
-   una tarjeta con foto. */
-.bloque-cita--ancha{max-width:none}
+     `--ambar`         DA8100  → **2,76** sobre crema · 2,49 sobre cálido
+     `--naranja-texto` BF3F06  → 5,00 sobre crema plano, pero **4,33–4,38**
+                                 sobre el velo al 86 %, contra los 4,5 de AA
+
+   El ámbar del manual es un acento *sobre oscuro* (4,78 sobre tinta) y acá el
+   fondo es claro; el naranja-texto se cae en cuanto hay una foto debajo. La
+   salida que la orden no previó, y que es la única que deja las dos cosas en
+   pie —0 pares **y** la cara visible—, es **tinta**: el eyebrow pierde el color
+   y el velo se queda ocho puntos más abajo.
+
+   Lo que se pierde está dicho para que dirección pueda revertirlo con un dato:
+   en la captura de Lucía el eyebrow es ámbar. Para tenerlo habría que **subir
+   el velo al 94 %** (y perder la foto, que es lo que se rechazó dos veces),
+   **agrandar el eyebrow** a ≥ 18,7 px en negrita —ahí el umbral baja a 3:1— o
+   **agregar un token** de naranja más oscuro al design system. Las tres son
+   decisiones de dirección, no de esta orden.
+
+   Y por lo mismo **los números NO van en naranja**: serían un segundo acento en
+   la misma sección, y `check:acento` —que solo excusa `.eyebrow`— se pondría
+   rojo con razón. Van en tinta, con el resto del texto secundario. */
+
+/* ── La cita: tarjeta cálida translúcida, a lo ancho ─────────────────────
+   Como en la captura de Lucía: se ve la remera del chico detrás. El 80 % y el
+   `blur(6px)` son los de la orden, y se miden igual que todo lo demás. Sin
+   barra lateral. */
+.bloque-cita--ancha{max-width:none;background:color-mix(in oklab, var(--calido) 80%, transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--tinta);border-left:0;padding:28px}
+
+/* ── Y la sección entera dentro de 100 vh a escritorio (regla de la #20 A) ─
+   La franja de hechos incluida. Los números salen de la orden: paddings
+   verticales a `clamp(40px,5vh,64px)`, el `gap` de la grilla a `--s5`, la
+   franja compacta —ícono y rótulo en la misma línea, que es lo que la hace
+   bajar de tres renglones a dos— y la cita con 28 px. Lo medido está en el
+   informe; si algo sobra, también. */
+@media (min-width:1101px){
+  .suena-fondo{padding-top:clamp(40px,5vh,64px);padding-bottom:clamp(40px,5vh,64px)}
+  .suena-fondo .grid-2{gap:var(--s5);margin-top:var(--s5)}
+  .suena-fondo .lista{margin-top:var(--s4)}
+  .suena-fondo .lista li{padding:16px 0}
+  .suena-fondo .bloque-cita{margin-top:var(--s5)}
+  .suena-fondo .hechos{padding-block:clamp(14px,1.8vh,20px);margin-top:var(--s4)}
+  /* La franja compacta: el ícono a la izquierda y las dos líneas a su derecha,
+     en vez de ícono arriba / rótulo / valor en tres renglones. Son ~46 px por
+     celda y es lo que hace que la sección entre en la ventana. */
+  .suena-fondo .hechos>div{display:grid;grid-template-columns:40px 1fr;column-gap:12px;align-items:center}
+  .suena-fondo .hechos>div>svg,.suena-fondo .hechos>div>img{grid-row:1 / span 2;align-self:center}
+  .suena-fondo .hechos div span{grid-column:2;align-self:end}
+  .suena-fondo .hechos div b{grid-column:2;margin-top:2px;align-self:start}
+}
 
 .foto-tarjeta{border-radius:12px;overflow:hidden;background:var(--calido)}
 .foto-tarjeta img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
@@ -716,15 +738,10 @@ a,button{-webkit-tap-highlight-color:transparent}
   .hechos{grid-template-columns:repeat(2,1fr)}
   .tres,.testimonios,.libros,.contacto{grid-template-columns:1fr}
   /* A 900 y a 375 la foto sigue **detrás** (orden #19, A.4): apilarla es el
-     último recurso y habría que declararlo. Lo que cambia es el velo, que en
-     una columna sola no puede abrirse a la derecha —el texto ocupa todo el
-     ancho— así que pasa a ser uniforme y se mide aparte. */
+     último recurso y habría que declararlo. El velo es el mismo uniforme que
+     a escritorio; lo que cambia es el encuadre, porque acá sí sobra ancho. */
   .fondo-foto img{object-position:62% 18%}
-  /* A 900 la foto sobra 203 px en X: el rostro llega al 58 % y no más. A 375
-     sobra 1120 px y ahí sí entra en el tercio derecho, con el 40 %. */
-  .fondo-foto--suena img{object-position:0% 26%}
-  .fondo-foto--suena::after{background:color-mix(in oklab, var(--crema) 86%, transparent)}
-  .suena-fondo{padding-top:var(--s6)}
+  .fondo-foto--suena img{object-position:50% 26%}
   .plan{grid-template-columns:1fr;gap:var(--s5)}
 }
 @media (max-width:700px){.pasos{grid-template-columns:1fr}.ft__grid{grid-template-columns:1fr}}

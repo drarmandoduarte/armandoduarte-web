@@ -128,7 +128,7 @@ export function Suena() {
         {/* La maqueta de antes de la #12, recuperada de `4b592d2^`: dos
             columnas —título y párrafo | los tres puntos— y la cita abajo. */}
         <div className="grid-2 u-mt-8">
-          <div className="suena__suelo">
+          <div>
             <span className="eyebrow reveal">{t('taller.suena.eyebrow')}</span>
             <h2 className="display-m u-mt-4 reveal" data-d="1">
               {t('taller.suena.titulo1')}<br /><span className="suave">{t('taller.suena.titulo2')}</span>
@@ -137,7 +137,7 @@ export function Suena() {
           </div>
           <ol className="lista lista--2 reveal" data-d="2">
             {sintomas.map(([n, titulo, texto]) => (
-              <li key={n} className="suena__suelo">
+              <li key={n}>
                 <span className="n">{n}</span>
                 <div><h3>{titulo}</h3><p>{texto}</p></div>
               </li>

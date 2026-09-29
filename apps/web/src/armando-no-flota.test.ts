@@ -143,17 +143,28 @@ describe('Armando no flota: el archivo termina en cuerpo, no en aire', () => {
 
   it('la ÚLTIMA fila tiene alfa 255, y el archivo viejo daba CERO', () => {
     /* ── Los números son medidos, no elegidos ────────────────────────────
-       Archivo nuevo (560×928): **319 de 560 píxeles opacos** en la última fila
-       —el 57 %—, con un tramo contiguo mayor de 163 (29 %) y alfa máxima 255.
-       Archivo viejo (560×1045): **0 opacos**, alfa máxima **0**. La última fila
-       del recorte publicado era enteramente transparente.
+       Archivo publicado hoy, la **v2** del insumo (560×1011): **321 de 560
+       píxeles opacos** en la última fila —el 57,3 %—, tramo contiguo mayor 164
+       (29,3 %) y alfa máxima 255. El archivo que estaba antes de la #19
+       (560×1045): **0 opacos**, alfa máxima **0** — la última fila del recorte
+       publicado era enteramente transparente.
+
+       (La v1 del insumo, que este PR llegó a publicar, daba 319/163: los mismos
+       números, con 212 px de pierna de menos. Cortaba en la fila 2320 porque se
+       midió mal el degradado del original, que era opaco hasta la 2532. Se
+       cambió por la v2 sin tocar ninguna afirmación de este archivo: cambió el
+       número declarado en `Retrato.tsx`, no la idea.)
 
        El tramo contiguo es 29 % y no 57 % por un motivo que conviene dejar
-       escrito, porque a primera vista parece poco: la última fila del recorte
-       son **los dos zapatos**, y entre ellos hay aire. Un umbral sobre el tramo
-       contiguo más largo mide un pie, no el cuerpo; el que mide el apoyo es el
-       total. Los dos van, con sus pisos debajo de lo medido y bien por encima
-       del cero del archivo viejo. */
+       escrito, porque a primera vista parece poco: la última fila son **las dos
+       piernas**, y entre ellas hay aire. Un umbral sobre el tramo contiguo más
+       largo mide una pierna, no el cuerpo; el que mide el apoyo es el total.
+       Los dos van, con sus pisos debajo de lo medido y bien por encima del cero
+       del archivo viejo.
+
+       Y no hay zapatos que buscar: la foto **termina en los muslos en todas las
+       fuentes que existen**. Por eso el corte del archivo tiene que coincidir
+       con el borde de la sección — así no se lee como un corte. */
     expect(
       Math.max(...ultima),
       'la última fila del recorte no tiene ni un píxel opaco. El archivo termina en un degradado a '
@@ -165,7 +176,7 @@ describe('Armando no flota: el archivo termina en cuerpo, no en aire', () => {
     expect(
       opacos,
       `la última fila tiene ${opacos} píxeles opacos de ${png.ancho}; medido sobre el recorte de la `
-      + '#19 son 319. Si bajó, el archivo volvió a tener degradado abajo.',
+      + '#19 son 321. Si bajó, el archivo volvió a tener degradado abajo.',
     ).toBeGreaterThan(png.ancho * 0.4);
 
     /* Y que ese apoyo sea cuerpo y no motitas del recorte. */
@@ -176,7 +187,7 @@ describe('Armando no flota: el archivo termina en cuerpo, no en aire', () => {
     }
     expect(
       mayorTramo,
-      `el tramo opaco contiguo más largo es ${mayorTramo} px; medido son 163 (un zapato). `
+      `el tramo opaco contiguo más largo es ${mayorTramo} px; medido son 164 (una pierna). `
       + 'Píxeles opacos sueltos no son un cuerpo llegando al borde.',
     ).toBeGreaterThan(png.ancho * 0.2);
   });
@@ -189,12 +200,12 @@ describe('Armando no flota: el archivo termina en cuerpo, no en aire', () => {
     const fuente = readFileSync(join(APP, 'src', 'web', 'comun', 'Retrato.tsx'), 'utf8');
     expect(
       fuente,
-      '`Retrato.tsx` sigue declarando el alto del recorte viejo (2614). El archivo nuevo mide 2321.',
-    ).toContain("'de-pie': { ancho: 1400, alto: 2321 }");
+      '`Retrato.tsx` no declara el alto del recorte publicado. El archivo de la v2 mide 1400×2526.',
+    ).toContain("'de-pie': { ancho: 1400, alto: 2526 }");
     /* La relación del PNG chico tiene que ser la misma que la declarada: si
        alguien reemplaza un archivo y no el otro, esto lo dice. */
     const relacionArchivo = png.ancho / png.alto;
-    const relacionDeclarada = 1400 / 2321;
+    const relacionDeclarada = 1400 / 2526;
     expect(
       Math.abs(relacionArchivo - relacionDeclarada),
       `el PNG de 560 tiene relación ${relacionArchivo.toFixed(4)} y el recorte declara `

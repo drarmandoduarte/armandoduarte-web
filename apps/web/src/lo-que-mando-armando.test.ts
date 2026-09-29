@@ -30,7 +30,7 @@
  * se pierde ni un carácter**.
  */
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RECURSOS_I18N } from '@codice/core';
@@ -40,7 +40,20 @@ import { RECURSOS_I18N } from '@codice/core';
    el repo es público y esa carpeta tiene material sin publicar. */
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const INSUMOS = join(REPO, '..', '..', '03 Producto', 'web', 'insumos', '2026-09-28-taller-merida', 'LEEME.md');
-const LEEME = readFileSync(INSUMOS, 'utf8');
+/**
+ * ── El guardia, que es lo que faltaba ───────────────────────────────────
+ * Este archivo vive **fuera del repo**, y el repo es **público**. Tal como
+ * estaba, un `readFileSync` a nivel de módulo hacía que en cualquier clon
+ * ajeno a esta carpeta el archivo entero **reventara al importar** —no se
+ * saltaba: se caía, y con un `ENOENT` que no explica nada—.
+ *
+ * Con el guardia, la suite se salta **declarándose**: aparece como saltada en
+ * el reporte, el guardián de guardianes la ve, y `qa/skips-permitidos.md` es el
+ * único lugar donde eso se puede autorizar. Un test que no corre no grita; éste
+ * al menos dice su nombre.
+ */
+const HAY_INSUMO = existsSync(INSUMOS);
+const LEEME = HAY_INSUMO ? readFileSync(INSUMOS, 'utf8') : '';
 
 /**
  * Los cinco núcleos tal como están escritos en el `LEEME.md`, en el formato en
@@ -70,7 +83,9 @@ const web = RECURSOS_I18N.es.web as Record<string, any>;
 const programa = web.taller.programa;
 const hechos = web.taller.hechos;
 
-describe('la web dice lo que mandó Armando, carácter por carácter', () => {
+const suite = HAY_INSUMO ? describe : describe.skip;
+
+suite('la web dice lo que mandó Armando, carácter por carácter', () => {
   it('EL PISO, PRIMERO: el LEEME de los insumos se leyó y trae los cinco', () => {
     /* Sin esto, un `LEEME.md` movido de carpeta o un formato distinto darían
        cero núcleos y las comparaciones de abajo —que recorren esa lista— no
