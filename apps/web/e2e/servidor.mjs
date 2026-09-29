@@ -49,6 +49,14 @@ const TIPOS = {
   '.svg': 'image/svg+xml',
   '.jpg': 'image/jpeg',
   '.png': 'image/png',
+  /* `.webp` faltaba, y no era cosmético: **la web sirve en WebP casi todas sus
+     imágenes** —los dos recortes de Armando y las seis fotografías— y acá salían
+     con `application/octet-stream`. Vercel las sirve como `image/webp`, así que
+     este servidor no estaba sirviendo lo mismo que la producción, que es su
+     única razón de ser. Lo destapó la #12 midiendo Lighthouse: el informe no
+     reconocía ninguna imagen de la página y por lo tanto no podía decir cuál era
+     el elemento LCP ni qué pesaba de más. */
+  '.webp': 'image/webp',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
   '.xml': 'application/xml',

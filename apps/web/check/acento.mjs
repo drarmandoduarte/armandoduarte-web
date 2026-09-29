@@ -81,12 +81,39 @@ export const PAGINAS = [
  * agregar un botón primario no rompa el barrido, pero agregar un número naranja
  * sí. Si algo de acá deja de existir, el barrido no se entera —y no tiene por
  * qué: su trabajo es cazar lo que sobra, no lo que falta—.
+ *
+ * ── El tercer valor: cuántos elementos puede excusar la regla (orden #12) ──
+ * Las cuatro primeras filas no lo llevan: son **clases de cosa** —los CTA
+ * primarios, los rótulos de sección— y cuántas haya es una cuestión de cuánto
+ * contenido tenga la página, no una decisión.
+ *
+ * La quinta sí, y por eso existe el campo. «ADOLESCENTE» es **una excepción a
+ * una regla**, y una excepción sin número no es una excepción: es una puerta.
+ * Medido acá mismo, y por eso está escrito: con la fila puesta sin tope, la
+ * mutación de la orden —pintar de naranja **otra** palabra del mismo `<h1>`,
+ * con la misma clase— salía **verde**. El selector permitía el elemento que
+ * dirección aprobó y también a cualquiera que se pusiera esa clase, que es
+ * exactamente el agujero que la orden pedía cerrar.
+ *
+ * Con el tope en 1, esa misma mutación cae diciendo que la regla excusó dos
+ * elementos y solo puede excusar uno.
  */
 export const PERMITIDO = [
   ['.btn--naranja', 'el CTA primario: es el único acento por pantalla'],
   ['.eyebrow', 'el rótulo que abre cada sección, solo sobre fondo claro'],
   ['.script', 'la firma de la marca en Great Vibes, en el pie'],
   ['.dato', 'la marca de dato pendiente de Armando: no es diseño, es andamio'],
+  /* ── La excepción declarada de la #12 (B) ─────────────────────────────────
+     «ADOLESCENTE» en el hero de `/merida`, en `--naranja-texto`. Lo pidió Lucía
+     el 28/9 y entra por D23. **Es una excepción, no una regla nueva**: está
+     anotada así en `docs/tareas.md` y el selector es todo lo estrecho que se
+     puede —el `<span>` de esa palabra, dentro del `<h1>` del hero— para que
+     permita ese elemento y ninguno más.
+
+     Lo que la hace comprobable es la mutación: poner de naranja cualquier otra
+     palabra de la página, incluida otra palabra del mismo `<h1>`, y ver que
+     este barrido se pone rojo. Está en el informe de la #12. */
+  ['#inicio h1 .hero-taller__palabra', 'la excepción declarada de la #12: «ADOLESCENTE», que pidió Lucía', 1],
 ];
 
 export const RECOLECTAR = ({ permitido }) => {
@@ -126,6 +153,11 @@ export const RECOLECTAR = ({ permitido }) => {
 
   const todos = [...document.querySelectorAll('body *')];
   const hallazgos = [];
+  /* Cuántos elementos distintos excusó cada regla. Se cuenta el **ancestro que
+     coincidió** y no el elemento que pintó, y se guarda en un Set para que un
+     mismo botón con el naranja en `color` y en `backgroundColor` cuente una vez
+     y no dos: el tope habla de elementos, no de propiedades. */
+  const excusados = new Map(permitido.map(([sel]) => [sel, new Set()]));
   for (const el of todos) {
     /* Lo que no se ve no pinta nada. El overlay cerrado es `visibility:hidden`
        y sus ítems no cuentan hasta que alguien lo abra. */
@@ -146,7 +178,10 @@ export const RECOLECTAR = ({ permitido }) => {
       const token = cual(cs[prop]);
       if (!token) continue;
       const permitidoPor = permitido.find(([sel]) => el.closest(sel));
-      if (permitidoPor) continue;
+      if (permitidoPor) {
+        excusados.get(permitidoPor[0]).add(el.closest(permitidoPor[0]));
+        continue;
+      }
 
       hallazgos.push({
         donde: el.tagName.toLowerCase()
@@ -158,8 +193,26 @@ export const RECOLECTAR = ({ permitido }) => {
       });
     }
   }
-  return { mirados: todos.length, hallazgos };
+  return {
+    mirados: todos.length,
+    hallazgos,
+    excusados: Object.fromEntries([...excusados].map(([sel, nodos]) => [sel, nodos.size])),
+  };
 };
+
+/**
+ * Las reglas que excusaron más elementos de los que tenían permitido.
+ *
+ * Vive acá y no en cada puerta por lo de siempre: dos copias de la misma
+ * comprobación son dos verdades que un día no coinciden. La consola y el spec
+ * llaman a ésta.
+ */
+export const DE_MAS = (excusados, permitido = PERMITIDO) => permitido
+  .filter(([sel, , tope]) => tope !== undefined && (excusados[sel] ?? 0) > tope)
+  .map(([sel, motivo, tope]) =>
+    `la regla «${sel}» excusó ${excusados[sel]} elementos y solo puede excusar ${tope}: `
+    + `es una excepción (${motivo}), no una puerta. Lo de más va en \`--gris\`, en \`--hair\` `
+    + 'o en el color del texto.');
 
 /**
  * La corrida por consola. Detrás de una guarda para que importar este módulo
@@ -200,7 +253,7 @@ async function porConsola() {
     await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
     await p.waitForTimeout(250);
 
-    const { mirados, hallazgos } = await p.evaluate(RECOLECTAR, { permitido: PERMITIDO });
+    const { mirados, hallazgos, excusados } = await p.evaluate(RECOLECTAR, { permitido: PERMITIDO });
     totalMirados += mirados;
 
     /* EL PISO, ANTES DEL CERO. */
@@ -209,6 +262,13 @@ async function porConsola() {
         + 'Un «cero acentos de más» sobre casi nada no afirma nada: o la página no cargó, '
         + 'o el selector se rompió y esto está mirando la nada.');
       fallo = true;
+    }
+
+    const deMas = DE_MAS(excusados);
+    if (deMas.length) {
+      fallo = true;
+      console.log(`✗ ${nombre} · una excepción declarada se usó de más`);
+      for (const d of deMas) console.log(`    ${d}`);
     }
 
     if (hallazgos.length) {

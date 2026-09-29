@@ -5,7 +5,20 @@ import { FotoArco } from '../comun/FotoArco';
 import { Icono } from '../comun/Icono';
 import { Retrato } from '../comun/Retrato';
 
-/** El hero del taller. Sin fecha: Armando todavía no la dio (orden web #02). */
+/** El hero del taller, con la fecha desde la orden #12 (A). */
+/**
+ * ── «ADOLESCENTE» en naranja: una excepción declarada, no una regla nueva ──
+ * Lo pidió Lucía el 28/9 y entra por D23. Rompe la regla del acento de la #07
+ * —«el naranja aparece una vez por pantalla: el CTA»— y por eso está escrito
+ * acá y en `docs/tareas.md`: es **una** excepción, en **un** elemento, con su
+ * propio selector, y `check/acento.mjs` permite ese selector y ningún otro. El
+ * día que alguien pinte otra palabra de naranja, el barrido se pone rojo.
+ *
+ * El acento de la palabra es `--naranja-texto` y no `--naranja`, aunque a 80 px
+ * los dos pasen su umbral: es el que el resto del sitio usa para texto, y tener
+ * dos naranjas de texto en la misma web es la clase de diferencia que nadie
+ * elige y que después nadie puede explicar. El número medido va en el informe.
+ */
 /**
  * ── El hero se pinta en el primer cuadro (orden #07, D) ──────────────────
  * Nada de acá lleva `.reveal`. El fundido de entrada está bien para lo que hay
@@ -25,7 +38,10 @@ export function Hero() {
             {t('taller.hero.eyebrow')}
           </span>
           <h1 className="display-xl u-mt-4">
-            {t('taller.hero.titulo1')}<br /><span className="acento">{t('taller.hero.titulo2')}</span>
+            {t('taller.hero.titulo1')}<br />
+            <span className="acento">
+              {t('taller.hero.titulo2')} <span className="hero-taller__palabra">{t('taller.hero.titulo2Palabra')}</span>
+            </span>
           </h1>
           <p className="hero-sub">{t('taller.hero.sub')}</p>
           <div className="hero-cta">
@@ -39,6 +55,13 @@ export function Hero() {
               {t('taller.hero.ctaPrograma')} <span className="btn-arrow">→</span>
             </a>
           </div>
+          {/* Tres datos y no cuatro: la fecha **reemplaza** a «Cupo limitado»,
+              que es una de las dos salidas que la orden #12 (A) dejaba abiertas.
+              Medido a 375: con cuatro, la línea se parte en **tres** renglones
+              (61 px de alto) y deja de leerse como una línea de hechos; con
+              tres entra en dos (41 px). El cupo no se pierde —sigue en la ficha
+              de la portada, en la descripción de la página y en «Inversión»—;
+              la fecha es el dato que faltaba. */}
           <p className="hero-micro">
             <span>{t('taller.hero.micro1')}</span>
             <span>{t('taller.hero.micro2')}</span>

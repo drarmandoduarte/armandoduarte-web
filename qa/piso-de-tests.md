@@ -20,7 +20,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/web` | 43 |
+| `@codice/web` | 51 |
 | `@codice/navegador` | 29 |
 
 ## De dónde salen estos números
@@ -34,6 +34,42 @@ i18n y el de los enlaces de WhatsApp; `@codice/prompts`, el del perfil de estilo
 y compara el port contra el sitio estático. Son las cuatro páginas por los tres anchos.
 Entra a esta tabla por la misma puerta que los demás — un guardián que no corre no dice
 nada, y desde afuera se ve igual que uno que corrió bien.
+
+## Lo que movió la orden #12
+
+`@codice/web` sube de 43 a **51**: ocho tests nuevos en dos archivos, y los dos
+vigilan cosas que **no se ven en pantalla ni en una captura**.
+
+**Cinco en `src/el-evento-de-merida-dice-la-verdad.test.ts`.** La #12 devolvió a
+`/merida` el `Event` de schema.org que la #02 había quitado por falta de fecha:
+es lo que Google publica como ficha del taller —el día, la sede y el precio— y
+vive en el `<head>`, donde nadie lo mira. El guardián de fidelidad ahora lo
+compara (su `cabeza()` lo incluye desde esta orden) y con eso alcanza para cazar
+que **cambie**; estos cinco cazan que sea **falso**, que es otra cosa.
+
+El que más vale es el del huso. El `-06:00` está escrito a mano porque un
+JSON-LD estático lleva marca ISO 8601 y no zona IANA, y un valor escrito a mano
+es una copia: el día que México vuelva a mover su horario de verano —ya lo hizo
+en 2022— ese número se queda viejo en silencio y la hora que publica Google se
+corre una hora. El test **no compara contra otro `-06:00` escrito**: le pregunta
+a `America/Merida` qué desplazamiento tiene ese día. Es la lección de la #06
+—un guardián que compara contra otra copia vigila la copia— aplicada a una
+fecha. Los otros atan el precio del `Event` a `taller.inversion.precio` y la
+sede a `taller.hechos.dondeValor`, que hoy son los dos lugares donde vive cada
+dato.
+
+**Tres en `src/la-imagen-al-compartir-existe.test.ts`.** Un `og:image` que
+nombra un archivo que no está no rompe absolutamente nada visible: la página
+carga, Lighthouse no lo mira, ninguna captura lo nota. Lo único que pasa es que
+el enlace se comparte **sin miniatura**, que es justo lo que Armando y Lucía
+pidieron arreglar en la sección F. Y el que lo ve es el que comparte el enlace,
+no el que lo publica. Comprueban que el archivo exista en `public/` y que mida
+lo que su `og:image:width`/`height` declara, leído de los píxeles del JPEG.
+
+`@codice/navegador` **no se mueve**: siguen siendo veintinueve. Lo que cambió es
+que dos de ellos miran más —`fidelidad` compara ahora los datos estructurados, y
+`acento` comprueba además el **tope** de cada excepción declarada— y las dos
+ampliaciones tienen su motivo escrito donde viven.
 
 ## Lo que rescató la #09, que NO se mergeó
 

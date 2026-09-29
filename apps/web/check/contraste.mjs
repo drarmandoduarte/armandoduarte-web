@@ -53,6 +53,34 @@
  * rincón donde la palabra no se lee, y esconderlo detrás de la media sería
  * fabricar un verde. Los dos números salen en la tabla.
  *
+ * ── Por qué las hojas van por CSSOM y no con `addStyleTag` (orden #12) ───
+ * Porque desde la #10 el servidor de QA sirve la CSP de verdad, y
+ * `style-src 'self'` **bloquea una hoja en línea**. Este barrido la usaba en dos
+ * lugares y los dos fallaban de maneras distintas:
+ *
+ *   · `addStyleTag` —el que apaga las transiciones— tira una excepción y el
+ *     barrido no arranca. Eso al menos se ve: es lo que pasó al correrlo en la
+ *     #12, y es la razón por la que este arreglo entró acá.
+ *   · la captura volvía a la página como `data:image/png;base64,…` y
+ *     `img-src 'self'` **no admite `data:`**, así que el `decode()` tiraba
+ *     «The source image cannot be decoded». Ahora los bytes entran como `Blob`
+ *     y se decodifican con `createImageBitmap`, que no pide ninguna URL y por lo
+ *     tanto no pasa por ninguna directiva de la política. La política no se
+ *     ablanda para que pase una herramienta nuestra — esa es la regla de la #10.
+ *   · el `<style id="sin-letras">` de `medirElLienzo` **falla en silencio**. El
+ *     elemento entra al DOM, la política le prohíbe aplicar, y la captura sale
+ *     *con las letras puestas*. O sea que el «fondo dibujado» de cada elemento
+ *     habría sido el promedio de sus propias letras y el guardián habría
+ *     informado un contraste inventado, en verde. Nadie lo habría notado: el
+ *     número existe y es plausible.
+ *
+ * Una hoja construida con `CSSStyleSheet` + `replaceSync` es CSSOM puro —no hay
+ * markup que analizar— y la CSP no la gobierna. Es el mismo arreglo que
+ * `check/acento.mjs` ya tenía escrito desde la #10; este archivo se quedó atrás
+ * porque nadie lo corrió entre aquella orden y ésta. **Y el silencioso lleva
+ * ahora su propio piso**: antes de sacar la captura se comprueba que el texto se
+ * haya vuelto transparente de verdad, y si no, el barrido se cae diciéndolo.
+ *
  * ── Lo que este barrido NO mira, dicho ───────────────────────────────────
  * Los estados `:hover` y `:focus` y los pseudo-elementos. Lo primero porque no
  * hay hover en un teléfono y la hoja no cambia de color al enfocar; lo segundo
@@ -178,19 +206,36 @@ async function medirElLienzo(p, pares) {
      hoja quedaba puesta, así que la segunda pasada —la del menú abierto— medía
      la página entera con el texto transparente e informaba 1,04:1 en sesenta y
      siete pares. Un barrido que se rompe a sí mismo a mitad de camino. */
-  await p.evaluate(() => {
-    const e = document.createElement('style');
-    e.id = 'sin-letras';
-    e.textContent = '*{color:transparent!important}';
-    document.head.appendChild(e);
+  const aplico = await p.evaluate(() => {
+    const hoja = new CSSStyleSheet();
+    hoja.replaceSync('*{color:transparent!important}');
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, hoja];
+    window.__sinLetras = hoja;
+    /* EL PISO, ANTES DE LA CAPTURA: que el texto se haya vuelto transparente de
+       verdad. Si la hoja no aplicó, la captura sale con las letras puestas y
+       todo lo que se mida abajo es un número inventado con cara de medición. */
+    const alguno = document.querySelector('p, h1, h2, h3, li, span');
+    return alguno ? getComputedStyle(alguno).color : null;
   });
+  if (aplico !== 'rgba(0, 0, 0, 0)') {
+    throw new Error(
+      `el lienzo se iba a capturar CON las letras puestas: el texto quedó en «${aplico}» y tenía que `
+      + 'quedar transparente. Sin eso, el «fondo dibujado» de cada elemento sería el promedio de sus '
+      + 'propias letras y este barrido informaría un contraste que no existe, en verde.',
+    );
+  }
   const lienzo = (await p.screenshot({ fullPage: true, animations: 'disabled' })).toString('base64');
-  await p.evaluate(() => document.getElementById('sin-letras')?.remove());
+  await p.evaluate(() => {
+    document.adoptedStyleSheets = document.adoptedStyleSheets.filter((h) => h !== window.__sinLetras);
+    delete window.__sinLetras;
+  });
 
   const medidos = await p.evaluate(async ({ lienzo, cajas, dpr }) => {
-    const img = new Image();
-    img.src = 'data:image/png;base64,' + lienzo;
-    await img.decode();
+    /* Los bytes, no una URL: `img-src 'self'` no admite `data:` y un `<img>`
+       con la captura adentro no carga. Un `Blob` + `createImageBitmap` no pide
+       nada por red, así que no hay directiva que lo gobierne. */
+    const crudo = Uint8Array.from(atob(lienzo), (c) => c.charCodeAt(0));
+    const img = await createImageBitmap(new Blob([crudo], { type: 'image/png' }));
     const c = document.createElement('canvas');
     c.width = img.width; c.height = img.height;
     const cx = c.getContext('2d', { willReadFrequently: true });
@@ -253,7 +298,11 @@ for (const [nombre, ruta] of PAGINAS) {
     const p = await navegador.newPage({ viewport: { width: ancho, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
     await p.goto(BASE + ruta, { waitUntil: 'load' });
     await p.evaluate(() => document.fonts.ready);
-    await p.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1!important}' });
+    await p.evaluate((css) => {
+      const hoja = new CSSStyleSheet();
+      hoja.replaceSync(css);
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, hoja];
+    }, '*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1!important}');
     await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
     for (const conMenu of [false, true]) {
       if (conMenu) await p.evaluate(() => {

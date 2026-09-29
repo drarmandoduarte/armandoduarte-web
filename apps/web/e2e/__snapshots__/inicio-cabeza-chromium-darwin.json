@@ -6,5 +6,6 @@
   "ogImage": "https://armandoduarte.com/img/og-home.jpg",
   "hojas": [
     "/assets/style-<hash>.css"
-  ]
+  ],
+  "datos": []
 }

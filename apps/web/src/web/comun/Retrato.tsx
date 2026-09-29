@@ -33,10 +33,20 @@
  * en vez del que la receta decía.
  */
 
-/** Los dos recortes que mandó Lucía, con la relación del archivo más grande. */
+/**
+ * Los dos recortes que mandó Lucía, con la relación del archivo más grande.
+ *
+ * ── `medio-cuerpo` cambió de forma en la #12 (D) ─────────────────────────
+ * Lucía mandó el busto corregido y no es el mismo recuadro: 1400×1690 donde el
+ * de la #05 era 1400×1769. Estos dos números **no son decoración**: son lo que
+ * el navegador usa para reservar el hueco antes de que la foto baje, y dejarlos
+ * viejos con el archivo nuevo es exactamente un salto de maquetación —el mismo
+ * que el `width`/`height` existe para evitar—. Salen del archivo, medidos, no
+ * de la orden.
+ */
 const RECORTES = {
   'de-pie': { ancho: 1400, alto: 2614 },
-  'medio-cuerpo': { ancho: 1400, alto: 1769 },
+  'medio-cuerpo': { ancho: 1400, alto: 1690 },
 } as const;
 
 export function Retrato({
