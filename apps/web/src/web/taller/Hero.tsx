@@ -7,17 +7,38 @@ import { Retrato } from '../comun/Retrato';
 
 /** El hero del taller, con la fecha desde la orden #12 (A). */
 /**
- * ── «ADOLESCENTE» en naranja: una excepción declarada, no una regla nueva ──
- * Lo pidió Lucía el 28/9 y entra por D23. Rompe la regla del acento de la #07
- * —«el naranja aparece una vez por pantalla: el CTA»— y por eso está escrito
- * acá y en `docs/tareas.md`: es **una** excepción, en **un** elemento, con su
- * propio selector, y `check/acento.mjs` permite ese selector y ningún otro. El
- * día que alguien pinte otra palabra de naranja, el barrido se pone rojo.
+ * ── Dos renglones y dos colores (orden #16, A) ────────────────────────────
+ * Hasta la #16 el titular decía «El arte de amar / a tu / ADOLESCENTE.»: tres
+ * renglones, y el del medio era «a tu» **en teal**, entre una línea tinta y una
+ * naranja. Tres colores y un renglón de dos palabras cortas en el título más
+ * importante del sitio.
  *
- * El acento de la palabra es `--naranja-texto` y no `--naranja`, aunque a 80 px
- * los dos pasen su umbral: es el que el resto del sitio usa para texto, y tener
- * dos naranjas de texto en la misma web es la clase de diferencia que nadie
- * elige y que después nadie puede explicar. El número medido va en el informe.
+ * Ahora son **dos renglones y dos colores** de 600 px para arriba: «El arte de
+ * amar a tu» en `--tinta` y «ADOLESCENTE.» en `--naranja-texto`. **El teal se
+ * va**, y es una decisión de dirección: con la palabra en naranja el teal ya no
+ * marcaba nada y competía con el acento. Está anotada en `docs/tareas.md` al
+ * lado de la excepción de la #12, que **no cambia** —sigue siendo un elemento,
+ * con tope 1—.
+ *
+ * ── Por qué el reparto es estructural y no `text-wrap: balance` ──────────
+ * Se probó con `balance` primero, que es lo que la orden proponía, y **se midió
+ * que reabría el CLS que la #12 había cerrado**: con el titular en una sola
+ * cadena, la tipografía de reserva lo acomoda en dos renglones y Montserrat en
+ * tres, y cuando la buena entra el titular crece y empuja la foto. Ocho de los
+ * doce anchos quedaban con distinta cuenta y `/merida` llegaba a **0,1765** de
+ * CLS a 390 px. La tabla está en `docs/informes/16/LEEME.md`.
+ *
+ * Así que los dos saltos son de CSS y **ninguno depende de la tipografía**:
+ * «ADOLESCENTE.» es `block` siempre (lo puso la #12) y «a tu» es `inline` de 600
+ * px para arriba y `block` para abajo. Con eso el titular mide **dos renglones
+ * arriba de 600 y tres abajo, con las dos tipografías, a los doce anchos**, y no
+ * hay nada que se corra. `balance` igual entra al design system por la #16 (B):
+ * gobierna el resto de los títulos del sitio, donde no hay una forma aprobada
+ * que defender.
+ *
+ * Por eso las tres claves de i18n **no se movieron**: `titulo1`, `titulo2` y
+ * `titulo2Palabra` siguen siendo las mismas tres cadenas. Lo que cambió es
+ * cuándo el navegador las pone juntas.
  */
 /**
  * ── El hero se pinta en el primer cuadro (orden #07, D) ──────────────────
@@ -31,17 +52,21 @@ export function Hero() {
   const { t } = useTranslation();
   return (
     <section className="hero" id="inicio">
-      <div className="container hero__grid">
+      <div className="container hero__grid hero__grid--taller">
         <div>
           <span className="eyebrow eyebrow--icono">
             <Icono nombre="taller" ancho={22} alto={20} />
             {t('taller.hero.eyebrow')}
           </span>
+          {/* Dos renglones y dos colores — orden #16, A. Los dos saltos son de
+              CSS y ninguno es un `<br>`: `hero-taller__atu` es `inline` de 600
+              px para arriba y `block` para abajo, y `hero-taller__palabra` es
+              `block` siempre (lo puso la #12 por el CLS). Por qué así y no con
+              `text-wrap: balance`, en `index.css`, arriba de las dos reglas. */}
           <h1 className="display-xl u-mt-4">
-            {t('taller.hero.titulo1')}<br />
-            <span className="acento">
-              {t('taller.hero.titulo2')} <span className="hero-taller__palabra">{t('taller.hero.titulo2Palabra')}</span>
-            </span>
+            {t('taller.hero.titulo1')}{' '}
+            <span className="hero-taller__atu">{t('taller.hero.titulo2')}</span>
+            <span className="hero-taller__palabra">{t('taller.hero.titulo2Palabra')}</span>
           </h1>
           <p className="hero-sub">{t('taller.hero.sub')}</p>
           <div className="hero-cta">

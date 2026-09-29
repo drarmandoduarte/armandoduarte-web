@@ -9,6 +9,7 @@
     ".": "./index.js",
     "./styles.css": "./styles.css",
     "./tokens.css": "./codice-tokens.css",
+    "./tipografia.css": "./tipografia.css",
     "./tokens.json": "./codice-tokens.json"
   },
   "peerDependencies": {

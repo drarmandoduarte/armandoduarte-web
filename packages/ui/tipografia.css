@@ -1,0 +1,59 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Códice · comportamiento tipográfico del design system · orden #16
+   ═══════════════════════════════════════════════════════════════════════
+
+   Acá vive **cómo se parten los renglones**, y nada más. Los tamaños, los pesos
+   y las familias siguen en `codice-tokens.css` y en el CSS de cada producto;
+   esto es la única hoja del paquete que dicta comportamiento en vez de valores.
+
+   ── Por qué está en `packages/ui` y no en `apps/web/src/index.css` ────────
+   Decisión de dirección del 29/9 (orden #16, pie 1). Es comportamiento
+   tipográfico del design system (D28), no de una página: `apps/familia` —y
+   después el consultorio y la academia— tienen que heredarlo sin volver a
+   escribirlo. Un titular que se parte mal es el mismo defecto en los cuatro
+   productos, y la regla que lo evita no puede vivir en uno.
+
+   ── La regla que lo obliga, del caso que abrió la #16 ────────────────────
+   El hero de `/merida` quedó en tres renglones y el del medio era «a tu»: dos
+   palabras cortas solas, en el título más importante del sitio. La regla que
+   dirección sacó de ahí vale para todo: **ningún título termina ni se parte en
+   un renglón de una o dos palabras cortas, a ningún ancho.** Lo vigila
+   `apps/web/check/renglones.mjs`, que corre en la gate.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── `balance` para los títulos ───────────────────────────────────────────
+   El navegador reparte las palabras entre los renglones en vez de llenar el
+   primero y dejar el resto: es lo que evita el renglón huérfano. Va por
+   **elemento** y no por clase —`h1, h2, h3`— a propósito: así lo hereda
+   cualquier producto que escriba un título, sin acordarse de ponerle una clase.
+
+   Sin `!important` y con selectores de especificidad 0-0-1: cualquier regla de
+   producto que necesite otra cosa gana sin pelear, y ese día la excepción se ve
+   en el diff del producto. Chromium lo aplica hasta seis renglones y después lo
+   ignora solo; un título de siete renglones no es un problema de `text-wrap`. */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+/* ── `pretty` para las bajadas ────────────────────────────────────────────
+   Distinto trabajo: `pretty` no reparte el párrafo entero, solo evita que el
+   último renglón quede con una palabra suelta. Es lo que se quiere en una
+   bajada —que es texto corrido— y no en un título.
+
+   ── El acoplamiento que esto tiene, dicho en voz alta ──────────────────
+   `.lead` y `.hero-sub` son clases de `apps/web`, y acá hay una hoja del design
+   system nombrándolas. Es deuda, y es la que dirección eligió: la alternativa
+   era que el paquete inventara su propia clase —`.bajada`— y que cada párrafo
+   de bajada de cada producto la llevara además de la suya, o sea tocar el markup
+   de todas las páginas para no tocar dos nombres acá.
+
+   Lo que la hace barata: es **una** lista, en **un** archivo, y cuando
+   `apps/familia` tenga su bajada suma su clase a este mismo renglón. Lo que la
+   haría caer: el día que haya tres productos con cuatro nombres distintos, se
+   unifica el nombre en el design system y esta lista queda en uno. */
+.lead,
+.hero-sub {
+  text-wrap: pretty;
+}

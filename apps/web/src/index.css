@@ -74,7 +74,61 @@ a,button{-webkit-tap-highlight-color:transparent}
    su propio renglón el titular mide tres líneas con las dos tipografías, a
    todos los anchos, y no hay nada que se corra. Es además la forma que
    Montserrat ya le daba sola en escritorio. ───────────────────────────────── */
+/* ── Y desde la #16 este `display:block` hace además el reparto ───────────
+   El titular pasó a dos renglones —«El arte de amar a tu» / «ADOLESCENTE.»— y
+   quien los separa es este `block`: se fue el `<br>` del markup, que con el
+   `block` puesto dejaba un renglón vacío. El primer renglón lo reparte
+   `text-wrap: balance` desde `packages/ui/tipografia.css` cuando no entra.
+
+   También se fue el `<span className="acento">` que envolvía «a tu
+   ADOLESCENTE.»: el titular tenía **tres** colores —tinta, teal y naranja— y
+   dirección lo dejó en dos. El teal ya no marcaba nada al lado del naranja. */
 .hero-taller__palabra{display:block;color:var(--naranja-texto)}
+/* ── «amar a tu»: el segundo salto, y también estructural (orden #16, A) ──
+   De 600 px para arriba es `inline` y el titular dice «El arte de amar a tu» en
+   un renglón; para abajo es `block` y dice «El arte de» / «amar a tu».
+
+   ── Por qué el corte cae entre «de» y «amar», y no donde estaba ─────────
+   La orden aceptaba «El arte de amar» / «a tu» debajo de 900. Se implementó así
+   y **el guardián nuevo de esta misma orden lo cazó**: «a tu» tiene cuatro
+   caracteres, o sea es exactamente el renglón huérfano que la #16 vino a
+   eliminar, y dejarlo habría obligado a excusarlo con una excepción — una
+   excepción para la forma que la orden quiere prohibir. Partido entre «de» y
+   «amar» los dos renglones tienen tres palabras y ninguno es huérfano, así que
+   no hace falta excusar nada. El texto que se lee es el mismo; lo único que
+   cambió es en qué espacio corta.
+
+   ── Por qué un `display` con media query y no `text-wrap: balance` ──────
+   Porque `balance` reparte según **lo que mide la tipografía**, y las dos que
+   esta página usa no miden igual: medido a los doce anchos de la #12, con el
+   titular en una sola cadena la fuente de reserva lo acomodaba en dos renglones
+   y Montserrat en tres, en **ocho** de los doce. Eso es exactamente el CLS que
+   la #12 cerró: el titular crece cuando la fuente buena entra y empuja la foto
+   del hero. `/merida` llegaba a **0,1765** a 390 px. La tabla está en
+   `docs/informes/16/LEEME.md`.
+
+   Un `display` gobernado por el ancho de ventana no sabe qué tipografía cargó, y
+   eso es la propiedad que se quiere: la cuenta de renglones sale igual con la
+   reserva y con Montserrat, así que no hay nada que se corra. `balance` sigue
+   entrando por la #16 (B) para el resto de los títulos del sitio, en
+   `packages/ui/tipografia.css`: ahí no hay una forma aprobada que defender.
+
+   ── Y el 600, que es un número medido ──────────────────────────────────
+   El corte está donde «El arte de amar a tu» **deja de entrar**, con margen. En
+   una columna (debajo de 900 px el hero es de una sola) el titular está en su
+   mínimo de 42 px y pide 400 px; el contenedor da 540 px a 600 de ventana y 387
+   a 430. El cruce real cae cerca de 447, así que 600 deja **140 px de aire** en
+   el peor borde. El margen no es cosmético: la fuente de reserva es la del
+   sistema y no mide lo mismo en macOS, en Windows y en Linux — un corte pegado
+   al cruce sería un corte que se mueve de máquina en máquina. Arriba de 600 la
+   tipografía real es la que tiene que entrar, y entra; abajo, el salto no
+   depende de ninguna.
+
+   `white-space:nowrap` es el cinturón: aunque alguien cambie el ancho de la
+   columna, «a tu» no se puede partir, así que «tu» no puede quedar solo nunca.
+   Lo comprueba `check/renglones.mjs`, que corre en la gate a cuatro anchos. */
+.hero-taller__atu{white-space:nowrap}
+@media (max-width:599px){.hero-taller__atu{display:block}}
 .suave{color:var(--gris);font-weight:300}
 /* «se construyen» del hero de la portada, en negritas (orden #05, B).
    Lucía pidió «probar poner en negritas». La orden lo daba por `.suave` —gris,
@@ -262,6 +316,26 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* ── Hero · pantalla completa, foto real a la derecha ───────────────── */
 .hero{min-height:min(100svh,880px);padding:calc(var(--header-h) + clamp(40px,6vh,72px)) 0 clamp(48px,7vh,80px);display:flex;align-items:center}
 .hero__grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(40px,6vw,96px);align-items:center}
+/* ── El hero de /merida pide más ancho de texto que el de la portada (#16, A)
+   «El arte de amar a tu» tiene que entrar en **un** renglón de 900 px para
+   arriba, y con el reparto de la portada no entraba: medido a nueve anchos entre
+   901 y 1440, al `h1` le faltaban entre **46 y 72 px**. La orden pide ensanchar
+   la columna de texto **antes** de tocar el tamaño de letra, y eso es lo que se
+   hace: el `clamp()` de `.display-xl` **no se toca**, que además es el de la
+   portada y esto no tiene por qué llegar allá.
+
+   Dos ajustes y los dos van en la misma dirección: 1,15fr → 1,32fr y la
+   canaleta de `clamp(40px,6vw,96px)` a `clamp(32px,3.5vw,64px)`. Se reparte
+   entre los dos para que la foto pague menos: solo con la columna habría que
+   llegar a 1,45fr. Los números medidos, a 1440: el `h1` pasa de 695 a 822 px
+   —pide 762, así que sobran 60— y la foto del arco de 514 a 424, un 17 % menos
+   de ancho. El antes y el después están en `docs/informes/16/`.
+
+   Es una clase propia y no un cambio a `.hero__grid` porque el hero de la
+   portada **no tiene este problema**: su titular es más corto y su foto es el
+   recorte de cuerpo entero, que a 424 px se vería apretado. Un cambio en
+   `.hero__grid` habría movido las dos páginas para arreglar una. */
+.hero__grid--taller{grid-template-columns:1.32fr .68fr;gap:clamp(32px,3.5vw,64px)}
 .hero-sub{margin-top:var(--s4);font-size:clamp(18px,1.5vw,21px);line-height:1.6;color:var(--gris);max-width:40ch}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:var(--s5)}
 .hero-micro{margin-top:var(--s4);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}

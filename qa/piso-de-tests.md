@@ -22,7 +22,41 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 83 |
 | `@codice/web` | 51 |
-| `@codice/navegador` | 29 |
+| `@codice/navegador` | 33 |
+
+## Lo que movió la orden #16 — `@codice/navegador` sube a 33
+
+Cuatro tests nuevos en `e2e/renglones.spec.ts`, uno por ruta, y cada uno mide los
+**cuatro anchos** que pide la orden (1440, 900, 390, 375): dieciséis mediciones en
+cuatro tests. Van agrupados por ruta y no como dieciséis tests porque así hacen
+una navegación cada uno en vez de cuatro — **2,4 s medidos** sobre una gate que ya
+levanta Chromium. Un rojo igual dice ruta, ancho, título y renglón, porque las
+cuatro mediciones se acumulan antes de comparar.
+
+Lo que vigilan es la regla que dirección sacó del hero de `/merida`: *ningún
+título termina ni se parte en un renglón de una palabra ni de menos de seis
+caracteres.* Es de las que se deshacen solas —alguien alarga un texto, tres
+órdenes después otro angosta una columna— y contra la deriva no sirve una
+herramienta que hay que acordarse de correr. Ninguna otra comprobación de la casa
+mide **cómo se parte** un título: las capturas de fidelidad lo verían, pero
+dirían «cambió», no «quedó mal», y solo después de que alguien aprobara la captura
+nueva.
+
+La lógica **no se duplica**: el spec importa `RUTAS`, `ANCHOS`, `PISO`,
+`EXCEPCIONES`, `RECOLECTAR` y `DE_MAS` de `apps/web/check/renglones.mjs`, que es
+el mismo archivo que corre por consola con `pnpm check:renglones`. Es el reparto
+que la #07 ya usó con `acento.mjs`, por el mismo motivo: dos copias de la lista de
+excepciones serían dos verdades que un día no coinciden.
+
+Y una nota que vale más escrita que callada, porque es un falso positivo con muy
+buena cara: la primera versión del barrido agrupaba las palabras por `top`
+redondeado y **denunció cuatro renglones huérfanos que no existían**. Las fichas
+de «Ahora» tienen `h3 a{display:inline-flex;align-items:center}` con la flecha a
+`.8em`, así que la flecha va al lado del texto con otro `top`. Se llegó a
+«arreglar» la página con un espacio duro antes de la flecha, y el arreglo no
+cambió nada — un ítem de flex con `flex-wrap:nowrap` no se puede ir de renglón. Lo
+que estaba mal era la medición. Ahora agrupa por **solape vertical**, que tolera
+tamaños de letra distintos y sigue separando dos renglones de verdad.
 
 ## Lo que trae la orden #13 — `@codice/db` nace con 83
 
