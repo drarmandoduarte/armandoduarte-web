@@ -467,7 +467,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 .ft__rule{position:relative;height:1px;background:var(--hair);margin:24px 0 56px}
 /* La marquita del centro de la hairline: gris y no naranja. Es cromo (D25). */
 .ft__rule span{position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:50%;border:1px solid var(--gris);background:var(--crema);transform:translate(-50%,-50%)}
-.ft__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-bottom:56px}
+.ft__grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-bottom:56px}
 .ft__col h3{font-family:var(--display);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.24em;margin-bottom:16px;color:var(--gris)}
 .ft__col a{display:block;font-size:16px;padding:3px 0;color:var(--tinta);margin-bottom:6px;transition:color .32s,padding-left .32s var(--ease)}
 .ft__col a:hover{color:var(--naranja-texto);padding-left:6px}
@@ -561,7 +561,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* ── Responsive ─────────────────────────────────────────────────────── */
 /* Cinco núcleos no entran en dos columnas sin dejar una fila de uno: entre
    1100 y 700 van 3+2, y debajo de 700, uno abajo del otro (orden #12, G). */
-@media (max-width:1100px){.pasos{grid-template-columns:repeat(3,1fr)}.paso__line{display:none}.lista li{grid-template-columns:56px 1fr}.lista p{grid-column:2}}
+/* El pie pasa a dos columnas acá y no a 900 (orden #14): con cuatro, el nombre
+   del taller no entra en un cuarto de 1100 px. Quedan Explorar+Talleres arriba y
+   Legal+Canales abajo, que es el reparto que pidió la orden. */
+@media (max-width:1100px){.pasos{grid-template-columns:repeat(3,1fr)}.paso__line{display:none}.lista li{grid-template-columns:56px 1fr}.lista p{grid-column:2}.ft__grid{grid-template-columns:1fr 1fr}}
 @media (max-width:900px){
   .hero{min-height:0;padding-top:calc(var(--header-h) + 40px)}
   .hero__grid{grid-template-columns:1fr;gap:var(--s5)}
@@ -587,9 +590,8 @@ a,button{-webkit-tap-highlight-color:transparent}
   .suena-fondo .fondo-foto img{width:100%;height:100%;object-position:58% 32%}
   .suena-fondo{padding-top:var(--s6)}
   .plan{grid-template-columns:1fr;gap:var(--s5)}
-  .ft__grid{grid-template-columns:1fr 1fr}
 }
-@media (max-width:700px){.pasos{grid-template-columns:1fr}}
+@media (max-width:700px){.pasos{grid-template-columns:1fr}.ft__grid{grid-template-columns:1fr}}
 @media (max-width:600px){
   :root{--header-h:64px}
   .hd__menu span,.hd__wa span{display:none}.hd__wa{padding:0 13px;width:42px;justify-content:center}.hd__inner{column-gap:12px}

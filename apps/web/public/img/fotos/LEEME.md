@@ -25,6 +25,7 @@ como asistentes al taller, y ninguna lleva un pie que lo sugiera.
 | archivo | dónde se ve | original de Pexels | autor |
 |---|---|---|---|
 | `porque-fondo` | Taller · «¿El niño dulce que criaste…?», **de fondo otra vez desde la #12**, sin velo y con el texto sobre un panel | `pexels-karola-g-6345445` (4405×6608) | Karola G |
+| `porque-fondo-1800` | **la misma foto**, en 1800×2700, que se sirve solo por encima de 1100 px de ancho de ventana (#14 D) | el mismo | Karola G |
 | `suena-tarjeta` | Taller · «Las estrategias del pasado ya no funcionan», en tarjeta | `pexels-pavel-danilyuk-8057317` (4016×6016) | Pavel Danilyuk |
 | `llevas-claridad` | Taller · «Lo que te llevas» → Claridad | `pexels-alena-32936525` (1600×2522 en el insumo) | Alena |
 | `llevas-palabras` | Taller · «Lo que te llevas» → Palabras precisas | `pexels-astreyas-photo-10358308` (2337×3505) | Astreyas Photo |
@@ -49,6 +50,31 @@ o no entra.
 El presupuesto es **180 KB por archivo** y ninguna lo pasa: la más pesada es
 `porque-fondo.jpg` con 160 KB, y su WebP —que es lo que baja casi todo el
 mundo— pesa 72 KB.
+
+### La excepción, que es una y está declarada: `porque-fondo-1800`
+
+`porque-fondo-1800.webp` pesa **163 KB** y su JPG **367 KB**: el JPG pasa el
+presupuesto al doble. Entra igual, y por tres motivos que se escriben juntos para
+que nadie tenga que reconstruirlos:
+
+1. **Nadie lo baja en un teléfono.** El corte es por `media="(min-width: 1101px)"`
+   sobre el **ancho de ventana**, no por `sizes`, que multiplicaría por el DPR y
+   le daría la foto grande a un teléfono 3×. Medido a 375 px con DPR 3: bajan los
+   mismos **73.380 B** de antes, ni un byte más.
+2. **El JPG de 367 KB solo lo ve quien no entiende WebP**, y esa persona se lleva
+   la de **1200** —`porque-fondo.jpg`, 160 KB—, no ésta: el `<img>` de respaldo
+   apunta a la chica. El JPG grande queda en el repo como par del WebP, para no
+   dejar un formato huérfano el día que haga falta regenerarlo.
+3. **Lo que se cambia por esos 93 KB de más en escritorio** es un reescalado de
+   ×1,8. A 1440 el contenedor pide la foto a 2160 px (`width:150%`), y la de 1200
+   se estiraba hasta ahí. Con la de 1800 el estiramiento baja a ×1,2. El antes y
+   el después, al mismo recorte, están en `docs/informes/14/`.
+
+El presupuesto de 180 KB **no se baja**: sigue valiendo para toda foto que se
+sirva a todos los anchos. Lo que esta excepción dice es que una foto que solo
+viaja a escritorio se mide contra el LCP, no contra el presupuesto — y el LCP de
+`/merida` no se movió, porque el elemento LCP es el retrato del hero y ésta carga
+`lazy` debajo del pliegue.
 
 ## Lo que cambió en la #12 (28/9/2026)
 

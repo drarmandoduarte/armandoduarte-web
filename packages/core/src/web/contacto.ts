@@ -73,3 +73,37 @@ export const CONTACTO_DE_PAGINA = {
   privacidad: { numero: TELEFONO_GABY, visible: TELEFONO_GABY_VISIBLE },
   terminos: { numero: TELEFONO_GABY, visible: TELEFONO_GABY_VISIBLE },
 } as const;
+
+/**
+ * La clave de i18n del mensaje con el que se reserva el taller.
+ *
+ * Vive acá, al lado del teléfono, y no suelta en cada componente, porque
+ * **teléfono y mensaje son un solo dato**: «el enlace para reservar». Separados,
+ * lo que pasa es lo que pasó — el mismo enlace calculado en dos lugares, y el
+ * día que cambie el mensaje va a cambiar en uno.
+ */
+export const CLAVE_MENSAJE_RESERVA = 'comun.mensajes.reservar';
+
+/**
+ * El enlace de «reservar el taller», y es **el único lugar donde se arma**.
+ *
+ * ── Por qué se unifica en la orden #14 ────────────────────────────────────
+ * Hasta acá el mismo enlace se calculaba en dos componentes: el botón del hero
+ * de `/merida` (`taller/Hero.tsx`) y el `mensaje` que `taller/Taller.tsx` le pasa
+ * al `Marco` para la cabecera y el menú. Los dos hacían
+ * `enlaceWhatsApp(TELEFONO_TALLER, t('comun.mensajes.reservar'))` por separado.
+ * Con el pie sumando un tercero, la orden #14 (B.3) pide una sola fuente, y ésta
+ * es: el teléfono y la clave del mensaje se eligen una vez.
+ *
+ * ── Y por qué recibe `t` en vez de recibir el texto ya traducido ──────────
+ * Recibir el texto dejaría la mitad de la decisión afuera: quien llama seguiría
+ * eligiendo **qué** mensaje, que es justo lo que se desincronizó. Recibiendo `t`,
+ * lo único que el componente aporta es el idioma de su sesión, y el enlace
+ * —número y texto— sale entero de este archivo.
+ *
+ * El texto en sí sigue en i18n, como todo lo que se lee: acá vive la clave, no
+ * la frase.
+ */
+export function enlaceReservaDelTaller(t: (clave: string) => string): string {
+  return enlaceWhatsApp(TELEFONO_TALLER, t(CLAVE_MENSAJE_RESERVA));
+}

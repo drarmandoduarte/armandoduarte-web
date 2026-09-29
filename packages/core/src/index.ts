@@ -18,4 +18,6 @@ export {
   TELEFONO_TALLER_VISIBLE,
   CONTACTO_DE_PAGINA,
   enlaceWhatsApp,
+  CLAVE_MENSAJE_RESERVA,
+  enlaceReservaDelTaller,
 } from './web/contacto';
