@@ -1,0 +1,17 @@
+{
+  "name": "@codice/db",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "El esquema de Códice y su banco de pruebas: un Postgres real, en proceso, que corre las migraciones del repo sin tocar Supabase.",
+  "scripts": {
+    "test": "TZ=America/Merida vitest run --reporter=default --reporter=json --outputFile=.vitest-report.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.4",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.3",
+    "vitest": "^4.1.10"
+  }
+}

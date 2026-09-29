@@ -42,6 +42,7 @@ const SUITES = [
   ['@codice/ui', 'packages/ui'],
   ['@codice/core', 'packages/core'],
   ['@codice/prompts', 'packages/prompts'],
+  ['@codice/db', 'packages/db'],
   ['@codice/web', 'apps/web'],
 ];
 
