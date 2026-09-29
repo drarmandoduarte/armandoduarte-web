@@ -15,6 +15,10 @@ build/
 apps/web/test-results/
 apps/web/playwright-report/
 apps/web/.playwright-report.json
+# Y lo mismo para Mi espacio, que desde la #15 también tiene Playwright.
+apps/familia/test-results/
+apps/familia/playwright-report/
+apps/familia/.playwright-report.json
 
 # Las capturas del guardián de fidelidad **SÍ se versionan** desde la orden #05
 # (D24): son la referencia, no un producto de la corrida. Antes se reescribían
