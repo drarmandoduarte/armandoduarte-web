@@ -73,9 +73,9 @@
     "ahora": {
       "pill": "Ahora",
       "titulo": "El arte de amar a tu adolescente · taller presencial",
-      "meta1": "Mérida",
-      "meta2": "9:00 a 13:30",
-      "meta3": "Cupo limitado",
+      "meta1": "Fiesta Inn Mérida",
+      "meta2": "Jueves 5 de noviembre",
+      "meta3": "8:30 a 13:00",
       "cta": "Ver el taller"
     },
     "quien": {
@@ -116,10 +116,12 @@
       "lead": "Descodifica su cerebro, sana la distancia emocional y conviértete en la guía que tu hijo necesita. Cuatro horas y media, en vivo, con cupo limitado.",
       "ctaPrograma": "Ver el programa",
       "ctaWhatsapp": "Reservar por WhatsApp",
+      "fichaFechaClave": "Fecha",
+      "fichaFechaValor": "Jueves 5 de noviembre de 2026",
       "fichaHorarioClave": "Horario",
-      "fichaHorarioValor": "9:00 a 13:30 · 4 horas y media",
+      "fichaHorarioValor": "8:30 a 13:00 · 4 horas y media",
       "fichaLugarClave": "Lugar",
-      "fichaLugarValor": "Mérida",
+      "fichaLugarValor": "Fiesta Inn Mérida",
       "fichaModalidadClave": "Modalidad",
       "fichaModalidadValor": "Sesión privada en vivo · cupo limitado",
       "fichaInversionClave": "Inversión",
@@ -167,26 +169,29 @@
   "taller": {
     "head": {
       "title": "Taller para padres de adolescentes en Mérida · El arte de amar a tu adolescente · Armando Duarte",
-      "description": "Taller presencial de 4 horas y media para padres de adolescentes. Neurociencia y crianza consciente con Armando Duarte. Mérida, cupo limitado.",
-      "ogImageAlt": "El arte de amar a tu adolescente · taller presencial en Mérida con Armando Duarte"
+      "description": "Taller presencial de 4 horas y media para padres de adolescentes. Jueves 5 de noviembre de 2026, Fiesta Inn Mérida, 8:30 a 13:00. Con Armando Duarte, cupo limitado.",
+      "ogImageAlt": "El arte de amar a tu hijo adolescente · taller en Mérida"
     },
     "hero": {
       "eyebrow": "Taller presencial · Mérida",
       "titulo1": "El arte de amar",
-      "titulo2": "a tu adolescente.",
+      "titulo2": "a tu",
+      "titulo2Palabra": "ADOLESCENTE.",
       "sub": "Descodifica su cerebro, sana la distancia emocional y conviértete en la guía que tu hijo necesita.",
       "ctaReservar": "Reservar mi lugar",
       "ctaPrograma": "Ver el programa",
       "micro1": "4 horas y media",
-      "micro2": "9:00 a 13:30",
-      "micro3": "Cupo limitado",
+      "micro2": "8:30 a 13:00",
+      "micro3": "Jueves 5 de noviembre",
       "fotoAlt": "Armando Duarte"
     },
     "hechos": {
+      "fechaClave": "Fecha",
+      "fechaValor": "Jueves 5 de noviembre",
       "horarioClave": "Horario",
-      "horarioValor": "9:00 a 13:30",
+      "horarioValor": "8:30 a 13:00",
       "dondeClave": "Dónde",
-      "dondeValor": "Mérida",
+      "dondeValor": "Fiesta Inn Mérida",
       "modalidadClave": "Modalidad",
       "modalidadValor": "Sesión privada en vivo"
     },
@@ -213,31 +218,32 @@
     },
     "programa": {
       "eyebrow": "El programa",
-      "titulo1": "Cuatro núcleos.",
-      "titulo2": "Cuatro horas y media.",
+      "titulo1": "Cinco núcleos.",
+      "titulo2": "Modelo orientado a la madurez.",
       "uno": {
         "rotulo": "Núcleo 1",
-        "titulo": "La arquitectura del cerebro adolescente",
-        "texto1": "Por qué actúa impulsivamente y cómo la remodelación de su cerebro afecta sus reacciones.",
-        "texto2": "La paradoja de la madurez: razona como adulto en calma, actúa por impulso bajo presión."
+        "titulo": "Estudiar la adolescencia",
+        "texto": "Comprender los cambios biológicos, cerebrales y emocionales propios de esta etapa de la vida."
       },
       "dos": {
         "rotulo": "Núcleo 2",
-        "titulo": "De la coacción a la co-regulación emocional",
-        "texto1": "La regla de oro: conectar antes de redirigir.",
-        "texto2": "Validar sus emociones sin ceder en tus normas: «sí al sentimiento, no a la conducta»."
+        "titulo": "Entender a mi adolescente",
+        "texto": "Observar a tu hijo de manera individual, reconociendo su temperamento único y su mundo interno."
       },
       "tres": {
         "rotulo": "Núcleo 3",
-        "titulo": "Las cinco victorias del adolescente",
-        "texto1": "Individualidad, identidad, autonomía, independencia y emancipación: cómo acompañar cada hito.",
-        "texto2": "Tratar al adolescente mayor como a un «huésped de honor»."
+        "titulo": "Comprender nuestra familia",
+        "texto": "Analizar la dinámica del hogar, las creencias heredadas y los patrones de relación entre los adultos."
       },
       "cuatro": {
         "rotulo": "Núcleo 4",
-        "titulo": "Límites y comunicación asertiva",
-        "texto1": "La «motivación dialogada» y los acuerdos de los que él se hace responsable.",
-        "texto2": "Reformular el «no» en un «sí condicional» para expandir su tolerancia a la frustración."
+        "titulo": "Definir estrategias",
+        "texto": "Implementar herramientas de comunicación, disciplina consciente y límites claros."
+      },
+      "cinco": {
+        "rotulo": "Núcleo 5",
+        "titulo": "Realizar los cambios",
+        "texto": "Llevar los acuerdos a la práctica diaria con paciencia, consistencia y autocontrol adulto."
       },
       "receso": "Con un receso de 20 minutos entre el núcleo 2 y el 3"
     },
@@ -246,13 +252,13 @@
       "titulo": "Lo que te llevas.",
       "unoTitulo": "Claridad",
       "unoTexto": "Entenderás qué le ocurre a tu hijo en cada estallido o retraimiento.",
-      "unoFotoAlt": "Una madre y sus dos hijos sentados en el sofá, con los ojos cerrados",
+      "unoFotoAlt": "Un padre y su hijo caminan por la playa",
       "dosTitulo": "Palabras precisas",
       "dosTexto": "Sabrás qué decir y qué callar para mantener abiertos los canales de comunicación.",
       "dosFotoAlt": "Una madre abraza a su hija adolescente",
       "tresTitulo": "Serenidad con firmeza",
       "tresTexto": "Mantendrás la calma sin caer en gritos, culpas ni desgaste.",
-      "tresFotoAlt": "Una madre y su hija pequeña conversan recostadas en el sofá",
+      "tresFotoAlt": "Un padre y su hijo conversan sentados en la cama",
       "cta": "Reservar mi lugar"
     },
     "facilitador": {

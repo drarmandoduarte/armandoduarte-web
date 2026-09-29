@@ -6,22 +6,32 @@ import { Icono } from '../comun/Icono';
 import { Seccion } from '../comun/Seccion';
 
 /**
- * Los cuatro núcleos y lo que te llevas.
+ * Los cinco núcleos y lo que te llevas.
  *
  * Los pasos llevan una línea entre el número y el siguiente, que se apaga en el
  * último (`.paso:last-child .paso__line`) y en pantallas de menos de 1100px. El
- * `<span class="paso__line">` va igual en los cuatro: quién se ve y quién no lo
+ * `<span class="paso__line">` va igual en los cinco: quién se ve y quién no lo
  * decide el CSS, no el marcado.
+ *
+ * ── De cuatro a cinco, y de dos párrafos a uno (orden #12, G) ────────────
+ * Armando mandó el 28/9 el modelo entero —«Modelo orientado a la madurez»— con
+ * **una línea por núcleo**. Los dos párrafos de antes eran de la #01 y estaban
+ * escritos por la casa; el segundo de cada núcleo no tiene equivalente en lo
+ * que Armando escribió, y **lo que Armando no escribió no se pone**. Así que la
+ * clave pasa de `texto1`/`texto2` a un solo `texto`, que es lo que hay.
  */
 export function Programa() {
   const { t } = useTranslation();
-  /* El cuarto valor es el ícono de Lucía. El orden es el que ella marcó sobre
-     la captura: cerebro, emociones, las cinco victorias, comunicación. */
+  /* El cuarto valor es el ícono. Los cuatro primeros son los PNG de Lucía; el
+     quinto, `cambios.svg`, llegó con los insumos de la #12 en el mismo estilo y
+     en el mismo naranja. El orden es el que fijó la orden #12, G, y ya no es el
+     que Lucía marcó sobre la captura de la #05: los núcleos son otros. */
   const nucleos = [
     ['01', '1', 'uno', 'cerebro'],
     ['02', '2', 'dos', 'emociones'],
-    ['03', '3', 'tres', 'victorias'],
-    ['04', '3', 'cuatro', 'comunicacion'],
+    ['03', '3', 'tres', 'comunicacion'],
+    ['04', '3', 'cuatro', 'victorias'],
+    ['05', '3', 'cinco', 'cambios'],
   ] as const;
 
   const llevas = [
@@ -45,8 +55,7 @@ export function Programa() {
               <span className="paso__line" />
             </div>
             <h3><b>{t(`taller.programa.${clave}.rotulo`)}</b>{t(`taller.programa.${clave}.titulo`)}</h3>
-            <p>{t(`taller.programa.${clave}.texto1`)}</p>
-            <p>{t(`taller.programa.${clave}.texto2`)}</p>
+            <p>{t(`taller.programa.${clave}.texto`)}</p>
           </div>
         ))}
       </div>

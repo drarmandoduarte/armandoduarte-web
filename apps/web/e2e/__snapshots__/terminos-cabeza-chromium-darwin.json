@@ -6,5 +6,6 @@
   "ogImage": null,
   "hojas": [
     "/assets/style-<hash>.css"
-  ]
+  ],
+  "datos": []
 }

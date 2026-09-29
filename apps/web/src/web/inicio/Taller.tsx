@@ -31,6 +31,7 @@ export function Taller() {
           </div>
         </div>
         <ul className="ficha reveal" data-d="2">
+          <li><span>{t('inicio.taller.fichaFechaClave')}</span><span>{t('inicio.taller.fichaFechaValor')}</span></li>
           <li><span>{t('inicio.taller.fichaHorarioClave')}</span><span>{t('inicio.taller.fichaHorarioValor')}</span></li>
           <li><span>{t('inicio.taller.fichaLugarClave')}</span><span>{t('inicio.taller.fichaLugarValor')}</span></li>
           <li><span>{t('inicio.taller.fichaModalidadClave')}</span><span>{t('inicio.taller.fichaModalidadValor')}</span></li>

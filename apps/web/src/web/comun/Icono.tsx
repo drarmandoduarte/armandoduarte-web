@@ -3,7 +3,7 @@
  *
  * ── Decorativos, y por eso `alt=""` ──────────────────────────────────────
  * Los ocho van siempre pegados a un texto que ya dice lo mismo: el ícono del
- * reloj está al lado de «Horario · 9:00 a 13:30». Un `alt="reloj"` ahí hace que
+ * reloj está al lado de «Horario · 8:30 a 13:00». Un `alt="reloj"` ahí hace que
  * un lector de pantalla diga la cosa dos veces, que es peor que no decirla. Van
  * con `alt=""` **y** `aria-hidden`, que es el par que los saca del árbol de
  * accesibilidad sin dejarlos como imagen sin describir.
@@ -16,11 +16,17 @@
  * tercera copia de un color, y `check:tokens` la caza —cazó estas dos líneas—.
  * Teñirlos con un filtro CSS sería pintar encima de lo que ya está bien.
  *
- * ── Cuatro son PNG y once son SVG, y la lista está acá ──────────────────
- * Los cuatro naranja de «Cuatro núcleos» son los PNG que mandó Lucía: llegan a
- * 2× en el tamaño en que se muestran, así que no había motivo para redibujarlos.
- * Los otros once son SVG —los siete nuevos y los cuatro que la #05 dejó cortos,
- * redibujados en vector—, y a un SVG no le importa la densidad de pantalla.
+ * ── Cuatro son PNG y trece son SVG, y la lista está acá ─────────────────
+ * Los cuatro naranja que Lucía mandó para los núcleos son PNG: llegan a 2× en
+ * el tamaño en que se muestran, así que no había motivo para redibujarlos. Los
+ * otros son SVG —los siete nuevos de la #05, los cuatro que aquella orden dejó
+ * cortos y redibujados en vector, y los dos de la #12: `cambios`, el quinto
+ * núcleo, que vino con los insumos, y `fecha`, el único que esta casa dibujó—,
+ * y a un SVG no le importa la densidad de pantalla.
+
+ * El quinto núcleo es SVG y los otros cuatro PNG, y eso se ve de cerca: el
+ * vector tiene el borde más limpio. Se deja así porque redibujar los cuatro de
+ * Lucía sería cambiarle el dibujo a la clienta, que no es lo que se pidió.
  *
  * La lista vive acá y no en cada llamada porque el formato es una propiedad del
  * archivo, no de dónde se lo usa: quien pone un ícono en una sección nueva no

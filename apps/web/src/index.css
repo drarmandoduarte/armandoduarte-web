@@ -49,6 +49,32 @@ a,button{-webkit-tap-highlight-color:transparent}
 .display-m{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.8vw,52px);line-height:1.1;letter-spacing:-.005em;color:var(--tinta)}
 .display-s{font-family:var(--display);font-weight:400;font-size:clamp(22px,2.4vw,32px);line-height:1.2;color:var(--tinta)}
 .acento{color:var(--teal)}.acento-teal{color:var(--teal)}
+/* ── «ADOLESCENTE», la excepción declarada de la #12 (B) ──────────────────
+   Lo pidió Lucía y entra por D23. Rompe la regla del acento de la #07 —el
+   naranja aparece una vez por pantalla, y es el CTA— así que vale la pena que
+   la clase sea fea de reusar: nombra su hueco, no su color. `check/acento.mjs`
+   permite exactamente `#inicio h1 .hero-taller__palabra` y nada más, y la
+   mutación que lo prueba es pintar de naranja cualquier otra palabra.
+
+   `--naranja-texto` y no `--naranja`: a 80 px los dos pasan su umbral —el de
+   texto grande es 3:1— pero el sitio ya tiene un solo naranja para texto y dos
+   serían una diferencia que nadie eligió. El número medido va en el informe. */
+/* ── Y `display:block`, que no es estética: es el CLS ────────────────────
+   Medido con la fuente cortada y con la fuente puesta, a doce anchos: con
+   «ADOLESCENTE.» en línea, **Montserrat y la tipografía de reserva no se ponen
+   de acuerdo en cuántas líneas ocupa el titular** —tres contra dos a 1440, a
+   1100, a 430 y a 412— y cuando la fuente buena entra, el titular crece 43 px y
+   empuja la foto del hero hacia abajo. Eso es un CLS de **0,060** en `/merida`,
+   donde antes de esta orden era 0,0002.
+
+   El salto de tipografía es un pendiente viejo y de dirección —`docs/tareas.md`
+   § 5c, que se cerró sin abrir porque el arreglo (`size-adjust`) vive en
+   `packages/ui`—, pero esto no es aquel salto: **lo trajo esta orden** al
+   alargar el titular, y se apaga sin tocar el design system. Con la palabra en
+   su propio renglón el titular mide tres líneas con las dos tipografías, a
+   todos los anchos, y no hay nada que se corra. Es además la forma que
+   Montserrat ya le daba sola en escritorio. ───────────────────────────────── */
+.hero-taller__palabra{display:block;color:var(--naranja-texto)}
 .suave{color:var(--gris);font-weight:300}
 /* «se construyen» del hero de la portada, en negritas (orden #05, B).
    Lucía pidió «probar poner en negritas». La orden lo daba por `.suave` —gris,
@@ -258,6 +284,17 @@ a,button{-webkit-tap-highlight-color:transparent}
    lo que el `style=` inline hacía y lo que hay que conservar. */
 #quien .foto--libre{max-width:520px}
 #facilitador .foto--libre{max-width:480px}
+/* ── Armando apoyado en la orilla (orden #12, E) ──────────────────────────
+   Lucía vio aire entre el borde de abajo del PNG y el del bloque teal. La
+   figura deja de estar centrada y se pega al fondo de la fila, y el aire que
+   perdió la columna de la foto se le devuelve a la de texto: si en cambio se
+   le quitara el padding a la sección entera, el texto también quedaría pegado
+   al borde. Se verifica midiendo: `bottom` de la imagen = `bottom` de la
+   sección, ±1 px, a 1440 y a 375. ─────────────────────────────────────────── */
+#facilitador .grid-2.centro{align-items:end}
+#facilitador .foto--libre{align-self:end;margin-bottom:0}
+#facilitador{padding-bottom:0}
+#facilitador .grid-2>div:last-child{padding-bottom:clamp(88px,12vh,140px)}
 #porque .foto-tarjeta{max-width:480px}
 #programa .sello{margin-top:var(--s5)}
 #programa .lista--2{margin-top:0}
@@ -315,8 +352,17 @@ a,button{-webkit-tap-highlight-color:transparent}
 .oscuro .lista{border-color:var(--hair-oscura)}.oscuro .lista li{border-color:var(--hair-oscura)}.oscuro .lista h3{color:var(--crema)}.oscuro .lista p{color:rgba(250,247,241,.75)}.oscuro .lista .n{color:color-mix(in oklab, var(--crema) 70%, transparent)}
 
 /* ── Pasos · número en círculo + línea (512) ────────────────────────── */
-.pasos{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s5);margin-top:var(--s7)}
-.paso{display:flex;flex-direction:column;gap:var(--s3)}
+/* ── Las tres filas se alinean entre columnas (orden #12, G) ──────────────
+   Con cuatro núcleos los títulos medían casi lo mismo y nadie lo notaba. Con
+   cinco, «Definir estrategias» entra en una línea y los otros cuatro en dos, y
+   entonces su párrafo arrancaba 30 px más arriba que el de al lado. `subgrid`
+   hace que las tres filas —el ícono, el título y el texto— sean las mismas
+   filas para las cinco columnas, así que los párrafos empiezan todos a la misma
+   altura sin fijarle un alto a nada. Donde no haya `subgrid`, la declaración se
+   descarta y queda el mismo apilado de antes: el `span 3` sigue dando una fila
+   de cinco. ─────────────────────────────────────────────────────────────── */
+.pasos{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:auto auto 1fr;gap:var(--s5);margin-top:var(--s7)}
+.paso{display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:var(--s3);align-content:start}
 .paso__head{display:flex;align-items:center;gap:16px}
 /* El número, sin el círculo naranja que lo envolvía: en una línea de tiempo el
    círculo compite con el ícono que tiene al lado (orden #07, A). */
@@ -330,7 +376,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 .receso{margin-top:var(--s5);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)}
 
 /* ── Hechos · la franja ─────────────────────────────────────────────── */
-.hechos{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:var(--s4) 0;margin-top:var(--s6)}
+/* Cuatro celdas desde la #12: el «Cuándo» que la #02 quitó por no tener fecha
+   volvió como «Fecha», y con él la cuarta columna que aquella orden dejó
+   anotada («cuando Armando dé la fecha, el CSS vuelve a cuatro»). */
+.hechos{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:var(--s4) 0;margin-top:var(--s6)}
 .hechos div span{display:block;font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)}
 .hechos div b{display:block;margin-top:6px;font-family:var(--display);font-weight:400;font-size:clamp(17px,1.5vw,21px);color:var(--tinta)}
 
@@ -465,6 +514,12 @@ a,button{-webkit-tap-highlight-color:transparent}
    **textura**, no una imagen. Se intuye el chico, no se lo mira. Es lo que cuesta
    poner texto encima de una fotografía y que se pueda leer. ─────────────── */
 .con-fondo{position:relative;isolation:isolate;--velo-opacidad:94%}
+/* ── Y la variante sin velo, que es la de la #12 (C) ─────────────────────
+   El velo uniforme se midió dos veces y las dos veces perdió: al 88 % dejaba
+   14 pares bajo AA y al 94 % la foto deja de ser una imagen. Acá no hay velo:
+   el contraste lo resuelve el panel de abajo, que le da al texto su propio
+   suelo en vez de apagar la fotografía. ────────────────────────────────── */
+.fondo-foto--sin-velo::after{display:none}
 .fondo-foto{position:absolute;inset:0;z-index:-1;overflow:hidden}
 .fondo-foto img{width:100%;height:100%;object-fit:cover;object-position:76% 24%}
 .fondo-foto::after{content:'';position:absolute;inset:0;background:color-mix(in oklab, var(--velo,var(--crema)) var(--velo-opacidad,88%), transparent)}
@@ -472,27 +527,69 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* ── Fotografía en tarjeta (orden #05, D) ────────────────────────────────
    El mismo radio de 12 px que el resto de las tarjetas de la casa. El fondo
    cálido se ve mientras la imagen carga, en vez de un hueco blanco. ─────── */
+/* ── «¿Te suena?» · la foto de fondo y el panel de texto (orden #12, C) ───
+   El bloque va a sangre de lado a lado —por eso `Seccion` se dibuja sin
+   contenedor y el contenedor entra adentro— y arranca debajo de la franja de
+   hechos, que es el único texto chico suelto que queda en esta sección. El
+   margen negativo de abajo lo lleva hasta el borde inferior de la sección: lo
+   que se ve es una fotografía que ocupa la sección entera.
+
+   La foto se dibuja al 150 % del ancho del bloque a propósito. Con `cover` a
+   ancho exacto el recorte es **vertical** —la foto es 2:3 y el bloque es
+   apaisado, así que el ancho entra entero— y ahí `object-position` en X no
+   mueve nada: el chico queda en el 48 % del ancho, o sea justo detrás del
+   panel. Agrandándola hay de dónde correrla, y el rostro cae en el 72 % del
+   bloque, que es la banda que el panel no tapa. El eje Y sí es `object-
+   position` puro y elige la franja: 26 % deja la cara y los hombros. ─────── */
+.suena-fondo{position:relative;margin-top:var(--s8);padding-top:var(--s8);padding-bottom:clamp(88px,12vh,140px);margin-bottom:calc(clamp(88px,12vh,140px) * -1)}
+.suena-fondo__grid{display:grid;grid-template-columns:minmax(0,58%) 1fr;align-items:start}
+.suena-fondo__grid>*{grid-column:1}
+.suena-fondo .fondo-foto img{width:150%;max-width:none;object-position:50% 26%}
+/* El panel: crema al 92 % con desenfoque. El 92 % sale de la medición, no del
+   gusto —el barrido de contraste sobre el píxel dibujado dice si alcanza— y
+   sube de a 2 hasta el primero que pase. El número que quedó va en el informe. */
+.suena__panel{background:color-mix(in oklab, var(--crema) 92%, transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:12px;padding:clamp(28px,4vw,48px)}
+.suena__panel .lista{border-top-color:var(--hair-hover)}
+.suena__panel .lista li{border-bottom-color:var(--hair-hover)}
+.suena-fondo .bloque-cita{max-width:52ch}
+
 .foto-tarjeta{border-radius:12px;overflow:hidden;background:var(--calido)}
 .foto-tarjeta img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
 .tres figure{border-radius:12px;overflow:hidden;background:var(--calido);margin-bottom:var(--s3)}
 .tres figure img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
 
 /* ── Responsive ─────────────────────────────────────────────────────── */
-@media (max-width:1100px){.pasos{grid-template-columns:1fr 1fr}.paso__line{display:none}.lista li{grid-template-columns:56px 1fr}.lista p{grid-column:2}}
+/* Cinco núcleos no entran en dos columnas sin dejar una fila de uno: entre
+   1100 y 700 van 3+2, y debajo de 700, uno abajo del otro (orden #12, G). */
+@media (max-width:1100px){.pasos{grid-template-columns:repeat(3,1fr)}.paso__line{display:none}.lista li{grid-template-columns:56px 1fr}.lista p{grid-column:2}}
 @media (max-width:900px){
   .hero{min-height:0;padding-top:calc(var(--header-h) + 40px)}
   .hero__grid{grid-template-columns:1fr;gap:var(--s5)}
   .hero .foto{aspect-ratio:4/5;max-height:none;max-width:420px;margin-top:8px}
   .grid-2{grid-template-columns:1fr;gap:var(--s5)}
+  /* Apilado, el recorte pasa **debajo** del texto para poder seguir apoyado en
+     la orilla de abajo del bloque, que es lo que pidió Lucía (#12, E). Arriba,
+     que es donde estaba, no hay orilla que tocar: la de arriba la ocupa el
+     rótulo. El padding inferior se lo queda la figura en 0 y el aire entre las
+     dos mitades lo pone el `gap`. */
+  #facilitador .foto--libre{order:2;margin-top:0}
+  #facilitador .grid-2>div:last-child{order:1;padding-bottom:0}
   .ahora__row{grid-template-columns:1fr;gap:14px}
-  .hechos{grid-template-columns:repeat(3,1fr)}
+  .hechos{grid-template-columns:repeat(2,1fr)}
   .tres,.testimonios,.libros,.contacto{grid-template-columns:1fr}
-  /* La foto de fondo se corre al centro: a 900px o menos el texto ocupa todo
-     el ancho y anclarla a la derecha dejaría al chico fuera de cuadro. */
+  /* A 900 px o menos la foto **no** va detrás del panel: va arriba, apilada,
+     como un bloque propio. Detrás no funcionaría —el texto ocupa todo el ancho,
+     así que el panel taparía la foto entera— y el chico quedaría fuera de
+     cuadro. Es lo que la orden #12 (C) pide declarar para 375. */
   .fondo-foto img{object-position:62% 18%}
+  .suena-fondo__grid{grid-template-columns:1fr}
+  .suena-fondo .fondo-foto{position:static;height:min(72vw,420px);margin-bottom:var(--s5)}
+  .suena-fondo .fondo-foto img{width:100%;height:100%;object-position:58% 32%}
+  .suena-fondo{padding-top:var(--s6)}
   .plan{grid-template-columns:1fr;gap:var(--s5)}
   .ft__grid{grid-template-columns:1fr 1fr}
 }
+@media (max-width:700px){.pasos{grid-template-columns:1fr}}
 @media (max-width:600px){
   :root{--header-h:64px}
   .hd__menu span,.hd__wa span{display:none}.hd__wa{padding:0 13px;width:42px;justify-content:center}.hd__inner{column-gap:12px}
@@ -501,7 +598,7 @@ a,button{-webkit-tap-highlight-color:transparent}
      una línea: el botón toma la columna entera en vez de partirse en dos. */
   .btn{padding:16px 22px;width:100%}
   .hero-cta,.cta-row{flex-direction:column;align-items:stretch}
-  .pasos,.hechos{grid-template-columns:1fr}
+  .hechos{grid-template-columns:1fr}
   .ficha li{grid-template-columns:1fr;gap:4px}
   .libro{grid-template-columns:110px 1fr}
   /* El overlay en móvil: los ítems se quedan en 24 px —el motor tampoco los

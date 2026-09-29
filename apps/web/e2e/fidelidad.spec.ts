@@ -187,6 +187,19 @@ const enlaces = (page: Page) =>
  * build que toque el CSS, y una captura que se reescribe sola en cada orden deja
  * de decir nada. Lo que se vigila es cuántas hojas hay y en qué orden, que es la
  * decisión; el hash es ruido.
+ *
+ * ── Y `datos`, desde la #12 ─────────────────────────────────────────────
+ * La #12 devolvió a `/merida` el `Event` de schema.org que la #02 había quitado
+ * por falta de fecha, y esta lista **no lo miraba**: se puede borrar el
+ * `<script type="application/ld+json">` entero y las doce comprobaciones siguen
+ * en verde. Es, otra vez, la ceguera de la #09 —un guardián que existe pero no
+ * mira lo que la orden movió— y se cierra igual: ampliando la lista y
+ * declarándolo.
+ *
+ * Va el objeto **parseado** y no el texto: así una coma de más rompe el test
+ * acá, con el error de JSON, en vez de llegar a Google como un bloque que se
+ * descarta en silencio. Y va entero, porque cada campo de ese objeto es un dato
+ * que el buscador publica: la fecha, el lugar y el precio del taller.
  */
 const cabeza = (page: Page) => page.evaluate(() => ({
   title: document.title,
@@ -196,6 +209,8 @@ const cabeza = (page: Page) => page.evaluate(() => ({
   ogImage: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? null,
   hojas: [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')]
     .map((l) => new URL(l.href).pathname.replace(/-[A-Za-z0-9_-]{8}\.css$/, '-<hash>.css')),
+  datos: [...document.querySelectorAll('script[type="application/ld+json"]')]
+    .map((n) => JSON.parse(n.textContent ?? 'null')),
 }));
 
 for (const { nombre, ruta } of PAGINAS) {

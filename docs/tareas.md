@@ -22,6 +22,7 @@ usa.
 | #09 | El CSS en dos hojas, y el contrato de `@codice/ui` escrito | **cerrada sin mergear** — se midió y no convenía (PR #16 cerrado). Lo que valía entró aparte: **PR #19, mergeado el 17/9/2026** (rama `web/09b-rescate`, ya borrada) |
 | #10 | La CSP, mientras todavía es fácil | **cerrada** (PR #18, mergeado el 17/9/2026) |
 | #11 | `Cache-Control` para `/assets/` | **cerrada** (PR #17, mergeado el 17/9/2026) |
+| #12 | El taller con fecha: lo que pidieron Armando y Lucía el 28/9 | rama `web/12-taller-con-fecha` |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -91,7 +92,81 @@ porque **el contrato de Rodolfo ya prohibía tocar `main` directo** y el hook de
 remoto lo hizo cumplir: dos defensas independientes, y la que atajó no fue la
 lectura.
 
+### El acento tiene UNA excepción declarada, y se llama «ADOLESCENTE»
+
+**Orden #12, B — decidido por Lucía Duarte, entra por D23.** El hero de `/merida`
+dice «El arte de amar / a tu / **ADOLESCENTE.**» con la última palabra en
+`--naranja-texto`. Eso **rompe la regla del acento de la #07** —«el naranja
+aparece una vez por pantalla, y es el CTA»— y está acá para que se lea como lo
+que es: una excepción a una regla, no una regla nueva.
+
+Lo medido, que es lo que la orden pedía declarar: el titular es de 80 px, así que
+le rige el umbral de texto grande, 3:1. Sobre el crema, `--naranja` da **3,86** y
+`--naranja-texto` da **5,00**; las dos pasan. Se eligió `--naranja-texto` porque
+es el único naranja que este sitio usa para texto, y tener dos sería una
+diferencia que nadie eligió. El barrido de contraste de la orden lo confirma en
+la página dibujada.
+
+**Cómo se sostiene que siga siendo una excepción.** `check/acento.mjs` permite el
+selector `#inicio h1 .hero-taller__palabra` **y le pone tope: un elemento**. El
+tope es el punto, y está medido: con la fila puesta sin tope, la mutación que la
+orden pedía —pintar de naranja otra palabra del mismo `<h1>`, con la misma
+clase— salía **verde**. Un selector de clase permite el elemento aprobado y
+también a cualquiera que se ponga esa clase. Con el tope en 1, esa mutación cae
+diciendo que la regla excusó dos elementos y solo puede excusar uno. La
+comprobación vive en el barrido y se afirma en las dos puertas —la consola y
+`e2e/acento.spec.ts`— importando la misma función.
+
+**Si alguna vez se quiere volver atrás**: se borra la fila de `PERMITIDO`, la
+regla `.hero-taller__palabra` de `index.css` y las dos claves
+`taller.hero.titulo2Palabra` / `titulo2` vuelven a ser una sola.
+
 ## Pendientes abiertos
+
+### 0. Tres guardianes estuvieron rotos desde la #10 y nadie se enteró · **encontrado y arreglado en la #12**
+
+No es un pendiente: es el caso, escrito donde se lee. La #10 puso la CSP de
+verdad en el servidor de QA, y `check/contraste.mjs` —que no se corrió entre
+aquella orden y ésta— usaba tres cosas que `style-src 'self'` e `img-src 'self'`
+prohíben. Las tres fallaban distinto, y **la peor no hacía ruido**:
+
+1. `page.addStyleTag`, el que apaga las transiciones: tira una excepción y el
+   barrido no arranca. Éste al menos grita.
+2. El `<style id="sin-letras">` de `medirElLienzo`, que vuelve el texto
+   transparente antes de fotografiar el fondo: el elemento entra al DOM, la
+   política le prohíbe aplicar, y **la captura sale con las letras puestas**. O
+   sea que el «fondo dibujado» de cada línea habría sido el promedio de sus
+   propias letras y el guardián habría informado un contraste inventado, en
+   verde y plausible.
+3. La captura volvía a la página como `data:image/png;base64,…`, y `img-src
+   'self'` no admite `data:`: `decode()` tiraba «The source image cannot be
+   decoded».
+
+Los tres se arreglaron **sin ablandar la política**, que es la regla de la #10:
+las hojas van por CSSOM (`CSSStyleSheet` + `replaceSync`), como `check/acento.mjs`
+ya hacía desde entonces, y los bytes de la captura entran como `Blob` con
+`createImageBitmap`, que no pide ninguna URL. Y el silencioso lleva ahora **su
+propio piso**: antes de fotografiar se comprueba que el texto se haya vuelto
+transparente de verdad, y si no, el barrido se cae diciéndolo.
+
+**Por qué nadie se enteró durante cinco órdenes**: porque desde la #07 no había
+texto sobre ninguna fotografía, así que `medirElLienzo` no se llamaba nunca. La
+#12 volvió a poner una foto de fondo y destapó los tres de una sola corrida. La
+lección, que ya es de la casa: *un guardián que no se corre no está verde, está
+apagado* — y éste ni siquiera estaba en la gate.
+
+### 0b. El servidor de QA servía los WebP como `application/octet-stream` · **arreglado en la #12**
+
+`e2e/servidor.mjs` tiene una tabla de tipos MIME y **`.webp` no estaba**. La web
+sirve en WebP casi todas sus imágenes —los dos recortes de Armando y las seis
+fotografías—, así que el servidor contra el que se miden el guardián de
+fidelidad, la CSP y Lighthouse **no estaba sirviendo lo mismo que Vercel**, que
+es su única razón de ser.
+
+Lo destapó la #12 midiendo Lighthouse: el informe no reconocía ninguna imagen de
+la página, y por lo tanto no podía decir cuál era el elemento LCP ni qué pesaba
+de más. Con el tipo puesto, la medición señaló en un renglón el archivo que
+había que arreglar.
 
 ### 1. Conectar Vercel al monorepo ~~· es de dirección~~ · **cerrado en la #04**
 

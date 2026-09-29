@@ -3,7 +3,7 @@ import { PUERTO_PORT } from '../playwright.config';
 // @ts-expect-error -- `check/acento.mjs` es JavaScript sin tipos a propósito: es
 // una herramienta de consola que además se importa acá. Tiparla obligaría a
 // compilarla, y entonces dejaría de poder correrse con `node` a secas.
-import { PAGINAS, PERMITIDO, QUIETAR, RECOLECTAR } from '../check/acento.mjs';
+import { DE_MAS, PAGINAS, PERMITIDO, QUIETAR, RECOLECTAR } from '../check/acento.mjs';
 
 /**
  * El acento, dentro de la gate — orden Códice #07, y decisión de dirección del
@@ -26,6 +26,15 @@ import { PAGINAS, PERMITIDO, QUIETAR, RECOLECTAR } from '../check/acento.mjs';
  * dos verdades que un día no coinciden — y entonces el guardián de la gate y el
  * de la consola dirían cosas distintas sobre la misma página.
  *
+ * ── Y desde la #12, también el tope de las excepciones ───────────────────
+ * «ADOLESCENTE» entró como excepción declarada, y una excepción vale por el
+ * elemento que dirección aprobó y por ninguno más. El tope se comprueba **acá
+ * también** y con la misma función —`DE_MAS`, importada— porque si viviera solo
+ * en la corrida por consola, la mutación que la orden #12 pide (pintar otra
+ * palabra de naranja con la misma clase) pasaría la gate en verde. Es el mismo
+ * reparto que las dos puertas ya tenían: un barrido, dos lugares donde se lo
+ * afirma, cero copias de la lógica.
+ *
  * ── Qué agrega en tiempo ─────────────────────────────────────────────────
  * Cuatro páginas, una carga cada una, sin capturas: **~4 segundos** sobre una
  * gate que ya levanta Chromium para el guardián de fidelidad. Es barato porque
@@ -47,7 +56,7 @@ for (const [nombre, ruta, piso] of PAGINAS as [string, string, number][]) {
     await page.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
     await page.waitForTimeout(250);
 
-    const { mirados, hallazgos } = await page.evaluate(RECOLECTAR, { permitido: PERMITIDO });
+    const { mirados, hallazgos, excusados } = await page.evaluate(RECOLECTAR, { permitido: PERMITIDO });
 
     /* EL PISO, ANTES DEL CERO: «cero acentos de más» sobre un barrido que no
        recorrió nada se lee igual que sobre una casa en orden. */
@@ -62,6 +71,13 @@ for (const [nombre, ruta, piso] of PAGINAS as [string, string, number][]) {
         `${h.prop} ${h.token} en ${h.donde}${h.texto ? ` «${h.texto}»` : ''}`),
       'el acento se usa una vez por pantalla: esto lo usa de más. Va en `--gris`, en `--hair` '
       + 'o en el color del texto.',
+    ).toEqual([]);
+
+    /* Y las excepciones declaradas, dentro de su tope: una excepción sin número
+       es una puerta, y se abre sola. */
+    expect(
+      DE_MAS(excusados) as string[],
+      'una excepción declarada excusó más elementos de los que tiene permitidos',
     ).toEqual([]);
   });
 }
