@@ -7,7 +7,10 @@
 -- ORDEN QUE LA APROBÓ: Códice #13 (Mi espacio, PR 1), aprobada por dirección el
 -- 29/9/2026.
 --
--- APLICADA: —
+-- APLICADA: 29/9/2026 02:34 (UY), en `armandoduarte-familia`, desde fd93eab.
+--   Corrida por el CEO con autorización de Germán; verificada contra la base
+--   (10 tablas con RLS, 39 policies en `public`, 3 en `storage`, bucket
+--   `comprobantes` privado). Guardada en el editor SQL como `006_storage_comprobantes`.
 --
 -- ── LO QUE HAY QUE SABER ANTES DE CORRERLA ────────────────────────────────
 -- `storage.objects` no es de `postgres`: es de `supabase_storage_admin`. En el

@@ -11,9 +11,10 @@
 -- ORDEN QUE LA APROBÓ: Códice #13 (Mi espacio, PR 1), aprobada por dirección el
 -- 29/9/2026. Especificación: `03 Producto/mi-espacio/especificacion-v1.md` §3.
 --
--- APLICADA: —
---   (esta línea la completa SOLO Germán, el día que la corre en el editor SQL de
---    `armandoduarte-familia`, y se escribe cuando se vio terminar.)
+-- APLICADA: 29/9/2026 02:34 (UY), en `armandoduarte-familia`, desde fd93eab.
+--   Corrida por el CEO con autorización de Germán; verificada contra la base
+--   (10 tablas con RLS, 39 policies en `public`, 3 en `storage`, bucket
+--   `comprobantes` privado). Guardada en el editor SQL como `001_personas_y_miembros`.
 --
 -- NINGUNA POLICY DE ACÁ SE COPIÓ de Bitácora ni de Omnia. Están escritas de cero
 -- porque Códice es un tercer modelo de inquilino: no el profesional (Bitácora) ni

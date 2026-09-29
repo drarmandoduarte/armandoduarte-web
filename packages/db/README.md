@@ -46,8 +46,14 @@ trae ni una policy: trae la forma de ejecutarlas.
 `armandoduarte-familia`, ref `jrscpjdscgycetyvenco`, región us-east-1. No hay
 base de desarrollo: el banco de pruebas **es** el entorno de desarrollo.
 
-**El SQL viaja a `main` en su propio PR y lo corre Germán** en el editor SQL,
-después del merge. Rodolfo no toca Supabase.
+**El SQL viaja a `main` en su propio PR y lo corre dirección** en el editor SQL,
+después del merge. Rodolfo no toca Supabase, y esa regla no se movió.
+
+Las seis de la #13 las corrió **el CEO con autorización expresa de Germán**, no
+Germán en persona; la cabecera de cada archivo lo dice con esas palabras. Se
+escribe porque la versión anterior de este párrafo decía «SOLO Germán» y una
+regla que en los hechos se cumplió de otra manera, sin que nadie lo anote, es una
+regla que la próxima vez no va a frenar nada.
 
 ### Las dos cicatrices de Omnia, como procedimiento
 
@@ -61,19 +67,46 @@ después del merge. Rodolfo no toca Supabase.
 
 ## Estado de las migraciones
 
+**LAS SEIS ESTÁN APLICADAS.** El 29/9/2026 a las 02:34 (hora de Uruguay), en
+`armandoduarte-familia`, desde el commit `fd93eab`. Las corrió el CEO con
+autorización de Germán.
+
 | # | archivo | qué trae | aplicada |
 |---|---|---|---|
-| 001 | `001_personas_y_miembros.sql` | `personas`, `miembros` y **las cinco funciones** de las que cuelgan todas las policias siguientes | — |
-| 002 | `002_cursos_y_ediciones.sql` | el catálogo; lo publicado se ve sin entrar | — |
-| 003 | `003_inscripciones_y_libro.sql` | `inscripciones` (sin columna estado) y `pagos_libro` insert-only | — |
-| 004 | `004_datos_de_cobro_y_auditoria.sql` | la cuenta a la que se transfiere y el registro append-only | — |
-| 005 | `005_seguridad_512.sql` | `totp_backup_codes` y `security_devices`, del kit | — |
-| 006 | `006_storage_comprobantes.sql` | el bucket privado `comprobantes` y sus policies | — |
+| 001 | `001_personas_y_miembros.sql` | `personas`, `miembros` y **las cinco funciones** de las que cuelgan todas las policias siguientes | **29/9/2026 02:34** |
+| 002 | `002_cursos_y_ediciones.sql` | el catálogo; lo publicado se ve sin entrar | **29/9/2026 02:34** |
+| 003 | `003_inscripciones_y_libro.sql` | `inscripciones` (sin columna estado) y `pagos_libro` insert-only | **29/9/2026 02:34** |
+| 004 | `004_datos_de_cobro_y_auditoria.sql` | la cuenta a la que se transfiere y el registro append-only | **29/9/2026 02:34** |
+| 005 | `005_seguridad_512.sql` | `totp_backup_codes` y `security_devices`, del kit | **29/9/2026 02:34** |
+| 006 | `006_storage_comprobantes.sql` | el bucket privado `comprobantes` y sus policies | **29/9/2026 02:34** |
 
-**Al correrlas, se completa la columna de arriba y la línea `-- APLICADA:` de
-cada archivo, con la fecha.** Hay un test que hoy afirma que las seis están en
-«—»: el día que se apliquen se pone rojo, y eso es a propósito — es el
-recordatorio más barato de que el repo y la base tienen que decir lo mismo.
+Las seis quedaron guardadas en el editor SQL de Supabase con el nombre de su
+archivo (`001_personas_y_miembros` … `006_storage_comprobantes`).
+
+### Lo que se verificó contra la base, y no contra la intención
+
+No alcanza con que el editor no haya dado error: lo que sigue se consultó sobre la
+base real, después de correr las seis.
+
+| qué | medido |
+|---|---|
+| tablas en `public` | **10**, y **las 10 con RLS** |
+| policies en `public` | **39** |
+| policies en `storage` | **3** |
+| bucket `comprobantes` | **privado**, 5 MB, `jpeg`/`png`/`pdf` |
+| triggers | **17** |
+| funciones | **20** |
+
+### Y el test que tenía fecha de vencimiento se cumplió
+
+Hasta esta rama, `toda-tabla-lleva-rls.test.ts` afirmaba que **las seis decían
+«APLICADA: —»**, y estaba escrito que el día que se aplicaran se iba a poner rojo
+y a obligar a alguien a venir. Pasó exactamente eso: al completar las cabeceras el
+test se puso rojo, y por eso ahora afirma lo contrario — que **ninguna** dice «—»,
+que las seis nombran el proyecto, la fecha y el commit, y que ese commit es el
+mismo en las seis. Un test que se actualiza para volver a verde sin cambiar de
+afirmación sería un test apagado; éste cambió de afirmación porque cambió el
+mundo.
 
 ### El orden es el orden
 
