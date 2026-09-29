@@ -25,7 +25,7 @@ como asistentes al taller, y ninguna lleva un pie que lo sugiera.
 | archivo | dónde se ve | original de Pexels | autor |
 |---|---|---|---|
 | `porque-fondo` | Taller · «¿El niño dulce que criaste…?», **de fondo otra vez desde la #12**, sin velo y con el texto sobre un panel | `pexels-karola-g-6345445` (4405×6608) | Karola G |
-| `porque-fondo-1800` | **la misma foto**, en 1800×2700, que se sirve solo por encima de 1100 px de ancho de ventana (#14 D) | el mismo | Karola G |
+| `porque-fondo-1800` | **la misma foto**, en 1800×2700, que se sirve solo por encima de 1100 px de ancho de ventana (#14 D). **Solo en WebP desde la #16**: el JPG no lo pedía nadie | el mismo | Karola G |
 | `suena-tarjeta` | Taller · «Las estrategias del pasado ya no funcionan», en tarjeta | `pexels-pavel-danilyuk-8057317` (4016×6016) | Pavel Danilyuk |
 | `llevas-claridad` | Taller · «Lo que te llevas» → Claridad | `pexels-alena-32936525` (1600×2522 en el insumo) | Alena |
 | `llevas-palabras` | Taller · «Lo que te llevas» → Palabras precisas | `pexels-astreyas-photo-10358308` (2337×3505) | Astreyas Photo |
@@ -38,7 +38,9 @@ lo que el navegador baja.
 ## Cómo se generaron, por si hay que rehacerlas
 
 Cada una sale en dos formatos —WebP y JPG— desde el original, con `sips` para el
-recorte y el tamaño y `cwebp` para el WebP. Ninguna herramienta nueva: las dos
+recorte y el tamaño y `cwebp` para el WebP. La única que no tiene su JPG es
+`porque-fondo-1800`, y el porqué está más abajo: ningún `<source>` ni `<img>` lo
+nombraba. Ninguna herramienta nueva: las dos
 vienen con macOS y con Homebrew, y una dependencia de más en el repo se justifica
 o no entra.
 
@@ -51,30 +53,31 @@ El presupuesto es **180 KB por archivo** y ninguna lo pasa: la más pesada es
 `porque-fondo.jpg` con 160 KB, y su WebP —que es lo que baja casi todo el
 mundo— pesa 72 KB.
 
-### La excepción, que es una y está declarada: `porque-fondo-1800`
+### La excepción que había, y que se cerró sola en la #16
 
-`porque-fondo-1800.webp` pesa **163 KB** y su JPG **367 KB**: el JPG pasa el
-presupuesto al doble. Entra igual, y por tres motivos que se escriben juntos para
-que nadie tenga que reconstruirlos:
+Hasta la #16 acá había una excepción declarada: `porque-fondo-1800.jpg` pesaba
+**367 KB** y pasaba el presupuesto al doble. **La #16 borró ese archivo**, y con
+él la excepción: `porque-fondo-1800.webp` pesa **163 KB**, que está bajo los 180,
+así que ya no hay nada que excusar. **El presupuesto de 180 KB se cumple en todos
+los archivos de esta carpeta, sin excepciones.**
 
-1. **Nadie lo baja en un teléfono.** El corte es por `media="(min-width: 1101px)"`
-   sobre el **ancho de ventana**, no por `sizes`, que multiplicaría por el DPR y
-   le daría la foto grande a un teléfono 3×. Medido a 375 px con DPR 3: bajan los
-   mismos **73.380 B** de antes, ni un byte más.
-2. **El JPG de 367 KB solo lo ve quien no entiende WebP**, y esa persona se lleva
-   la de **1200** —`porque-fondo.jpg`, 160 KB—, no ésta: el `<img>` de respaldo
-   apunta a la chica. El JPG grande queda en el repo como par del WebP, para no
-   dejar un formato huérfano el día que haga falta regenerarlo.
-3. **Lo que se cambia por esos 93 KB de más en escritorio** es un reescalado de
-   ×1,8. A 1440 el contenedor pide la foto a 2160 px (`width:150%`), y la de 1200
-   se estiraba hasta ahí. Con la de 1800 el estiramiento baja a ×1,2. El antes y
-   el después, al mismo recorte, están en `docs/informes/14/`.
+El motivo del borrado es que **nadie lo pedía**: el `<picture>` de `Suena.tsx`
+tiene un `<source type="image/webp">` que nombra el WebP de 1800 y un `<img>` de
+respaldo que apunta a `porque-fondo.jpg`, el de 1200. Ningún `<source>` ni `<img>`
+nombra el JPG de 1800. Estaba en el repo como «par del WebP, para no dejar un
+formato huérfano», que es un motivo razonable de escribir y malo de pagar: 367 KB
+versionados para un archivo que ningún navegador va a pedir. Si algún día hay que
+regenerarlo, sale del original en `01 Documentos/Recursos/Lucia Duarte/` con la
+receta de arriba.
 
-El presupuesto de 180 KB **no se baja**: sigue valiendo para toda foto que se
-sirva a todos los anchos. Lo que esta excepción dice es que una foto que solo
-viaja a escritorio se mide contra el LCP, no contra el presupuesto — y el LCP de
-`/merida` no se movió, porque el elemento LCP es el retrato del hero y ésta carga
-`lazy` debajo del pliegue.
+Lo que **sí** queda, porque sigue siendo cierto y explica por qué existe la
+versión de 1800: se sirve **solo por encima de 1100 px de ancho de ventana**, por
+`media="(min-width: 1101px)"` y no por `sizes` —que multiplicaría por el DPR y le
+daría la foto grande a un teléfono 3×—. Medido a 375 px con DPR 3: bajan los
+mismos **73.380 B**, ni un byte más. Y lo que se compra con ella en escritorio es
+bajar el reescalado de ×1,8 a ×1,2: a 1440 el contenedor pide la foto a 2160 px
+(`width:150%`) y la de 1200 se estiraba hasta ahí. El antes y el después están en
+`docs/informes/14/`.
 
 ## Lo que cambió en la #12 (28/9/2026)
 
