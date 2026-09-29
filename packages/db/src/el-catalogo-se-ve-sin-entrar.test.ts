@@ -10,7 +10,7 @@
  * quedan en una consulta pública).
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { levantarBanco, sembrar, type Banco, type Semilla } from './banco';
+import { levantarBanco, reventar, sembrar, type Banco, type Semilla } from './banco';
 
 let banco: Banco;
 let s: Semilla;
@@ -51,15 +51,30 @@ describe('(4) sin sesión', () => {
   });
 
   it('NO ve personas, ni miembros, ni inscripciones, ni el libro, ni los datos de cobro, ni la auditoría', async () => {
-    await banco.comoAnonimo(async () => {
-      for (const tabla of [
-        'personas', 'miembros', 'inscripciones', 'pagos_libro',
-        'datos_de_cobro', 'auditoria', 'totp_backup_codes', 'security_devices',
-      ]) {
-        const filas = await banco.sql(`select * from public.${tabla}`);
-        expect(filas, `anon alcanzó a ver filas de ${tabla}`).toHaveLength(0);
-      }
-    });
+    /* ── Desde la 007, esto ya no lo decide la RLS ─────────────────────────
+       Antes `anon` hacía los ocho `select`, la RLS los filtraba y volvían cero
+       filas. Ahora no tiene `select` sobre ninguna de las ocho —la 007 solo se
+       lo da sobre `cursos` y `ediciones`— y Postgres corta antes, con
+       `42501 permission denied`.
+
+       Se afirma **el permiso** y no «cero filas», porque cero filas volvería a
+       pasar el día que alguien abriera el `grant`: la RLS seguiría filtrando y
+       el test no diría nada. Acá el freno que se vigila es el de más afuera, y
+       la lista de las ocho es la del punto 0 de la corrección de la #15. */
+    const abiertas: string[] = [];
+    for (const tabla of [
+      'personas', 'miembros', 'inscripciones', 'pagos_libro',
+      'datos_de_cobro', 'auditoria', 'totp_backup_codes', 'security_devices',
+    ]) {
+      const e = await reventar(() => banco.comoAnonimo(
+        () => banco.sql(`select * from public.${tabla}`)));
+      if (!/permission denied/i.test(e ?? '')) abiertas.push(`${tabla}: ${e ?? 'la consulta NO falló'}`);
+    }
+    expect(
+      abiertas,
+      'estas tablas dejaron pasar a `anon`. La 007 le da `select` solo sobre `cursos` y '
+      + '`ediciones`: todo lo demás tiene que cortar en el permiso, antes de llegar a la RLS.',
+    ).toEqual([]);
     // Y el piso: como superusuario esas tablas SÍ tienen filas. Sin esto, un
     // esquema vacío daría ocho ceros y se leería como ocho aciertos.
     const [f] = await banco.sql<{ n: string }>(`select count(*) as n from public.personas`);
@@ -106,14 +121,22 @@ describe('el equipo ve el borrador, y solo con aal2', () => {
       `select estado from public.cursos where slug = 'curso-de-gabi'`);
     expect(f.estado).toBe('archivado');
 
-    // Borrar no levanta error: borra cero filas, porque no hay policy de delete.
-    // Se afirma mirando que la fila siga ahí (ver la nota en
-    // `territorio-y-segundo-paso.test.ts`).
-    await banco.como(s.gabi, 'aal2', () => banco.sql(
-      `delete from public.cursos where slug = 'curso-de-gabi'`));
+    /* ── Borrar: dos frenos, y se afirman los dos ──────────────────────────
+       Hasta la 007 el `delete` no levantaba error —la RLS filtra, no hay fila
+       que borrar, cero filas afectadas— y la única forma honesta de afirmarlo
+       era mirar que la fila siguiera ahí. Ahora hay un freno más afuera: la 007
+       **no le da `delete` a `authenticated` en ninguna tabla**, así que corta en
+       el permiso.
+
+       Se afirman los dos, y no uno: el permiso, porque es el que decide hoy; y
+       la fila, porque el día que alguien devuelva el `grant` —que es un renglón
+       en un diff— el segundo freno tiene que seguir ahí y decirlo. */
+    const e = await reventar(() => banco.como(s.gabi, 'aal2', () => banco.sql(
+      `delete from public.cursos where slug = 'curso-de-gabi'`)));
+    expect(e, '`authenticated` no tiene `delete` en ninguna tabla (migración 007)').toMatch(/permission denied/i);
     const [n] = await banco.sql<{ n: string }>(
       `select count(*) as n from public.cursos where slug = 'curso-de-gabi'`);
-    expect(Number(n.n)).toBe(1);
+    expect(Number(n.n), 'y la fila sigue ahí: el segundo freno es la falta de policy de delete').toBe(1);
   });
 });
 

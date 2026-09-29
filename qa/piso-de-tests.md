@@ -20,7 +20,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/ui` | 30 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
-| `@codice/db` | 83 |
+| `@codice/db` | 87 |
 | `@codice/web` | 51 |
 | `@codice/navegador` | 33 |
 
@@ -57,6 +57,52 @@ de «Ahora» tienen `h3 a{display:inline-flex;align-items:center}` con la flecha
 cambió nada — un ítem de flex con `flex-wrap:nowrap` no se puede ir de renglón. Lo
 que estaba mal era la medición. Ahora agrupa por **solape vertical**, que tolera
 tamaños de letra distintos y sigue separando dos renglones de verdad.
+
+## Lo que trae la corrección de la #15 — `@codice/db` 83 → 87
+
+Cuatro tests en `src/los-permisos-estan-puestos.test.ts`, y existen porque **el
+banco regalaba permisos**.
+
+`supabase-base.sql` reproducía lo que Supabase da cuando se le deja exponer las
+tablas nuevas automáticamente (`grant all on tables` por default privilege). El
+proyecto `armandoduarte-familia` se creó con esa opción en **no**, que es la
+decisión correcta, y Supabase lo implementa quitando `select, insert, update,
+delete` de esos defaults. Resultado: las diez tablas nacían **sin un solo
+permiso** en producción y con los cuatro verbos acá.
+
+Lo que costó: un cliente con token válido pedía `/api/yo`, el `select` sobre
+`miembros` contestaba `42501 permission denied`, el middleware lo atrapaba en
+silencio —por diseño: no autentica—, el guard fallaba cerrado y la pantalla lo
+mandaba a enrolar un autenticador. **Un cliente no podía entrar de ninguna
+forma, y los 83 tests estaban en verde.**
+
+La distinción que ninguna comprobación de esta casa sabía hacer: **42501 no es
+RLS**. La RLS devuelve cero filas; la falta de `grant` levanta un error.
+
+| mutación | qué cae |
+|---|---|
+| quitar `grant select` de `miembros` | «esperado: [select, insert, update] · tiene: [insert, update]» |
+| dar `delete` a `authenticated` en `inscripciones` | el de los verbos **y** el que dice «delete en ninguna de las diez» |
+| **quitar el revoke del banco** (volver a regalar) | el PISO: «el banco le está dando select sobre personas a anon sin que ninguna migración lo pida» |
+
+La tercera es la que sostiene a las otras dos, y por eso va primero en el
+archivo: sin ella, los dos tests de abajo miden la generosidad de PGlite.
+
+### Y cuatro de los 83 cambiaron de afirmación
+
+No se aflojaron: **se endurecieron**, porque con los permisos reales el freno
+que corta es otro y es el de más afuera.
+
+| test | antes | ahora |
+|---|---|---|
+| `anon` no lee `datos_de_cobro` | cero filas (RLS) | `permission denied` (no tiene `select`) |
+| `anon` no ve las ocho tablas | ocho ceros (RLS) | ocho `permission denied` |
+| nadie borra cursos | la fila sigue ahí | `permission denied` **y** la fila sigue ahí |
+| un miembro se desactiva, no se borra | la fila sigue ahí | `permission denied` **y** la fila sigue ahí |
+
+Los dos últimos afirman **las dos mitades**: el permiso, porque es el que decide
+hoy, y la fila, porque el día que alguien devuelva el `grant` —un renglón en un
+diff— el segundo freno tiene que seguir ahí y decirlo.
 
 ## Lo que trae la orden #13 — `@codice/db` nace con 83
 
