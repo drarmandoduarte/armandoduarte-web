@@ -6,7 +6,12 @@
 -- ORDEN QUE LA APROBÓ: Códice #15, «Corrección del CEO, 30 minutos después»,
 -- punto 0. Aprobada por dirección el 29/9/2026.
 --
--- APLICADA: —
+-- APLICADA: 29/9/2026 15:58 (UY), en `armandoduarte-familia`, desde c3a485e.
+--   Corrida por el CEO con autorización de Germán; guardada en el editor SQL
+--   como `007_permisos`. Verificada contra el catálogo
+--   (`information_schema.role_table_grants`: 22 filas de permisos en `public`,
+--   exactamente la lista del punto 0) y con un token real de cliente contra la
+--   Data API: `miembros` → `[]` (RLS, ya no 42501) y `personas` → su propia fila.
 --
 -- ── EL SÍNTOMA, Y POR QUÉ NO ERA LO QUE PARECÍA ────────────────────────────
 -- Un cliente con token válido no podía entrar a Mi espacio. El camino completo,
