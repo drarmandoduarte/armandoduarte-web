@@ -172,7 +172,18 @@ a,button{-webkit-tap-highlight-color:transparent}
 .link:hover{gap:16px;color:var(--naranja-texto)}
 
 /* ── Secciones ──────────────────────────────────────────────────────── */
-.section{padding:clamp(88px,12vh,140px) 0;position:relative}
+/* ── El aire de una sección, después de la #20 ─────────────────────────
+   `clamp(88px,12vh,140px)` → `clamp(40px,5vh,64px)`. Lo escribió la orden #20
+   (A.5) y es el primero de los tres resortes para que ninguna sección pase de la
+   pantalla, en este orden y sin sacar contenido: paddings, `gap` de grillas, y
+   recién después el tamaño de título **dentro de la sección que sobra**.
+
+   Medido a 1440×900: eran 108 px arriba y 108 abajo, y pasan a 45 y 45. Son
+   **126 px menos por sección**, y es un cambio de ritmo de todo el sitio, no
+   solo de las que sobraban: la regla es de todas, y dos aires distintos en la
+   misma página se ven peor que uno más ajustado. La tabla completa —sección ×
+   viewport × altura × sobra, antes y después— está en `docs/informes/20/`. */
+.section{padding:clamp(40px,5vh,64px) 0;position:relative}
 .calido{background:var(--calido);--velo:var(--calido)}
 
 .oscuro{background:var(--teal);color:var(--crema);--velo:var(--teal)}
@@ -314,8 +325,46 @@ a,button{-webkit-tap-highlight-color:transparent}
 .ov__foot a:hover{color:var(--ambar)}
 
 /* ── Hero · pantalla completa, foto real a la derecha ───────────────── */
-.hero{min-height:min(100svh,880px);padding:calc(var(--header-h) + clamp(40px,6vh,72px)) 0 clamp(48px,7vh,80px);display:flex;align-items:center}
+/* ── El hero mide la pantalla, ni un píxel más ni uno menos (orden #20, A.3)
+   Hasta la #20 decía `min-height:min(100svh,880px)`, y ese tope de 880 es lo que
+   dirección vio en producción: a 1920×1080 el hero terminaba a los 909 px y por
+   debajo asomaba una franja del color de la sección siguiente antes del pliegue
+   —«en el hero hay dos colores por la sección que le sigue»—. Con el hero del
+   alto de la pantalla, lo que sigue empieza donde termina la pantalla.
+
+   `100dvh` y no `100vh`: en el móvil el `vh` es la altura CON la barra de
+   direcciones retraída, así que `100vh` se pasa de lo que se ve. `dvh` es lo
+   que el navegador deja ver ahora, que es lo que pidió dirección («teniendo en
+   cuenta el borde del navegador»). La línea de `100vh` queda **antes** como
+   respaldo para el navegador que no entienda `dvh`: la que gana es la última
+   que el navegador sepa leer.
+
+   `max-height` además de `min-height` porque la regla es «exactamente», no «al
+   menos»: sin el tope, un texto más largo estira el hero y vuelve el defecto.
+
+   ── Y el aire de abajo se lo queda el texto (orden #20, B) ──────────────
+   `padding-bottom:0` en la sección, y el `clamp` que tenía pasa a la columna de
+   texto. Así el arco con el busto **apoya** su borde inferior en el borde de la
+   sección —que es el cambio de color— y el texto no queda pegado al filo. Es la
+   misma maniobra que la #19 B hizo en `#facilitador` y `#quien`, y por el mismo
+   motivo: quitarle el padding a la sección entera arrastraría también al texto.
+   ───────────────────────────────────────────────────────────────────────── */
+.hero{min-height:100vh;max-height:100vh;min-height:100dvh;max-height:100dvh;padding:calc(var(--header-h) + clamp(28px,4vh,56px)) 0 0;display:flex;align-items:stretch}
+/* Sin `width:100%`: la rejilla **es** el `.container`, y aquel ya trae su ancho
+   —`min(90%,1400px,calc(100% - 40px))`— que es lo que le da el margen lateral a
+   toda la web. Un `width:100%` acá lo pisaba (misma especificidad, y esta regla
+   va después) y el hero quedaba **pegado al filo izquierdo** de la ventana, sin
+   un píxel de aire. Se vio en la primera captura del informe y no lo habría
+   visto ninguna medición de altura: la regla A mira el alto, y esto era el
+   ancho. Para estirar la rejilla a lo alto no hacía falta —el `align-items:
+   stretch` del `.hero` ya lo hace, que estira el eje transversal—. */
 .hero__grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(40px,6vw,96px);align-items:center}
+/* La columna de texto se queda con el aire que cedió la sección. */
+.hero__grid>div:first-child{padding-bottom:clamp(48px,7vh,80px)}
+/* Y el arco baja hasta el filo. `max-height:100%` es el freno: sin él, una
+   columna ancha con `aspect-ratio:4/5` pide más alto del que hay y el arco se
+   sale por arriba, que es peor que el defecto que vino a arreglar. */
+.hero .foto--arco{align-self:end;max-height:100%}
 /* ── El hero de /merida pide más ancho de texto que el de la portada (#16, A)
    «El arte de amar a tu» tiene que entrar en **un** renglón de 900 px para
    arriba, y con el reparto de la portada no entraba: medido a nueve anchos entre
@@ -342,7 +391,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 .hero-micro span+span::before{content:'·';margin:0 .8em;color:var(--gris-claro)}
 .foto{border-radius:12px;overflow:hidden;background:var(--calido);position:relative}
 .foto img{width:100%;height:100%;object-fit:cover}
-.hero .foto{aspect-ratio:4/5;max-height:78vh}
+/* `78vh` era el tope de cuando el hero medía como mucho 880 px. Ahora el hero
+   mide la pantalla y el tope lo pone `max-height:100%` sobre el alto disponible,
+   que es el número correcto: el otro dejaba 22 vh de aire debajo del arco. */
+.hero .foto{aspect-ratio:4/5}
 .foto--arco{background:var(--calido);border-radius:260px 260px 12px 12px;overflow:hidden}
 .foto--arco img{object-fit:cover;object-position:center top}
 .foto--libre{background:transparent;border-radius:0;overflow:visible}
@@ -379,7 +431,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 #facilitador .grid-2.centro,#quien .grid-2.centro{align-items:end}
 #facilitador .foto--libre,#quien .foto--libre{align-self:end;margin-bottom:0}
 #facilitador,#quien{padding-bottom:0}
-#facilitador .grid-2>div:last-child,#quien .grid-2>div:last-child{padding-bottom:clamp(88px,12vh,140px)}
+#facilitador .grid-2>div:last-child,#quien .grid-2>div:last-child{padding-bottom:clamp(40px,5vh,64px)}
 #porque .foto-tarjeta{max-width:480px}
 #programa .sello{margin-top:var(--s5)}
 #programa .lista--2{margin-top:0}
@@ -467,6 +519,13 @@ a,button{-webkit-tap-highlight-color:transparent}
 .hechos{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:var(--s4) 0;margin-top:var(--s6)}
 .hechos div span{display:block;font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)}
 .hechos div b{display:block;margin-top:6px;font-family:var(--display);font-weight:400;font-size:clamp(17px,1.5vw,21px);color:var(--tinta)}
+/* ── El lugar abre el mapa (orden #20, E) ─────────────────────────────────
+   El mismo trato que el resto de los enlaces de la casa: sin subrayado en
+   reposo, hairline al pasar, y el foco lo pone la regla global de D26. La
+   diferencia con `.contacto .grande a` es el color de la línea, porque acá el
+   fondo es claro. */
+.hechos div b a{color:inherit;border-bottom:1px solid transparent;transition:border-color .32s var(--ease)}
+.hechos div b a:hover{border-color:var(--gris)}
 
 /* ── Tres · lo que te llevas ────────────────────────────────────────── */
 .tres{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s5);margin-top:var(--s6)}
@@ -537,6 +596,23 @@ a,button{-webkit-tap-highlight-color:transparent}
    así el renglón no salta cuando aparece. */
 .contacto .grande a{border-bottom:1px solid transparent;padding-bottom:3px;transition:border-color .32s var(--ease),color .32s var(--ease)}
 .contacto .grande a:hover,.contacto .grande a:focus-visible{border-color:color-mix(in oklab, var(--crema) 45%, transparent)}
+/* ── Y en hover, la línea es naranja (orden #20, C) ──────────────────────
+   Lo pidió dirección: «la línea de cuando hacemos hover me gustaría de su color
+   naranja». **Solo `hover`**: el `:focus-visible` sigue con la regla global de
+   D26 —2 px de `currentColor`—, que es la que hace que el foco se vea igual en
+   todo el sitio y no dependa de la sección.
+
+   Va después de la regla de arriba, que nombra los dos estados juntos: misma
+   especificidad, gana la última. Sin esta línea aparte habría que partir aquella
+   en dos, y partirla es perder el renglón que dice que en reposo el borde está
+   declarado en transparente.
+
+   La línea no es texto, así que no tiene umbral de contraste; el número se anota
+   igual: `--naranja` sobre el `--tinta` del bloque da **3,42**. (El valor de cada
+   token no se transcribe acá: `check:tokens` no distingue una cita de una
+   declaración, y tiene razón en no distinguirla — un hex citado en un comentario
+   es, con el tiempo, un hex copiado a una regla.) */
+.contacto .grande a:hover{border-color:var(--naranja)}
 
 /* ── Cierre ─────────────────────────────────────────────────────────── */
 .cierre{text-align:center;padding:clamp(110px,16vh,180px) 0}
@@ -723,8 +799,14 @@ a,button{-webkit-tap-highlight-color:transparent}
    Legal+Canales abajo, que es el reparto que pidió la orden. */
 @media (max-width:1100px){.pasos{grid-template-columns:repeat(3,1fr)}.paso__line{display:none}.lista li{grid-template-columns:56px 1fr}.lista p{grid-column:2}.ft__grid{grid-template-columns:1fr 1fr}}
 @media (max-width:900px){
-  .hero{min-height:0;padding-top:calc(var(--header-h) + 40px)}
+  /* Apilado, la regla de «una pantalla» no aplica y el tope se saca: el hero de
+     una columna es texto arriba y foto abajo, y encerrarlo en 100dvh lo
+     recortaría. Está declarado igual que en `check/altura.mjs`, que tampoco mide
+     debajo de 1440. */
+  .hero{min-height:0;max-height:none;padding:calc(var(--header-h) + 40px) 0 clamp(48px,7vh,80px)}
   .hero__grid{grid-template-columns:1fr;gap:var(--s5)}
+  .hero__grid>div:first-child{padding-bottom:0}
+  .hero .foto--arco{align-self:auto;max-height:none}
   .hero .foto{aspect-ratio:4/5;max-height:none;max-width:420px;margin-top:8px}
   .grid-2{grid-template-columns:1fr;gap:var(--s5)}
   /* Apilado, el recorte pasa **debajo** del texto para poder seguir apoyado en

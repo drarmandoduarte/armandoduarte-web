@@ -22,7 +22,30 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
 | `@codice/web` | 58 |
-| `@codice/navegador` | 35 |
+| `@codice/navegador` | 38 |
+
+## Lo que trae la orden #20 — `@codice/navegador` 35 → 38
+
+Tres tests en `e2e/altura.spec.ts`, la segunda puerta del guardián nuevo
+`check:altura`: **ninguna sección es más alta que la pantalla** (regla A de la
+#20, que nace de lo que dirección vio en producción a 1920).
+
+Dos son por ruta —portada y `/merida`, los dos viewports de escritorio adentro de
+una sola navegación, como `renglones.spec.ts` y por el mismo precio— y **el
+tercero es la otra mitad**: que ninguna fila de `PENDIENTES` sobre. Va aparte
+porque sobra tan rojo como falta, y una lista de excepciones que no se limpia se
+convierte en una lista de mentiras.
+
+Las dos mutaciones, cada una vista en rojo y cada mitad por separado:
+
+| mutación | qué cae |
+|---|---|
+| `#quien{padding-bottom:400px}` | «#quien mide 1434px y la pantalla 900px: sobran 534px», y también el de 1920 |
+| una fila de `PENDIENTES` para una sección que ya entra | «estas secciones ya entran… se borra su fila» |
+
+La lógica no se copia: se importa de `check/altura.mjs`, **incluidas las dos
+listas de excepciones**. Dos copias serían dos verdades que un día no coinciden —
+la lección del token duplicado de la #06.
 
 ## Lo que movió la orden #16 — `@codice/navegador` sube a 33
 
