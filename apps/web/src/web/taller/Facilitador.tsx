@@ -26,7 +26,7 @@ export function Facilitador() {
     <Seccion id="facilitador" tono="oscuro" contenedor={false}>
       <div className="container grid-2 centro">
         <figure className="foto foto--libre reveal">
-          <Retrato cual="de-pie" alt={t('taller.facilitador.fotoAlt')} tamanos="(max-width:900px) 92vw, 480px" />
+          <Retrato cual="de-pie" alt={t('taller.facilitador.fotoAlt')} tamanos="(max-width:900px) 92vw, 472px" />
         </figure>
         <div>
           <span className="eyebrow reveal">{t('taller.facilitador.eyebrow')}</span>

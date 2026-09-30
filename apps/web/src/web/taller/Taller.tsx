@@ -5,6 +5,7 @@ import { Hero } from './Hero';
 import { Suena } from './Suena';
 import { Porque } from './Porque';
 import { Programa } from './Programa';
+import { Llevas } from './Llevas';
 import { Facilitador } from './Facilitador';
 import { Testimonios } from './Testimonios';
 import { Inversion } from './Inversion';
@@ -27,6 +28,7 @@ export function Taller() {
       <Suena />
       <Porque />
       <Programa />
+      <Llevas />
       <Facilitador />
       <Testimonios />
       <Inversion />

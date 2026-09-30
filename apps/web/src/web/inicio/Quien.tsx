@@ -22,7 +22,7 @@ export function Quien() {
     <Seccion id="quien" contenedor={false}>
       <div className="container grid-2 centro">
         <figure className="foto foto--libre reveal">
-          <Retrato cual="de-pie" alt={t('inicio.quien.fotoAlt')} tamanos="(max-width:900px) 92vw, 520px" />
+          <Retrato cual="de-pie" alt={t('inicio.quien.fotoAlt')} tamanos="(max-width:900px) 92vw, 470px" />
         </figure>
         <div>
           <span className="eyebrow reveal">{t('inicio.quien.eyebrow')}</span>

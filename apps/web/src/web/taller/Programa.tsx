@@ -1,17 +1,20 @@
 import { useTranslation } from 'react-i18next';
-import { TELEFONO_TALLER } from '@codice/core';
-import { BotonWhatsApp } from '../comun/BotonWhatsApp';
-import { Foto } from '../comun/Foto';
 import { Icono } from '../comun/Icono';
 import { Seccion } from '../comun/Seccion';
 
 /**
- * Los cinco núcleos y lo que te llevas.
+ * Los cinco núcleos.
  *
- * Los pasos llevan una línea entre el número y el siguiente, que se apaga en el
- * último (`.paso:last-child .paso__line`) y en pantallas de menos de 1100px. El
- * `<span class="paso__line">` va igual en los cinco: quién se ve y quién no lo
- * decide el CSS, no el marcado.
+ * ── Una sección de dos, desde la #20-bis ─────────────────────────────────
+ * Hasta la #20 esta sección traía también «Lo que te llevas» y medía 1738 px
+ * contra una pantalla de 900. Dirección la partió (#20, A.5): «Lo que te llevas»
+ * es `Llevas.tsx`, su propia sección, y acá quedan los núcleos. El ancla
+ * `#programa` del hero sigue cayendo acá, que es donde empieza el programa.
+ *
+ * Los pasos llevaban una línea entre el número y el siguiente. Con la grilla
+ * «3 + 2» de la #20-bis se apaga en todos los anchos (el tercero apuntaría a
+ * nada). El `<span class="paso__line">` queda en el marcado: quién se ve y quién
+ * no lo decide el CSS, no el marcado.
  *
  * ── De cuatro a cinco, y de dos párrafos a uno (orden #12, G) ────────────
  * Armando mandó el 28/9 el modelo entero —«Modelo orientado a la madurez»— con
@@ -34,12 +37,6 @@ export function Programa() {
     ['05', '3', 'cinco', 'cambios'],
   ] as const;
 
-  const llevas = [
-    ['01', 'uno', 'llevas-claridad'],
-    ['02', 'dos', 'llevas-palabras'],
-    ['03', 'tres', 'llevas-serenidad'],
-  ] as const;
-
   return (
     <Seccion id="programa">
       <span className="eyebrow reveal">{t('taller.programa.eyebrow')}</span>
@@ -60,37 +57,6 @@ export function Programa() {
         ))}
       </div>
       <p className="receso reveal">{t('taller.programa.receso')}</p>
-
-      <div className="u-mt-8">
-        <span className="eyebrow reveal">{t('taller.llevas.eyebrow')}</span>
-        <h2 className="display-m u-mt-4 reveal" data-d="1">{t('taller.llevas.titulo')}</h2>
-        <div className="tres reveal" data-d="2">
-          {llevas.map(([n, clave, foto]) => (
-            <div key={n}>
-              <figure>
-                <Foto
-                  nombre={foto}
-                  alt={t(`taller.llevas.${clave}FotoAlt`)}
-                  ancho={800}
-                  alto={1000}
-                  tamanos="(max-width:900px) 92vw, 30vw"
-                />
-              </figure>
-              <span className="n">{n}</span>
-              <h3>{t(`taller.llevas.${clave}Titulo`)}</h3>
-              <p>{t(`taller.llevas.${clave}Texto`)}</p>
-            </div>
-          ))}
-        </div>
-        <div className="hero-cta reveal" data-d="3">
-          <BotonWhatsApp
-            telefono={TELEFONO_TALLER}
-            mensaje={t('comun.mensajes.programa')}
-            texto={t('taller.llevas.cta')}
-            clase="btn btn--naranja"
-          />
-        </div>
-      </div>
     </Seccion>
   );
 }

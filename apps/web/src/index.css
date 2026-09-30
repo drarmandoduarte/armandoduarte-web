@@ -408,8 +408,8 @@ a,button{-webkit-tap-highlight-color:transparent}
    que es `.ficha`. El primer intento de esta orden hizo eso y el guardián de
    fidelidad lo cazó con la portada 56 px más alta. Un `id` gana siempre, que es
    lo que el `style=` inline hacía y lo que hay que conservar. */
-#quien .foto--libre{max-width:520px}
-#facilitador .foto--libre{max-width:480px}
+#quien .foto--libre{max-width:470px}
+#facilitador .foto--libre{max-width:472px}
 /* ── Armando apoyado en la orilla (orden #12, E) ──────────────────────────
    Lucía vio aire entre el borde de abajo del PNG y el del bloque teal. La
    figura deja de estar centrada y se pega al fondo de la fila, y el aire que
@@ -498,14 +498,22 @@ a,button{-webkit-tap-highlight-color:transparent}
    altura sin fijarle un alto a nada. Donde no haya `subgrid`, la declaración se
    descarta y queda el mismo apilado de antes: el `span 3` sigue dando una fila
    de cinco. ─────────────────────────────────────────────────────────────── */
-.pasos{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:auto auto 1fr;gap:var(--s5);margin-top:var(--s7)}
+/* ── Tres más dos (orden #20-bis) ─────────────────────────────────────────
+   Dirección partió `#programa` en dos secciones (#20, A.5) y pidió los núcleos
+   «3 + 2»: una fila de tres y otra de dos. Es la misma grilla que ya tenía la
+   pantalla de menos de 1100, ahora en todas. La línea entre núcleos se apaga
+   en todos los anchos: en una fila de tres el tercero apuntaría a nada.
+   Medido a 1440×900: la sección queda en 844 (con los cinco en fila medía 693;
+   la opción literal «dos columnas, 3 a la izquierda y 2 a la derecha» mide
+   1076 y no entra). ──────────────────────────────────────────────────────── */
+.pasos{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto 1fr;gap:var(--s5);margin-top:var(--s7)}
+.paso__line{display:none}
 .paso{display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:var(--s3);align-content:start}
 .paso__head{display:flex;align-items:center;gap:16px}
 /* El número, sin el círculo naranja que lo envolvía: en una línea de tiempo el
    círculo compite con el ícono que tiene al lado (orden #07, A). */
 .paso__num{font-family:var(--display);font-weight:500;font-size:12px;color:var(--gris);letter-spacing:.06em;flex:none;font-variant-numeric:tabular-nums}
 .paso__line{flex:1;height:1px;background:var(--hair);margin-right:calc(var(--s5) * -1)}
-.paso:last-child .paso__line{display:none}
 .paso h3{font-family:var(--display);font-weight:400;font-size:clamp(19px,1.6vw,23px);line-height:1.25;color:var(--tinta)}
 .paso h3 b{display:block;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
 .paso p{font-size:15.5px;line-height:1.7;color:var(--gris)}
@@ -797,7 +805,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* El pie pasa a dos columnas acá y no a 900 (orden #14): con cuatro, el nombre
    del taller no entra en un cuarto de 1100 px. Quedan Explorar+Talleres arriba y
    Legal+Canales abajo, que es el reparto que pidió la orden. */
-@media (max-width:1100px){.pasos{grid-template-columns:repeat(3,1fr)}.paso__line{display:none}.lista li{grid-template-columns:56px 1fr}.lista p{grid-column:2}.ft__grid{grid-template-columns:1fr 1fr}}
+@media (max-width:1100px){.lista li{grid-template-columns:56px 1fr}.lista p{grid-column:2}.ft__grid{grid-template-columns:1fr 1fr}}
 @media (max-width:900px){
   /* Apilado, la regla de «una pantalla» no aplica y el tope se saca: el hero de
      una columna es texto arriba y foto abajo, y encerrarlo en 100dvh lo

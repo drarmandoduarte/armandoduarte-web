@@ -65,13 +65,15 @@ export const VIEWPORTS = [
 ];
 
 /**
- * El piso de secciones por ruta, **medido** el 29/9 y no estimado.
+ * El piso de secciones por ruta, **medido** el 29/9 y no estimado. `/merida`
+ * pasó de 9 a 10 en la #20-bis, cuando «Lo que te llevas» salió de `#programa`
+ * a su propia sección `#llevas`.
  *
  * «Ninguna sección sobra» sobre un barrido que no encontró ninguna sección se
  * escribe igual que sobre una página en orden. Es la regla de la casa sobre las
  * aserciones de cero: al lado del cero va cuántas secciones se miraron.
  */
-export const PISO = { inicio: 8, merida: 9 };
+export const PISO = { inicio: 8, merida: 10 };
 
 /**
  * ── Las excepciones, en dos listas que NO significan lo mismo ─────────────
@@ -98,23 +100,27 @@ export const APROBADAS = [];
 /**
  * Lo que sobra y **espera decisión de dirección**.
  *
- * Ninguna de estas filas es una aprobación. Son dos casos distintos:
+ * Ninguna de estas filas es una aprobación. La #20-bis aplicó las tres
+ * decisiones de dirección (A.5) y **midió después**, y lo que quedó es esto:
  *
- *   · **la foto manda** — `#quien` y `#facilitador` usan el mismo recorte
- *     `de-pie` (1400×2526). A su `max-width` declarado la foto mide 938 y 866 px
- *     de alto, y en `#quien` eso es **más alto que la pantalla de 900 aunque el
- *     padding fuera cero**. Ni el `gap` ni el tamaño del título la tocan: el
- *     único resorte que queda es achicar a Armando, y cuánto se achica al
- *     cliente en su propia portada no es una decisión de código;
- *   · **el contenido no entra** — el `#programa` de `/merida` son los cinco
- *     núcleos con su descripción: 1738 px contra 900. Sobran 838, y no hay
- *     padding que los devuelva. La orden ya lo nombraba como candidato y deja
- *     las tres salidas: dos columnas, acordeón, o aceptar el desborde ahí.
+ *   · **`#quien` — manda el texto, no la foto.** El informe del #30 decía que
+ *     mandaba la foto y se equivocaba: la columna de texto mide 944 px más los
+ *     90 del padding, y eso da 1034 con la foto a 520 **o** a 470. La foto a 470
+ *     se aplicó porque es lo decidido, pero no compra ningún píxel. Achicar los
+ *     `margin` entre bloques (40 → 28, 28 → 20) la deja en 994: tampoco entra;
+ *   · **`#facilitador` — lo mismo, por 6 px.** Con la foto a 472 bajó de 911 a
+ *     906, no a 897: acá también manda el texto (816 px). `margin-top` de la
+ *     ficha 40 → 32 la deja en 898;
+ *   · **`#llevas` — la sección nueva.** Sola mide 1023 a 1440×900 y 1085 a
+ *     1920×1080: la manda la foto 4:5 de cada columna (405×507). En 5:4 la
+ *     sección queda en 841; en 1:1, en 922 (no entra).
+ *
+ * `#programa` salió de la lista: con los núcleos en 3 + 2 mide 844.
  */
 export const PENDIENTES = [
-  ['inicio', 'quien', 'la foto `de-pie` a 520 px de ancho mide 938 de alto y la pantalla de 1440×900 da 900: no entra ni con padding cero. Opción medida: `max-width` 520 → 470 px (−9,6 %), que deja la sección en 893. A 1920×1080 ya entra (−28)', 134],
-  ['merida', 'facilitador', 'lo mismo, un pelo: la foto a 480 px mide 866 y con el padding de 45 la sección queda en 911. Opción medida: `max-width` 480 → 472 px (−1,7 %), que la deja en 897. A 1920×1080 ya entra (−156)', 11],
-  ['merida', 'programa', 'los cinco núcleos con su descripción: 1738 px contra 900. Sobran 838 y ningún resorte de la A.5 los devuelve. Dirección elige: dos columnas, acordeón, o aceptar el desborde en esta sola sección', 838],
+  ['inicio', 'quien', 'manda la columna de texto (944 + 90 de padding = 1034), no la foto: a 520 o a 470 mide lo mismo. A 1920×1080 entra (−28)', 134],
+  ['merida', 'facilitador', 'manda la columna de texto (816 + 90 = 906); la foto a 472 compró 5 px de los 11. `margin-top` de la ficha 40 → 32 la deja en 898. A 1920×1080 entra (−156)', 6],
+  ['merida', 'llevas', 'la foto 4:5 de cada columna (405×507) mide 1023 a 1440×900 y 1085 (+5) a 1920×1080. Fotos en 5:4: 841', 123],
 ];
 
 /** Las dos listas juntas es lo que el barrido aplica. */
