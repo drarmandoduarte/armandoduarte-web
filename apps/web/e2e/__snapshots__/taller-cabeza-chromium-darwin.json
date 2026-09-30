@@ -24,6 +24,7 @@
       "location": {
         "@type": "Place",
         "name": "Fiesta Inn Mérida",
+        "hasMap": "https://maps.app.goo.gl/7CzJ1jubvL8KfNyt8",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Mérida",

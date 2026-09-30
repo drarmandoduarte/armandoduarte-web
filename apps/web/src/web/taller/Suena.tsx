@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { CANALES } from '../comun/canales';
 import { Icono } from '../comun/Icono';
 import { Seccion } from '../comun/Seccion';
 
@@ -117,7 +118,28 @@ export function Suena() {
           </div>
           <div>
             <Icono nombre="lugar" ancho={40} alto={40} />
-            <span>{t('taller.hechos.dondeClave')}</span><b>{t('taller.hechos.dondeValor')}</b>
+            <span>{t('taller.hechos.dondeClave')}</span>
+            {/* ── El lugar abre el mapa (orden #20, E) ──────────────────────
+                El **texto no cambia**: es la misma clave, y el test del evento
+                lo compara con `location.name` del JSON-LD. Lo que se agrega es
+                el `<a>` alrededor.
+
+                El `aria-label` dice a dónde lleva porque el texto solo no lo
+                dice: «Fiesta Inn Mérida» leído por un lector de pantalla es el
+                nombre de un hotel, no «esto abre un mapa».
+
+                La CSP no cambia: un `href` externo es navegación, no carga de
+                recurso. */}
+            <b>
+              <a
+                href={CANALES.mapaSede}
+                target="_blank"
+                rel="noopener"
+                aria-label={t('taller.hechos.dondeAria')}
+              >
+                {t('taller.hechos.dondeValor')}
+              </a>
+            </b>
           </div>
           <div>
             <Icono nombre="sesion" ancho={40} alto={40} />

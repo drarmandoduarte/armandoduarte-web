@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { enlaceReservaDelTaller, enlaceWhatsApp } from '@codice/core';
+import { enlaceWhatsApp } from '@codice/core';
 import { CANALES } from './canales';
 
 /**
@@ -10,19 +10,22 @@ import { CANALES } from './canales';
  * ── Por qué «Talleres» tiene columna propia (orden #14) ───────────────────
  * Los talleres son lo que Armando vende y hasta acá eran **un renglón** perdido
  * en el medio de «Explorar», entre «Qué hago» y «Libros». Un pie con tres
- * columnas y aire de sobra podía decirlo mejor. La columna nace con lo que hay
- * hoy y sin inventar nada: el taller, su fecha y el WhatsApp para reservar. Sin
- * «próximos talleres», sin «próximamente» — la web no promete un calendario que
- * todavía no existe.
+ * columnas y aire de sobra podía decirlo mejor. Sin «próximos talleres», sin
+ * «próximamente» — la web no promete un calendario que todavía no existe.
  *
  * Es también donde va a vivir la entrada a «Mi espacio» (PR 4), así que nace
  * ahora para que ese día sea un renglón más y no una columna nueva.
  *
- * ── La fecha es un enlace al mismo lugar que el nombre, y es a propósito ──
- * Dos enlaces a `/merida` seguidos parecen un descuido y no lo son: **lo que la
- * gente busca en un pie es la fecha**, no el título del taller. Quien baja hasta
- * acá ya sabe cuál es el taller y quiere saber cuándo. Con un solo enlace en el
- * nombre, la fecha sería texto muerto al lado de algo clicable.
+ * ── Y desde la #20 (D) la columna es UN enlace ───────────────────────────
+ * «Los talleres: solo el título, no todo», dijo dirección mirando producción.
+ * Se fueron la fecha y «Reservar por WhatsApp». La #14 había escrito que la
+ * fecha valía su renglón porque «lo que la gente busca en un pie es la fecha»;
+ * dirección miró el pie hecho y decidió lo contrario, y entra por D23. Queda
+ * escrito porque el argumento de la #14 no era malo: era una hipótesis, y la
+ * decidió quien mira la página.
+ *
+ * `enlaceReservaDelTaller` **sigue existiendo** y se usa en el hero y en
+ * `Taller.tsx`: lo que se fue de acá es este enlace, no la función.
  *
  * El `aria-hidden` de la firma es del original y es correcto: «Construyendo
  * familias fuertes» ya está dicho en el `aria-label` de la marca, y un lector
@@ -59,11 +62,10 @@ export function Pie({ telefono, visible }: { telefono: string; visible: string }
           </div>
           <div className="ft__col">
             <h3>{t('comun.pie.talleres')}</h3>
+            {/* Un solo enlace desde la #20 (D): «los talleres: solo el título, no
+                todo». Se fueron la fecha y «Reservar por WhatsApp», y con ellos
+                sus dos claves de `web.json` — una clave sin uso es deuda. */}
             <a href="/merida">{t('comun.pie.tallerMerida')}</a>
-            <a href="/merida">{t('comun.pie.tallerFecha')}</a>
-            <a href={enlaceReservaDelTaller(t)} target="_blank" rel="noopener">
-              {t('comun.pie.reservar')}
-            </a>
           </div>
           <div className="ft__col">
             <h3>{t('comun.pie.legal')}</h3>
