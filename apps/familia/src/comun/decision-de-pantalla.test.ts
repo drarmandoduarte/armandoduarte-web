@@ -64,4 +64,11 @@ describe('decidirPantalla', () => {
       respuestaDeYo: 'respondio',
     })).toBe('cerrar-sesion');
   });
+
+  it('«sin sesión» no es error: con la sesión recién llegada, se espera a `/api/yo`', () => {
+    /* F.4 cuarta corrida, 30/9: el estado inicial se anotaba `no-contesto` y
+       el login terminaba en error. Y tampoco se le pregunta al kit: con
+       `rol: undefined` diría `enrolar`. */
+    expect(decidirPantalla({ ...reciénEntrada, respuestaDeYo: 'sin-sesion' })).toBe('esperando');
+  });
 });

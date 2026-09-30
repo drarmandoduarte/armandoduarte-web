@@ -51,7 +51,8 @@ export function App() {
     );
   }
 
-  if (cargando) {
+  /* `esperando`: hay sesión y el `/api/yo` está en camino (recién entró). */
+  if (cargando || decision === 'esperando') {
     return (
       <Pantalla>
         <p className="bajada" role="status">{t('comun.cargando')}</p>

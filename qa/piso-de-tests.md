@@ -22,9 +22,28 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
 | `@codice/web` | 58 |
-| `@codice/familia` | 54 |
+| `@codice/familia` | 59 |
 | `@codice/api` | 62 |
 | `@codice/navegador` | 35 |
+
+## Lo que trajo F.4 cuarta corrida — `@codice/familia` 54 → 59
+
+Cuatro tests en `src/comun/sesion-pregunta-al-entrar.test.tsx` y uno en
+`decision-de-pantalla.test.ts`. Existen porque correo → código → «Entrar» daba
+`POST /auth/v1/verify` 200 y **no salía ningún `GET /api/yo`**: al montar sin
+sesión se anotaba `'no-contesto'`, y el `onAuthStateChange` guardaba la sesión
+nueva sin volver a preguntar. La pantalla decía «No pudimos confirmar tu cuenta»
+a alguien que acababa de entrar bien.
+
+Se monta `App` entera, con Supabase y `fetch` simulados: el defecto no estaba en
+una pieza sino en cómo se encadenaban, y una tabla pura no lo habría visto.
+
+Mutaciones, cada mitad por separado: sacar el `recargar()` del callback → caen
+«EL CASO» (un `GET /api/yo` y Mi espacio) y «se espera»; volver el estado sin
+sesión a `'no-contesto'` → cae «se espera»; borrar la regla `sin-sesion →
+esperando` de `decidirPantalla` → caen la tabla y «se espera». «Montar sin
+sesión» no cae con ninguna, y está dicho en su archivo: sin sesión `App` pinta la
+entrada sin mirar la decisión; el test está para que eso siga siendo cierto.
 
 ## Lo que trajo F.4 tercera corrida — `@codice/familia` 51 → 54
 

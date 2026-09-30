@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Session } from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { supabase } from '../supabase';
 import { api, ErrorDeApi, type Yo } from './api';
 import {
@@ -42,11 +42,21 @@ export interface EstadoDeSesion {
   marcarVerificado: () => void;
 }
 
+/**
+ * Los avisos que traen una sesión nueva y obligan a volver a preguntar quién es.
+ * `INITIAL_SESSION` no está a propósito: al montar ya pregunta `recargar()`.
+ */
+const EVENTOS_QUE_RECARGAN: ReadonlySet<AuthChangeEvent> = new Set<AuthChangeEvent>([
+  'SIGNED_IN',
+  'TOKEN_REFRESHED',
+  'MFA_CHALLENGE_VERIFIED',
+]);
+
 export function useSesion(): EstadoDeSesion {
   const [cargando, setCargando] = useState(true);
   const [sesion, setSesion] = useState<Session | null>(null);
   const [yo, setYo] = useState<Yo | null>(null);
-  const [respuestaDeYo, setRespuestaDeYo] = useState<RespuestaDeYo>('no-contesto');
+  const [respuestaDeYo, setRespuestaDeYo] = useState<RespuestaDeYo>('sin-sesion');
   const [nivelPosible, setNivelPosible] = useState<'aal1' | 'aal2'>('aal1');
   const { expired, markVerified, clearWindow } = useAalWindow();
 
@@ -62,7 +72,8 @@ export function useSesion(): EstadoDeSesion {
     setSesion(data.session);
     if (!data.session) {
       setYo(null);
-      setRespuestaDeYo('no-contesto');
+      /* Sin sesión no se le preguntó nada a la API: no es «no contestó». */
+      setRespuestaDeYo('sin-sesion');
       setCargando(false);
       return;
     }
@@ -91,14 +102,34 @@ export function useSesion(): EstadoDeSesion {
 
   useEffect(() => {
     void recargar();
-    const { data } = supabase.auth.onAuthStateChange((_evento, nueva) => {
+    let vivo = true;
+    const { data } = supabase.auth.onAuthStateChange((evento, nueva) => {
       setSesion(nueva);
       if (!nueva) {
         setYo(null);
-        setRespuestaDeYo('no-contesto');
+        setRespuestaDeYo('sin-sesion');
+        return;
+      }
+      /* ── F.4, cuarta corrida (30/9/2026) ────────────────────────────────
+         Acá antes solo se guardaba la sesión. Al montar sin sesión `recargar()`
+         ya había corrido; después del login nadie la volvía a llamar, no salía
+         ningún `GET /api/yo` y la pantalla quedaba en error. `Entrar.tsx` no
+         navega a mano —este aviso es el que decide—, así que el aviso tiene
+         que preguntar.
+
+         Fuera del callback, con `setTimeout(0)`: supabase-js avisa que llamar
+         a sus métodos (`getSession`, el `mfa.*` de `leerNiveles`) adentro de
+         este callback puede trabarse con su propio lock. */
+      if (EVENTOS_QUE_RECARGAN.has(evento)) {
+        setTimeout(() => {
+          if (vivo) void recargar();
+        }, 0);
       }
     });
-    return () => data.subscription.unsubscribe();
+    return () => {
+      vivo = false;
+      data.subscription.unsubscribe();
+    };
   }, [recargar]);
 
   const salir = useCallback(
@@ -111,7 +142,7 @@ export function useSesion(): EstadoDeSesion {
       clearWindow();
       await supabase.auth.signOut();
       setYo(null);
-      setRespuestaDeYo('no-contesto');
+      setRespuestaDeYo('sin-sesion');
     },
     [clearWindow],
   );

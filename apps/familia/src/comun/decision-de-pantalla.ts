@@ -39,9 +39,18 @@ export type RespuestaDeYo =
    *  paso», y el rol llega después del reto. */
   | 'falta-el-segundo-paso'
   /** No contestó, o contestó cualquier otra cosa. No se sabe quién es. */
-  | 'no-contesto';
+  | 'no-contesto'
+  /** Todavía no se preguntó: no había sesión cuando se miró por última vez.
+   *
+   *  **No es un error, y confundirlo fue el defecto de F.4, cuarta corrida
+   *  (30/9/2026).** Al montar sin sesión se anotaba `'no-contesto'`; después
+   *  del login la sesión aparecía, nadie volvía a preguntar, y la pantalla
+   *  mostraba «No pudimos confirmar tu cuenta» a alguien que acababa de entrar
+   *  bien. Con sesión y este valor, lo que pasa es que el `/api/yo` está en
+   *  camino: se espera. */
+  | 'sin-sesion';
 
-export type DecisionDePantalla = Decision | 'error';
+export type DecisionDePantalla = Decision | 'error' | 'esperando';
 
 export function decidirPantalla(
   estado: EstadoDeLaSesion & { respuestaDeYo: RespuestaDeYo },
@@ -49,5 +58,9 @@ export function decidirPantalla(
   /* Va PRIMERO, antes que cualquier regla del kit: sin saber quién es, ninguna
      de las otras cuatro decisiones se puede tomar con honestidad. */
   if (estado.respuestaDeYo === 'no-contesto') return 'error';
+  /* Y tampoco se le pregunta al kit sin haber preguntado a la API: con
+     `rol: undefined` diría `enrolar`, que es el defecto del 29/9 por otra
+     puerta. Se espera a que `/api/yo` conteste. */
+  if (estado.respuestaDeYo === 'sin-sesion') return 'esperando';
   return decidirReto(estado);
 }
