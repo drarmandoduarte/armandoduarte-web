@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import tokens from '@codice/ui/tokens.json';
 import { RECURSOS_I18N } from '@codice/core';
+import { CANALES } from './canales';
 
 /**
  * El `<head>` de cada página.
@@ -109,6 +110,10 @@ const EVENTO_MERIDA = {
   location: {
     '@type': 'Place',
     name: 'Fiesta Inn Mérida',
+    /* El mismo enlace que la franja de hechos (orden #20, E), de `CANALES`:
+       una dirección escrita dos veces es una dirección que un día apunta a dos
+       lugares. Google lo usa para el mapa del resultado enriquecido. */
+    hasMap: CANALES.mapaSede,
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Mérida',

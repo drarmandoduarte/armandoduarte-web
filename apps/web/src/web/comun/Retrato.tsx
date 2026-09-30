@@ -24,8 +24,8 @@
  *
  * ── Los tamaños, y por qué no son los que la orden pedía ─────────────────
  * La orden pedía 900 y 1800 de ancho. Medido, **ningún hueco de esta web pasa
- * de 520 px**: el arco del hero, la foto de «Quién soy» (520) y la de «Sobre el
- * facilitador» (480). A 2× eso es 1040, y 1400 ya deja margen de sobra. Los
+ * de 520 px**: el arco del hero (520), la foto de «Quién soy» (520) y la de «Sobre
+ * el facilitador» (472, desde la #20-bis). A 2× eso es 1040, y 1400 ya deja margen de sobra. Los
  * 1800 solo servían para pasarse del presupuesto: el recorte de cuerpo entero a
  * 1800 pesaba 486 KB y bajarlo a los 220 KB que la orden fija exigía calidad 45,
  * o sea publicar al cliente borroso en su propia portada. A 1400 el mismo

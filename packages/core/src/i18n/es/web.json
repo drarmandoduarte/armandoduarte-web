@@ -32,8 +32,6 @@
       "explorar": "Explorar",
       "talleres": "Talleres",
       "tallerMerida": "El arte de amar a tu hijo adolescente · Mérida",
-      "tallerFecha": "Jueves 5 de noviembre · Fiesta Inn",
-      "reservar": "Reservar por WhatsApp",
       "legal": "Legal",
       "canales": "Canales",
       "privacidad": "Aviso de privacidad",
@@ -196,6 +194,7 @@
       "horarioValor": "8:30 a 13:00",
       "dondeClave": "Dónde",
       "dondeValor": "Fiesta Inn Mérida",
+      "dondeAria": "Fiesta Inn Mérida · abre en Google Maps",
       "modalidadClave": "Modalidad",
       "modalidadValor": "Sesión privada en vivo"
     },

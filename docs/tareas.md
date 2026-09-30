@@ -25,8 +25,12 @@ usa.
 | #12 | El taller con fecha: lo que pidieron Armando y Lucía el 28/9 | **cerrada** (PR #22, mergeado el 29/9/2026) |
 | #13 | Mi espacio: la base nace | **cerrada** (PR #24, mergeado el 29/9/2026). Las seis migraciones **corridas** en `armandoduarte-familia` el 29/9 a las 02:34 |
 | #14 | Talleres tiene su columna en el pie | **cerrada** (PR #23, mergeado el 29/9/2026) |
-| #15 | Mi espacio: la puerta | rama `mi-espacio/02-la-puerta` |
-| #16 | Títulos sin renglones huérfanos | rama `web/16-titulos` |
+| #15 | Mi espacio: la puerta | rama `mi-espacio/02-la-puerta` (PR #27). La corrección de la 007 entró aparte: **PR #29, mergeado el 29/9/2026**, migración corrida a las 15:58 |
+| #16 | Títulos sin renglones huérfanos | **cerrada** (PR #25, mergeado el 29/9/2026) |
+| #17 | La noche del 29 | ver `03 Producto/codice/ordenes/orden-17-la-noche-del-29.md` |
+| #18 | La entrada a la altura | ver su orden |
+| #19 | Lo que pidieron Lucía y Armando, terminado de verdad | **cerrada** (PR #28, mergeado el 29/9/2026) |
+| #20 | Lo que vio Germán en producción el 29/9 | rama `web/20-lo-que-vio-german` |
 
 ## Reglas de la casa, con el caso que las obligó
 
@@ -162,7 +166,7 @@ orden es explícita: eso no lo decide Rodolfo. Son tres clases de cosa:
 | qué | dónde | cómo se cierra |
 |---|---|---|
 | un `<br>` declarado cuyo primer renglón quedó de una palabra | «Construyendo» (`#programa`), «Escríbeme.» (`#contacto`) | moviendo dónde cae el `<br>` — es mover texto |
-| una palabra larga que cae sola al final de un título que envuelve | «desconocido?», «silencio.», «adolescencia», «Comprender», «cambios», «responsables», «digitalmente», «Padres», «y yo.», «Construyendo» del libro | acortando el texto, bajando el tamaño o ensanchando la columna |
+| una palabra larga que cae sola al final de un título que envuelve | «desconocido?», «silencio.», «Comprender», «responsables», «digitalmente», «Padres», «y yo.», «Construyendo» del libro | acortando el texto, bajando el tamaño o ensanchando la columna |
 | un título que no cabe de ninguna manera | el cierre de `#reservar`: **siete** renglones a 375 px | con menos palabras o menos tamaño — `text-wrap: balance` de Chromium deja de trabajar arriba de seis renglones |
 
 La lista completa, con la ruta y el ancho de cada una, está en
@@ -224,6 +228,57 @@ código.** El `catch` del middleware convertía `42703` en «sin perfil» y el d
 de las tres que costó esto fueron para averiguar un número que la base había dicho
 desde el principio. Un `catch` que descarta el código del error está tirando la
 única parte del mensaje que sirve.
+
+### Ninguna sección de la web es más alta que la pantalla
+
+**A escritorio: 1440×900 y 1920×1080**, y el de 900 de alto es el que manda
+porque es el más chico. A 900 px de ancho y a 375 **no aplica** —una lista de
+siete preguntas no entra en un teléfono— y eso está escrito en
+`apps/web/check/altura.mjs`, no en la cabeza de nadie. Lo que se mide es
+`innerHeight`, la altura que el navegador deja ver, no la del monitor: en CSS eso
+es `100dvh` con `100vh` de respaldo.
+
+**El caso, del 29/9/2026.** Dirección recorrió producción a 1920 y lo dijo así:
+«todas las secciones nunca pueden ser más grandes que 100vh teniendo en cuenta el
+borde del navegador», y «en el hero hay dos colores por la sección que le sigue».
+Las dos frases son el mismo defecto medido de dos maneras: el hero tenía
+`min-height: min(100svh, 880px)`, así que en una pantalla de 1080 terminaba a los
+909 px y por debajo asomaba una franja del color de la sección siguiente antes
+del pliegue.
+
+**Cuando algo no entra, el orden es fijo y sin sacar contenido:** paddings
+verticales, `gap` de grillas un paso menor, tamaño de título un paso menor dentro
+de la sección que sobra. **Y si con eso no entra, no se inventa**: se declara
+cuánto sobra, en píxeles, en la lista `PENDIENTES` del guardián, y lo decide
+dirección. La #20 dejó tres filas ahí y las tres tienen su número y su opción
+medida al lado.
+
+**Lo que la regla enseñó de paso, y vale para cualquier guardián de navegador:**
+esperar a que carguen «todas las imágenes» es una trampa. El sello CFF de
+`#programa` es `loading="lazy"` y **nunca se carga** en un barrido automatizado
+—medido: `naturalWidth: 0` tres segundos después de pasar por pantalla—, así que
+la espera se comía el tope entero y el guardián moría por timeout de Playwright.
+Un guardián que muere por reloj no habla del sitio. Lo que sí hay que esperar es
+**la imagen que no declara `width`/`height`**, que es la única que puede mover el
+alto: una con su caja reservada mide lo mismo cargada que pendiente.
+
+### «Listo para mergear» quiere decir que la rama ya trae `main`
+
+Antes de escribir «listo para mergear» —en un informe, en el PR o en el chat— la
+rama hace `git merge origin/main`, la gate corre verde **sobre el resultado** y
+el PR en GitHub dice **«No conflicts»**. Si falta cualquiera de las tres, no está
+listo: está listo *el código de la rama*, que es otra cosa y no se puede mergear.
+
+**El caso, del 30/9/2026.** El PR #27 (Mi espacio, la puerta) pasó cuatro
+corridas de F.4 y quedó «listo» mientras #30 y #31 entraban a `main`. Cuando
+dirección fue a mergear, había conflictos en `docs/tareas.md` y en
+`qa/piso-de-tests.md` —los dos archivos que toca casi toda orden—. Ninguno era
+difícil, pero la tabla de pisos es justo el lugar donde resolver mal no se nota:
+quedarse con un solo lado le baja el piso a una suite en silencio, y la gate
+sigue verde porque mide contra el piso que quedó escrito.
+
+Por eso el merge se resuelve **conservando los dos lados** y se mira la tabla
+entera después, no solo las líneas marcadas.
 
 ## Pendientes abiertos
 

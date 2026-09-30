@@ -152,7 +152,7 @@ export const APROBADAS = [
  *     «Escríbeme.» son el primer renglón de un `<br>` que alguien escribió a
  *     propósito. Se arreglan cambiando dónde cae ese `<br>`, que es mover texto;
  *   · **una palabra larga que cae sola al final de un título que envuelve** —
- *     «desconocido?», «adolescencia», «silencio.», «cambios», «Comprender».
+ *     «desconocido?», «silencio.», «Comprender» (y «adolescencia» y «cambios» hasta la #20-bis, que los arregló con la grilla 3 + 2).
  *     Se arreglan acortando el texto, bajando el tamaño o ensanchando la
  *     columna, y las tres son decisiones de diseño;
  *   · **un título que no cabe de ninguna manera** — el cierre de `#reservar` mide
@@ -172,9 +172,7 @@ export const PENDIENTES = [
   /* ── `/merida` ─────────────────────────────────────────────────────────── */
   ['#suena h2', 'desconocido?', 'cola de «¿El niño dulce que criaste se volvió un desconocido?» a 1440, 390 y 375', 1],
   ['#preguntas h2', 'silencio.', 'cola de «Siete preguntas que te haces en silencio.» a 390 y 375', 1],
-  ['#programa h3', 'adolescencia', 'cola del Núcleo 1, «Estudiar la adolescencia», a 1440', 1],
   ['#programa h3', 'Comprender', 'renglón del medio del Núcleo 3, «Comprender nuestra familia», a 1440 y 900', 1],
-  ['#programa h3', 'cambios', 'cola del Núcleo 5, «Realizar los cambios», a 1440', 1],
   ['#reservar h2', 'padres', 'el cierre («El amor incondicional no es la ausencia de límites…») mide siete renglones a 375, y `text-wrap: balance` de Chromium sólo trabaja hasta seis', 1],
   ['#reservar h2', 'conscientes.', 'el mismo cierre, último renglón, a 375', 1],
 ];

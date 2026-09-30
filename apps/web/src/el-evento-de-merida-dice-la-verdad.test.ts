@@ -43,6 +43,7 @@
 import { describe, expect, it } from 'vitest';
 import { RECURSOS_I18N } from '@codice/core';
 import { cabezaHtml, type Pagina } from './web/comun/cabeza';
+import { CANALES } from './web/comun/canales';
 
 const PAGINAS: Pagina[] = ['inicio', 'taller', 'privacidad', 'terminos'];
 
@@ -72,7 +73,7 @@ interface Evento {
   '@type': string;
   startDate: string;
   endDate: string;
-  location: { name: string; address: { addressLocality: string; addressRegion: string; addressCountry: string } };
+  location: { name: string; hasMap: string; address: { addressLocality: string; addressRegion: string; addressCountry: string } };
   offers: { price: number; priceCurrency: string };
 }
 
@@ -148,5 +149,17 @@ describe('el Event de schema.org de /merida', () => {
     expect(evento.location.address.addressLocality).toBe('Mérida');
     expect(evento.location.address.addressRegion).toBe('Yucatán');
     expect(evento.location.address.addressCountry).toBe('MX');
+
+    /* ── Y el mapa es EL MISMO que el de la franja (orden #20, E) ────────
+       No se compara contra una URL escrita acá: se compara contra `CANALES`,
+       que es de donde salen las dos. Una copia en este archivo vigilaría la
+       copia y no el hecho — la lección del token duplicado de la #06. Si
+       alguien pega otra URL en la franja, este test no se entera; si alguien
+       cambia `CANALES.mapaSede`, los dos lugares se mueven juntos, que es el
+       punto de que haya una sola fuente. */
+    expect(
+      evento.location.hasMap,
+      'el Event no publica el mapa de la sede, o publica otro que el de la página',
+    ).toBe(CANALES.mapaSede);
   });
 });
