@@ -52,6 +52,27 @@ const EVENTOS_QUE_RECARGAN: ReadonlySet<AuthChangeEvent> = new Set<AuthChangeEve
   'MFA_CHALLENGE_VERIFIED',
 ]);
 
+/**
+ * Cuánto se espera, como mucho, a que la sesión, sus niveles y `/api/yo`
+ * contesten, las tres juntas (orden #22, que fija el número). Tiene que dejar
+ * lugar a un arranque en frío de la función de Vercel con red de celular sin
+ * cortarlo, y no tanto que la persona cierre la pestaña antes de ver el error.
+ * Un solo tope y no uno por pregunta: a la persona le importa cuánto esperó,
+ * no cuál de las tres tardó.
+ */
+export const TOPE_DE_ESPERA_MS = 12_000;
+
+/** Una promesa, o un rechazo si no se resolvió en `ms`. */
+function conTope<T>(promesa: Promise<T>, ms: number): Promise<T> {
+  /* Si pierde la carrera y después falla, que no quede un rechazo suelto. */
+  promesa.catch(() => {});
+  let reloj: ReturnType<typeof setTimeout> | undefined;
+  const tope = new Promise<never>((_, rechazar) => {
+    reloj = setTimeout(() => rechazar(new Error(`sin respuesta en ${ms} ms`)), ms);
+  });
+  return Promise.race([promesa, tope]).finally(() => clearTimeout(reloj));
+}
+
 export function useSesion(): EstadoDeSesion {
   const [cargando, setCargando] = useState(true);
   const [sesion, setSesion] = useState<Session | null>(null);
@@ -67,14 +88,14 @@ export function useSesion(): EstadoDeSesion {
     return data;
   }, []);
 
-  const recargar = useCallback(async () => {
+  /** Las tres preguntas en orden: la sesión, sus niveles y quién es. */
+  const preguntar = useCallback(async () => {
     const { data } = await supabase.auth.getSession();
     setSesion(data.session);
     if (!data.session) {
       setYo(null);
       /* Sin sesión no se le preguntó nada a la API: no es «no contestó». */
       setRespuestaDeYo('sin-sesion');
-      setCargando(false);
       return;
     }
     await leerNiveles();
@@ -95,10 +116,36 @@ export function useSesion(): EstadoDeSesion {
          guarda y `decidirPantalla` lo convierte en un error visible. */
       const esSegundoPaso = error instanceof ErrorDeApi && error.codigo === 'AAL2_REQUIRED';
       setRespuestaDeYo(esSegundoPaso ? 'falta-el-segundo-paso' : 'no-contesto');
+    }
+  }, [leerNiveles]);
+
+  /**
+   * ── Nunca un «Un momento…» eterno (orden Códice #22) ──────────────────
+   * El caso, del 30/9: armando las pruebas de la #18, un JWT mal formado hizo
+   * que `leerNiveles()` tirara una excepción. Nadie la atrapaba, `cargando` no
+   * bajaba nunca y la pantalla quedaba en «Un momento…» para siempre. Una mamá
+   * que ve eso cierra la pestaña.
+   *
+   * Ahora las tres preguntas van adentro de un `try/finally` que **siempre**
+   * baja `cargando`, y cualquier falla —incluida la de `leerNiveles`— se anota
+   * como «no contestó»: la pantalla de error que ya existe, con «Volver a
+   * intentar» y «Cerrar sesión». Y las tres juntas tienen un solo tope,
+   * `TOPE_DE_ESPERA_MS`: lo que no contesta, tampoco puede dejar la espera
+   * abierta.
+   *
+   * Si la respuesta llega después del tope, igual se aplica: la pantalla pasa
+   * del error a donde corresponde, que es lo que la persona quería.
+   */
+  const recargar = useCallback(async () => {
+    try {
+      await conTope(preguntar(), TOPE_DE_ESPERA_MS);
+    } catch {
+      setYo(null);
+      setRespuestaDeYo('no-contesto');
     } finally {
       setCargando(false);
     }
-  }, [leerNiveles]);
+  }, [preguntar]);
 
   useEffect(() => {
     void recargar();
@@ -150,9 +197,12 @@ export function useSesion(): EstadoDeSesion {
   const nivelActual: 'aal1' | 'aal2' =
     sesion?.access_token && leerAal(sesion.access_token) === 'aal2' ? 'aal2' : 'aal1';
 
+  /* Sin sesión no hay nada que decidir… salvo que ni siquiera se haya podido
+     saber si la hay: `getSession` que no contestó en el tope (#22). Eso es el
+     mismo «no sé quién sos» que un `/api/yo` caído, y va a la misma pantalla. */
   const decision: DecisionDePantalla | null = sesion
     ? decidirPantalla({ nivelActual, nivelPosible, rol: yo?.rol, ventanaVencida: expired, respuestaDeYo })
-    : null;
+    : respuestaDeYo === 'no-contesto' ? 'error' : null;
 
   return { cargando, sesion, yo, decision, recargar, salir, marcarVerificado: markVerified };
 }

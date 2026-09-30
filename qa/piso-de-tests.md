@@ -22,11 +22,22 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
 | `@codice/web` | 62 |
-| `@codice/familia` | 80 |
+| `@codice/familia` | 83 |
 | `@codice/api` | 62 |
 | `@codice/navegador` | 38 |
 
 
+
+## Lo que trae la orden #22 — `@codice/familia` 80 → 83
+
+Tres en `src/comun/nunca-un-momento-eterno.test.tsx`, montando `App`:
+(a) `getAuthenticatorAssuranceLevel` rechaza → la pantalla de error con sus dos
+botones, nunca «Un momento…»; (b) nunca contesta → a los 11.999 ms todavía
+espera y a los 12.000 muestra el error (reloj falso); y la otra mitad, que
+cuando todo contesta se llega a Mi espacio igual que antes.
+
+Mutaciones: sin el `finally` que baja `cargando` → caen (a) y (b); sin el tope
+→ cae (b) y solo (b).
 
 ## Lo que trae la orden #21 — `@codice/web` 58 → 62 y `@codice/ui` 30 → 31
 
