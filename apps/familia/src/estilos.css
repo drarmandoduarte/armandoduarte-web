@@ -250,3 +250,88 @@ img,svg{display:block;max-width:100%}
 
 /* Solo para lectores de pantalla: los rótulos que el diseño no dibuja. */
 .solo-lectura{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ── El panel del equipo · `/equipo` (orden #24 A) ────────────────────────
+   Escritorio primero —el equipo trabaja en computadora— y usable en el
+   teléfono: las tablas se desplazan de costado dentro de su marco en vez de
+   romper la página. Para eso la columna lleva `min-width:0` (un hijo de flex
+   no se achica por debajo de su contenido, y la tabla la estiraba a 524 px en
+   un teléfono de 390) y la tabla un ancho mínimo de 720, para que en el
+   teléfono se desplace en vez de apretar la fecha en seis renglones. La columna se ensancha a 1200 y va arriba, no centrada:
+   un panel no es un formulario suelto.
+
+   Un solo naranja por pantalla (D26): el «Guardar» del formulario abierto.
+   Todo lo demás es contorno, enlace o chip. Los chips no llevan color de
+   estado inventado: tinta sobre cálido, y teal para lo que está en marcha
+   («Publicado», «Abierta», «Confirmada»). ────────────────────────────────── */
+.marco__principal--arriba{align-items:flex-start}
+.columna--ancha{max-width:1200px;min-width:0}
+
+.panel-cabeza{display:flex;justify-content:space-between;align-items:flex-start;gap:16px 32px;flex-wrap:wrap}
+
+.pestanas{display:flex;gap:4px;margin-top:32px;border-bottom:1px solid var(--hair);overflow-x:auto}
+.pestana{
+  position:relative;padding:14px 18px;min-height:44px;white-space:nowrap;
+  font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gris);transition:color .3s var(--ease);
+}
+.pestana:hover{color:var(--tinta)}
+.pestana--activa{color:var(--tinta)}
+.pestana--activa::after{content:'';position:absolute;left:18px;right:18px;bottom:-1px;height:2px;background:var(--teal)}
+.pestana-contenido{padding-top:28px}
+
+.barra{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap}
+.barra--filtros{align-items:flex-start;justify-content:flex-start}
+.barra--filtros .campo{margin-top:0;flex:1 1 260px;max-width:420px}
+/* El botón a la altura del campo, no de su rótulo: 26 px es rótulo + su margen. */
+.barra__accion{padding-top:26px}
+
+.cursos{list-style:none;margin:24px 0 0;padding:0}
+.curso{padding:28px 0;border-top:1px solid var(--hair)}
+.curso__cabeza{display:flex;justify-content:space-between;align-items:flex-start;gap:16px 24px;flex-wrap:wrap}
+.curso__titulo{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.3;color:var(--tinta)}
+.curso__acciones{display:flex;gap:8px;flex-wrap:wrap}
+
+.btn--chico{min-height:40px;padding:12px 18px}
+
+.chip{
+  display:inline-block;padding:3px 10px;border-radius:999px;white-space:nowrap;
+  font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.08em;line-height:1.5;
+  color:var(--tinta);background:var(--calido);
+}
+.chip--publicado,.chip--abierta,.chip--confirmada{color:var(--teal);background:color-mix(in oklab, var(--teal) 10%, var(--crema))}
+
+/* `position:relative` no es decoración: la columna «Editar» lleva un rótulo
+   `.solo-lectura` (absoluto), y un hijo absoluto se escapa del recorte de un
+   marco que no está posicionado. Sin esto, a 390 estiraba la página a 524. */
+.tabla-marco{position:relative;margin-top:16px;overflow-x:auto;border:1px solid var(--hair);border-radius:2px;background:var(--superficie)}
+.tabla{width:100%;min-width:720px;border-collapse:collapse;font-size:14px;line-height:1.45}
+.tabla th{
+  text-align:left;padding:12px 14px;white-space:nowrap;background:var(--crema);
+  font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gris);
+  border-bottom:1px solid var(--hair);
+}
+.tabla td{padding:12px 14px;vertical-align:top;border-bottom:1px solid var(--hair);color:var(--tinta)}
+.tabla tbody tr:last-child td{border-bottom:0}
+.tabla__sub{display:block;margin-top:2px;font-size:13px;color:var(--gris)}
+.tabla__numero{white-space:nowrap;font-variant-numeric:tabular-nums}
+.tabla__ref{white-space:nowrap;font-family:var(--display);font-weight:500;letter-spacing:.06em}
+.tabla__equipo{min-width:200px}
+.tabla__equipo .chip{margin-right:8px}
+.tabla .enlace{font-size:14px}
+
+.formulario{margin-top:20px;padding:24px;background:var(--superficie);border:1px solid var(--hair);border-radius:2px}
+.formulario__rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0 24px}
+.formulario__botones{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.formulario__botones .btn--ancho{width:auto}
+.campo__entrada--area{resize:vertical;min-height:96px}
+
+.confirmar{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+.confirmar .campo{margin-top:0}
+.confirmar__botones{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* Dos espaciados sueltos, con los valores de la web (`apps/web/src/index.css`).
+   Mi espacio ya usaba `u-mt-4` y `u-mt-6` en Seguridad y en esta app no
+   existían: no hacían nada. Entran con la #24 A porque el panel los usa. */
+.u-mt-4{margin-top:var(--s4)}
+.u-mt-6{margin-top:var(--s6)}

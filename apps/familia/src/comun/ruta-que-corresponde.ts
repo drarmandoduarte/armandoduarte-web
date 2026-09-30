@@ -27,12 +27,17 @@ export function rutaQueCorresponde(estado: {
   hayYo: boolean;
   decision: DecisionDePantalla | null;
   rutaActual: string;
+  /** Si quien entró es del equipo. Sin `yo`, falso. */
+  esEquipo?: boolean;
 }): string | null {
   if (estado.cargando) return null;
+  /* `/equipo` es un lugar para el equipo (#24 A): ahí se queda. A un cliente
+     que escribe `/equipo` se lo lleva a Mi espacio, sin error. */
+  const sePuedeQuedar = estado.rutaActual === RUTAS.equipo && estado.esEquipo === true;
   const destino = !estado.haySesion
     ? RUTAS.entrar
     : estado.hayYo && estado.decision === 'pasar'
-      ? RUTAS.miEspacio
+      ? sePuedeQuedar ? RUTAS.equipo : RUTAS.miEspacio
       : null;
   return destino && destino !== estado.rutaActual ? destino : null;
 }

@@ -87,7 +87,9 @@ describe('Cobertura del segundo paso (AAL2) — guardián', () => {
      es `/api/yo`; lo que este inventario mira es `/yo`.
 
      EL PISO, PRIMERO. Cenit pedía más de 50 rutas; esta app tiene **seis** y
-     el número se baja acá, que es un renglón que se lee. Sin esto, «todas las
+     el número se baja acá, que es un renglón que se lee. Con la #24 A suma las
+     nueve de `/equipo`, **ninguna exceptuada**: el panel es del equipo y el
+     equipo entra con segundo paso. Sin esto, «todas las
      rutas exigen el segundo paso» sobre un inventario vacío sale verde, y un
      inventario vacío es exactamente lo que deja un `AppModule` que no compiló. */
   it('hay rutas para inspeccionar (si esto falla, el inventario se rompió)', () => {
@@ -96,9 +98,18 @@ describe('Cobertura del segundo paso (AAL2) — guardián', () => {
       'el inventario real de rutas de Nest cambió. Si agregaste una, súmala acá; si el barrido '
       + 'devolvió menos de las que hay, la metadata no se leyó y nada de lo que sigue afirma nada.',
     ).toEqual([
+      'GET /equipo/clientes',
+      'GET /equipo/cursos',
+      'GET /equipo/inscriptos/:edicion',
       'GET /respaldo/cuantos',
       'GET /salud',
       'GET /yo',
+      'POST /equipo/cursos',
+      'POST /equipo/cursos/:id',
+      'POST /equipo/ediciones',
+      'POST /equipo/ediciones/:id',
+      'POST /equipo/miembros',
+      'POST /equipo/miembros/:id/quitar',
       'POST /respaldo/generar',
       'POST /respaldo/usar',
       'POST /sesiones/cerrar-las-otras',

@@ -34,9 +34,12 @@ import { ANCHO_DE_DOS_MITADES, usarAncho } from './usar-ancho';
 export function Pantalla({
   children,
   conArmando = false,
+  ancha = false,
 }: {
   children: ReactNode;
   conArmando?: boolean;
+  /** El panel del equipo (#24 A): columna de escritorio, arriba y no centrada. */
+  ancha?: boolean;
 }) {
   /* Panel o retrato, nunca los dos: se monta el que corresponde al ancho y la
      otra imagen no se descarga (ver `usar-ancho.ts`, con la medición). */
@@ -45,8 +48,8 @@ export function Pantalla({
     <div className={`marco${conArmando ? ' marco--con-armando' : ''}`}>
       <Cabecera />
       {conArmando && dosMitades ? <PanelDeArmando /> : null}
-      <main className="marco__principal">
-        <div className="columna">
+      <main className={`marco__principal${ancha ? ' marco__principal--arriba' : ''}`}>
+        <div className={`columna${ancha ? ' columna--ancha' : ''}`}>
           {conArmando && !dosMitades ? <RetratoChico /> : null}
           {children}
         </div>
@@ -254,6 +257,62 @@ export function Campo({
  * Pegar «123 456» o «123-456» deja seis dígitos: se limpia todo lo que no es
  * número y se corta en seis. Lo prueba `casillas.test.tsx`.
  */
+/** Un `<select>` con su rótulo y su error, con la misma anatomía que `Campo`. */
+export function Selector({
+  id,
+  rotulo,
+  error,
+  opciones,
+  ...resto
+}: {
+  id: string;
+  rotulo: string;
+  error?: string | null;
+  opciones: { valor: string; texto: string }[];
+} & React.SelectHTMLAttributes<HTMLSelectElement>) {
+  const idError = error ? `${id}-error` : undefined;
+  return (
+    <label className="campo" htmlFor={id}>
+      <span className="campo__rotulo">{rotulo}</span>
+      <select id={id} className="campo__entrada" aria-invalid={error ? 'true' : undefined} aria-describedby={idError} {...resto}>
+        {opciones.map((o) => <option key={o.valor} value={o.valor}>{o.texto}</option>)}
+      </select>
+      {error ? <span className="error" id={idError} role="alert">{error}</span> : null}
+    </label>
+  );
+}
+
+/** Un `<textarea>` con su rótulo, su ayuda y su error. */
+export function AreaDeTexto({
+  id,
+  rotulo,
+  ayuda,
+  error,
+  ...resto
+}: {
+  id: string;
+  rotulo: string;
+  ayuda?: string;
+  error?: string | null;
+} & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const idAyuda = ayuda ? `${id}-ayuda` : undefined;
+  const idError = error ? `${id}-error` : undefined;
+  return (
+    <label className="campo" htmlFor={id}>
+      <span className="campo__rotulo">{rotulo}</span>
+      <textarea
+        id={id}
+        className="campo__entrada campo__entrada--area"
+        aria-invalid={error ? 'true' : undefined}
+        aria-describedby={[idAyuda, idError].filter(Boolean).join(' ') || undefined}
+        {...resto}
+      />
+      {ayuda ? <span className="campo__ayuda" id={idAyuda}>{ayuda}</span> : null}
+      {error ? <span className="error" id={idError} role="alert">{error}</span> : null}
+    </label>
+  );
+}
+
 /* Las seis posiciones, escritas. No `Array.from`: `sin-base-desde-el-navegador`
    busca `.from(` —la lectura directa de Supabase— y tiene razón en no saber
    distinguirlo. Mejor no darle nada que distinguir. */
