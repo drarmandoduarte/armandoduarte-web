@@ -128,6 +128,29 @@ problema que no está.
 ancha con `aspect-ratio:4/5` pide más alto del que hay y el arco se sale por
 arriba — peor que el defecto que vino a arreglar.
 
+### El riesgo que `max-height` introduce, medido y descartado
+
+Un `max-height` no recorta —no hay `overflow:hidden`— pero si el contenido no
+entrara, se saldría por abajo y se montaría sobre la sección siguiente. Es la
+pregunta obvia de cualquiera que lea este diff, así que va contestada con
+números y no con una opinión. **Siete tamaños de escritorio, las dos páginas,
+catorce mediciones: desborde 0 px en las catorce.**
+
+| viewport | alto de la sección | alto del contenido | desborde |
+|---|---|---|---|
+| 901×600 | 600 | 496 | 0 |
+| 1000×700 | 700 | 596 | 0 |
+| 1100×768 | 768 | 661 | 0 |
+| 1280×720 | 720 | 615 | 0 |
+| 1366×768 | 768 | 661 | 0 |
+| 1440×700 | 700 | 596 | 0 |
+| 1920×900 | 900 | 788 | 0 |
+
+El margen más chico es de **104 px**, a 901×600 — que es más angosto y más bajo
+que cualquier escritorio real. Debajo de 900 px de ancho el tope se levanta
+explícitamente (`max-height:none`), porque apilado el hero es texto arriba y foto
+abajo y encerrarlo en una pantalla lo recortaría.
+
 ### Y un defecto propio, encontrado por la primera captura
 
 La primera versión de esto le puso `width:100%` a `.hero__grid` para estirarlo.
@@ -180,8 +203,12 @@ la afirmación del test del evento contra `location.name`. Lo que se agrega es e
 `<a>` y un `aria-label` que dice a dónde lleva: «Fiesta Inn Mérida» leído por un
 lector de pantalla es el nombre de un hotel, no «esto abre un mapa».
 
-La **CSP no cambia**: un `href` externo es navegación, no carga de recurso. Se
-verificó en el navegador: consola sin violaciones.
+La **CSP no cambia**, y se verificó haciéndolo en vez de razonándolo: consola
+**sin una sola violación en las cuatro rutas**, con la cabecera servida tal cual
+—`default-src 'self'` y nada más, sin `frame-src` ni `connect-src` nuevos—. Un
+`href` externo es navegación, no carga de recurso, y la CSP no gobierna la
+navegación del usuario. El enlace sale con `target="_blank"` y `rel="noopener"`,
+medidos en el navegador junto con su `aria-label`.
 
 ## El guardián nuevo, y sus dos mutaciones
 
@@ -248,7 +275,58 @@ Las genera `apps/web/check/capturas-20.mjs`, reproducible:
 | `E-hechos-mapa.jpg` | «Fiesta Inn Mérida» con su hairline de hover |
 | `F-lo-que-te-llevas-1440.jpg` | fresco: las tres fotos publicadas son `llevas-claridad`, `llevas-palabras` y `llevas-serenidad`, las de Lucía del 28/9. **La captura de dirección con la mujer meditando es vieja o de caché; no se tocó nada.** |
 
+## Lighthouse — el número **con su método**, que es la regla de la casa
+
+**Lighthouse 13.5.0, móvil, `dist/` servido en local, `--throttling-method=simulate`.**
+El método va pegado al número porque el de la casa lo exige desde la #04: *un
+número sin su método vuelve a hacer perder media hora al que lo lea en tres
+meses*.
+
+Y **la base se midió en esta misma sesión**, no se copió del informe de la #19.
+Aquel decía `/merida` en 96, con Lighthouse 13.4.1 y otra máquina en otro
+momento: comparar contra esa copia habría sido exactamente el error que la regla
+persigue. Se corrió `main` con el mismo binario, el mismo método y la misma
+máquina, minutos antes.
+
+*(Y hubo que corregirlo: la primera base se midió sobre el `main` **local**, que
+estaba tres merges atrás — sin la #16, la #19 ni la 007. Se descartó entera y se
+rehizo sobre `origin/main`, que es de donde sale esta rama. Queda escrito porque
+un número medido contra el árbol equivocado es peor que ninguno: parece una
+comparación.)*
+
+**Performance, ocho corridas por rama en `/` y tres en `/merida`:**
+
+| ruta | `main` | esta rama | peor de cada una |
+|---|---|---|---|
+| `/` | 95 96 96 96 96 96 96 96 | 95 96 96 95 95 96 96 96 | **95 = 95** |
+| `/merida` | 96 96 95 | 95 95 95 | **95 = 95** |
+
+**No baja.** Por el método de la casa —tres corridas, la peor— las dos rutas dan
+el mismo número que `main`. La dispersión es real y está a la vista: `main` mismo
+da 95 en una de sus ocho corridas de `/`, así que el 95 no es una propiedad de
+esta rama.
+
+Lo que sí se mueve es la **mediana de `/merida`**, de 96 a 95 sobre tres
+corridas. Se dice en vez de taparlo, y también se dice por qué no hay mecanismo
+para que sea real: **ninguno de los cambios del hero llega al móvil.** Todo lo de
+A.3 y B vive arriba de 900 px de ancho; a los 412 px que mide el Lighthouse móvil
+rige el bloque `@media (max-width:900px)`, que pone `min-height:0` y
+`max-height:none`. Lo único de esta rama que sí llega al móvil es el padding de
+sección —que hace las páginas **más cortas**— y dos enlaces menos en el pie. Los
+dos van en la dirección contraria a una regresión.
+
+**Accesibilidad: 100 en las cuatro rutas**, que es lo que la orden pide.
+Prácticas recomendadas 100 en las cuatro; SEO 100 en `/` y `/merida`, y 66 en las
+legales, que es el `noindex` de siempre y no cambió.
+
+| ruta | performance (peor de 3) | accesibilidad | b. prácticas | SEO |
+|---|---|---|---|---|
+| `/` | 95 | **100** | 100 | 100 |
+| `/merida` | 95 | **100** | 100 | 100 |
+| `/privacidad` | 97 | **100** | 100 | 66 |
+| `/terminos` | 98 | **100** | 100 | 66 |
+
 ## Lo que quedó pendiente
 
-- Las **tres decisiones de A.5** de arriba. Ninguna bloquea.
-- **Lighthouse**: el número y el método, abajo.
+- Las **tres decisiones de A.5** de arriba. Ninguna bloquea el merge: la gate está
+  verde y el guardián dice en voz alta que las excusó.
