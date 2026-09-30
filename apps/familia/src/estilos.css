@@ -42,21 +42,86 @@ img,svg{display:block;max-width:100%}
    `:focus-visible` y no `:focus`, para que el dedo y el mouse no lo enciendan. */
 :focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:2px}
 
-/* ── El lienzo ───────────────────────────────────────────────────────────
-   Mi espacio no tiene cabecera fija ni pie: es una pantalla a la vez, centrada,
-   con el ancho de una columna de lectura. Nada de lo que la web pública
-   necesita —menú, overlay, velo— existe acá, y no se trae «por consistencia». */
-.lienzo{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px 48px}
-.lienzo--ancho{justify-content:flex-start;padding-top:48px}
-.tarjeta{width:100%;max-width:440px}
-.tarjeta--ancha{max-width:620px}
+/* ── El marco · orden Códice #18 ─────────────────────────────────────────
+   Cabecera arriba, pie abajo, la columna de 420 en el medio: igual en las
+   cinco pantallas. Hasta la #15 no había ni cabecera ni pie («una pantalla a
+   la vez»); la #18 los suma porque, al lado de la entrada de Bitácora Clínica,
+   la de Armando era un formulario suelto sin marca y sin salida.
 
-.marca{
-  font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.24em;
-  text-transform:uppercase;color:var(--gris);display:block;margin-bottom:28px;text-align:center;
+   A ≥ 1100 px, en `/entrar`, la pantalla se parte en dos: el panel cálido de
+   Armando a la izquierda (≈ 45 %), a sangre de arriba abajo **por detrás** de
+   la cabecera, y el formulario a la derecha. Por eso la cabecera es absoluta
+   en ese caso: si ocupara su fila, el panel empezaría debajo de ella y dejaría
+   de ser a sangre. */
+.marco{min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:minmax(0,1fr);background:var(--crema)}
+.marco__principal{display:flex;justify-content:center;align-items:center;padding:40px 20px 56px}
+.columna{width:100%;max-width:420px}
+
+.cab{position:relative;z-index:2}
+.cab__dentro{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  height:72px;width:min(90%,1400px,calc(100% - 40px));margin:0 auto;
+  border-bottom:1px solid color-mix(in oklab, var(--tinta) 15%, transparent);
+}
+/* El wordmark, con la anatomía del de la web (`.marca b`, 14 px, .3em). */
+.cab__marca{display:inline-flex;align-items:center;min-height:44px;text-decoration:none;font-family:var(--display);color:var(--tinta)}
+.cab__marca b{font-weight:500;font-size:14px;letter-spacing:.3em;text-transform:uppercase;white-space:nowrap}
+.cab__volver{
+  display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;
+  font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--tinta);white-space:nowrap;transition:opacity .32s var(--ease);
+}
+.cab__volver:hover{opacity:.6}
+/* A 375 no entraban los dos (medido: «Volver a la web» terminaba en el px 398).
+   Se aprieta el espaciado, no el texto: la salida tiene que decir adónde va. */
+@media (max-width:480px){
+  .cab__marca b{font-size:12px;letter-spacing:.2em}
+  .cab__volver{letter-spacing:.1em;gap:6px}
 }
 
-.titulo{font-family:var(--display);font-weight:300;font-size:clamp(28px,4.4vw,38px);line-height:1.12;letter-spacing:-.01em;color:var(--tinta)}
+.pie{padding:0 0 24px}
+.pie__dentro{
+  width:min(90%,1400px,calc(100% - 40px));margin:0 auto;padding-top:18px;
+  border-top:1px solid var(--hair);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px 24px;
+  font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gris);
+}
+.pie__grupo{display:flex;gap:8px 24px;flex-wrap:wrap}
+.pie a{text-decoration:none;color:var(--gris);transition:color .32s var(--ease)}
+.pie a:hover{color:var(--tinta)}
+
+/* ── A · el panel de Armando, solo en `/entrar` y solo a ≥ 1100 ───────────
+   Cuál de las dos imágenes existe lo decide `usarAncho()` en `Piezas.tsx`, no
+   el CSS: una imagen escondida con `display:none` se descarga igual. */
+.retrato-chico{width:64px;height:64px;border-radius:50%;object-fit:cover;margin-bottom:24px;background:var(--calido)}
+
+@media (min-width:1100px){
+  .marco--con-armando{grid-template-columns:45fr 55fr;grid-template-rows:1fr auto}
+  .marco--con-armando .cab{position:absolute;inset:0 0 auto 0}
+  .marco--con-armando .panel{
+    display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+    grid-column:1;grid-row:1;background:var(--calido);
+    padding:calc(72px + clamp(32px,6vh,72px)) 0 0;overflow:hidden;
+  }
+  .marco--con-armando .marco__principal{grid-column:2;grid-row:1;padding-top:calc(72px + 40px)}
+  /* El pie, de lado a lado (B.10): el panel termina donde empieza, así que el
+     busto queda apoyado sobre la línea del pie. */
+  .marco--con-armando .pie{grid-column:1 / -1;grid-row:2;padding-top:24px}
+}
+/* La firma, en la Great Vibes de la web. En `--tinta` y no en naranja: en esta
+   pantalla el naranja es del botón y de nadie más (D26). */
+.panel__firma{font-family:var(--script);font-weight:400;font-size:var(--script-size);line-height:1.1;color:var(--tinta);text-align:center;padding:0 32px}
+/* El busto se apoya en el borde de abajo, y va contra el borde DERECHO del
+   panel: el archivo termina en seco en el hombro derecho (x = 560, desde la
+   mitad de la foto para abajo). Centrado, ese corte quedaba como una línea
+   vertical en medio del cálido; contra el borde, coincide con el cambio a
+   crema y se lee como un apoyo, no como un recorte — la misma regla que la
+   #19 (B) aplicó al borde de abajo en «Sobre el facilitador». */
+.panel__busto{width:min(86%,470px);height:auto;margin-top:32px;align-self:flex-end}
+
+.titulo{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,44px);line-height:1.1;letter-spacing:-.01em;color:var(--tinta);text-wrap:balance}
+/* La palabra acentuada (B.2): teal, nunca naranja — el naranja es del botón. */
+.titulo__palabra{color:var(--teal)}
 .bajada{margin-top:12px;font-size:16px;line-height:1.6;color:var(--gris)}
 .subtitulo{font-family:var(--display);font-weight:500;font-size:15px;letter-spacing:.02em;color:var(--tinta)}
 .nota{font-size:14px;line-height:1.55;color:var(--gris)}
@@ -69,22 +134,36 @@ img,svg{display:block;max-width:100%}
 .campo__rotulo{display:block;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
 .campo__entrada{
   width:100%;font-family:var(--lectura);font-size:16px;line-height:1.4;padding:14px 16px;
-  color:var(--tinta);background:var(--superficie);
+  color:var(--tinta);background:color-mix(in oklab, var(--calido) 60%, var(--crema));
   border:1px solid var(--hair);border-radius:2px;
-  transition:border-color .3s var(--ease);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease);
 }
+/* B.6 · se va la caja negra dura: fondo cálido, hairline, y el foco en teal
+   —borde y un anillo de 1 px— para que se vea sin gritar. */
 .campo__entrada:hover{border-color:var(--hair-hover)}
-.campo__entrada:focus{outline:none;border-color:var(--tinta)}
+.campo__entrada:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
 .campo__entrada[aria-invalid='true']{border-color:var(--naranja-texto)}
 .campo__ayuda{margin-top:6px;font-size:13px;line-height:1.5;color:var(--gris)}
 
-/* El campo del código: seis dígitos, monoespaciados por tabulación de cifras y
-   muy separados. No son seis cajitas: una sola entrada se pega, se autocompleta
-   desde el SMS/correo y funciona con lector de pantalla sin trucos. */
-.codigo{
-  font-family:var(--display);font-size:30px;font-weight:500;letter-spacing:.32em;
-  text-align:center;padding:16px 12px;font-variant-numeric:tabular-nums;
+/* El campo del código · seis casillas (B.8, F). Se ven seis y es UNA entrada:
+   el `<input>` va encima, transparente, y recibe teclado, pegado y el
+   autocompletado de iOS; las casillas solo dibujan. Ver `CampoDeCodigo`. */
+.casillas{position:relative}
+.casillas__entrada{
+  position:absolute;inset:0;width:100%;height:100%;z-index:1;
+  opacity:0;border:0;padding:0;font-size:16px;cursor:text;
 }
+.casillas__fila{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.casilla{
+  display:flex;align-items:center;justify-content:center;height:56px;
+  font-family:var(--display);font-size:24px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--tinta);
+  background:color-mix(in oklab, var(--calido) 60%, var(--crema));
+  border:1px solid var(--hair);border-radius:2px;
+  transition:border-color .2s var(--ease),box-shadow .2s var(--ease);
+}
+.casilla--llena{border-color:var(--hair-hover)}
+.casilla--sigue{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
+.casillas__entrada[aria-invalid='true'] + .casillas__fila .casilla{border-color:var(--naranja-texto)}
 
 .error{margin-top:12px;font-size:14px;line-height:1.5;color:var(--naranja-texto)}
 .aviso{
@@ -124,6 +203,10 @@ img,svg{display:block;max-width:100%}
 /* El separador del «o», antes de Google. */
 .separador{display:flex;align-items:center;gap:16px;margin:24px 0}
 .separador::before,.separador::after{content:'';flex:1;height:1px;background:var(--hair)}
+.aviso-legal{margin-top:28px;font-size:13px;line-height:1.6;color:var(--gris)}
+.aviso-legal a{color:var(--gris);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.aviso-legal a:hover{color:var(--tinta)}
+.btn img{width:18px;height:18px;flex:none}
 .separador span{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}
 
 /* ── El QR y la clave a mano ─────────────────────────────────────────────
@@ -143,6 +226,10 @@ img,svg{display:block;max-width:100%}
   margin-top:20px;padding:20px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px 20px;
   background:var(--calido);border-radius:2px;
   font-family:var(--display);font-size:15px;letter-spacing:.1em;font-variant-numeric:tabular-nums;
+  /* El número va ADENTRO de la caja. Con el reset (`padding:0`) la viñeta de un
+     `<ol>` cuelga afuera, y a 375 el «10.» se salía por el borde izquierdo del
+     cálido (medido en las capturas de la #18). */
+  list-style-position:inside;
 }
 @media (max-width:420px){.codigos{grid-template-columns:1fr}}
 

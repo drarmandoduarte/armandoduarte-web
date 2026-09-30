@@ -12,3 +12,10 @@ export const RUTAS = {
 
 /** A dónde va alguien que llega a `/` o a una ruta que no existe. */
 export const RUTA_POR_DEFECTO = RUTAS.miEspacio;
+
+/**
+ * La web pública, adonde llevan el wordmark, «Volver a la web» y los enlaces
+ * legales (orden #18, B.1 y B.9). Absoluta porque Mi espacio vive en otro
+ * dominio: un `/privacidad` relativo caería en esta app, que no la tiene.
+ */
+export const WEB = 'https://armandoduarte.com';

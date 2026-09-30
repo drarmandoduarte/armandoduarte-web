@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSesion } from './comun/sesion';
 import { api } from './comun/api';
+import { rutaQueCorresponde } from './comun/ruta-que-corresponde';
 import { Pantalla } from './comun/Piezas';
 import { Entrar } from './entrar/Entrar';
 import { Enrolar } from './entrar/Enrolar';
@@ -35,6 +36,22 @@ export function App() {
   const { cargando, sesion, yo, decision, recargar, salir, marcarVerificado } = useSesion();
   /** Los diez códigos recién generados, mientras la pantalla 4 los muestra. */
   const [codigosNuevos, setCodigosNuevos] = useState<string[] | null>(null);
+
+  /* F · la URL dice dónde está la persona: `/mi-espacio` cuando entró,
+     `/entrar` cuando no. Quién decide es `rutaQueCorresponde()`, pura y con
+     tabla; acá solo se aplica. `replaceState` y no `pushState`: el «atrás»
+     del navegador no tiene que volver a una pantalla de entrada que ya no
+     corresponde. */
+  useEffect(() => {
+    const destino = rutaQueCorresponde({
+      cargando,
+      haySesion: !!sesion,
+      hayYo: !!yo,
+      decision,
+      rutaActual: window.location.pathname,
+    });
+    if (destino) window.history.replaceState(null, '', destino);
+  }, [cargando, sesion, yo, decision]);
 
   /* Lo primero, antes que cualquier pantalla: si falta una variable, se dice
      SU NOMBRE. Quien va a leer esto es dirección cargando el proyecto en

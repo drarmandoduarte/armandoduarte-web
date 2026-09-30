@@ -100,7 +100,7 @@ const PAGINAS = [['inicio','/'],['taller','/merida'],['privacidad','/privacidad'
    esas mediciones afirmaron. */
 const ANCHOS = [1440, 900, 390, 375];
 
-const RECOLECTAR = () => {
+export const RECOLECTAR = () => {
   /* Los colores se resuelven con un lienzo y no con una expresión regular.
      `getComputedStyle` devuelve `color-mix()` y `oklab()` tal cual —el overlay del
      menú y los dos fondos «suaves» los usan—, y leerlos con un `match(/[\d.]+/g)`
@@ -201,7 +201,7 @@ const RECOLECTAR = () => {
  * píxel real, más `p5` —el percentil 5 de luminancia del rectángulo, o sea el
  * rincón más oscuro— para que un promedio cómodo no tape un punto ilegible.
  */
-async function medirElLienzo(p, pares) {
+export async function medirElLienzo(p, pares) {
   const conFoto = pares.filter((x) => x.sobreFoto);
   if (!conFoto.length) return pares;
 
@@ -295,74 +295,82 @@ async function medirElLienzo(p, pares) {
   });
 }
 
-const navegador = await chromium.launch();
-const todo = [];
-for (const [nombre, ruta] of PAGINAS) {
-  for (const ancho of ANCHOS) {
-    const p = await navegador.newPage({ viewport: { width: ancho, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
-    await p.goto(BASE + ruta, { waitUntil: 'load' });
-    await p.evaluate(() => document.fonts.ready);
-    await p.evaluate((css) => {
-      const hoja = new CSSStyleSheet();
-      hoja.replaceSync(css);
-      document.adoptedStyleSheets = [...document.adoptedStyleSheets, hoja];
-    }, '*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1!important}');
-    await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
-    for (const conMenu of [false, true]) {
-      if (conMenu) await p.evaluate(() => {
-        document.getElementById('ov')?.classList.add('open');
-        /* Y la clase del `<body>` que aparta el header (orden #06, C): sin ella
-           el barrido mediría el header debajo del telón, que en la web real no
-           existe — y no mediría que, por estar apartado, deja de contar. */
-        document.body.classList.add('ov-abierto');
-      });
-      await p.waitForTimeout(250);
-      let pares = await p.evaluate(RECOLECTAR);
+/* La corrida por consola. Va detrás de esta guarda desde la #18: Mi espacio
+   mide sus pantallas con este mismo `RECOLECTAR` (`apps/familia/check/
+   capturas-18.mjs`) y un import no puede lanzar un navegador contra la web.
+   Es la misma guarda que `acento.mjs` y `renglones.mjs` ya tenían. */
+async function porConsola() {
+  const navegador = await chromium.launch();
+  const todo = [];
+  for (const [nombre, ruta] of PAGINAS) {
+    for (const ancho of ANCHOS) {
+      const p = await navegador.newPage({ viewport: { width: ancho, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
+      await p.goto(BASE + ruta, { waitUntil: 'load' });
+      await p.evaluate(() => document.fonts.ready);
+      await p.evaluate((css) => {
+        const hoja = new CSSStyleSheet();
+        hoja.replaceSync(css);
+        document.adoptedStyleSheets = [...document.adoptedStyleSheets, hoja];
+      }, '*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1!important}');
+      await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
+      for (const conMenu of [false, true]) {
+        if (conMenu) await p.evaluate(() => {
+          document.getElementById('ov')?.classList.add('open');
+          /* Y la clase del `<body>` que aparta el header (orden #06, C): sin ella
+             el barrido mediría el header debajo del telón, que en la web real no
+             existe — y no mediría que, por estar apartado, deja de contar. */
+          document.body.classList.add('ov-abierto');
+        });
+        await p.waitForTimeout(250);
+        let pares = await p.evaluate(RECOLECTAR);
 
-      /* ── El fondo dibujado, para lo que está sobre una fotografía ────────
-         Solo si hay algo sobre foto: la captura de página completa y su vuelta
-         a la página cuestan casi un segundo, y en tres de las cuatro páginas no
-         hay nada que medir así. */
-      if (pares.some((x) => x.sobreFoto)) {
-        pares = await medirElLienzo(p, pares);
+        /* ── El fondo dibujado, para lo que está sobre una fotografía ────────
+           Solo si hay algo sobre foto: la captura de página completa y su vuelta
+           a la página cuestan casi un segundo, y en tres de las cuatro páginas no
+           hay nada que medir así. */
+        if (pares.some((x) => x.sobreFoto)) {
+          pares = await medirElLienzo(p, pares);
+        }
+        for (const x of pares) todo.push({ ...x, pagina: nombre, ancho });
       }
-      for (const x of pares) todo.push({ ...x, pagina: nombre, ancho });
+      await p.close();
     }
-    await p.close();
+  }
+  await navegador.close();
+
+  const mapa = new Map();
+  for (const x of todo) {
+    const k = `${x.fg}|${x.bg}|${x.px}|${x.peso}`;
+    if (!mapa.has(k)) mapa.set(k, { ...x, veces: 0, ejemplos: new Set(), textos: new Set() });
+    const e = mapa.get(k);
+    e.veces++; e.ejemplos.add(x.donde); e.textos.add(x.texto);
+  }
+  const filas = [...mapa.values()]
+    .map((e) => ({ ...e, ejemplos: [...e.ejemplos].slice(0, 3), textos: [...e.textos].slice(0, 2) }))
+    .sort((a, b) => (a.ratio / a.umbral) - (b.ratio / b.umbral));
+
+  writeFileSync(SALIDA, JSON.stringify(filas, null, 2));
+  const fallan = filas.filter((f) => f.ratio < f.umbral);
+  console.log(`${filas.length} pares distintos · ${fallan.length} por debajo del umbral\n`);
+  for (const f of fallan) {
+    console.log(`✗ ${f.fg} sobre ${f.bg}  ${String(f.px).padStart(5)}px/${f.peso}  a${f.alfa}  ` +
+      `${String(f.ratio).padStart(5)} < ${f.umbral}   ${f.ejemplos.join(' , ')}` +
+      (f.sobreFoto ? `   [sobre foto · rincón más oscuro ${f.ratioPeor}]` : ''));
+  }
+
+  const sobreFoto = filas.filter((f) => f.sobreFoto);
+  if (sobreFoto.length) {
+    console.log(`\n— los ${sobreFoto.length} pares sobre fotografía, medidos contra el píxel dibujado —`);
+    for (const f of sobreFoto.slice(0, 12)) {
+      console.log(`  ${f.fg} sobre ${f.bg} (declarado ${f.bgDeclarado})  ${String(f.px).padStart(5)}px  ` +
+        `medio ${String(f.ratio).padStart(5)} ${f.ratio >= f.umbral ? '≥' : '<'} ${f.umbral}  ` +
+        `· peor rincón ${String(f.ratioPeor).padStart(5)}   ${f.ejemplos[0]}`);
+    }
+  }
+  console.log('\n— los más justos que SÍ pasan —');
+  for (const f of filas.filter((x) => x.ratio >= x.umbral).slice(0, 8)) {
+    console.log(`  ${f.fg} sobre ${f.bg}  ${String(f.px).padStart(5)}px/${f.peso}  a${f.alfa}  ${String(f.ratio).padStart(5)} ≥ ${f.umbral}   ${f.ejemplos[0]}`);
   }
 }
-await navegador.close();
 
-const mapa = new Map();
-for (const x of todo) {
-  const k = `${x.fg}|${x.bg}|${x.px}|${x.peso}`;
-  if (!mapa.has(k)) mapa.set(k, { ...x, veces: 0, ejemplos: new Set(), textos: new Set() });
-  const e = mapa.get(k);
-  e.veces++; e.ejemplos.add(x.donde); e.textos.add(x.texto);
-}
-const filas = [...mapa.values()]
-  .map((e) => ({ ...e, ejemplos: [...e.ejemplos].slice(0, 3), textos: [...e.textos].slice(0, 2) }))
-  .sort((a, b) => (a.ratio / a.umbral) - (b.ratio / b.umbral));
-
-writeFileSync(SALIDA, JSON.stringify(filas, null, 2));
-const fallan = filas.filter((f) => f.ratio < f.umbral);
-console.log(`${filas.length} pares distintos · ${fallan.length} por debajo del umbral\n`);
-for (const f of fallan) {
-  console.log(`✗ ${f.fg} sobre ${f.bg}  ${String(f.px).padStart(5)}px/${f.peso}  a${f.alfa}  ` +
-    `${String(f.ratio).padStart(5)} < ${f.umbral}   ${f.ejemplos.join(' , ')}` +
-    (f.sobreFoto ? `   [sobre foto · rincón más oscuro ${f.ratioPeor}]` : ''));
-}
-
-const sobreFoto = filas.filter((f) => f.sobreFoto);
-if (sobreFoto.length) {
-  console.log(`\n— los ${sobreFoto.length} pares sobre fotografía, medidos contra el píxel dibujado —`);
-  for (const f of sobreFoto.slice(0, 12)) {
-    console.log(`  ${f.fg} sobre ${f.bg} (declarado ${f.bgDeclarado})  ${String(f.px).padStart(5)}px  ` +
-      `medio ${String(f.ratio).padStart(5)} ${f.ratio >= f.umbral ? '≥' : '<'} ${f.umbral}  ` +
-      `· peor rincón ${String(f.ratioPeor).padStart(5)}   ${f.ejemplos[0]}`);
-  }
-}
-console.log('\n— los más justos que SÍ pasan —');
-for (const f of filas.filter((x) => x.ratio >= x.umbral).slice(0, 8)) {
-  console.log(`  ${f.fg} sobre ${f.bg}  ${String(f.px).padStart(5)}px/${f.peso}  a${f.alfa}  ${String(f.ratio).padStart(5)} ≥ ${f.umbral}   ${f.ejemplos[0]}`);
-}
+if (process.argv[1] && process.argv[1].endsWith('contraste.mjs')) await porConsola();

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BotonPrincipal, Pantalla } from '../comun/Piezas';
+import { BotonPrincipal, Pantalla, Titulo } from '../comun/Piezas';
 import { archivoDeCodigos } from '../seguridad-512/nucleo/nombres';
 
 /**
@@ -61,8 +61,8 @@ export function CodigosDeRespaldo({
   }
 
   return (
-    <Pantalla ancha arriba>
-      <h1 className="titulo">{t('respaldo.titulo')}</h1>
+    <Pantalla>
+      <Titulo texto={t('respaldo.titulo')} />
       <p className="bajada">{t('respaldo.bajada')}</p>
 
       {/* `<ol>` y no un `<div>`: son diez cosas contables y en orden, y así un
