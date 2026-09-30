@@ -64,42 +64,51 @@ export function Suena() {
        sección e informa un contraste que no existe, porque entre ese blanco y
        el texto hay una fotografía. */
     <Seccion id="suena" tono="blanco" clase="suena-fondo con-fondo" contenedor={false}>
-      {/* ── La foto, en dos tamaños desde la orden #14 (D) ──────────────────
-          El archivo de 1200 se sirve hasta 1100 px de ventana y el de 1800 por
-          encima. Es `<source media>` y no `srcset`/`sizes` a propósito: aquél
-          elige multiplicando el ancho de presentación por el DPR, así que un
-          teléfono de 375 px con pantalla 3× se llevaría la de 1800 — justo lo
-          que la #14 prohíbe. La `media` mira el ancho de ventana y nada más.
+      {/* ── La foto, con el encuadre de Lucía (orden #21, B) ─────────────────
+          La misma foto de siempre (Pexels 6345445, Karola G), **recortada del
+          original** por el CEO para que con `cover` en una sección apaisada se
+          vea como en la captura de Lucía: cabeza grande y centrada, pelo contra
+          el borde de arriba, remera a rayas abajo. El recorte está en
+          `03 Producto/web/insumos/2026-09-30-te-suena-como-lucia/`, con su
+          LEEME. Entra con **nombres nuevos**: una URL nueva no puede quedar
+          atrapada en la caché vieja (lo mismo que resuelve la #21 A).
 
-          El `<img>` es el **JPG**: es el respaldo de quien no entiende WebP, y
-          es el de 1200 porque quien no entiende WebP tampoco necesita la grande. */}
+          Tres tamaños por `<source media>` y no por `srcset`/`sizes`, por la
+          razón de la #14 (D): aquél multiplica por el DPR y un teléfono 3× se
+          llevaría la grande. 2400 por encima de 1100 px, 1600 hasta 1100, y el
+          vertical de 750 hasta 600. El `<img>` es el JPG de 1600: el respaldo de quien no
+          entiende WebP. */}
       <div className="fondo-foto fondo-foto--suena">
         <picture>
           <source
             type="image/webp"
             media="(min-width: 1101px)"
-            srcSet="img/fotos/porque-fondo-1800.webp"
-            width={1800}
-            height={2700}
+            srcSet="img/fotos/suena-lucia-2400.webp"
+            width={2400}
+            height={1708}
           />
-          <source type="image/webp" srcSet="img/fotos/porque-fondo.webp" />
+          <source
+            type="image/webp"
+            media="(min-width: 601px)"
+            srcSet="img/fotos/suena-lucia-1600.webp"
+            width={1600}
+            height={1138}
+          />
+          {/* ≤ 600 px: el recorte **vertical** del CEO (auditoría del #33, 2).
+              A este ancho la sección mide ~375×2200 y ningún apaisado deja ver
+              la cara; este ocupa solo la primera pantalla (ver `index.css`). */}
+          <source type="image/webp" srcSet="img/fotos/suena-lucia-movil-750.webp" width={750} height={1631} />
           <img
-            src="img/fotos/porque-fondo.jpg"
-            width={1200}
-            height={1800}
+            src="img/fotos/suena-lucia-1600.jpg"
+            width={1600}
+            height={1138}
             alt=""
             aria-hidden="true"
             loading="lazy"
-            /* Decorativa y por debajo del pliegue. Dicho con honestidad: esto
-               **no** recuperó el punto. Medido en `/merida` móvil, la foto de
-               fondo cuesta 0,2 s de LCP (2,5 → 2,7 s) y baja performance de 96
-               a 95, y con `fetchPriority="low"` sigue en 95 — el costo es de
-               **pintado**, no de descarga: a 375 el bloque mide 375×2242 y la
-               foto se dibuja a 1495×2242. Lo comprobado: apagando la foto, 96
-               y 2,5 s. Quedan las dos banderas igual porque son correctas para
-               una imagen decorativa bajo el pliegue; lo que no hacen es
-               arreglar esto. El punto está en el informe como decisión de
-               dirección: es el precio de lo que pidió Lucía. */
+            /* Decorativa y por debajo del pliegue. `fetchPriority="low"` y
+               `decoding="async"` son correctos para una imagen así; lo que la
+               #16 midió es que el costo de esta foto en `/merida` móvil es de
+               pintado, no de descarga. */
             decoding="async"
             fetchPriority="low"
           />
