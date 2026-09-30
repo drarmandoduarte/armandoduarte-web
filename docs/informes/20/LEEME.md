@@ -330,3 +330,117 @@ legales, que es el `noindex` de siempre y no cambió.
 
 - Las **tres decisiones de A.5** de arriba. Ninguna bloquea el merge: la gate está
   verde y el guardián dice en voz alta que las excusó.
+
+---
+
+# #20-bis — Las tres decisiones de A.5, aplicadas y medidas
+
+Rama `web/20-bis-alturas`. Las tres decisiones de dirección de la auditoría del
+PR #30: `#quien` 520 → 470, `#facilitador` 480 → 472, y `#programa` partido en
+dos secciones (núcleos en 3 + 2, y «Lo que te llevas» como `#llevas`).
+
+## Primero, una corrección a este mismo informe
+
+**Lo que el #30 dijo de `#quien` y `#facilitador` estaba mal.** Decía que mandaba
+la foto y proyectaba 893 y 897. Medido ahora, en las dos secciones manda la
+**columna de texto**:
+
+| sección | columna de texto | foto | sección |
+|---|---|---|---|
+| `/` `#quien`, foto a 520 | 944 + 45 de padding | 938 | **1034** |
+| `/` `#quien`, foto a 470 | 944 + 45 | 848 | **1034** |
+| `/merida` `#facilitador`, foto a 472 | 816 + 45 | 852 | **906** |
+
+La proyección del #30 sumó la foto y el padding sin medir el texto de al lado.
+En `#quien` el texto ya era más alto que la foto: achicar a Armando **no compra
+ni un píxel**. Se aplicó igual porque es lo decidido; volver a 520 es una línea.
+
+## La tabla, a 1440×900 y 1920×1080
+
+| sección | 1440×900 | 1920×1080 | estado |
+|---|---|---|---|
+| `/merida` `#programa` (núcleos 3 + 2) | **844 · −56** | 862 · −218 | **entra**, fuera de `PENDIENTES` |
+| `/merida` `#llevas` (nueva) | 1023 · **+123** | 1085 · **+5** | `PENDIENTES` |
+| `/` `#quien` | 1034 · **+134** | 1052 · −28 | `PENDIENTES` (igual que antes) |
+| `/merida` `#facilitador` | 906 · **+6** | 924 · −156 | `PENDIENTES` (era +11) |
+
+`check:altura` verde con **tres** filas en `PENDIENTES`, no con cero ni con una:
+la verificación de la orden **no se cumple**, y por eso este PR sube como borrador.
+
+### Sobre «dos columnas (3 + 2)»
+
+Se leyó como **una fila de tres y otra de dos**, que es lo que dibuja «3 + 2».
+Medidas las dos lecturas:
+
+| grilla de los núcleos | `#programa` a 1440×900 |
+|---|---|
+| cinco en fila (como estaba) | 693 |
+| **3 + 2 (fila de 3, fila de 2)** — aplicada | **844** |
+| dos columnas, 3 a la izquierda y 2 a la derecha | 1076 (no entra) |
+
+La línea entre núcleos se apaga en todos los anchos: en una fila de tres, el
+tercero apuntaría a nada. De paso, los títulos de los núcleos 1 y 5 dejaron de
+tener un renglón huérfano, y sus dos filas salieron de `check/renglones.mjs`.
+
+La orden decía «el sello CFF arriba con el título»: el `#programa` de `/merida`
+**no tiene sello** (el sello está en el `#programa` de la portada). No se agregó
+nada; arriba quedan el eyebrow y el título, como estaban.
+
+## Lo que necesita dirección, con opciones medidas
+
+1. **`#llevas` +123.** La manda la foto 4:5 de cada columna (405×507). Medido
+   recortando las tres fotos: **5:4 → 841, entra**; 1:1 → 922, no entra.
+2. **`#quien` +134.** Manda el texto: eyebrow, título, párrafo, ficha de cuatro
+   filas y la cita. Achicar los márgenes entre bloques (40 → 28, 28 → 20) la deja
+   en 994, que tampoco entra. Ficha en 2×2: 1184, peor. Lo que queda es menos
+   texto o un texto más chico, y ninguna de las dos las decide Rodolfo. También:
+   ¿Armando vuelve a 520, ya que 470 no compra nada?
+3. **`#facilitador` +6.** `margin-top` de la ficha 40 → 32 la deja en **898**.
+
+## Verificación
+
+| qué | resultado |
+|---|---|
+| gate de la casa | verde |
+| `check:altura` | verde · 40 secciones · 3 excusadas: `inicio#quien`, `merida#llevas`, `merida#facilitador` |
+| visto fallar | tope de `#llevas` 123 → 100: rojo en `#llevas mide 1023`. Piso de `/merida` 10 → 12: rojo en `PISO: miró 11` (10 secciones + el pie; el piso cuenta secciones, como en el #30) |
+| `check:renglones` | verde; dos filas menos |
+| fidelidad | regeneradas con `--update-snapshots`, **declarado**: portada 1440 y 900 (la foto a 470 también rige a 900 de ancho, como regía 520), taller 1440, 900 y 390 (la sección nueva) |
+| una fluctuación | `taller-1440` dio 4200 px (0,01 %) distintos una vez en la gate; 0 de 5 corridas más |
+
+## Capturas
+
+`apps/web/check/capturas-20-bis.mjs` — cada sección **entera**, recortada por su
+propia caja: si sobra, la imagen mide más de 900.
+
+| archivo | alto |
+|---|---|
+| `bis-quien-1440x900.jpg` | 1034 |
+| `bis-programa-1440x900.jpg` | 844 |
+| `bis-llevas-1440x900.jpg` | 1023 |
+| `bis-facilitador-1440x900.jpg` | 906 |
+
+## #20-bis · Las decisiones del CEO, aplicadas
+
+1. **`#llevas`: fotos en 5:4** con `aspect-ratio` y `object-fit: cover`, sin
+   tocar los archivos. Mirada foto por foto: `llevas-palabras` y
+   `llevas-serenidad` conservan las caras enteras con el recorte centrado;
+   `llevas-claridad`, centrada, le cortaba la cabeza al padre, y lleva
+   `object-position: center top` (clase `encuadre--arriba`, declarada en
+   `Llevas.tsx`). Se ve en `bis-llevas-1440x900.jpg`.
+2. **`#facilitador`: ficha 40 → 32.**
+3. **`#quien`: se acepta el desborde**, la única excepción del sitio, con el
+   motivo «texto del cliente». **Armando vuelve a 520.**
+
+| sección (1440×900) | alto | |
+|---|---|---|
+| `/merida` `#programa` | 844 | entra |
+| `/merida` `#llevas` | **841** | entra |
+| `/merida` `#facilitador` | **898** | entra |
+| `/` `#quien` | 1034 · +134 | la única fila en `PENDIENTES` |
+
+`check:altura`: verde, **una** sección excusada (`inicio#quien`). La vi fallar
+volviendo la ficha de `#facilitador` a 40: rojo en `#facilitador mide 906px`.
+Gate de la casa verde. Fidelidad: las capturas de la portada vuelven a ser
+**exactamente** las del #30 (la foto está otra vez en 520); cambian las del
+taller a 1440, 900 y 390, por la sección nueva, el 3 + 2 y el 5:4.

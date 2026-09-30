@@ -166,7 +166,7 @@ orden es explícita: eso no lo decide Rodolfo. Son tres clases de cosa:
 | qué | dónde | cómo se cierra |
 |---|---|---|
 | un `<br>` declarado cuyo primer renglón quedó de una palabra | «Construyendo» (`#programa`), «Escríbeme.» (`#contacto`) | moviendo dónde cae el `<br>` — es mover texto |
-| una palabra larga que cae sola al final de un título que envuelve | «desconocido?», «silencio.», «adolescencia», «Comprender», «cambios», «responsables», «digitalmente», «Padres», «y yo.», «Construyendo» del libro | acortando el texto, bajando el tamaño o ensanchando la columna |
+| una palabra larga que cae sola al final de un título que envuelve | «desconocido?», «silencio.», «Comprender», «responsables», «digitalmente», «Padres», «y yo.», «Construyendo» del libro | acortando el texto, bajando el tamaño o ensanchando la columna |
 | un título que no cabe de ninguna manera | el cierre de `#reservar`: **siete** renglones a 375 px | con menos palabras o menos tamaño — `text-wrap: balance` de Chromium deja de trabajar arriba de seis renglones |
 
 La lista completa, con la ruta y el ancho de cada una, está en

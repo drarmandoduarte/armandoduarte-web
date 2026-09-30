@@ -117,14 +117,14 @@ console.log(`     el enlace del lugar apunta a: ${destino}`);
    La orden lo pide para desmentir una captura de dirección que muestra una mujer
    meditando: las fotos publicadas son las de Lucía del 28/9 —padre e hijo en la
    playa y padre e hijo en la cama—, así que la captura era vieja o de caché. Acá
-   no se toca nada: se muestra lo que hay. Vive dentro de `#programa`, en el
-   bloque de las tres fotos. */
+   no se toca nada: se muestra lo que hay. Vivía dentro de `#programa`; desde la
+   #20-bis es su propia sección, `#llevas`. */
 await preparar('/merida');
-const llevas = page.locator('#programa .tres');
+const llevas = page.locator('#llevas .tres');
 await llevas.scrollIntoViewIfNeeded();
 await page.waitForTimeout(400);
 await guardar('F-lo-que-te-llevas-1440.jpg', { clip: await llevas.boundingBox() });
-const fotos = await page.locator('#programa .tres img').evaluateAll(
+const fotos = await page.locator('#llevas .tres img').evaluateAll(
   (els) => els.map((e) => (e.currentSrc || e.src).split('/').pop()));
 console.log(`     las tres fotos publicadas: ${fotos.join(', ')}`);
 
