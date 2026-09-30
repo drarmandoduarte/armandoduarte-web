@@ -66,3 +66,19 @@ La accesibilidad da 100 en las dos rutas.
 ## Qué quedó pendiente
 
 Nada más de la orden. La prueba real de A la hace Germán: con el PASA, merge, recarga normal en su Chrome, y ver las fotos nuevas.
+
+---
+
+## Ajustes de la auditoría del CEO (PR #33, 30/9 11:40)
+
+**1 · Etiquetas de la franja de hechos en tinta** dentro de `#suena` (`.suena-fondo .hechos div span`). Es la opción (a) medida arriba. `check:contraste`: **0 bajo AA** en los cuatro anchos (200 pares, 61 sobre fotografía). `check:renglones` 0.
+
+**2 · El teléfono (≤ 600 px).** Entra `suena-lucia-movil-750.webp` (750×1631) en lugar de `suena-lucia-900`, que quedó sin uso y se borró. A ese ancho la foto ocupa solo la primera pantalla de la sección (`height: 100svh`, arriba, `object-position: 50% 30%`). El velo es el mismo 86 % y en el último 20 % se funde a crema pleno. El resto de la sección va sobre crema. A 375×812 la sección mide 2075 y la foto 812, con la cara entera. Contraste medido a 375: dentro del 0 de arriba.
+
+Captura: `D-te-suena-375x812.jpg`.
+
+**Lo que no se cumple tal como está escrito: la cara no queda «detrás del título».** A 375, la franja de hechos va primero en la sección: son cuatro celdas apiladas que ocupan ~680 px. La primera pantalla es entonces la franja, y la cara queda detrás de ella. El rótulo «¿TE SUENA?» aparece justo donde termina el fundido, y el título ya queda sobre crema. Se hizo lo que dice la auditoría (la foto arriba de la sección) y **se midió la alternativa sin aplicarla**: la foto anclada al título (su `top` en el rótulo, 72 px antes del `grid-2`). Con eso la cara queda detrás del título y del párrafo. Captura: `D-te-suena-375x812-alternativa.jpg`. Es una línea de CSS. Decide dirección.
+
+**Fidelidad, actualizada por la auditoría del #33** (`--update-snapshots`, `taller` solamente): `taller-1440/900/390.png`. En los tres cambian las etiquetas de la franja; en 390 cambia también la foto.
+
+**Verificación:** gate verde; `check:acento` verde; `check:renglones` 0; `check:altura` con la misma única excepción (`#quien`); e2e 38/38. Lighthouse móvil `/merida`, 3 corridas: 96 95 96 (antes 96 95 96), accesibilidad 100.

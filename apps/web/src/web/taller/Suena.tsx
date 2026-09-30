@@ -75,8 +75,8 @@ export function Suena() {
 
           Tres tamaños por `<source media>` y no por `srcset`/`sizes`, por la
           razón de la #14 (D): aquél multiplica por el DPR y un teléfono 3× se
-          llevaría la grande. 2400 por encima de 1100 px, 1600 hasta 1100, 900
-          hasta 600. El `<img>` es el JPG de 1600: el respaldo de quien no
+          llevaría la grande. 2400 por encima de 1100 px, 1600 hasta 1100, y el
+          vertical de 750 hasta 600. El `<img>` es el JPG de 1600: el respaldo de quien no
           entiende WebP. */}
       <div className="fondo-foto fondo-foto--suena">
         <picture>
@@ -94,7 +94,10 @@ export function Suena() {
             width={1600}
             height={1138}
           />
-          <source type="image/webp" srcSet="img/fotos/suena-lucia-900.webp" width={900} height={640} />
+          {/* ≤ 600 px: el recorte **vertical** del CEO (auditoría del #33, 2).
+              A este ancho la sección mide ~375×2200 y ningún apaisado deja ver
+              la cara; este ocupa solo la primera pantalla (ver `index.css`). */}
+          <source type="image/webp" srcSet="img/fotos/suena-lucia-movil-750.webp" width={750} height={1631} />
           <img
             src="img/fotos/suena-lucia-1600.jpg"
             width={1600}

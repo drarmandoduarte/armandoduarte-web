@@ -9,6 +9,8 @@
  *   · `B-te-suena-1377x980-junto-a-lucia.jpg`: «¿Te suena?» al tamaño exacto
  *     de la captura de Lucía, a la derecha de la suya. Es la prueba de B.
  *   · `C-que-hago-1440x900.jpg`: «Qué hago» a escritorio, en dos columnas.
+ *   · `D-te-suena-375x812.jpg`: «¿Te suena?» en el teléfono (auditoría del
+ *     #33, 2), y `-alternativa` con la foto anclada al título, sin aplicar.
  *   · `A-huellas-en-dist.txt`: las líneas de `dist/merida.html` con `img/`,
  *     para ver las `?v=` sin abrir el HTML.
  */
@@ -68,6 +70,33 @@ async function seccion(ruta, id, ancho, alto) {
   </body>`);
   await lamina.screenshot({ path: join(SALIDA, 'B-te-suena-1377x980-junto-a-lucia.jpg'), type: 'jpeg', quality: 84 });
   await lamina.close();
+}
+
+/* ── Auditoría del #33 (2) · «¿Te suena?» en el teléfono, 375×812 ───────
+   La sección desde su borde de arriba: la foto vertical ocupa esa primera
+   pantalla. `D-te-suena-375x812-alternativa.jpg` es la misma sección con la
+   foto anclada al título en vez de al borde, **no aplicada**: es para que
+   dirección compare (ver el LEEME). */
+for (const [nombre, alTitulo] of [['D-te-suena-375x812.jpg', false], ['D-te-suena-375x812-alternativa.jpg', true]]) {
+  const p = await seccion('/merida', 'suena', 375, 812);
+  const y = await p.evaluate((alTitulo) => {
+    const s = document.getElementById('suena');
+    if (!alTitulo) return Math.round(s.getBoundingClientRect().top + window.scrollY);
+    const g = s.querySelector('.grid-2');
+    const arriba = Math.round(g.getBoundingClientRect().top - s.getBoundingClientRect().top) - 72;
+    s.querySelector('.fondo-foto--suena').style.top = `${arriba}px`;
+    return Math.round(s.getBoundingClientRect().top + window.scrollY + arriba);
+  }, alTitulo);
+  await p.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), y);
+  await p.waitForTimeout(200);
+  const medida = await p.evaluate(() => {
+    const s = document.getElementById('suena');
+    const f = s.querySelector('.fondo-foto--suena');
+    return { seccion: s.offsetHeight, foto: f.offsetHeight, src: f.querySelector('img').currentSrc.split('/').pop() };
+  });
+  console.log(`${nombre}: sección ${medida.seccion} px, foto ${medida.foto} px, ${medida.src}`);
+  await p.screenshot({ path: join(SALIDA, nombre), type: 'jpeg', quality: 86 });
+  await p.close();
 }
 
 /* ── C · «Qué hago» a 1440×900 ────────────────────────────────────────── */

@@ -768,6 +768,10 @@ a,button{-webkit-tap-highlight-color:transparent}
    píxel pintado —foto + velo— a 12 px; el número y cómo se midió están en
    `codice-tokens.css`. Solo se usa en esta sección. */
 .suena-fondo .eyebrow,.suena-fondo .lista .n{color:var(--ocre-texto)}
+/* Auditoría del #33 (1): con el encuadre de Lucía el pelo del chico queda
+   detrás de la franja de hechos, y las etiquetas grises de 11 px caían a
+   3,69–4,31. En tinta, como el resto del texto de esta sección: 0 bajo AA. */
+.suena-fondo .hechos div span{color:var(--tinta)}
 
 /* ── El eyebrow: ni ámbar ni naranja, y los dos números están acá ────────
    (Los hex de abajo van **sin numeral** a propósito: `check:tokens` lee un `#`
@@ -888,8 +892,15 @@ a,button{-webkit-tap-highlight-color:transparent}
 }
 @media (max-width:700px){.pasos{grid-template-columns:1fr}.ft__grid{grid-template-columns:1fr}}
 @media (max-width:600px){
-  /* Acá la foto sobra 1120 px en X: el rostro entra en el tercio derecho. */
-  .fondo-foto--suena img{object-position:52% 40%}
+  /* ── «¿Te suena?» en el teléfono (auditoría del #33, 2) ─────────────────
+     La sección mide ~375×2200: ningún recorte muestra la cara entera si la
+     foto cubre toda la sección. Entonces la foto (el recorte vertical
+     `suena-lucia-movil-750`) ocupa **solo la primera pantalla**, arriba, y se
+     funde en crema en su último ~20 %; el resto de la sección va sobre crema. */
+  .suena-fondo{background:var(--crema)}
+  .fondo-foto--suena{bottom:auto;height:100svh}
+  .fondo-foto--suena img{object-position:50% 30%}
+  .fondo-foto--suena::after{background:linear-gradient(to bottom,color-mix(in oklab, var(--crema) 86%, transparent) 80%,var(--crema))}
   :root{--header-h:64px}
   .hd__menu span,.hd__wa span{display:none}.hd__wa{padding:0 13px;width:42px;justify-content:center}.hd__inner{column-gap:12px}
   .marca b{font-size:12px;letter-spacing:.24em}
