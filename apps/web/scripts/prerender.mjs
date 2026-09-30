@@ -47,6 +47,7 @@ import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
+import { ponerHuellas } from './huellas.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..');
@@ -149,7 +150,19 @@ try {
 
   for (const { ruta, archivo, pagina } of RUTAS) {
     const { app, cabeza } = dibujar(ruta, pagina);
-    const html = plantilla.replace('<!--cabeza-->', cabeza).replace('<!--app-->', app);
+    /* #21 A · cada imagen, con la huella de su contenido en la URL: `/img/` se
+       sirve `immutable` un año, y sin esto un archivo reemplazado en el mismo
+       nombre no le llega nunca a quien ya lo tenía. Ver `huellas.mjs`. */
+    let html;
+    let tocadas;
+    try {
+      ({ html, tocadas } = ponerHuellas(
+        plantilla.replace('<!--cabeza-->', cabeza).replace('<!--app-->', app),
+        DIST,
+      ));
+    } catch (error) {
+      morir(`${ruta}: ${error.message}`);
+    }
 
     if (Buffer.byteLength(html, 'utf8') < PISO_DE_BYTES) {
       morir(
@@ -159,7 +172,7 @@ try {
     }
 
     writeFileSync(join(DIST, archivo), html);
-    console.log(`prerender: ${archivo.padEnd(16)} ${ruta.padEnd(12)} ${(Buffer.byteLength(html, 'utf8') / 1024).toFixed(1)} KB`);
+    console.log(`prerender: ${archivo.padEnd(16)} ${ruta.padEnd(12)} ${(Buffer.byteLength(html, 'utf8') / 1024).toFixed(1)} KB · ${tocadas} imágenes con huella`);
   }
   console.log(`prerender: sin hidratar · css ${css} · script ${js}`);
 } finally {

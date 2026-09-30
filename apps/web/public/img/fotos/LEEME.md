@@ -24,8 +24,7 @@ como asistentes al taller, y ninguna lleva un pie que lo sugiera.
 
 | archivo | dónde se ve | original de Pexels | autor |
 |---|---|---|---|
-| `porque-fondo` | Taller · «¿El niño dulce que criaste…?», **de fondo otra vez desde la #12**, sin velo y con el texto sobre un panel | `pexels-karola-g-6345445` (4405×6608) | Karola G |
-| `porque-fondo-1800` | **la misma foto**, en 1800×2700, que se sirve solo por encima de 1100 px de ancho de ventana (#14 D). **Solo en WebP desde la #16**: el JPG no lo pedía nadie | el mismo | Karola G |
+| `suena-lucia-{2400,1600,900}` | Taller · «¿El niño dulce que criaste…?», de fondo, **con el encuadre de la captura de Lucía** (#21 B): recortada del original `x 499–3778, y 2072–4405`. Reemplaza a `porque-fondo*`, que se borró. 2400 y 900 solo en WebP; 1600 en WebP y JPG (respaldo del `<img>`) | `pexels-karola-g-6345445` (4405×6608) | Karola G |
 | `suena-tarjeta` | Taller · «Las estrategias del pasado ya no funcionan», en tarjeta | `pexels-pavel-danilyuk-8057317` (4016×6016) | Pavel Danilyuk |
 | `llevas-claridad` | Taller · «Lo que te llevas» → Claridad | `pexels-alena-32936525` (1600×2522 en el insumo) | Alena |
 | `llevas-palabras` | Taller · «Lo que te llevas» → Palabras precisas | `pexels-astreyas-photo-10358308` (2337×3505) | Astreyas Photo |
@@ -50,8 +49,8 @@ o no entra.
 - **Tarjetas**: recorte centrado a **4:5** y 800 px de ancho, calidad 74/76.
 
 El presupuesto es **180 KB por archivo** y ninguna lo pasa: la más pesada es
-`porque-fondo.jpg` con 160 KB, y su WebP —que es lo que baja casi todo el
-mundo— pesa 72 KB.
+`suena-lucia-1600.jpg` con 159 KB (#21), y su WebP —que es lo que baja casi
+todo el mundo— pesa 74 KB. La de 2400, que solo baja a escritorio, pesa 131 KB.
 
 ### La excepción que había, y que se cerró sola en la #16
 

@@ -491,6 +491,25 @@ a,button{-webkit-tap-highlight-color:transparent}
 .lista h3 a{display:inline-flex;align-items:center;gap:10px;transition:color .4s}.lista h3 a:hover{color:var(--naranja-texto)}.lista h3 .btn-arrow{font-size:.8em;color:currentColor}
 .lista p{font-size:16px;line-height:1.7;color:var(--gris);max-width:48ch}
 .lista--2{--cols:64px 1fr}.lista--2 li{grid-template-columns:64px 1fr}
+/* ── «Qué hago» en dos columnas a ≥ 1100 (orden #21, C) ─────────────────
+   Rótulo y título a la izquierda, arriba, a la altura de la primera fila; las
+   tres filas a la derecha con la descripción DEBAJO del nombre (en la columna
+   angosta no entra una tercera). Debajo de 1100 `.hago` es un bloque y todo se
+   apila como antes. Textos, íconos y colores, iguales.
+
+   7/5 y no 5/7: con la columna del título más angosta, a 1440 «juntos.»
+   quedaba solo en su renglón (lo cazó `renglones.spec.ts`). Con 7/5 el título
+   entra en sus dos renglones de siempre y las filas siguen holgadas. */
+@media (min-width:1100px){
+  .hago{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);column-gap:var(--s7);align-items:start}
+  .hago .lista{margin-top:0}
+  .hago .lista li{grid-template-columns:64px 1fr;grid-template-rows:auto 1fr;row-gap:6px;align-items:start}
+  /* El ícono con su número ocupa las dos filas: si no, la primera mide lo que
+     él y la descripción queda lejos del nombre (medido en la captura). */
+  .hago .lista__marca{grid-row:1 / span 2}
+  .hago .lista h3{grid-column:2}
+  .hago .lista p{grid-column:2}
+}
 .oscuro .lista{border-color:var(--hair-oscura)}.oscuro .lista li{border-color:var(--hair-oscura)}.oscuro .lista h3{color:var(--crema)}.oscuro .lista p{color:rgba(250,247,241,.75)}.oscuro .lista .n{color:color-mix(in oklab, var(--crema) 70%, transparent)}
 
 /* ── Pasos · número en círculo + línea (512) ────────────────────────── */
@@ -732,7 +751,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 
    (El recorte `2026-09-29-porque-fondo-derecha`, que corre al chico al 70 %,
    NO entra: dirección lo dejó guardado por si Lucía cambia de idea.) */
-.fondo-foto--suena img{object-position:50% 34%}
+/* Desde la #21 (B) la foto es el recorte con el encuadre de Lucía y ya es
+   apaisada: `cover` recorta arriba y abajo, y `50% 40%` deja los ojos a media
+   altura, como en su captura. */
+.fondo-foto--suena img{object-position:50% 40%}
 .fondo-foto--suena::after{background:color-mix(in oklab, var(--crema) 86%, transparent)}
 
 /* ── El texto de esta sección, más oscuro que en el resto de la web ──────
@@ -740,8 +762,12 @@ a,button{-webkit-tap-highlight-color:transparent}
    gris (`--gris`, 716A60) da 4,99 sobre crema plano y se cae apenas hay una fotografía
    debajo; la tinta da 13,19 y aguanta cualquier velo. No es una excepción de
    estilo: es que acá el fondo no es un color, es una imagen. */
-.suena-fondo .lista .n,.suena-fondo .lista p{color:var(--tinta)}
-.suena-fondo .eyebrow{color:var(--tinta)}
+.suena-fondo .lista p{color:var(--tinta)}
+/* #21 (B.2): el rótulo y los números van en ocre, como en la captura de Lucía.
+   `--ocre-texto` es el ocre más cercano al de ella que llega a 4,5 sobre el
+   píxel pintado —foto + velo— a 12 px; el número y cómo se midió están en
+   `codice-tokens.css`. Solo se usa en esta sección. */
+.suena-fondo .eyebrow,.suena-fondo .lista .n{color:var(--ocre-texto)}
 
 /* ── El eyebrow: ni ámbar ni naranja, y los dos números están acá ────────
    (Los hex de abajo van **sin numeral** a propósito: `check:tokens` lee un `#`
@@ -769,13 +795,28 @@ a,button{-webkit-tap-highlight-color:transparent}
 
    Y por lo mismo **los números NO van en naranja**: serían un segundo acento en
    la misma sección, y `check:acento` —que solo excusa `.eyebrow`— se pondría
-   rojo con razón. Van en tinta, con el resto del texto secundario. */
+   rojo con razón. Van en tinta, con el resto del texto secundario.
 
-/* ── La cita: tarjeta cálida translúcida, a lo ancho ─────────────────────
+   **#21 (B.2) cierra esto con la tercera salida**: un token de ocre más
+   oscuro, `--ocre-texto`, medido sobre el píxel pintado. Rótulo y números van
+   en ocre como en la captura de Lucía, sin tocar el velo ni el tamaño. El ocre
+   no es un acento naranja, así que `check:acento` no tiene nada que decir. */
+
+/* ── La cita: tarjeta cálida translúcida, al 84 % ────────────────────────
    Como en la captura de Lucía: se ve la remera del chico detrás. El 80 % y el
    `blur(6px)` son los de la orden, y se miden igual que todo lo demás. Sin
-   barra lateral. */
+   barra lateral.
+
+   No va de lado a lado (#21, B.3): en la captura ocupa 1048 de los 1247 px del
+   contenedor —el 84 %— y deja ver la remera a la derecha. Alineada a la
+   izquierda, que es donde cae sola un bloque con `max-width`. Solo desde
+   901 px: la captura es de escritorio, y en tableta y teléfono la cita sigue a
+   lo ancho como estaba («nada más cambia»). */
 .bloque-cita--ancha{max-width:none;background:color-mix(in oklab, var(--calido) 80%, transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--tinta);border-left:0;padding:28px}
+/* Al 84 % la cita envuelve un renglón más y la sección pasaba a 905 px a
+   1440×900 (`check:altura`). Por el orden de la #20 (A.5), primero los
+   paddings verticales: 28 → 24 arriba y abajo devuelve los 5 px y 3 más. */
+@media (min-width:901px){.bloque-cita--ancha{max-width:84%;padding-block:24px}}
 
 /* ── Y la sección entera dentro de 100 vh a escritorio (regla de la #20 A) ─
    La franja de hechos incluida. Los números salen de la orden: paddings
@@ -842,13 +883,13 @@ a,button{-webkit-tap-highlight-color:transparent}
      último recurso y habría que declararlo. El velo es el mismo uniforme que
      a escritorio; lo que cambia es el encuadre, porque acá sí sobra ancho. */
   .fondo-foto img{object-position:62% 18%}
-  .fondo-foto--suena img{object-position:50% 26%}
+  .fondo-foto--suena img{object-position:52% 40%}
   .plan{grid-template-columns:1fr;gap:var(--s5)}
 }
 @media (max-width:700px){.pasos{grid-template-columns:1fr}.ft__grid{grid-template-columns:1fr}}
 @media (max-width:600px){
   /* Acá la foto sobra 1120 px en X: el rostro entra en el tercio derecho. */
-  .fondo-foto--suena img{object-position:40% 26%}
+  .fondo-foto--suena img{object-position:52% 40%}
   :root{--header-h:64px}
   .hd__menu span,.hd__wa span{display:none}.hd__wa{padding:0 13px;width:42px;justify-content:center}.hd__inner{column-gap:12px}
   .marca b{font-size:12px;letter-spacing:.24em}

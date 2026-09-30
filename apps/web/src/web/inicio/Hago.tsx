@@ -34,10 +34,17 @@ export function Hago() {
   ] as const;
   return (
     <Seccion id="hago" tono="calido">
-      <span className="eyebrow reveal">{t('inicio.hago.eyebrow')}</span>
-      <h2 className="display-l u-mt-4 reveal" data-d="1">
-        {t('inicio.hago.titulo1')}<br /><span className="suave">{t('inicio.hago.titulo2')}</span>
-      </h2>
+      {/* #21 (C) · a ≥ 1100 px, dos columnas como «¿Te suena?»: rótulo y
+          título a la izquierda, las tres filas a la derecha. Debajo de 1100 se
+          apila como antes. Lo pidió Germán: «el título a la izquierda y las
+          secciones a la derecha». */}
+      <div className="hago">
+      <div className="hago__cabeza">
+        <span className="eyebrow reveal">{t('inicio.hago.eyebrow')}</span>
+        <h2 className="display-l u-mt-4 reveal" data-d="1">
+          {t('inicio.hago.titulo1')}<br /><span className="suave">{t('inicio.hago.titulo2')}</span>
+        </h2>
+      </div>
       <ol className="lista reveal" data-d="2">
         {filas.map(([n, icono, titulo, texto]) => (
           <li key={n}>
@@ -50,6 +57,7 @@ export function Hago() {
           </li>
         ))}
       </ol>
+      </div>
     </Seccion>
   );
 }
