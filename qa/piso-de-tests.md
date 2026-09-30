@@ -22,6 +22,8 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
 | `@codice/web` | 58 |
+| `@codice/familia` | 59 |
+| `@codice/api` | 62 |
 | `@codice/navegador` | 38 |
 
 ## Lo que trae la orden #20 — `@codice/navegador` 35 → 38
@@ -46,6 +48,81 @@ Las dos mutaciones, cada una vista en rojo y cada mitad por separado:
 La lógica no se copia: se importa de `check/altura.mjs`, **incluidas las dos
 listas de excepciones**. Dos copias serían dos verdades que un día no coinciden —
 la lección del token duplicado de la #06.
+
+## Lo que trajo F.4 cuarta corrida — `@codice/familia` 54 → 59
+
+Cuatro tests en `src/comun/sesion-pregunta-al-entrar.test.tsx` y uno en
+`decision-de-pantalla.test.ts`. Existen porque correo → código → «Entrar» daba
+`POST /auth/v1/verify` 200 y **no salía ningún `GET /api/yo`**: al montar sin
+sesión se anotaba `'no-contesto'`, y el `onAuthStateChange` guardaba la sesión
+nueva sin volver a preguntar. La pantalla decía «No pudimos confirmar tu cuenta»
+a alguien que acababa de entrar bien.
+
+Se monta `App` entera, con Supabase y `fetch` simulados: el defecto no estaba en
+una pieza sino en cómo se encadenaban, y una tabla pura no lo habría visto.
+
+Mutaciones, cada mitad por separado: sacar el `recargar()` del callback → caen
+«EL CASO» (un `GET /api/yo` y Mi espacio) y «se espera»; volver el estado sin
+sesión a `'no-contesto'` → cae «se espera»; borrar la regla `sin-sesion →
+esperando` de `decidirPantalla` → caen la tabla y «se espera». «Montar sin
+sesión» no cae con ninguna, y está dicho en su archivo: sin sesión `App` pinta la
+entrada sin mirar la decisión; el test está para que eso siga siendo cierto.
+
+## Lo que trajo F.4 tercera corrida — `@codice/familia` 51 → 54
+
+Tres tests en `src/comun/api-manda-la-cookie-del-preview.test.ts`. Existen porque
+la pantalla cargaba y **ninguna llamada funcionaba**: los previews de Vercel están
+detrás de *Vercel Authentication*, que protege el despliegue con una cookie, y
+`api()` salía con `credentials: 'omit'`, llegaba al borde sin ella y volvía 503.
+
+Es el modo de falla de siempre —una opción de transporte que nadie mira hasta que
+está publicada, como el `X-Robots-Tag` de la #08 o el `exports` de la #15— y acá
+costaba más que un 503 suelto: **sin esto F.4 no se puede correr nunca contra un
+preview**, y F.4 es lo que dice si la #15 sirve.
+
+Mutación: volver a `'omit'` y caen dos de los tres, diciendo «expected 'omit' to
+be 'same-origin'». El tercero es la otra mitad y va aparte a propósito: que el
+token siga yendo en el header `Authorization`. La cookie es del borde de Vercel,
+no de nuestra autenticación, y un lector apurado de este cambio podría entender lo
+contrario.
+
+## Lo que trae el 0-bis de la #15 — `@codice/api` 48 → 62 y `@codice/familia` 46 → 51
+
+Catorce tests nuevos en `@codice/api` y cinco en `@codice/familia`, y los
+diecinueve existen por el mismo motivo: **los 48 de esta API estaban en verde
+sobre cuatro consultas que no habrían funcionado nunca**, porque los 48 le
+hablaban a un doble de `SupabaseService` en vez de a una base.
+
+**Nueve** en `src/las-consultas-corren-contra-la-base.spec.ts`. Levantan el banco
+PGlite de `@codice/db` —las siete migraciones, la `007` incluida— y le corren por
+encima `rolDe`, `personaDe` y los tres métodos de `RespaldoController` **sin
+tocarlos**: lo único reemplazado es a quién le hablan. Un traductor convierte la
+misma cadena de `.from().select().eq()` en SQL y la ejecuta como `authenticated`
+o como `service_role`. Las tres mutaciones, cada una vista en rojo:
+
+| mutación | qué cae |
+|---|---|
+| `miembros.user_id` → `persona_id` | los dos de `rolDe`: «promise rejected UnauthorizedException» (42703 atrapado) |
+| `totp_backup_codes.used_at` → `usado_en` | los cuatro de respaldo, empezando por «No pudimos contar tus códigos» |
+| `generar` con el token de la persona en vez de `service_role` | tres, con «No pudimos reemplazar tus códigos» (42501) |
+
+**Cinco** en `src/el-token-se-verifica-de-verdad.spec.ts`, y la parte que importa
+es contra qué corren: **`dist/funcion.cjs`**, el empaquetado, no el fuente. Un
+JWKS de verdad en un servidor HTTP efímero, una clave ES256 generada en el test y
+publicada en la ruta exacta que arma `SupabaseService`. Es lo único que ejercita a
+la vez el `fetch` del runtime, el `jose` que esbuild metió adentro y la URL que
+sale de `SUPABASE_URL` — los tres sospechosos del 401 del 29/9, y ninguno de los
+tres existe en `src/`. Se vio en rojo sin pedirlo: el primer intento corrió contra
+un empaquetado de cinco minutos antes y el caso del `sub` faltante falló diciendo
+«Token inválido o vencido» en vez del mensaje propio, que es exactamente la
+diferencia que el arreglo introduce.
+
+**Cinco** en `apps/familia/src/comun/decision-de-pantalla.test.ts`: que un
+`/api/yo` que no contesta dé `error` y nunca `enrolar`. La mutación es borrar el
+renglón que lo atrapa, y el rojo dice la frase del incidente: *expected 'enrolar'
+to be 'error'*. Van con su otra mitad al lado —el mismo estado, con respuesta del
+servidor, sí da `enrolar`—, porque si no el test podría estar pasando sobre un
+estado que no producía `enrolar` de todos modos.
 
 ## Lo que movió la orden #16 — `@codice/navegador` sube a 33
 
@@ -186,6 +263,164 @@ solo**: su excepción nombraba «ADOLESCENTE.» y dejó de excusar ningún rengl
 así que la denunció como permiso que sobra. Nadie tuvo que acordarse de ir a
 tocarla. Es exactamente para lo que esa comprobación existe.
 
+## Lo que arregló F.4 — `@codice/familia` sube de 40 a 46
+
+Seis tests en `src/la-api-llega-compilada.test.ts`, y existen porque **la #15
+pasó la gate entera en verde y se cayó al desplegarse**: `apps/api/package.json`
+exportaba `./src/index.ts`, Vercel no compila las dependencias del workspace, y
+toda `/api/*` devolvió 500 con `ERR_MODULE_NOT_FOUND`. Las tres herramientas que
+podían haberlo dicho —vitest, `tsc --noEmit`, el build de la pantalla— tienen en
+común que **ninguna arranca la función**.
+
+Son seis porque hay seis maneras de volver a romperlo, y cada una se probó
+apagándola y viéndola en rojo antes de darla por buena:
+
+| lo que vigila | la mutación que lo puso en rojo |
+|---|---|
+| el piso: el cierre se calculó sobre la entrada real | — (es el piso de los otros cinco) |
+| ningún paquete del cierre resuelve a un `.ts` | devolver `"exports": "./src/index.ts"` |
+| el `.js` existe compilado y hay un `build` que lo hace | borrar `apps/api/dist` |
+| el `vercel.json` lo compila antes que la pantalla | sacar `--filter @codice/api build` del `buildCommand` |
+| el empaquetado es CommonJS, conserva `design:paramtypes` y no deja un `require()` de ESM puro | devolver `"type": "module"`; apagar `emitDecoratorMetadata`; y dejar `jose` afuera del empaquetado |
+| el lector de manifiestos y la regla de «¿se puede requerir?» | — (el autoexamen: afloja la regla y este test cae antes que los otros) |
+
+El cierre **se recorre, no se escribe**: el test arranca en
+`apps/familia/api/index.ts`, junta los `@codice/*` que importa de verdad —sin
+leer los comentarios, que nombran `@codice/api` una docena de veces— y sigue
+hacia adentro. Una lista escrita a mano se desactualiza en silencio; el día que
+`@codice/api` importe `@codice/core`, el barrido lo incluye solo y se pone rojo
+el mismo día, porque `@codice/core` todavía exporta su fuente.
+
+Y el quinto merece su renglón, porque es el que aprendió de la **segunda**
+caída del mismo día. Arreglado el `.ts`, el preview volvió a dar 500 con
+`ERR_REQUIRE_ESM` sobre `jose@6`, que no publica CommonJS. De ahí salieron las
+dos mitades del build —y la orden dejaba elegir entre ellas cuando en realidad
+hacen falta las dos—:
+
+- **`tsc` primero**, porque es el único que emite `emitDecoratorMetadata`.
+  `RolMiddleware` recibe `SupabaseService` por el tipo del constructor y por
+  nada más; sin esos metadatos Nest arranca igual y se cae al inyectar, en
+  ejecución. esbuild no sabe emitirlos.
+- **esbuild después**, sobre el JavaScript ya compilado, porque es el único que
+  puede meter adentro un paquete ESM puro. Ahí no hay decorador que emitir: ya
+  están resueltos como llamadas a `__metadata()`.
+
+Qué entra y qué queda afuera **no es una lista**: `scripts/empaquetar-funcion.mjs`
+le pregunta a cada dependencia, leyendo su `package.json`, si Node la puede
+requerir. Una lista de nombres cazaría a `jose` y a nadie más; la regla caza al
+próximo. Y la regla vive en un solo archivo —`scripts/se-puede-requerir.mjs`—
+que usan el build y el test, porque dos copias serían dos verdades y el día que
+no coincidieran mandaría la del servidor.
+
+### Y el 404 que los seis no vieron, que vale escribirlo
+
+Con la API ya en 200, `/entrar` seguía dando **404** en el preview. El
+`vercel.json` decía `"source": "/((?!api/).*)"` —la negación adelantada que se
+lee en medio internet— y **Vercel no la matchea**: `/entrar`, `/mi-espacio` y
+`/cualquier-cosa` caían en el 404 de la plataforma mientras `/api/(.*)`, sin
+negación, andaba.
+
+Nada lo vio, y por dos motivos que son el mismo:
+
+- `cabeceras.test.ts` (6) afirmaba el rewrite **con un `toEqual` contra el texto
+  del archivo**. Estaba en verde sobre un 404. Ahora afirma el orden, prohíbe la
+  negación y comprueba que el comodín cubra las rutas de `src/rutas.ts`.
+- `e2e/servidor.mjs` **inventaba el fallback de SPA** en vez de leer el
+  `vercel.json`, con un comentario que decía, palabra por palabra, que sin él
+  «`/mi-espacio` da 404 en QA y anda en producción — la peor clase de diferencia
+  entre los dos». Pasó al revés. Ahora aplica los rewrites del archivo, en orden,
+  y con la negación puesta **no arranca**: dice que no sabe traducir ese source.
+
+El guardián que sí lo habría cazado ya existía —`e2e/f4-en-vivo.spec.ts` pide
+`GET /entrar` y espera 200— y nunca se había corrido, porque necesita un preview
+de verdad. Se corrió.
+
+## Lo que trae la orden #15 — `@codice/api` nace con 48
+
+Seis archivos, y **cinco de los seis vienen del kit** (`tests-por-app/`), que es
+la carpeta que el `LEEME.md` del kit manda «copiar y adaptar». Lo adaptado son
+las rutas y los nombres de esta app; lo que afirman es del kit.
+
+| archivo | cuántos | qué vigila |
+|---|--:|---|
+| `aal2-cobertura.spec.ts` | 8 | el inventario REAL de rutas de Nest contra la lista de excepciones |
+| `aal2.guard.spec.ts` | 13 | el guard, unidad por unidad (del kit, casi sin tocar) |
+| `paso-reciente.spec.ts` | 9 | qué rutas piden un código reciente, y qué pasa con un `aal2` viejo |
+| `roles-clasificados.spec.ts` | 8 | los roles de la base contra `seguridad-512.config.ts` |
+| `guardian-del-kit.spec.ts` | 2 | que `check-seguridad-512.mjs` exista y dé verde |
+| `aal2-comportamiento.spec.ts` | 13 | el guard **ejecutado** sobre las seis rutas de verdad |
+
+El último **no se adaptó: se reescribió**, y el motivo va escrito arriba de
+todo en el archivo. El del kit está armado contra `TeamController.invite`,
+`MeController.updateProfile` y `POST /team/:id/reset-2fa`, que no existen acá ni
+van a existir; cambiarle los nombres habría dejado un test que *parece* probar
+algo. Tampoco está entre los que el `LEEME.md` enumera para adaptar (nombra
+cobertura, roles, el guard, paso reciente y el guardián). Se copió la idea
+—preguntarle al guard lo mismo que le pregunta Nest, con la ruta real— y los
+casos son los de esta app.
+
+### Y uno del núcleo que NO corre, dicho en voz alta
+
+`src/seguridad-512/nucleo/usuario-del-pedido.spec.ts` viene del kit **byte por
+byte y con su huella**, y no se puede ejecutar acá: importa
+`../../auth/auth.guard`, `../../auth/profiles.repository` y
+`../../shared/supabase.service`, que son tres archivos de Cenit. Es un defecto
+del kit v1.1.0 —`nucleo/` se copia byte por byte a cualquier app y este archivo
+no es portable— y se arregla en el kit, no acá.
+
+**No se editó**: la huella sigue siendo la del kit y el guardián compara 19 de
+19. Lo que se hizo es excluirlo del corredor, en `apps/api/vitest.config.ts`,
+con el motivo escrito — porque un test que no corre no grita, se calla.
+
+**Y la vigilancia que perdía se recuperó**: lo que ese archivo afirma —que el
+token se valida UNA sola vez por pedido— lo afirman ahora dos tests de
+`aal2-comportamiento.spec.ts`, escritos contra las piezas de esta app: dos
+pasadas del guard sobre el mismo pedido hacen **una** validación, y un token
+distinto en el mismo pedido hace **dos**. No es la misma prueba; es la misma
+propiedad, probada donde se puede probar.
+
+## Lo que trae la orden #15 — `@codice/familia` nace con 31
+
+`apps/familia` entra a esta tabla el día que existe, con **40 tests medidos** en
+seis archivos. La mayoría no son nuestros y ése es el punto:
+
+| archivo | cuántos | de quién |
+|---|--:|---|
+| `seguridad-512/nucleo/useAalWindow.test.tsx` | 9 | **del kit**, byte por byte |
+| `seguridad-512/nucleo/decidir-reto.test.ts` | 9 | **del kit**, byte por byte |
+| `seguridad-512/nucleo/aparato.test.ts` | 6 | **del kit**, byte por byte |
+| `seguridad-512/nucleo/modo-instalado.test.ts` | 4 | **del kit**, byte por byte |
+| `sin-base-desde-el-navegador.test.ts` | 3 | de esta app |
+| `cabeceras.test.ts` | 9 | de esta app |
+
+**Veintiocho de los treinta y uno vienen del Kit de Seguridad 512 y no se
+escribieron acá**: viajan dentro de `nucleo/`, con su huella en
+`seguridad-512/HUELLAS.txt`, y `scripts/check-seguridad-512.mjs` se pone rojo si
+alguien los edita dentro de la app. Entran al piso igual que cualquier otro: si
+un archivo del núcleo desaparece del glob, la cuenta baja y el guardián de
+guardianes lo dice — que es una segunda red debajo de la de las huellas.
+
+Los propios son doce. Tres son el barrido de `.from(` / `.rpc(` / `.storage`: el
+piso de archivos, el cero, y el auto-examen que comprueba que `soloCodigo()`
+sepa distinguir el código de la prosa —sin el tercero, los otros dos podrían
+salir verdes sobre archivos que el limpiador dejó en blanco—.
+
+Los otros nueve son las **cabeceras** (`cabeceras.test.ts`), y existen por el
+motivo de siempre: una cabecera que se cae no rompe nada visible. La app carga
+igual, las pantallas se ven igual y Lighthouse no dice una palabra; lo único que
+cambia es que la política que impide que un script ajeno corra en la pantalla de
+entrada ya no está. Es el mismo perfil de defecto que el `X-Robots-Tag` de la #08
+y el `Cache-Control` de la #11, y las dos veces se descubrió que **ninguna
+comprobación miraba el `vercel.json`**.
+
+Vigilan que las cinco cabeceras de seguridad sean las mismas de la web pública,
+que el `noindex` vaya **sin condición de host** —allá está condicionado porque el
+dominio propio sí se indexa; acá la condición sería un agujero—, que la CSP no
+tenga `unsafe-inline` en ninguna directiva, que `connect-src` nombre a Supabase y
+a nadie más (`https:` a secas dejaría hablar con cualquier servidor del mundo),
+que `/api/*` vaya a la función y el resto al `index.html`, y que la API nunca se
+cachee: una respuesta de `/api/yo` guardada por un intermediario es la sesión de
+una persona servida a otra.
 
 ## Lo que trae la orden #13 — `@codice/db` nace con 83
 

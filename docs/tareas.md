@@ -183,6 +183,52 @@ ver «Padres / digitalmente / responsables», que son tres renglones de una pala
 y es un título de verdad mal partido. Es un renglón de código en
 `check/renglones.mjs`; el porqué de las dos opciones está en el informe de la #16.
 
+### Un test de la API que no toca la base no prueba una consulta
+
+Un doble de `SupabaseService` contesta igual de bien a `persona_id` que a
+`user_id`. Lo que el doble no puede decir nunca es si la pregunta existe: si la
+tabla está, si la columna se llama así, si el rol tiene el `grant`. Entonces: una
+consulta que la app manda a la base **se prueba contra una base**. El banco PGlite
+de `@codice/db` ya levanta Postgres de verdad con las migraciones del repo puestas
+en 1,5 segundos, así que el costo de la regla es un `import`.
+
+**El caso, del 29/9/2026.** Con la migración `007` ya corrida y los permisos
+puestos, `GET /api/yo` seguía devolviendo `403 AAL2_REQUIRED` a una clienta con
+token válido. La consulta era ésta:
+
+```
+supabase.service.ts:126       .eq('persona_id', personaId)     sobre `miembros`
+001_personas_y_miembros.sql   create table public.miembros (user_id uuid …)
+```
+
+`42703 column miembros.persona_id does not exist`. El middleware lo atrapaba en
+silencio —por diseño: no autentica—, el pedido seguía sin `profile`, el guard
+fallaba cerrado y le pedía un autenticador a una mamá que se había inscrito a un
+taller. Lo mismo en las tres consultas de `respaldo`: `persona_id` por `user_id`,
+`usado_en` por `used_at`, y las escrituras hechas con el token de la persona
+cuando la `005` las había reservado para `service_role`. **Ninguna de esas cuatro
+consultas habría funcionado nunca**, y los 48 tests de `@codice/api` estaban en
+verde, porque los 48 le hablaban a un doble.
+
+Es el mismo perfil que la casa ya pagó tres veces —el `X-Robots-Tag` de la #08, el
+`Cache-Control` de la #11, el `exports` de la #15— y la forma es siempre la misma:
+**la herramienta que podía verlo no se ejecuta contra lo que falla.** Acá las tres
+que estaban puestas (vitest con dobles, `tsc --noEmit`, el build) tienen en común
+que ninguna abre una conexión.
+
+Lo que la regla NO pide: levantar Supabase, ni tener red, ni probar PostgREST. El
+traductor de `apps/api/src/las-consultas-corren-contra-la-base.spec.ts` convierte
+la misma cadena de `.from().select().eq()` que escribe la app en SQL y la corre
+contra el banco, como `authenticated` o como `service_role`. Lo que no entiende,
+lo tira: un traductor que adivina se prueba a sí mismo.
+
+Y de yapa, la mitad que se ve poco: **la respuesta de la base viajaba sin su
+código.** El `catch` del middleware convertía `42703` en «sin perfil» y el de
+`getUserFromToken` convertía cualquier error de `jose` en un 401 pelado. Dos horas
+de las tres que costó esto fueron para averiguar un número que la base había dicho
+desde el principio. Un `catch` que descarta el código del error está tirando la
+única parte del mensaje que sirve.
+
 ### Ninguna sección de la web es más alta que la pantalla
 
 **A escritorio: 1440×900 y 1920×1080**, y el de 900 de alto es el que manda
@@ -215,6 +261,24 @@ la espera se comía el tope entero y el guardián moría por timeout de Playwrig
 Un guardián que muere por reloj no habla del sitio. Lo que sí hay que esperar es
 **la imagen que no declara `width`/`height`**, que es la única que puede mover el
 alto: una con su caja reservada mide lo mismo cargada que pendiente.
+
+### «Listo para mergear» quiere decir que la rama ya trae `main`
+
+Antes de escribir «listo para mergear» —en un informe, en el PR o en el chat— la
+rama hace `git merge origin/main`, la gate corre verde **sobre el resultado** y
+el PR en GitHub dice **«No conflicts»**. Si falta cualquiera de las tres, no está
+listo: está listo *el código de la rama*, que es otra cosa y no se puede mergear.
+
+**El caso, del 30/9/2026.** El PR #27 (Mi espacio, la puerta) pasó cuatro
+corridas de F.4 y quedó «listo» mientras #30 y #31 entraban a `main`. Cuando
+dirección fue a mergear, había conflictos en `docs/tareas.md` y en
+`qa/piso-de-tests.md` —los dos archivos que toca casi toda orden—. Ninguno era
+difícil, pero la tabla de pisos es justo el lugar donde resolver mal no se nota:
+quedarse con un solo lado le baja el piso a una suite en silencio, y la gate
+sigue verde porque mide contra el piso que quedó escrito.
+
+Por eso el merge se resuelve **conservando los dos lados** y se mira la tabla
+entera después, no solo las líneas marcadas.
 
 ## Pendientes abiertos
 

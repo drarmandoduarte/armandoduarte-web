@@ -73,9 +73,11 @@ describe('el censo de RLS', () => {
  * mentira con formato de tabla.
  */
 const PENDIENTES: Record<string, string> = {
-  '007_permisos.sql':
-    'los GRANT que el proyecto no da solo (corrección de la #15, punto 0). La corre dirección '
-    + 'en `armandoduarte-familia` y completa su cabecera; hasta entonces un cliente no entra.',
+  /* Vacía, y el 29/9/2026 a las 15:58 se vació sola: la 007 se corrió, se le
+     completó la cabecera, y este test se puso rojo diciendo «se borra la fila de
+     PENDIENTES». Nadie se acordó de venir; lo mandó el rojo. La lista se queda
+     acá vacía porque la próxima migración pendiente tiene que volver a
+     escribirse, no inventarse un mecanismo nuevo. */
 };
 
 describe('las migraciones', () => {
@@ -124,11 +126,12 @@ describe('las migraciones', () => {
        commit**. La tercera es la que más vale: es la que permite saber qué SQL
        exacto se ejecutó, porque el archivo de hoy puede no ser el de aquel día.
 
-       Y el commit se compara **entre las seis**, no contra una copia escrita acá:
-       las seis se corrieron en la misma sesión, así que si una dice otro commit,
-       o alguien la rehízo o alguien copió mal la cabecera. Comparar contra un
-       `fd93eab` escrito en este archivo sería vigilar la copia y no el hecho —la
-       lección de la #06 con el token duplicado—. */
+       Y el commit se compara **contra la hora de la propia cabecera**, no contra
+       una copia escrita acá: las que dicen la misma hora se corrieron en la misma
+       sesión y tienen que decir el mismo commit, y dos horas distintas no pueden
+       compartirlo. Comparar contra un `fd93eab` escrito en este archivo sería
+       vigilar la copia y no el hecho —la lección de la #06 con el token
+       duplicado—, y ya cobró una vez: ver el comentario de la fecha. */
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const leer = (a: string) =>
@@ -172,7 +175,15 @@ describe('las migraciones', () => {
       return {
         archivo: a,
         proyecto: /armandoduarte-familia/.test(bloque),
-        fecha: /\b29\/9\/2026 02:34\b/.test(linea),
+        /* La fecha se pide por FORMA, no por valor: día, mes, año, hora y el huso
+           escrito. Hasta la 007 acá decía `29/9/2026 02:34` literal, y esa copia
+           solo sabía reconocer la sesión de las seis: la 007 se corrió otro día y a
+           otra hora, puso el test en rojo, y el rojo era sobre el test y no sobre la
+           cabecera. Es la misma lección del token duplicado de la #06 —vigilar la
+           copia en vez del hecho—, servida esta vez por el lado de la fecha. */
+        fecha: /\b\d{1,2}\/\d{1,2}\/\d{4} \d{1,2}:\d{2} \(UY\)/.test(linea),
+        /* La sesión: el «cuándo» en crudo, que es contra lo que se compara el commit. */
+        sesion: linea.match(/\b(\d{1,2}\/\d{1,2}\/\d{4} \d{1,2}:\d{2}) \(UY\)/)?.[1] ?? null,
         commit: bloque.match(/\bdesde ([0-9a-f]{7,40})\b/)?.[1] ?? null,
         /* Cada una dice con qué nombre quedó guardada en el editor SQL, y ese
            nombre es el suyo: es lo que permite encontrarla allá sin adivinar. */
@@ -197,11 +208,49 @@ describe('las migraciones', () => {
       'la cabecera no dice con qué nombre quedó guardada en el editor SQL, o dice el de otra',
     ).toEqual([]);
 
-    /* Las seis, el mismo commit: se corrieron en una sola sesión. */
+    /* ── Una corrida, un commit. Y al revés ──────────────────────────────
+       Hasta el 29/9 acá decía «las seis, un solo commit», y era verdad porque
+       las seis de la #13 se corrieron juntas. La 007 se corrió sola doce horas
+       después y la afirmación se puso roja:
+
+         × las seis se corrieron en la misma sesión y desde el mismo commit
+           expected [ 'fd93eab', 'c3a485e' ] to have a length of 1 but got 2
+
+       El rojo era honesto pero la afirmación era vieja: no dice «hay un commit»,
+       lo que se quería decir siempre fue **«dos cabeceras que dicen la misma
+       hora dicen el mismo commit»**. Escrito así vale para la sesión que viene
+       sin que nadie toque este archivo, y sigue cazando lo mismo: la cabecera
+       copiada de la vecina y el commit pegado de memoria. */
+    const porSesion = new Map<string, Set<string>>();
+    const porCommit = new Map<string, Set<string>>();
+    let emparejadas = 0;
+    for (const c of cabeceras) {
+      if (!c.sesion || !c.commit) continue;
+      emparejadas += 1;
+      if (!porSesion.has(c.sesion)) porSesion.set(c.sesion, new Set());
+      porSesion.get(c.sesion)!.add(c.commit);
+      if (!porCommit.has(c.commit)) porCommit.set(c.commit, new Set());
+      porCommit.get(c.commit)!.add(c.sesion);
+    }
+
+    /* EL PISO, ANTES de los dos ceros: sin esto, una cabecera que dejara de
+       parsear saldría de los dos mapas y los dos ceros se cumplirían solos. */
     expect(
-      [...new Set(cabeceras.map((c) => c.commit))],
-      'las seis se corrieron en la misma sesión y desde el mismo commit: si hay dos, una cabecera miente',
-    ).toHaveLength(1);
+      emparejadas,
+      'hay cabeceras aplicadas de las que no se pudo leer la hora o el commit: los dos ceros de '
+      + 'abajo estarían midiendo sobre menos migraciones de las que hay',
+    ).toBe(corridas.length);
+
+    expect(
+      [...porSesion].filter(([, commits]) => commits.size > 1).map(([sesion]) => sesion),
+      'estas corridas dicen la misma fecha y hora desde commits distintos: o se corrieron en dos '
+      + 'sesiones y una cabecera miente la hora, o alguien pegó mal el commit',
+    ).toEqual([]);
+    expect(
+      [...porCommit].filter(([, sesiones]) => sesiones.size > 1).map(([commit]) => commit),
+      'estas migraciones dicen el mismo commit desde horas distintas: una cabecera copiada de la '
+      + 'vecina se ve exactamente así',
+    ).toEqual([]);
   });
 });
 

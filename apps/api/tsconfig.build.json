@@ -1,0 +1,32 @@
+{
+  "//": [
+    "El tsconfig que COMPILA. El de al lado (`tsconfig.json`) sólo typechequea",
+    "y hereda `noEmit: true` de la base; éste es el único que deja archivos.",
+    "",
+    "── Por qué CommonJS, si el resto del monorepo es ESM ──────────────────",
+    "Porque el núcleo del kit no se toca. Emitir ESM con `tsc` exige que cada",
+    "import relativo lleve su extensión (`./app.module.js`), y `nucleo/` viaja",
+    "byte por byte con imports extensionless: `./verificador-de-token`,",
+    "`./roles`, `./usuario-del-pedido`. Con `module: ESNext` tsc los copia tal",
+    "cual y Node ESM se niega a resolverlos — el mismo ERR_MODULE_NOT_FOUND que",
+    "este arreglo viene a cerrar, un nivel más adentro. En CommonJS resuelven",
+    "solos, que además es como NestJS se ejecuta en todas partes.",
+    "",
+    "── Y los `.spec.ts` no se compilan ────────────────────────────────────",
+    "No los llama nadie desde `index.ts`, así que no viajarían igual; pero",
+    "importan `vitest`, que es devDependency, y dejarlos fuera hace que este",
+    "build siga andando el día que la función se construya sin las de desarrollo."
+  ],
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "noEmitOnError": true,
+    "outDir": "dist",
+    "declaration": false,
+    "sourceMap": true
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.spec.ts"]
+}

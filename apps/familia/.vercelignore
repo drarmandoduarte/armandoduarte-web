@@ -1,0 +1,4 @@
+# Lo que no viaja al despliegue de Mi espacio.
+docs
+qa
+apps/web

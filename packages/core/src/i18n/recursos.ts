@@ -6,12 +6,21 @@
    es/en/pt para la plataforma — cuando entre, `en/` y `pt/` son dos carpetas
    hermanas de `es/` y `scripts/check-i18n-parity.mjs` empieza a compararlas sin
    tocar una línea. Mientras tanto no se quejan: el guardián tolera un idioma
-   solo, y lo dice. */
+   solo, y lo dice.
+
+   ── Dos namespaces desde la #15 ─────────────────────────────────────────
+   `web` es la web pública (`apps/web`) y `familia` es Mi espacio
+   (`apps/familia`). Van separados y no en un `web.json` que crezca porque son
+   dos productos con dos vidas: la web la edita el equipo de Armando (D23) y Mi
+   espacio no lo ve nadie de afuera. Un archivo por app también hace que
+   `check-i18n-parity` diga cuál de los dos perdió una clave el día que entren
+   `en/` y `pt/`. */
 import esWeb from './es/web.json';
+import esFamilia from './es/familia.json';
 
 export const IDIOMAS = ['es'] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 
 export const RECURSOS_I18N = {
-  es: { web: esWeb },
+  es: { web: esWeb, familia: esFamilia },
 } as const;

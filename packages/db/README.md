@@ -4,7 +4,7 @@ Nace con la orden Códice #13 (Mi espacio, PR 1). Trae **el esquema entero de v1
 con su RLS y sus tests, y nada más**: ni API, ni pantalla, ni kit.
 
 ```
-migrations/          las seis migraciones, inmutables una vez aplicadas
+migrations/          las siete migraciones, inmutables una vez aplicadas
 supabase-base.sql    el entorno de Supabase para el banco — NO es una migración
 src/banco.ts         un Postgres de verdad, en proceso, con las migraciones puestas
 src/*.test.ts        87 tests: 83 que afirman fila por fila qué ve cada sesión
@@ -68,9 +68,10 @@ regla que la próxima vez no va a frenar nada.
 
 ## Estado de las migraciones
 
-**LAS SEIS ESTÁN APLICADAS.** El 29/9/2026 a las 02:34 (hora de Uruguay), en
-`armandoduarte-familia`, desde el commit `fd93eab`. Las corrió el CEO con
-autorización de Germán.
+**LAS SIETE ESTÁN APLICADAS.** Las seis de la #13 el 29/9/2026 a las 02:34
+(hora de Uruguay), desde el commit `fd93eab`; la 007 el mismo día a las 15:58,
+desde `c3a485e`, en su propia sesión. Todas en `armandoduarte-familia`, corridas
+por el CEO con autorización de Germán.
 
 | # | archivo | qué trae | aplicada |
 |---|---|---|---|
@@ -80,15 +81,15 @@ autorización de Germán.
 | 004 | `004_datos_de_cobro_y_auditoria.sql` | la cuenta a la que se transfiere y el registro append-only | **29/9/2026 02:34** |
 | 005 | `005_seguridad_512.sql` | `totp_backup_codes` y `security_devices`, del kit | **29/9/2026 02:34** |
 | 006 | `006_storage_comprobantes.sql` | el bucket privado `comprobantes` y sus policies | **29/9/2026 02:34** |
-| 007 | `007_permisos.sql` | los `grant` de tabla, secuencia y función que el proyecto no da solo | **pendiente** |
+| 007 | `007_permisos.sql` | los `grant` de tabla, secuencia y función que el proyecto no da solo | **29/9/2026 15:58** |
 
-Las seis quedaron guardadas en el editor SQL de Supabase con el nombre de su
-archivo (`001_personas_y_miembros` … `006_storage_comprobantes`).
+Las siete quedaron guardadas en el editor SQL de Supabase con el nombre de su
+archivo (`001_personas_y_miembros` … `007_permisos`).
 
 ### Lo que se verificó contra la base, y no contra la intención
 
 No alcanza con que el editor no haya dado error: lo que sigue se consultó sobre la
-base real, después de correr las seis.
+base real, después de correr las seis de la #13.
 
 | qué | medido |
 |---|---|
@@ -105,16 +106,23 @@ Hasta esta rama, `toda-tabla-lleva-rls.test.ts` afirmaba que **las seis decían
 «APLICADA: —»**, y estaba escrito que el día que se aplicaran se iba a poner rojo
 y a obligar a alguien a venir. Pasó exactamente eso: al completar las cabeceras el
 test se puso rojo, y por eso ahora afirma lo contrario — que **ninguna** dice «—»,
-que las seis nombran el proyecto, la fecha y el commit, y que ese commit es el
-mismo en las seis. Un test que se actualiza para volver a verde sin cambiar de
-afirmación sería un test apagado; éste cambió de afirmación porque cambió el
-mundo.
+que todas nombran el proyecto, la fecha y el commit, y que **dos cabeceras que
+dicen la misma hora dicen el mismo commit**. Un test que se actualiza para volver
+a verde sin cambiar de afirmación sería un test apagado; éste cambió de afirmación
+porque cambió el mundo.
+
+Y volvió a cobrar con la 007, que es lo que hizo falta para escribirlo bien: la
+afirmación decía «un solo commit en las seis», la 007 se corrió doce horas después
+en su propia sesión y el rojo fue sobre el test, no sobre la cabecera. Lo que se
+quería decir siempre fue *una corrida, un commit* —y al revés—, que es lo que dice
+ahora y vale para la sesión que viene sin que nadie toque el archivo.
 
 ### El orden es el orden
 
-`001` → `006`, una por una, esperando que cada una termine. La `002` usa
+`001` → `007`, una por una, esperando que cada una termine. La `002` usa
 `es_zona_iana()` de la `001`; la `003` usa `veo_pais()` de la `001`; la `006` usa
-`inscripcion_es_mia()` de la `003`. Salteada una, la siguiente no compila.
+`inscripcion_es_mia()` de la `003`; la `007` da permisos sobre todo lo anterior.
+Salteada una, la siguiente no compila.
 
 ### Si la `006` da un error de permisos
 
@@ -145,7 +153,7 @@ que es lo que deja el renglón en `auditoria`.
 ## El banco de pruebas
 
 `pnpm --filter @codice/db test`. Levanta PGlite —Postgres compilado a
-WebAssembly, en proceso—, le pone encima `supabase-base.sql` y le corre las seis
+WebAssembly, en proceso—, le pone encima `supabase-base.sql` y le corre las siete
 migraciones en orden. No toca Supabase, no toca la red, no necesita Docker.
 
 `banco.como(usuarioId, aal, hacer)` corre algo como esa persona, con el rol
@@ -160,7 +168,7 @@ el de Omnia no, y sin él no se puede probar S3 del kit.
   `storage.objects`, que son filas. El tope de 5 MB y los tres tipos MIME los
   aplica el servicio de Storage: acá se afirma que el bucket los **declare**.
 - **La versión de Postgres.** PGlite trae una más nueva que la del proyecto. Nada
-  de estas seis migraciones usa sintaxis posterior a Postgres 15, pero la
+  de estas siete migraciones usa sintaxis posterior a Postgres 15, pero la
   diferencia existe.
 
 ## Los tipos generados
