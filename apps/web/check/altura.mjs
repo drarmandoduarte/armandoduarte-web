@@ -2,21 +2,26 @@
 /**
  * El barrido de alturas — orden Códice #20, A.
  *
- * ── La regla que vigila ────────────────────────────────────────────────────
- * **Ninguna sección es más alta que la pantalla.** Lo pidió dirección el 29/9
- * mirando producción a 1920: «todas las secciones nunca pueden ser más grandes
- * que 100vh teniendo en cuenta el borde del navegador». El borde del navegador
- * es la parte que importa: lo que se mide es `innerHeight` —lo que el navegador
- * deja ver, ya descontadas la barra de direcciones y la de pestañas—, no la
- * altura del monitor. En CSS eso es `100dvh`, con `100vh` de respaldo para los
- * navegadores que no lo tengan.
+ * ── La regla que vigila, desde la #23 ────────────────────────────────────
+ * Dos afirmaciones, y ninguna es «toda sección cabe en la pantalla»:
+ *
+ *   1. **Los héroes miden exactamente la pantalla** (`section.hero`, con ±1 px
+ *      de redondeo). Es lo que dirección pidió en la #20 mirando producción a
+ *      1920 —«en el hero hay dos colores por la sección que le sigue»— y eso no
+ *      cambió.
+ *   2. **Ninguna otra sección pasa de 1,6 pantallas.** Es un tope contra lo
+ *      desproporcionado, no contra el aire.
+ *
+ * La regla de la #20 A decía «ninguna sección más alta que la pantalla» y bajó
+ * el aire de todas a `clamp(40px,5vh,64px)` para cumplirla: todo se veía
+ * apretado. Dirección la acotó en la #23 con 512 como vara —160 px arriba y
+ * abajo, y «Cuatro etapas» mide 976 en una pantalla de 900—. Desde entonces las
+ * secciones llevan su aire y **ninguna se aprieta para caber**.
  *
  * ── Dónde aplica, y dónde NO ──────────────────────────────────────────────
- * **Solo a escritorio: 1440×900 y 1920×1080.** El que manda es el de 900 de
- * alto, que es el más chico de los dos. A 900 px de ancho y a 375 la regla no
- * aplica y no es un olvido: una lista de siete preguntas no entra en un
- * teléfono, y exigirlo sería pedir que el contenido desaparezca. Está escrito acá
- * y no en la cabeza de nadie.
+ * **Solo a escritorio: 1440×900 y 1920×1080.** Abajo de 900 de ancho el hero
+ * apila y no mide la pantalla, y una sección de teléfono es más alta que la
+ * pantalla por naturaleza.
  *
  * Mide **cada `<section>` con `id`** de la portada y de `/merida`, más el
  * `<footer>`. Sin `id` no se mide, y eso también es deliberado: una sección sin
@@ -32,9 +37,8 @@
  *     node check/altura.mjs http://127.0.0.1:4180
  *     node check/altura.mjs http://127.0.0.1:4180 --tabla   (mide y no juzga)
  *
- * `--tabla` es lo que pide el punto A.5 de la orden: **primero se mide, después
- * se achica**. Imprime sección × viewport × altura × sobra sin fallar, que es lo
- * que va al informe antes de tocar una línea de CSS.
+ * `--tabla` imprime sección × viewport × altura sin fallar, que es lo que va al
+ * informe.
  *
  * ── Dos puertas, un barrido ──────────────────────────────────────────────
  * La otra es `e2e/altura.spec.ts`, que importa de acá las constantes y la
@@ -67,57 +71,27 @@ export const VIEWPORTS = [
 /**
  * El piso de secciones por ruta, **medido** el 29/9 y no estimado. `/merida`
  * pasó de 9 a 10 en la #20-bis, cuando «Lo que te llevas» salió de `#programa`
- * a su propia sección `#llevas`.
+ * a su propia sección `#llevas`, y a 11 en la #23 con la banda `#hechos`.
  *
  * «Ninguna sección sobra» sobre un barrido que no encontró ninguna sección se
  * escribe igual que sobre una página en orden. Es la regla de la casa sobre las
  * aserciones de cero: al lado del cero va cuántas secciones se miraron.
  */
-export const PISO = { inicio: 8, merida: 10 };
+export const PISO = { inicio: 8, merida: 11 };
+
+/** El tope de una sección que no es hero, en pantallas (#23). */
+export const TOPE_PANTALLAS = 1.6;
 
 /**
- * ── Las excepciones, en dos listas que NO significan lo mismo ─────────────
+ * Las excepciones, con su número: `[ruta, id, motivo, px por encima del tope]`.
  *
- * El formato es `[ruta, id de la sección, motivo, cuántos px puede sobrar]`.
- *
- * El tope va en **píxeles y no en un booleano**, que es la lección de la #12: una
- * excepción sin número no es una excepción, es una puerta. Una sección excusada
- * que crezca otros 300 px vuelve a caer, y eso es lo que hace que la fila siga
- * significando algo el mes que viene.
- *
- * **Están separadas en dos listas a propósito**, igual que en
- * `check/renglones.mjs`: una lista sola se lee como «tres secciones aprobadas» y
- * no lo son. `APROBADAS` es lo que dirección decidió. `PENDIENTES` es lo que el
- * barrido midió y **no se puede arreglar con los tres resortes de la orden**
- * —paddings, `gap`, tamaño de título—, porque en las tres el que manda es otra
- * cosa. La orden #20 (A.5) es explícita: eso no lo decide Rodolfo. Están acá
- * para que la gate quede verde sin dejar de ver el defecto, y cada fila se borra
- * el día que dirección resuelve la suya. Los números y las opciones, en
- * `docs/informes/20/`.
+ * **Vacía desde la #23.** La única fila que había, `#quien` (1034 contra 900),
+ * era una excepción a la regla vieja; con el tope de 1,6 pantallas mide 1160
+ * contra 1440 y no excusa nada. La lista se queda, vacía, porque el día que una
+ * sección pase el tope la salida no es subir el tope: es declararla acá, con su
+ * número, y que decida dirección.
  */
-export const APROBADAS = [];
-
-/**
- * Lo que sobra, con su número.
- *
- * **Una sola fila, y es la única excepción del sitio** (#20-bis, decisión del
- * CEO). `#quien` no entra porque la manda la columna de texto de Armando
- * —eyebrow, título, párrafo, ficha de cuatro filas y cita: 944 px más los 90
- * del padding—, no la foto: con la foto a 520 o a 470 mide 1034 igual, y por eso
- * Armando volvió a 520. Achicar márgenes la dejaba en 994; lo que queda es menos
- * texto o texto más chico, y el texto es del cliente. Se acepta el desborde acá
- * y en ningún otro lado. El tope va en píxeles, como siempre: si la sección
- * crece, vuelve a caer.
- *
- * Lo que la #20-bis cerró y salió de la lista: `#programa` (núcleos en 3 + 2,
- * 844), `#llevas` (fotos en 5:4, 841) y `#facilitador` (ficha 40 → 32, 898).
- */
-export const PENDIENTES = [
-  ['inicio', 'quien', 'texto del cliente: manda la columna de texto (944 + 90 de padding = 1034), no la foto. Única excepción del sitio (#20-bis). A 1920×1080 entra (−28)', 134],
-];
-
-/** Las dos listas juntas es lo que el barrido aplica. */
-export const EXCEPCIONES = [...APROBADAS, ...PENDIENTES];
+export const PENDIENTES = [];
 
 /**
  * El barrido, que corre **dentro** del navegador.
@@ -144,6 +118,7 @@ export const RECOLECTAR = () => {
 
     medidas.push({
       id: el.id || el.tagName.toLowerCase(),
+      hero: el.classList.contains('hero'),
       alto: Math.round(caja.height),
       sobra: Math.round(caja.height - alto),
     });
@@ -211,15 +186,41 @@ export const PREPARAR = async (page, url) => {
   await page.waitForTimeout(150);
 };
 
-/** Cuánto puede sobrarle a esta sección según las excepciones. */
-export const TOPE_DE = (ruta, id) => {
-  const fila = EXCEPCIONES.find((e) => e[0] === ruta && e[1] === id);
-  return fila ? fila[3] : 0;
-};
+/**
+ * El juicio, compartido por la consola y la gate: devuelve los hallazgos de
+ * una medición. Un hero que no mide la pantalla, o una sección que pasa de
+ * `TOPE_PANTALLAS` más lo que su fila de `PENDIENTES` excuse.
+ *
+ * EL PISO, ANTES DE LAS AFIRMACIONES: «ningún hallazgo» sobre un barrido que no
+ * encontró secciones se lee igual que sobre una página en orden. Y la página
+ * tiene que tener **un** hero: sin él, la afirmación 1 se cumple sola.
+ */
+export const JUZGAR = (ruta, ancho, r) => {
+  const hallazgos = [];
+  const donde = `${ruta} @${ancho}×${r.alto}`;
+  if (r.mirados < PISO[ruta]) {
+    hallazgos.push(`${donde} · PISO: miró ${r.mirados} secciones y el piso es ${PISO[ruta]} — `
+      + 'o la página no cargó, o el selector se rompió');
+  }
+  const heroes = r.medidas.filter((m) => m.hero);
+  if (heroes.length !== 1) hallazgos.push(`${donde} · PISO: encontró ${heroes.length} héroes y tiene que haber uno`);
 
-/** El renglón de un hallazgo, con todo lo que hace falta para ir a arreglarlo. */
-export const CONTAR = (ruta, ancho, alto, m) =>
-  `${ruta} @${ancho}×${alto} · #${m.id} mide ${m.alto}px y la pantalla ${alto}px: sobran ${m.sobra}px`;
+  const tope = Math.round(r.alto * TOPE_PANTALLAS);
+  for (const m of r.medidas) {
+    if (m.hero) {
+      if (Math.abs(m.sobra) > 1) {
+        hallazgos.push(`${donde} · el hero #${m.id} mide ${m.alto}px y la pantalla ${r.alto}px: `
+          + 'tiene que medirla exactamente');
+      }
+      continue;
+    }
+    const fila = PENDIENTES.find((e) => e[0] === ruta && e[1] === m.id);
+    if (m.alto > tope + (fila ? fila[3] : 0)) {
+      hallazgos.push(`${donde} · #${m.id} mide ${m.alto}px: pasa el tope de ${TOPE_PANTALLAS} pantallas (${tope}px)`);
+    }
+  }
+  return hallazgos;
+};
 
 /* ── La puerta de consola ─────────────────────────────────────────────────── */
 
@@ -231,7 +232,6 @@ if (process.argv[1] && process.argv[1].endsWith('altura.mjs')) {
   const navegador = await chromium.launch();
   const page = await navegador.newPage();
   const problemas = [];
-  const excusadas = new Set();
   let mirados = 0;
 
   for (const [nombre, ruta] of RUTAS) {
@@ -245,21 +245,14 @@ if (process.argv[1] && process.argv[1].endsWith('altura.mjs')) {
       if (SOLO_TABLA) {
         console.log(`\n── ${nombre} @${ancho}×${alto} (innerHeight ${r.alto}) ──`);
         for (const m of r.medidas) {
-          const marca = m.sobra > 0 ? '  ✗' : '  ·';
-          console.log(`${marca} ${m.id.padEnd(14)} ${String(m.alto).padStart(5)}px  sobra ${String(m.sobra).padStart(5)}px`);
+          const mal = m.hero ? Math.abs(m.sobra) > 1 : m.alto > r.alto * TOPE_PANTALLAS;
+          const pantallas = (m.alto / r.alto).toFixed(2);
+          console.log(`${mal ? '  ✗' : '  ·'} ${m.id.padEnd(14)} ${String(m.alto).padStart(5)}px  ${pantallas} pantallas${m.hero ? '  (hero)' : ''}`);
         }
         continue;
       }
 
-      if (r.mirados < PISO[nombre]) {
-        problemas.push(`${nombre} @${ancho}×${alto} · PISO: miró ${r.mirados} secciones y el piso es `
-          + `${PISO[nombre]} — o la página no cargó, o el selector se rompió`);
-      }
-      for (const m of r.medidas) {
-        const tope = TOPE_DE(nombre, m.id);
-        if (m.sobra > tope) problemas.push(CONTAR(nombre, ancho, r.alto, m));
-        else if (m.sobra > 0) excusadas.add(`${nombre}#${m.id}`);
-      }
+      problemas.push(...JUZGAR(nombre, ancho, r));
     }
   }
 
@@ -270,19 +263,12 @@ if (process.argv[1] && process.argv[1].endsWith('altura.mjs')) {
     process.exit(0);
   }
   if (problemas.length) {
-    console.error(`\n✗ check-altura: ${problemas.length} sección(es) más altas que la pantalla.\n`);
+    console.error(`\n✗ check-altura: ${problemas.length} hallazgo(s).\n`);
     for (const p of problemas) console.error(`  · ${p}`);
-    console.error('\nSe achica en este orden y sin sacar contenido: paddings verticales, `gap` de');
-    console.error('grillas, tamaño de título dentro de la sección que sobra. Si no entra, se');
-    console.error('declara cuánto sobra y lo decide dirección (orden #20, A.5).\n');
+    console.error('\nUn hero mide la pantalla, exactamente. Una sección que pasa el tope no se');
+    console.error('aprieta: se declara en `PENDIENTES` con su número y lo decide dirección (#23).\n');
     process.exit(1);
   }
-  /* El verde dice **también** lo que excusó. Un «ninguna más alta que la
-     pantalla» sobre tres secciones que sí lo son es una mentira con cara de
-     verde, y esta casa ya sabe cómo termina eso. */
-  const cola = excusadas.size
-    ? ` · ${excusadas.size} excusada(s) esperando decisión de dirección: ${[...excusadas].join(', ')}`
-    : '';
-  console.log(`✓ check-altura: ${mirados} secciones medidas en ${RUTAS.length} rutas × ${VIEWPORTS.length} viewports, `
-    + `ninguna más alta que la pantalla salvo las declaradas${cola}.`);
+  console.log(`✓ check-altura: ${mirados} secciones medidas en ${RUTAS.length} rutas × ${VIEWPORTS.length} viewports: `
+    + `los héroes miden la pantalla y ninguna sección pasa de ${TOPE_PANTALLAS} pantallas.`);
 }

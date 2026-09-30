@@ -192,6 +192,22 @@ describe('Armando no flota: el archivo termina en cuerpo, no en aire', () => {
     ).toBeGreaterThan(png.ancho * 0.2);
   });
 
+  it('la PRIMERA fila es transparente en todo el ancho: la cabeza está entera (#23, C)', () => {
+    /* La v2 recortaba desde la fila 474 del PNG de Lucía y el pelo empieza en
+       la 25: la primera fila del archivo publicado **era pelo**, y en la web
+       Armando aparecía con la cabeza cortada. La v3 recorta desde la fila 0, y
+       sobre el pelo queda aire (medido en el 560: el pelo empieza en la fila 6).
+       La afirmación es sobre todo el ancho: un solo píxel con alfa en la fila 0
+       es un corte. */
+    const primera = png.alfaDeLaFila(0);
+    const conAlfa = primera.filter((a) => a > 0).length;
+    expect(
+      conAlfa,
+      `la primera fila del recorte tiene ${conAlfa} píxeles con alfa: el archivo arranca en el pelo `
+      + 'y Armando se ve con la cabeza cortada. Es lo que tenía la v2 de `de-pie`.',
+    ).toBe(0);
+  });
+
   it('y `Retrato.tsx` declara el alto del archivo nuevo, no el del viejo', () => {
     /* El `width`/`height` es lo que el navegador usa para reservar el hueco
        antes de que la foto baje. Con el archivo nuevo y el alto viejo, el
@@ -200,12 +216,12 @@ describe('Armando no flota: el archivo termina en cuerpo, no en aire', () => {
     const fuente = readFileSync(join(APP, 'src', 'web', 'comun', 'Retrato.tsx'), 'utf8');
     expect(
       fuente,
-      '`Retrato.tsx` no declara el alto del recorte publicado. El archivo de la v2 mide 1400×2526.',
-    ).toContain("'de-pie': { ancho: 1400, alto: 2526 }");
+      '`Retrato.tsx` no declara el alto del recorte publicado. El archivo de la v3 mide 1400×2791.',
+    ).toContain("'de-pie': { ancho: 1400, alto: 2791 }");
     /* La relación del PNG chico tiene que ser la misma que la declarada: si
        alguien reemplaza un archivo y no el otro, esto lo dice. */
     const relacionArchivo = png.ancho / png.alto;
-    const relacionDeclarada = 1400 / 2526;
+    const relacionDeclarada = 1400 / 2791;
     expect(
       Math.abs(relacionArchivo - relacionDeclarada),
       `el PNG de 560 tiene relación ${relacionArchivo.toFixed(4)} y el recorte declara `

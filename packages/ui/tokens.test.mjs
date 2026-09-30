@@ -75,8 +75,8 @@ function contraste(hexA, hexB) {
 
 describe('los tokens de Códice', () => {
   it('la versión del documento es la que esta orden dejó', () => {
-    expect(tokens.$meta.version).toBe('1.2.2');
-    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.2');
+    expect(tokens.$meta.version).toBe('1.2.3');
+    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.3');
   });
 
   /*

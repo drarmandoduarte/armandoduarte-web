@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { CLAVE_MENSAJE_RESERVA } from '@codice/core';
 import { Marco } from '../comun/Marco';
 import { Hero } from './Hero';
+import { Hechos } from './Hechos';
 import { Suena } from './Suena';
 import { Porque } from './Porque';
 import { Programa } from './Programa';
@@ -25,6 +26,7 @@ export function Taller() {
   return (
     <Marco pagina="taller" mensaje={t(CLAVE_MENSAJE_RESERVA)}>
       <Hero />
+      <Hechos />
       <Suena />
       <Porque />
       <Programa />

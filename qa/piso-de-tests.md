@@ -21,12 +21,30 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
-| `@codice/web` | 62 |
+| `@codice/web` | 63 |
 | `@codice/familia` | 83 |
 | `@codice/api` | 62 |
-| `@codice/navegador` | 38 |
+| `@codice/navegador` | 39 |
 
 
+
+## Lo que trae la orden #23 — `@codice/web` 62 → 63 y `@codice/navegador` 38 → 39
+
+**Uno** en `apps/web/src/armando-no-flota.test.ts`: la primera fila del
+`de-pie-560.png` es transparente en todo el ancho (la cabeza está entera).
+Mutación: el PNG de la v2 en su lugar → cae con «228 píxeles con alfa»; y cae
+también el de `Retrato.tsx`, que declara 2791.
+
+En el navegador, **dos más y uno menos**:
+- `e2e/heroes-iguales.spec.ts` (dos, 1440×900 y 1920×1080): portada y taller con
+  la misma caja de arco, rótulo a la misma altura y título del mismo tamaño;
+  arco a 48 px de la cabecera y apoyado abajo, rótulo a 72. Mutación: devolverle
+  al taller las columnas 1,32fr/0,68fr de la #16 → caen los dos.
+- `e2e/altura.spec.ts` pierde «ninguna excepción sobra»: `PENDIENTES` quedó
+  vacía y el mensaje del propio test decía que ese día se borraba. Las dos
+  afirmaciones nuevas (hero exacto, tope de 1,6 pantallas) viven en `JUZGAR` de
+  `check/altura.mjs`. Mutaciones: el hero con 40 px de más → 4 hallazgos; una
+  sección con `padding-block: 500px` → cae «pasa el tope de 1.6 pantallas».
 
 ## Lo que trae la orden #22 — `@codice/familia` 80 → 83
 

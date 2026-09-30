@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   Códice · tokens como variables CSS · v1.2.2
+   Códice · tokens como variables CSS · v1.2.3
    Fuente: packages/ui/codice-tokens.json. Si un valor cambia, cambia allá
    primero — el JSON es el documento y esto es su forma ejecutable.
 
@@ -25,6 +25,12 @@
    No son los candidatos que la orden proponía de memoria (#6F675C, #6B6358):
    ésos llegaban a 5,21 y 5,53 sobre crema, o sea más oscuros de lo necesario.
    El criterio es el mínimo, y el mínimo se mide.
+
+   ── v1.2.3 · el ocre de «¿Te suena?», medido otra vez (orden Códice #23) ─
+   Un valor cambia y nada más: **--ocre-texto** #795B34 → #755832. La #23 sacó
+   la franja de hechos de esa sección y le devolvió su aire, así que el título y
+   los números quedaron sobre otra parte de la foto: «01» y «03» caían a 4,32 y
+   4,43 a 1440. Mismo criterio de la #21, el mínimo medido.
 
    ── v1.2.2 · el ocre de «¿Te suena?» (orden Códice #21) ──────────────────
    Un token nuevo y nada más: **--ocre-texto**, para el rótulo y los números de
@@ -123,10 +129,11 @@
   /* ── Marca · la paleta del manual CFF (#05) ─────────────────────────── */
   --naranja:#DF4907;        /* color.cff.orange · el del manual, exacto · 3,86 sobre crema */
   --naranja-texto:#BF3F06;  /* color.cff.orangeText · el mínimo medido a 4,5 · 4,51 sobre cálido */
-  --ocre-texto:#795B34;     /* color.brand.ochre.text · #21 · SOLO «¿Te suena?» (rótulo y 01–03).
-                               El ocre de la casa (866539) oscurecido lo mínimo medido hasta 4,5
-                               sobre el píxel PINTADO (foto + velo) a 12 px: 390 → 4,51 · 375 → 4,60
-                               · 900 → 4,89 · 1440 → 4,92. Un paso más claro (7A5C34) da 4,45 a 390. */
+  --ocre-texto:#755832;     /* color.brand.ochre.text · #21, remedido en la #23 · SOLO «¿Te suena?»
+                               (rótulo y 01–03). El ocre de la casa (866539) oscurecido lo mínimo,
+                               en pasos de 0,5 %, hasta 4,5 sobre el píxel PINTADO (foto + velo) a
+                               12 px: 1440 → 4,54 · 900 → 5,14 · 390 → 5,24 · 375 → 5,22. Un paso más
+                               claro (765932) da 4,47 a 1440. En la #21 era 795B34. */
   --ambar:#DA8100;          /* color.cff.amber · acento sobre oscuro · 4,78 sobre tinta */
   --teal:#005761;           /* color.cff.tealDark · fondo de las secciones teal · crema encima 7,74 */
   --teal-medio:#3D9CA4;     /* color.cff.tealLight · SOLO ≥ 24 px o íconos, y SOLO sobre crema (3,03)

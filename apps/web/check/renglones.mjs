@@ -140,6 +140,14 @@ export const APROBADAS = [
      que esa comprobación existe —un permiso que sobra es una mentira con
      formato de tabla— y vale dejarlo escrito: nadie tuvo que acordarse. */
   ['#inicio h1', 'ADOLESCENTE', 'la excepción declarada de la #12 y sin punto desde la #19: la palabra que pidió Lucía, en su renglón y en naranja', 1],
+  /* ── Los títulos de los núcleos, aprobados en la auditoría del PR #35 ─────
+     Con la #23 (D) los núcleos van cinco en fila, a 24 px en columnas de 227:
+     «Estudiar la adolescencia» y «Realizar los cambios» no entran en un
+     renglón, y en dos cualquier corte deja una palabra sola. Dirección (CEO,
+     30/9 13:05): el último renglón es una palabra larga, no una viuda de dos
+     letras; a 24 px y cinco columnas es la mejor lectura. */
+  ['#programa h3', 'adolescencia', 'cola del Núcleo 1, «Estudiar la adolescencia»: una palabra larga, aprobada en la auditoría del PR #35. A 1440, 390 y 375', 1],
+  ['#programa h3', 'cambios', 'cola del Núcleo 5, «Realizar los cambios»: una palabra larga, aprobada en la auditoría del PR #35. A 1440', 1],
 ];
 
 /**

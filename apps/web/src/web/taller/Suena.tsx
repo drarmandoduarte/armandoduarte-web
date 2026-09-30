@@ -1,18 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { CANALES } from '../comun/canales';
-import { Icono } from '../comun/Icono';
 import { Seccion } from '../comun/Seccion';
 
 /**
- * La franja de hechos y «¿Te suena?».
- *
- * ── La franja volvió a cuatro celdas (orden #12, A) ──────────────────────
- * El «Cuándo» se había eliminado en la #02 porque no había fecha, y `.hechos`
- * pasó a tres columnas en el mismo cambio, con una nota que decía: «cuando
- * Armando dé la fecha, vuelve la celda y el CSS vuelve a cuatro». Armando la dio
- * el 28/9. Volvió la celda, volvió el CSS, y el ícono del calendario es el
- * único que esta orden dibujó — en el estilo de los otros tres: círculo de
- * `--teal-medio`, glifo blanco de trazo 5, sobre el mismo lienzo de 96.
+ * «¿Te suena?».
  *
  * ── La fotografía de fondo, cuarta vez y esta vez como la pidió Lucía ───
  * Conviene el relato entero, porque cada vuelta corrigió a la anterior:
@@ -41,6 +31,10 @@ import { Seccion } from '../comun/Seccion';
  * dé **0 pares bajo AA** a 1440, 900 y 375 con la foto cargada. El número que
  * quedó está escrito en `index.css`, al lado de la regla, con lo que se probó
  * antes.
+ *
+ * ── La franja de hechos salió de esta sección en la #23 (B) ─────────────
+ * Ahora es su propia banda, `Hechos.tsx`, entre el hero y esta sección, como
+ * «AHORA» en la portada. Lo de abajo es la historia de cuando estaba adentro.
  *
  * ── La franja de hechos ahora TAMBIÉN va sobre la foto ───────────────────
  * En la #12 la foto arrancaba debajo de la franja, y el informe lo declaró como
@@ -116,49 +110,9 @@ export function Suena() {
       </div>
 
       <div className="container">
-        <div className="hechos reveal">
-          <div>
-            <Icono nombre="fecha" ancho={40} alto={40} />
-            <span>{t('taller.hechos.fechaClave')}</span><b>{t('taller.hechos.fechaValor')}</b>
-          </div>
-          <div>
-            <Icono nombre="horario" ancho={40} alto={39} />
-            <span>{t('taller.hechos.horarioClave')}</span><b>{t('taller.hechos.horarioValor')}</b>
-          </div>
-          <div>
-            <Icono nombre="lugar" ancho={40} alto={40} />
-            <span>{t('taller.hechos.dondeClave')}</span>
-            {/* ── El lugar abre el mapa (orden #20, E) ──────────────────────
-                El **texto no cambia**: es la misma clave, y el test del evento
-                lo compara con `location.name` del JSON-LD. Lo que se agrega es
-                el `<a>` alrededor.
-
-                El `aria-label` dice a dónde lleva porque el texto solo no lo
-                dice: «Fiesta Inn Mérida» leído por un lector de pantalla es el
-                nombre de un hotel, no «esto abre un mapa».
-
-                La CSP no cambia: un `href` externo es navegación, no carga de
-                recurso. */}
-            <b>
-              <a
-                href={CANALES.mapaSede}
-                target="_blank"
-                rel="noopener"
-                aria-label={t('taller.hechos.dondeAria')}
-              >
-                {t('taller.hechos.dondeValor')}
-              </a>
-            </b>
-          </div>
-          <div>
-            <Icono nombre="sesion" ancho={40} alto={40} />
-            <span>{t('taller.hechos.modalidadClave')}</span><b>{t('taller.hechos.modalidadValor')}</b>
-          </div>
-        </div>
-
         {/* La maqueta de antes de la #12, recuperada de `4b592d2^`: dos
             columnas —título y párrafo | los tres puntos— y la cita abajo. */}
-        <div className="grid-2 u-mt-8">
+        <div className="grid-2">
           <div>
             <span className="eyebrow reveal">{t('taller.suena.eyebrow')}</span>
             <h2 className="display-m u-mt-4 reveal" data-d="1">
