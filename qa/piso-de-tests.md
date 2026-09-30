@@ -22,9 +22,38 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
 | `@codice/web` | 58 |
-| `@codice/familia` | 59 |
+| `@codice/familia` | 80 |
 | `@codice/api` | 62 |
 | `@codice/navegador` | 38 |
+
+
+## Lo que trae la orden #18 — `@codice/familia` 59 → 80
+
+Veintiuno nuevos, en dos archivos:
+
+- `src/comun/la-entrada-a-la-altura.test.tsx` (**12**): las seis casillas del
+  código —una sola entrada, pegar «123 456» o «65-43-21-99» las llena, el foco
+  que avanza, las casillas en `aria-hidden`—; el marco —la cabecera lleva a la
+  web, el pie trae las dos legales y **el WhatsApp de Gaby y nunca el del
+  taller**, el panel de Armando solo en `/entrar`, y panel **o** retrato, nunca
+  las dos imágenes—; y `/entrar` de arriba abajo —Google primero y con su logo,
+  «espacio» en teal y un solo naranja, el aviso legal con sus dos enlaces—.
+- `src/comun/acento-y-ruta.test.ts` (**9**): `partirAcento`, con la comprobación
+  de que los cinco títulos de `familia.json` llevan exactamente una palabra
+  marcada, y `rutaQueCorresponde` (punto F): `/entrar` → `/mi-espacio` con
+  sesión y rol, también desde `/`, y ningún estado intermedio mueve la URL.
+
+Mutaciones, cada una por separado y cada una vista en rojo: el campo sin limpiar
+lo pegado (cae 1); el retrato montado también a ≥ 1100 (cae «panel o retrato»);
+`/entrar` sin panel (caen 2); `rutaQueCorresponde` sin la rama de `pasar` (caen
+2); `partirAcento` que nunca parte (caen 4); el pie con `TELEFONO_TALLER` (cae 1).
+La última se hizo dos veces: la primera **no importaba la constante** y tiraba
+once tests por un `ReferenceError`, que es un rojo que no mide la regla; la
+segunda, con el import, cae exactamente el del pie.
+
+`check:tokens` suma su propia mitad sin contar tests: la excepción del logo de
+Google, con tres mutaciones (otro SVG con hex en `apps/familia/public`, una
+segunda fila en la lista, y el logo sin color) — ver el informe de la #18.
 
 ## Lo que trae la orden #20 — `@codice/navegador` 35 → 38
 

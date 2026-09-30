@@ -18,7 +18,7 @@
  * para que eso siga siendo cierto.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 /* ── Supabase, simulado ─────────────────────────────────────────────────
@@ -84,19 +84,27 @@ afterEach(() => {
 });
 
 const t = (clave: string) => i18n.t(clave);
+/* El título de /entrar lleva su palabra en teal desde la #18: se busca como
+   encabezado, por su nombre accesible, sin los corchetes que la marcan. */
+const sinEspacios = (s: string) => s.replace(/[\s[\]]/g, '');
+/* jsdom arma el nombre accesible con espacios alrededor del `<span>` de la
+   palabra; el navegador no. Se compara sin espacios para medir lo que importa. */
+const tituloDeEntrar = () => screen.findByRole('heading', {
+  name: (nombre) => sinEspacios(nombre) === sinEspacios(t('entrar.titulo')),
+});
 const pedidosDeYo = () => pedidos.filter((u) => u === '/api/yo').length;
 
 describe('la sesión, después de entrar', () => {
   it('montar sin sesión → la pantalla de entrada, nunca el error', async () => {
     render(<App />);
-    expect(await screen.findByText(t('entrar.titulo'))).toBeTruthy();
+    expect(await tituloDeEntrar()).toBeTruthy();
     expect(screen.queryByText(t('comun.noConfirmamos'))).toBeNull();
     expect(pedidosDeYo()).toBe(0);
   });
 
   it('EL CASO: llega SIGNED_IN → sale UN `GET /api/yo` y la pantalla es Mi espacio', async () => {
     render(<App />);
-    await screen.findByText(t('entrar.titulo'));
+    await tituloDeEntrar();
 
     /* Lo que hace supabase-js al terminar `verifyOtp`: la sesión ya está
        guardada y avisa. */
@@ -114,7 +122,7 @@ describe('la sesión, después de entrar', () => {
     /* La ventana entre el SIGNED_IN y el `/api/yo`. Con `rol: undefined`, el
        kit diría `enrolar` — el defecto del 29/9 por otra puerta. */
     render(<App />);
-    await screen.findByText(t('entrar.titulo'));
+    await tituloDeEntrar();
 
     act(() => {
       falso.sesion = sesionNueva;
@@ -136,7 +144,7 @@ describe('la sesión, después de entrar', () => {
       falso.avisar?.('SIGNED_OUT', null);
     });
 
-    await waitFor(() => expect(screen.getByText(t('entrar.titulo'))).toBeTruthy());
+    expect(await tituloDeEntrar()).toBeTruthy();
     expect(screen.queryByText(t('comun.noConfirmamos'))).toBeNull();
   });
 });

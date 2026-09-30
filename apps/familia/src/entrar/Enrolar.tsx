@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../supabase';
-import { BotonPrincipal, CampoDeCodigo, Pantalla } from '../comun/Piezas';
+import { BotonPrincipal, CampoDeCodigo, Pantalla, Titulo } from '../comun/Piezas';
 import { nombreDelAutenticador } from '../seguridad-512/nucleo/nombres';
 
 /**
@@ -78,8 +78,8 @@ export function Enrolar({ alTerminar }: { alTerminar: () => void }) {
   }
 
   return (
-    <Pantalla arriba>
-      <h1 className="titulo">{t('enrolar.titulo')}</h1>
+    <Pantalla>
+      <Titulo texto={t('enrolar.titulo')} />
       <p className="bajada">{t('enrolar.bajada')}</p>
 
       <div className="seccion">

@@ -101,6 +101,61 @@ for (const carpeta of CARPETAS) {
   }
 }
 
+/* ── Los SVG de Mi espacio, y la única marca ajena (orden Códice #18, B.4) ──
+   `public/` no se mira porque en la web son los archivos de Armando: sus
+   íconos vienen pintados en los colores del manual CFF. Mi espacio no tiene
+   ninguno de esos, y la #18 le suma el primer archivo con color propio: **el
+   logo de Google** de «Continuar con Google». Va sin recolorear porque es la
+   marca de un tercero —las guías de Google piden sus cuatro colores—, así que
+   es la única excepción de color de la app y se declara acá, con nombre y con
+   tope, igual que la excepción de «ADOLESCENTE» en `acento.mjs`.
+
+   Por qué se barre `apps/familia/public` y no solo se nombra el archivo: una
+   excepción que solo se nombra deja pasar al segundo logo que alguien suba al
+   lado. Barriendo la carpeta, cualquier otro SVG con un hex cae; y el tope
+   impide que la salida sea agrandar la lista. */
+const PUBLICO_DE_FAMILIA = 'apps/familia/public';
+const MARCAS_AJENAS = [
+  ['apps/familia/public/img/google.svg', 'el logo oficial de Google, en «Continuar con Google»: marca de un tercero, no un color nuestro'],
+];
+const TOPE_DE_MARCAS_AJENAS = 1;
+
+const svgs = [];
+const juntarSvg = (dir) => {
+  let entradas;
+  try { entradas = readdirSync(dir); } catch { return; }
+  for (const e of entradas) {
+    const full = join(dir, e);
+    if (statSync(full).isDirectory()) juntarSvg(full);
+    else if (full.endsWith('.svg')) svgs.push(full);
+  }
+};
+juntarSvg(join(RAIZ, PUBLICO_DE_FAMILIA));
+
+/* El piso de esta mitad: que haya visto por lo menos los SVG que excusa. */
+if (svgs.length < MARCAS_AJENAS.length) {
+  process.stderr.write(`check-tokens: en ${PUBLICO_DE_FAMILIA} hay ${svgs.length} SVG y la lista excusa ${MARCAS_AJENAS.length}. La carpeta se movió o el barrido no la ve.\n`);
+  process.exit(1);
+}
+if (MARCAS_AJENAS.length > TOPE_DE_MARCAS_AJENAS) {
+  process.stderr.write(`check-tokens: la lista de marcas ajenas tiene ${MARCAS_AJENAS.length} archivos y el tope es ${TOPE_DE_MARCAS_AJENAS}. Una excepción que crece deja de ser una excepción: lo decide dirección.\n`);
+  process.exit(1);
+}
+for (const archivo of svgs) {
+  const rel = relative(RAIZ, archivo);
+  const hex = readFileSync(archivo, 'utf8').match(HEX) ?? [];
+  const excusado = MARCAS_AJENAS.some(([ruta]) => ruta === rel);
+  if (excusado && hex.length === 0) {
+    /* La otra mitad: una excepción para un archivo que ya no tiene color es
+       una puerta abierta que nadie usa, hasta que alguien la usa. */
+    hallazgos.push(`${rel}  está excusado como marca ajena y no tiene ningún hex: se borra su fila`);
+  }
+  if (!excusado) for (const m of hex) hallazgos.push(`${rel}  ${m}  ->  un SVG de Mi espacio con color escrito`);
+}
+for (const [ruta] of MARCAS_AJENAS) {
+  if (!svgs.some((s) => relative(RAIZ, s) === ruta)) hallazgos.push(`${ruta}  está excusado y no existe: se borra su fila`);
+}
+
 /* EL PISO, ANTES DEL CERO. Ver la cabecera. */
 if (archivos < PISO_DE_ARCHIVOS) {
   process.stderr.write(
@@ -120,4 +175,5 @@ if (hallazgos.length) {
   process.exit(1);
 }
 
-process.stdout.write(`check-tokens: ${archivos} archivos recorridos, ningún hex fuera de ${DONDE_VIVEN}.\n`);
+process.stdout.write(`check-tokens: ${archivos} archivos recorridos, ningún hex fuera de ${DONDE_VIVEN}; `
+  + `${svgs.length} SVG en ${PUBLICO_DE_FAMILIA}, ${MARCAS_AJENAS.length} marca ajena excusada (tope ${TOPE_DE_MARCAS_AJENAS}).\n`);

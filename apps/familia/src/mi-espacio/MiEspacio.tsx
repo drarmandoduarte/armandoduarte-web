@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
-import { BotonPrincipal, Campo, Pantalla } from '../comun/Piezas';
+import { BotonPrincipal, Campo, Pantalla, Titulo } from '../comun/Piezas';
 
 /**
  * PANTALLA 5 · `/mi-espacio` — lo mínimo de la #15.
@@ -32,12 +32,12 @@ export function MiEspacio({
   const esEquipo = yo.tipo === 'equipo';
 
   return (
-    <Pantalla ancha arriba>
-      <h1 className="titulo">
-        {yo.persona?.nombre
+    <Pantalla>
+      <Titulo
+        texto={yo.persona?.nombre
           ? t('miEspacio.saludo', { nombre: yo.persona.nombre })
           : t('miEspacio.saludoSinNombre')}
-      </h1>
+      />
       <p className="bajada">{t('miEspacio.bajada')}</p>
 
       <SeccionDeDatos yo={yo} recargar={recargar} />

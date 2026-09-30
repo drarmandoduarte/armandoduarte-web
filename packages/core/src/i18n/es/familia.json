@@ -10,33 +10,41 @@
     "errorGenerico": "Algo no salió bien. Vuelve a intentarlo.",
     "noConfirmamos": "No pudimos confirmar tu cuenta. Vuelve a intentarlo.",
     "reintentar": "Volver a intentar",
-    "errorDeRed": "No pudimos conectarnos. Revisa tu conexión y vuelve a intentarlo."
+    "errorDeRed": "No pudimos conectarnos. Revisa tu conexión y vuelve a intentarlo.",
+    "volverALaWeb": "Volver a la web",
+    "inicioDeLaWeb": "Armando Duarte · ir a la web",
+    "ayuda": "¿Necesitas ayuda?",
+    "ayudaWhatsapp": "WhatsApp",
+    "ayudaMensaje": "Hola, necesito ayuda para entrar a Mi espacio.",
+    "avisoLegalAntes": "Al continuar aceptas el ",
+    "avisoLegalMedio": " y los ",
+    "avisoLegalDespues": "."
   },
   "entrar": {
-    "titulo": "Mi espacio",
-    "bajada": "Escribe tu correo y te enviamos un código de 6 dígitos. No necesitas contraseña.",
+    "titulo": "Entra a tu [espacio].",
+    "bajada": "Tus talleres, tus inscripciones y tus datos, en un solo lugar. Sin contraseñas.",
     "correoEtiqueta": "Tu correo",
     "correoAyuda": "El mismo que usas siempre.",
     "correoInvalido": "Ese correo no parece completo. Revísalo.",
     "enviarCodigo": "Enviarme el código",
     "enviando": "Enviando…",
-    "codigoTitulo": "Revisa tu correo",
-    "codigoBajada": "Te enviamos un código de 6 dígitos a {{correo}}. Vence en 10 minutos.",
+    "codigoBajada": "Te enviamos un código a {{correo}}.",
     "codigoEtiqueta": "Código de 6 dígitos",
     "codigoInvalido": "Ese código no es correcto o ya venció. Pide uno nuevo.",
     "verificar": "Entrar",
     "verificando": "Verificando…",
     "reenviar": "Enviar otro código",
     "reenviarEn": "Puedes pedir otro código en {{segundos}} s",
-    "cambiarCorreo": "Usar otro correo",
-    "oBien": "o",
-    "conGoogle": "Entrar con Google",
+    "cambiarCorreo": "Cambiar",
+    "oBien": "o con tu correo",
+    "conGoogle": "Continuar con Google",
     "conCodigoDeRespaldo": "Usar un código de respaldo",
     "avisoInactividad": "Cerramos tu sesión porque pasaron 30 minutos sin actividad. Vuelve a entrar.",
-    "avisoSesionPerdida": "Tu sesión ya no estaba activa. Vuelve a entrar."
+    "avisoSesionPerdida": "Tu sesión ya no estaba activa. Vuelve a entrar.",
+    "retratoAlt": "Armando Duarte"
   },
   "enrolar": {
-    "titulo": "Protege tu cuenta",
+    "titulo": "Protege tu [cuenta]",
     "bajada": "Tu cuenta ve datos de otras personas, así que necesita un segundo paso. Toma dos minutos y se hace una sola vez.",
     "paso1": "Abre tu app de autenticación",
     "paso1Ayuda": "Google Authenticator, 1Password, Authy o la que ya uses.",
@@ -53,7 +61,7 @@
     "sinSalida": "Para entrar necesitas terminar este paso."
   },
   "reto": {
-    "titulo": "Confirma que eres tú",
+    "titulo": "Confirma que eres [tú]",
     "bajada": "Escribe el código de 6 dígitos que te muestra tu app de autenticación.",
     "codigoEtiqueta": "Código de tu autenticador",
     "verificar": "Confirmar",
@@ -67,7 +75,7 @@
     "volverAlAutenticador": "Volver al autenticador"
   },
   "respaldo": {
-    "titulo": "Guarda tus códigos de respaldo",
+    "titulo": "Guarda tus [códigos] de respaldo",
     "bajada": "Son diez y sirven una sola vez cada uno. Te dejan entrar si pierdes el celular. No los volveremos a mostrar.",
     "descargar": "Descargar",
     "copiar": "Copiar",
@@ -85,7 +93,7 @@
     "regenerarAviso": "Los códigos anteriores dejan de servir."
   },
   "miEspacio": {
-    "saludo": "Hola, {{nombre}}",
+    "saludo": "Hola, [{{nombre}}]",
     "saludoSinNombre": "Hola",
     "bajada": "Este es tu espacio. Por ahora, tus datos y la seguridad de tu cuenta.",
     "datosTitulo": "Tus datos",

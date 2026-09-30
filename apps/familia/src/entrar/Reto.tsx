@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../supabase';
 import { api, ErrorDeApi } from '../comun/api';
-import { BotonPrincipal, Campo, CampoDeCodigo, Pantalla } from '../comun/Piezas';
+import { BotonPrincipal, Campo, CampoDeCodigo, Pantalla, Titulo } from '../comun/Piezas';
 
 /**
  * PANTALLA 3 · el reto — seis dígitos del autenticador, **o** un código de
@@ -99,7 +99,7 @@ export function Reto({ alVerificar }: { alVerificar: () => void }) {
 
   return (
     <Pantalla>
-      <h1 className="titulo">{t('reto.titulo')}</h1>
+      <Titulo texto={t('reto.titulo')} />
       <p className="bajada">{t('reto.bajada')}</p>
       <form onSubmit={conAutenticador} noValidate>
         <CampoDeCodigo

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../supabase';
-import { Aviso, BotonPrincipal, Campo, CampoDeCodigo, Pantalla } from '../comun/Piezas';
+import { Aviso, AvisoLegal, BotonPrincipal, Campo, CampoDeCodigo, Pantalla, Titulo } from '../comun/Piezas';
 import {
   consumeInactivityLogout,
   consumeSesionDesaparecida,
@@ -17,9 +17,11 @@ import {
  * Por eso no hay dos botones ni dos caminos: una sola pantalla que sirve para
  * entrar y para empezar.
  *
- * ── «Entrar con Google», visible para todos ─────────────────────────────
- * Decisión de dirección del 29/9 (orden #15, G.1), y va **debajo** del código,
- * no arriba: el camino principal es el correo. Un cliente que entra con Google
+ * ── «Continuar con Google», primero ─────────────────────────────────────
+ * Visible para todos desde el 29/9 (orden #15, G.1). Iba **debajo** del código
+ * porque el camino principal era el correo; la #18 (B.4) lo sube arriba, con su
+ * logo, que es como lo encuentra quien ya entró a cualquier otro servicio así.
+ * El correo queda a un separador de distancia. Un cliente que entra con Google
  * sigue siendo cliente — el rol no sale de cómo entró, sale de si tiene fila en
  * `miembros`.
  *
@@ -92,13 +94,23 @@ export function Entrar() {
   }
 
   return (
-    <Pantalla>
+    <Pantalla conArmando>
       {aviso ? <Aviso>{aviso}</Aviso> : null}
-      <h1 className="titulo">{t('entrar.titulo')}</h1>
+      <Titulo texto={t('entrar.titulo')} />
 
       {paso === 'correo' ? (
         <>
           <p className="bajada">{t('entrar.bajada')}</p>
+          <div className="fila">
+            <button type="button" className="btn btn--ancho" onClick={conGoogle}>
+              {/* El logo de Google, sin recolorear: marca de un tercero y la
+                  única excepción de color de la app (`check:tokens`, tope 1).
+                  `lazy` por lo mismo que el retrato chico (ver `Piezas.tsx`). */}
+              <img src="/img/google.svg" width={18} height={18} alt="" loading="lazy" />
+              {t('entrar.conGoogle')}
+            </button>
+          </div>
+          <div className="separador"><span>{t('entrar.oBien')}</span></div>
           <form onSubmit={pedirCodigo} noValidate>
             <Campo
               id="correo"
@@ -121,8 +133,12 @@ export function Entrar() {
         </>
       ) : (
         <>
-          <h2 className="subtitulo u-mt-4">{t('entrar.codigoTitulo')}</h2>
-          <p className="bajada">{t('entrar.codigoBajada', { correo })}</p>
+          <p className="bajada">
+            {t('entrar.codigoBajada', { correo })}{' '}
+            <button type="button" className="enlace" onClick={() => { setPaso('correo'); setCodigo(''); setError(null); }}>
+              {t('entrar.cambiarCorreo')}
+            </button>
+          </p>
           <form onSubmit={verificar} noValidate>
             <CampoDeCodigo
               id="codigo"
@@ -147,18 +163,11 @@ export function Entrar() {
             >
               {segundos > 0 ? t('entrar.reenviarEn', { segundos }) : t('entrar.reenviar')}
             </button>
-            <button type="button" className="enlace" onClick={() => { setPaso('correo'); setCodigo(''); setError(null); }}>
-              {t('entrar.cambiarCorreo')}
-            </button>
           </div>
         </>
       )}
 
-      {/* Google, debajo del código y visible para todos (decisión del 29/9). */}
-      <div className="separador"><span>{t('entrar.oBien')}</span></div>
-      <button type="button" className="btn btn--ancho" onClick={conGoogle}>
-        {t('entrar.conGoogle')}
-      </button>
+      <AvisoLegal />
     </Pantalla>
   );
 }
