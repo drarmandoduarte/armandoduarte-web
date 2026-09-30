@@ -98,29 +98,22 @@ export const PISO = { inicio: 8, merida: 10 };
 export const APROBADAS = [];
 
 /**
- * Lo que sobra y **espera decisión de dirección**.
+ * Lo que sobra, con su número.
  *
- * Ninguna de estas filas es una aprobación. La #20-bis aplicó las tres
- * decisiones de dirección (A.5) y **midió después**, y lo que quedó es esto:
+ * **Una sola fila, y es la única excepción del sitio** (#20-bis, decisión del
+ * CEO). `#quien` no entra porque la manda la columna de texto de Armando
+ * —eyebrow, título, párrafo, ficha de cuatro filas y cita: 944 px más los 90
+ * del padding—, no la foto: con la foto a 520 o a 470 mide 1034 igual, y por eso
+ * Armando volvió a 520. Achicar márgenes la dejaba en 994; lo que queda es menos
+ * texto o texto más chico, y el texto es del cliente. Se acepta el desborde acá
+ * y en ningún otro lado. El tope va en píxeles, como siempre: si la sección
+ * crece, vuelve a caer.
  *
- *   · **`#quien` — manda el texto, no la foto.** El informe del #30 decía que
- *     mandaba la foto y se equivocaba: la columna de texto mide 944 px más los
- *     90 del padding, y eso da 1034 con la foto a 520 **o** a 470. La foto a 470
- *     se aplicó porque es lo decidido, pero no compra ningún píxel. Achicar los
- *     `margin` entre bloques (40 → 28, 28 → 20) la deja en 994: tampoco entra;
- *   · **`#facilitador` — lo mismo, por 6 px.** Con la foto a 472 bajó de 911 a
- *     906, no a 897: acá también manda el texto (816 px). `margin-top` de la
- *     ficha 40 → 32 la deja en 898;
- *   · **`#llevas` — la sección nueva.** Sola mide 1023 a 1440×900 y 1085 a
- *     1920×1080: la manda la foto 4:5 de cada columna (405×507). En 5:4 la
- *     sección queda en 841; en 1:1, en 922 (no entra).
- *
- * `#programa` salió de la lista: con los núcleos en 3 + 2 mide 844.
+ * Lo que la #20-bis cerró y salió de la lista: `#programa` (núcleos en 3 + 2,
+ * 844), `#llevas` (fotos en 5:4, 841) y `#facilitador` (ficha 40 → 32, 898).
  */
 export const PENDIENTES = [
-  ['inicio', 'quien', 'manda la columna de texto (944 + 90 de padding = 1034), no la foto: a 520 o a 470 mide lo mismo. A 1920×1080 entra (−28)', 134],
-  ['merida', 'facilitador', 'manda la columna de texto (816 + 90 = 906); la foto a 472 compró 5 px de los 11. `margin-top` de la ficha 40 → 32 la deja en 898. A 1920×1080 entra (−156)', 6],
-  ['merida', 'llevas', 'la foto 4:5 de cada columna (405×507) mide 1023 a 1440×900 y 1085 (+5) a 1920×1080. Fotos en 5:4: 841', 123],
+  ['inicio', 'quien', 'texto del cliente: manda la columna de texto (944 + 90 de padding = 1034), no la foto. Única excepción del sitio (#20-bis). A 1920×1080 entra (−28)', 134],
 ];
 
 /** Las dos listas juntas es lo que el barrido aplica. */

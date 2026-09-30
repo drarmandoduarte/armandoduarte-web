@@ -419,3 +419,28 @@ propia caja: si sobra, la imagen mide más de 900.
 | `bis-programa-1440x900.jpg` | 844 |
 | `bis-llevas-1440x900.jpg` | 1023 |
 | `bis-facilitador-1440x900.jpg` | 906 |
+
+## #20-bis · Las decisiones del CEO, aplicadas
+
+1. **`#llevas`: fotos en 5:4** con `aspect-ratio` y `object-fit: cover`, sin
+   tocar los archivos. Mirada foto por foto: `llevas-palabras` y
+   `llevas-serenidad` conservan las caras enteras con el recorte centrado;
+   `llevas-claridad`, centrada, le cortaba la cabeza al padre, y lleva
+   `object-position: center top` (clase `encuadre--arriba`, declarada en
+   `Llevas.tsx`). Se ve en `bis-llevas-1440x900.jpg`.
+2. **`#facilitador`: ficha 40 → 32.**
+3. **`#quien`: se acepta el desborde**, la única excepción del sitio, con el
+   motivo «texto del cliente». **Armando vuelve a 520.**
+
+| sección (1440×900) | alto | |
+|---|---|---|
+| `/merida` `#programa` | 844 | entra |
+| `/merida` `#llevas` | **841** | entra |
+| `/merida` `#facilitador` | **898** | entra |
+| `/` `#quien` | 1034 · +134 | la única fila en `PENDIENTES` |
+
+`check:altura`: verde, **una** sección excusada (`inicio#quien`). La vi fallar
+volviendo la ficha de `#facilitador` a 40: rojo en `#facilitador mide 906px`.
+Gate de la casa verde. Fidelidad: las capturas de la portada vuelven a ser
+**exactamente** las del #30 (la foto está otra vez en 520); cambian las del
+taller a 1440, 900 y 390, por la sección nueva, el 3 + 2 y el 5:4.

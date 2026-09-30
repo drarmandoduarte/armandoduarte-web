@@ -408,8 +408,13 @@ a,button{-webkit-tap-highlight-color:transparent}
    que es `.ficha`. El primer intento de esta orden hizo eso y el guardián de
    fidelidad lo cazó con la portada 56 px más alta. Un `id` gana siempre, que es
    lo que el `style=` inline hacía y lo que hay que conservar. */
-#quien .foto--libre{max-width:470px}
+#quien .foto--libre{max-width:520px}
 #facilitador .foto--libre{max-width:472px}
+/* ── Los 6 px que le faltaban a `#facilitador` (#20-bis, decisión del CEO) ──
+   Manda la columna de texto, no la foto: la ficha arriba a 32 en vez de 40 y la
+   sección pasa de 906 a 898 a 1440×900. Colgado del `id` por lo mismo de arriba:
+   `.ficha` y cualquier utilidad empatan en especificidad. */
+#facilitador .ficha{margin-top:32px}
 /* ── Armando apoyado en la orilla (orden #12, E) ──────────────────────────
    Lucía vio aire entre el borde de abajo del PNG y el del bloque teal. La
    figura deja de estar centrada y se pega al fondo de la fila, y el aire que
@@ -798,6 +803,12 @@ a,button{-webkit-tap-highlight-color:transparent}
 .foto-tarjeta img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
 .tres figure{border-radius:12px;overflow:hidden;background:var(--calido);margin-bottom:var(--s3)}
 .tres figure img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
+/* ── «Lo que te llevas» en 5:4 (#20-bis, decisión del CEO) ─────────────────
+   Sola, la sección medía 1023 contra 900: la mandaba la foto 4:5 de cada columna
+   (405×507). En 5:4 queda en 841. Los archivos no se tocan: el recorte es
+   `aspect-ratio` + `cover`, y con las caras enteras en las tres. */
+#llevas .tres figure img{aspect-ratio:5/4}
+#llevas .tres figure img.encuadre--arriba{object-position:center top}
 
 /* ── Responsive ─────────────────────────────────────────────────────── */
 /* Cinco núcleos no entran en dos columnas sin dejar una fila de uno: entre

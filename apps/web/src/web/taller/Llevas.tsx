@@ -14,10 +14,13 @@ import { Seccion } from '../comun/Seccion';
  */
 export function Llevas() {
   const { t } = useTranslation();
+  /* El cuarto valor es el encuadre del recorte 5:4 (#20-bis). Sin clase, el
+     centro; `claridad` sube al borde de arriba porque centrada le cortaba la
+     cabeza al padre. Se decide mirando cada foto, no por regla. */
   const llevas = [
-    ['01', 'uno', 'llevas-claridad'],
-    ['02', 'dos', 'llevas-palabras'],
-    ['03', 'tres', 'llevas-serenidad'],
+    ['01', 'uno', 'llevas-claridad', 'encuadre--arriba'],
+    ['02', 'dos', 'llevas-palabras', undefined],
+    ['03', 'tres', 'llevas-serenidad', undefined],
   ] as const;
 
   return (
@@ -25,7 +28,7 @@ export function Llevas() {
       <span className="eyebrow reveal">{t('taller.llevas.eyebrow')}</span>
       <h2 className="display-m u-mt-4 reveal" data-d="1">{t('taller.llevas.titulo')}</h2>
       <div className="tres reveal" data-d="2">
-        {llevas.map(([n, clave, foto]) => (
+        {llevas.map(([n, clave, foto, encuadre]) => (
           <div key={n}>
             <figure>
               <Foto
@@ -34,6 +37,7 @@ export function Llevas() {
                 ancho={800}
                 alto={1000}
                 tamanos="(max-width:900px) 92vw, 30vw"
+                clase={encuadre}
               />
             </figure>
             <span className="n">{n}</span>
