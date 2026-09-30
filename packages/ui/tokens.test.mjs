@@ -75,8 +75,8 @@ function contraste(hexA, hexB) {
 
 describe('los tokens de Códice', () => {
   it('la versión del documento es la que esta orden dejó', () => {
-    expect(tokens.$meta.version).toBe('1.2.1');
-    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.1');
+    expect(tokens.$meta.version).toBe('1.2.2');
+    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.2');
   });
 
   /*
@@ -107,6 +107,10 @@ describe('los tokens de Códice', () => {
       ['background.cream sobre brand.ochre',       C.background.cream.value, C.brand.ochre.value],
       ['brand.ochre.mid sobre ink.primary',        C.brand.ochre.mid, C.ink.primary.value],
       ['ink.primary sobre brand.ochre.mid',        C.ink.primary.value, C.brand.ochre.mid],
+      /* #21 · el ocre de «¿Te suena?». Lo que manda es el píxel pintado (foto +
+         velo), y eso lo mide `check/contraste.mjs` en el navegador; acá queda el
+         piso plano, para que nadie lo aclare sin enterarse. */
+      ['brand.ochre.text sobre background.cream',  C.brand.ochre.text, C.background.cream.value],
     ];
 
     /*

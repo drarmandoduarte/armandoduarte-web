@@ -17,11 +17,11 @@ alguien lo va a leer en el PR. Ése es el punto.
 
 | paquete | piso |
 |---|---|
-| `@codice/ui` | 30 |
+| `@codice/ui` | 31 |
 | `@codice/core` | 23 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 87 |
-| `@codice/web` | 58 |
+| `@codice/web` | 62 |
 | `@codice/familia` | 83 |
 | `@codice/api` | 62 |
 | `@codice/navegador` | 38 |
@@ -38,6 +38,25 @@ cuando todo contesta se llega a Mi espacio igual que antes.
 
 Mutaciones: sin el `finally` que baja `cargando` → caen (a) y (b); sin el tope
 → cae (b) y solo (b).
+
+## Lo que trae la orden #21 — `@codice/web` 58 → 62 y `@codice/ui` 30 → 31
+
+**Cuatro** en `apps/web/src/las-imagenes-llevan-su-huella.test.ts`, sobre
+`dist/`: el piso (las cuatro páginas, ≥ 15 URLs de imagen en `/` y ≥ 25 en
+`/merida`, ninguna en el CSS), ninguna URL de `img/` sin `?v=`, la huella igual
+al SHA-256 del archivo publicado, y cada `og:image` con huella. Busca con una
+expresión propia y no con la de `scripts/huellas.mjs`, para no compartir sus
+puntos ciegos.
+
+Las dos mutaciones de la orden, cada una vista en rojo y en su test:
+(a) un byte más en `dist/img/armando/medio-cuerpo-900.webp` sin regenerar el
+HTML → cae «la huella es la del archivo», con «el archivo da 78fbc39d»;
+(b) un `<img src="/img/cff-400.webp">` escrito a mano en `dist/index.html` → cae
+«ninguna URL sale sin `?v=`», nombrándolo.
+
+**Uno** en `packages/ui/tokens.test.mjs`: `brand.ochre.text` sobre crema ≥ 4,5
+(6,48 plano). Lo que manda es el píxel pintado sobre la foto, y eso se mide en
+el navegador; esto es el piso para que nadie aclare el token sin enterarse.
 
 ## Lo que trae la orden #18 — `@codice/familia` 59 → 80
 

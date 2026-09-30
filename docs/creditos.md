@@ -32,13 +32,12 @@ acorta el camino.
 
 | archivo | original | autor | dónde se ve |
 |---|---|---|---|
-| `fotos/porque-fondo.*` | `pexels-karola-g-6345445` | Karola G | `/merida` · dentro de la tarjeta de la cita de «¿Te suena?» |
 | `fotos/suena-tarjeta.*` | `pexels-pavel-danilyuk-8057317` | Pavel Danilyuk | `/merida` · «Las estrategias del pasado» |
 | `fotos/llevas-claridad.*` | `pexels-alena-32936525` | Alena | `/merida` · «Lo que te llevas» → Claridad (reemplazó a la de Artem Podrez en la #12) |
 | `fotos/llevas-palabras.*` | `pexels-astreyas-photo-10358308` | Astreyas Photo | `/merida` · «Lo que te llevas» → Palabras precisas |
 | `fotos/llevas-serenidad.*` | `pexels-julia-m-cameron-8841302` | Julia M. Cameron | `/merida` · «Lo que te llevas» → Serenidad con firmeza (reemplazó a la de Karola G en la #12) |
 | `fotos/tres-maneras-fondo.*` | **Pexels #301987** | — | **en el repo, sin usar** (ver abajo) |
-| `fotos/porque-fondo.*` | `pexels-karola-g-6345445` | Karola G | `/merida` · fondo de «¿Te suena?» otra vez desde la #12 |
+| `fotos/suena-lucia-*` | `pexels-karola-g-6345445` | Karola G | `/merida` · fondo de «¿Te suena?», con el encuadre de Lucía desde la #21 (antes `porque-fondo.*`, borrado) |
 
 `tres-maneras-fondo` entró con la orden #07 (H.2) para ser el fondo de «Tres
 maneras» y **no se publicó en ninguna pantalla**: medido, no hay velo que la deje
