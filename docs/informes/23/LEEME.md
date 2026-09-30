@@ -71,3 +71,12 @@ Accesibilidad 100 en las dos rutas. En `/merida` el LCP de la rama es ~75 ms má
 1. **Los dos huérfanos de los núcleos** (punto 3). Salidas: aceptarlos, títulos a 22 px, o cuatro columnas en vez de cinco. Cualquiera de las tres cambia algo que fijó la orden.
 2. **El arco a 1920** (punto 1): ¿vale angostarlo, o se prefiere el 4/5 bajando el arco?
 3. **Lighthouse de `/merida`**: dos 94 en 15 corridas contra un piso de 95 en `main`, con la misma mediana. ¿Se acepta o se investiga más?
+
+---
+
+## Auditoría del CEO (PR #35, 30/9 13:05): el ajuste y las decisiones
+
+- **Una sola numeración por núcleo:** se quitó la línea «01»…«05» y queda «NÚCLEO 1»…, que es el nombre que usa Armando. Captura `D-nucleos-1440-junto-a-512.jpg` rehecha. Fidelidad de `taller` a 1440/900/390 actualizada por el ajuste: cambian el texto y la imagen.
+- **Títulos en dos renglones: aprobados.** Pasaron de `PENDIENTES` a `APROBADAS` en `check/renglones.mjs`, con el motivo de dirección.
+- **Arco a 1920 como está** y **Lighthouse de `/merida` aceptado**: sin cambios.
+- `main` con el #34 adentro. El conflicto en `qa/piso-de-tests.md` se resolvió con `web` 63 y `familia` 83, más las secciones de la #23 y la #22.

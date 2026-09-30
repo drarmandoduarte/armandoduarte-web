@@ -44,13 +44,14 @@ export function Programa() {
         {t('taller.programa.titulo1')}<br /><span className="suave">{t('taller.programa.titulo2')}</span>
       </h2>
       {/* La línea de tiempo de «Cuatro etapas» de 512 (#23, D): círculo con el
-          glifo, la línea al siguiente, y debajo número, título y texto. */}
+          glifo, la línea al siguiente, y debajo título y texto. Sin la línea
+          «01»: con «NÚCLEO 1» eran dos numeraciones seguidas, y el nombre que
+          usa Armando es el segundo (auditoría del PR #35). */}
       <ol className="nucleos">
         {nucleos.map(([n, demora, clave, icono]) => (
           <li className="nucleo reveal" data-d={demora} key={n}>
             <span className="nucleo__circulo"><Glifo nombre={icono} lado={20} /></span>
             <span className="nucleo__linea" aria-hidden="true" />
-            <span className="nucleo__num">{n}</span>
             <h3><b>{t(`taller.programa.${clave}.rotulo`)}</b>{t(`taller.programa.${clave}.titulo`)}</h3>
             <p>{t(`taller.programa.${clave}.texto`)}</p>
           </li>

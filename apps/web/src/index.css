@@ -544,8 +544,9 @@ a,button{-webkit-tap-highlight-color:transparent}
      del número;
    · la línea es de 1 px `--hair` y va del borde del círculo al siguiente,
      atravesando la separación; el último no tiene;
-   · debajo, «01»…«05» en 12 px `--gris` con tracking, el título en **24/400**
-     (30 no entra en ~230 px) y el texto en 16;
+   · debajo, el título en **24/400** (30 no entra en ~230 px), con su rótulo
+     «NÚCLEO 1»…, y el texto en 16. La línea «01»…«05» que pedía la orden se
+     fue en la auditoría del PR #35: con el rótulo eran dos numeraciones;
    · 40 px entre columnas. Sin naranja (D26).
 
    `subgrid` para las filas, por lo de la #12 G: con títulos de uno y dos
@@ -553,23 +554,21 @@ a,button{-webkit-tap-highlight-color:transparent}
 
    Debajo de 1100 px la misma línea va en **vertical**: el círculo a la
    izquierda, la línea que baja al siguiente y el texto a la derecha. */
-.nucleos{list-style:none;margin:var(--s7) 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:auto auto auto 1fr;column-gap:40px}
-.nucleo{position:relative;display:grid;grid-row:span 4;grid-template-rows:subgrid;align-content:start}
+.nucleos{list-style:none;margin:var(--s7) 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:auto auto 1fr;column-gap:40px}
+.nucleo{position:relative;display:grid;grid-row:span 3;grid-template-rows:subgrid;align-content:start}
 .nucleo__circulo{width:44px;height:44px;border:1px solid var(--teal);border-radius:50%;display:grid;place-items:center;color:var(--teal);background:var(--crema)}
 .nucleo__circulo svg{display:block}
 .nucleo__linea{position:absolute;top:22px;left:44px;right:-40px;height:1px;background:var(--hair)}
 .nucleo:last-child .nucleo__linea{display:none}
-.nucleo__num{margin-top:var(--s4);font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:.18em;color:var(--gris);font-variant-numeric:tabular-nums}
-.nucleo h3{margin-top:12px;font-family:var(--display);font-weight:400;font-size:24px;line-height:1.25;color:var(--tinta)}
+.nucleo h3{margin-top:var(--s4);font-family:var(--display);font-weight:400;font-size:24px;line-height:1.25;color:var(--tinta)}
 .nucleo h3 b{display:block;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
 .nucleo p{margin-top:12px;font-size:16px;line-height:1.7;color:var(--gris)}
 @media (max-width:1100px){
   .nucleos{grid-template-columns:1fr;grid-template-rows:none;row-gap:var(--s5)}
   .nucleo{grid-row:auto;grid-template-rows:none;grid-template-columns:44px 1fr;column-gap:var(--s4)}
-  .nucleo__circulo{grid-column:1;grid-row:1 / span 3}
+  .nucleo__circulo{grid-column:1;grid-row:1 / span 2}
   .nucleo__circulo{align-self:start}
-  .nucleo__num,.nucleo h3,.nucleo p{grid-column:2}
-  .nucleo__num{margin-top:0;align-self:center;line-height:44px}
+  .nucleo h3,.nucleo p{grid-column:2}
   .nucleo h3{margin-top:0}
   .nucleo__linea{top:44px;left:22px;right:auto;bottom:calc(var(--s5) * -1);width:1px;height:auto}
 }
