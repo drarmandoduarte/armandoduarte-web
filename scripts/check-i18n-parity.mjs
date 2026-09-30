@@ -33,8 +33,18 @@ const FUENTE = 'es';
    claves —una sección entera— y este guardián salía verde. Un piso que quedó
    atrás no vigila nada. Son las 300 que hay hoy, contadas sobre el JSON; la #16
    no agregó ni quitó ninguna (movió el contenido de `taller.hero.titulo1` y
-   `titulo2`, que siguen siendo dos claves). */
-const PISO_DE_CLAVES = 300;
+   `titulo2`, que siguen siendo dos claves).
+
+   ── 300 → 299, por la orden #20 (D y E) ───────────────────────────────
+   **Y bajar es lo que este renglón existe para que se vea.** La #20 se llevó
+   `comun.pie.tallerFecha` y `comun.pie.reservar` —dirección quiso la columna
+   «Talleres» con el título y nada más— y trajo `taller.hechos.dondeAria`, el
+   rótulo del enlace al mapa: −2 +1 = 299.
+
+   Bajó a propósito y por eso se baja el número acá. El guardián hizo justo su
+   trabajo: se puso rojo solo al quitar las dos claves, y nadie tuvo que
+   acordarse de venir. */
+const PISO_DE_CLAVES = 299;
 
 const destinos = readdirSync(LOCALES).filter(
   (e) => e !== FUENTE && !e.startsWith('.') && statSync(join(LOCALES, e)).isDirectory(),
