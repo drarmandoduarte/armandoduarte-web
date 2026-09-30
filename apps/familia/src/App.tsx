@@ -77,7 +77,9 @@ export function App() {
     );
   }
 
-  if (!sesion) return <Entrar />;
+  /* Sin sesión, a la entrada — salvo que no se haya podido saber si la hay
+     (#22): eso va a la pantalla de error de abajo, no a pedir el correo. */
+  if (!sesion && decision !== 'error') return <Entrar />;
 
   /* Los códigos nuevos tapan todo lo demás mientras estén en pantalla: se ven
      una sola vez y no se pueden volver a pedir. */
