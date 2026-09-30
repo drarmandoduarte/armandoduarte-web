@@ -58,9 +58,13 @@
    Y la foto **termina en los muslos en todas las fuentes que existen**: no hay
    rodillas ni zapatos que recuperar. Por eso la regla es que el corte del
    archivo coincida con el borde inferior de la sección — así no se lee como un
-   corte, se lee como un apoyo. */
+   corte, se lee como un apoyo.
+
+   Y en la #23 (C) pasó a **2791**: la v2 recortaba desde la fila 474 del PNG
+   de Lucía y el pelo empieza en la 25, así que le cortaba la cabeza. La v3
+   recorta desde la fila 0 hasta la misma última fila opaca. */
 const RECORTES = {
-  'de-pie': { ancho: 1400, alto: 2526 },
+  'de-pie': { ancho: 1400, alto: 2791 },
   'medio-cuerpo': { ancho: 1400, alto: 1690 },
 } as const;
 

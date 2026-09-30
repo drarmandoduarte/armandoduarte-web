@@ -1,7 +1,7 @@
 {
   "$meta": {
     "name": "Códice — Design System (App Dr. Armando)",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "tagline": "Construyendo familias fuertes",
     "generated": "2026-09-17",
     "philosophy": "Quiet luxury con la atmósfera del set de grabación del doctor: luz ámbar de tarde, orden, cercanía sin ruido. Restraint editorial, whitespace generoso, tipografía por encima de imagen, sin sombras, sin degradados, motion invisible.",
@@ -10,6 +10,15 @@
     ],
     "density": "comfortable",
     "changelog": [
+      {
+        "version": "1.2.3",
+        "date": "2026-09-30",
+        "orden": "Códice #23",
+        "cambios": [
+          "`color.brand.ochre.text` #795B34 → #755832. La #23 sacó la franja de hechos de «¿Te suena?» y le devolvió su aire: el título y los números 01–03 quedaron sobre otra parte de la foto, y a 1440 «01» y «03» caían a 4,32 y 4,43. Mismo criterio de la #21 (el ocre de la casa oscurecido lo mínimo, en pasos de 0,5 %, hasta 4,5 sobre el píxel pintado a 12 px): 1440 → 4,54, 900 → 5,14, 390 → 5,24, 375 → 5,22. Un paso más claro (#765932) da 4,47.",
+          "Ningún otro valor cambia."
+        ]
+      },
       {
         "version": "1.2.2",
         "date": "2026-09-30",
@@ -105,7 +114,7 @@
         "mid": "#B18C54",
         "role": "Primario. Wordmark, CTAs, nav activa, marcadores, citas de libro. La luz ámbar de sus videos.",
         "note": "app: citas de libro (D6); la web usa CFF desde la #05.",
-        "text": "#795B34",
+        "text": "#755832",
         "textRole": "Web · #21: el rótulo «¿TE SUENA?» y los números 01–03 de esa sección, en ocre como en la captura de Lucía. Solo ahí.",
         "textContrast": "El ocre de la casa (#866539) oscurecido lo mínimo medido —pasos de 0,5 %, conservando la relación entre canales— hasta 4,5:1 sobre el píxel PINTADO (foto + velo al 86 %) a 12 px, con check/contraste.mjs en sus cuatro anchos: 390 → 4,51 (el «03», el que manda) · 375 → 4,60 · 900 → 4,89 · 1440 → 4,92. Un paso más claro (#7A5C34) da 4,45 a 390. Percentil 5 del rectángulo (el rincón más oscuro): 4,46 · 4,55 · 4,27 · 4,83."
       },

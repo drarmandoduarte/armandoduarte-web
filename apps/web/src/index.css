@@ -127,8 +127,13 @@ a,button{-webkit-tap-highlight-color:transparent}
    `white-space:nowrap` es el cinturón: aunque alguien cambie el ancho de la
    columna, «a tu» no se puede partir, así que «tu» no puede quedar solo nunca.
    Lo comprueba `check/renglones.mjs`, que corre en la gate a cuatro anchos. */
-.hero-taller__atu{white-space:nowrap}
-@media (max-width:599px){.hero-taller__atu{display:block}}
+/* ── Y desde la #23 (A), `block` en todos los anchos ────────────────────
+   Con el mismo hero que la portada, la columna de texto mide 625 px a 1440 y
+   «El arte de amar a tu» pide 762 al mismo tamaño de letra, que la orden no
+   deja achicar. Se parte donde ya se partía debajo de 600, entre «de» y «amar»,
+   y por la misma razón: «a tu» solo es un renglón huérfano. Sigue siendo un
+   salto estructural, así que la cuenta de renglones no depende de la fuente. */
+.hero-taller__atu{display:block;white-space:nowrap}
 .suave{color:var(--gris);font-weight:300}
 /* «se construyen» del hero de la portada, en negritas (orden #05, B).
    Lucía pidió «probar poner en negritas». La orden lo daba por `.suave` —gris,
@@ -183,7 +188,15 @@ a,button{-webkit-tap-highlight-color:transparent}
    solo de las que sobraban: la regla es de todas, y dos aires distintos en la
    misma página se ven peor que uno más ajustado. La tabla completa —sección ×
    viewport × altura × sobra, antes y después— está en `docs/informes/20/`. */
-.section{padding:clamp(40px,5vh,64px) 0;position:relative}
+/* ── Y en la #23 vuelve el aire: la regla de 100 vh se acota ──────────────
+   Dirección corrigió la #20: esa regla bajó el aire de **todas** las secciones
+   para que cada una entrara en una pantalla, y es lo que hacía que todo se
+   viera apretado. La vara de la casa es 512, con 160 px arriba y abajo y
+   secciones más altas que la pantalla. Desde la #23 solo los héroes miden la
+   pantalla; el resto lleva `clamp(96px,12vh,144px)` —108 px a 1440×900— y
+   **ninguna sección se aprieta para caber**. `check:altura` vigila los héroes
+   exactos y un tope de 1,6 pantallas contra lo desproporcionado. */
+.section{padding-block:clamp(96px,12vh,144px);position:relative}
 .calido{background:var(--calido);--velo:var(--calido)}
 
 .oscuro{background:var(--teal);color:var(--crema);--velo:var(--teal)}
@@ -349,7 +362,20 @@ a,button{-webkit-tap-highlight-color:transparent}
    misma maniobra que la #19 B hizo en `#facilitador` y `#quien`, y por el mismo
    motivo: quitarle el padding a la sección entera arrastraría también al texto.
    ───────────────────────────────────────────────────────────────────────── */
-.hero{min-height:100vh;max-height:100vh;min-height:100dvh;max-height:100dvh;padding:calc(var(--header-h) + clamp(28px,4vh,56px)) 0 0;display:flex;align-items:stretch}
+/* ── Los dos héroes, idénticos (orden #23, A) ────────────────────────────
+   Uno solo para las dos páginas (`web/comun/Hero.tsx`), y todo lo que decide
+   la forma está acá, sin variante por página. Lo medido antes: portada con el
+   arco de 520 a 257 px del borde, taller con 424 a 371, y en las dos el rótulo a
+   158 px de la cabecera. Ahora, a 1440×900:
+
+   · el **arco** arranca a 48 px de la línea de la cabecera y apoya en el borde
+     de abajo del hero: 900 − 76 − 48 = **776** de alto, y el ancho sale del
+     4/5 de siempre (621);
+   · el **rótulo** arranca a 72 px de la cabecera (y≈148): la columna de texto
+     va arriba y no centrada, con los 24 px que le faltan al padding de 48.
+
+   El padding de arriba es el del arco; el texto se baja lo que le falta. */
+.hero{min-height:100vh;max-height:100vh;min-height:100dvh;max-height:100dvh;padding:calc(var(--header-h) + 48px) 0 0;display:flex;align-items:stretch}
 /* Sin `width:100%`: la rejilla **es** el `.container`, y aquel ya trae su ancho
    —`min(90%,1400px,calc(100% - 40px))`— que es lo que le da el margen lateral a
    toda la web. Un `width:100%` acá lo pisaba (misma especificidad, y esta regla
@@ -358,33 +384,28 @@ a,button{-webkit-tap-highlight-color:transparent}
    visto ninguna medición de altura: la regla A mira el alto, y esto era el
    ancho. Para estirar la rejilla a lo alto no hacía falta —el `align-items:
    stretch` del `.hero` ya lo hace, que estira el eje transversal—. */
-.hero__grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(40px,6vw,96px);align-items:center}
+/* Dos columnas: el texto y el arco. La del arco es `fit-content` con un tope:
+   lo que deja libre el titular («Familias fuertes» pide 44 vw, y 625 px a su
+   tope de 80). A 1440 el tope no muerde y el arco tiene su 4/5 (621 × 776). A
+   1920 sí: el 4/5 serían 765 de ancho, al texto le quedaban 571 y «Familias
+   fuertes» se partía en cuatro renglones; con el tope el arco mide 711 × 956
+   —más angosto que 4/5, con la foto en `cover`— y el titular entra en dos. Se
+   eligió angostar el arco y no bajarlo: la orden fija dónde arranca y dónde
+   apoya. La fila es la pantalla (`minmax(0,1fr)`): si el texto pide más, no
+   empuja el arco. */
+.hero__grid{display:grid;grid-template-columns:minmax(0,1fr) fit-content(calc(100% - min(44vw,625px) - clamp(32px,3.5vw,64px)));grid-template-rows:minmax(0,1fr);gap:clamp(32px,3.5vw,64px);align-items:start}
 /* La columna de texto se queda con el aire que cedió la sección. */
-.hero__grid>div:first-child{padding-bottom:clamp(48px,7vh,80px)}
+.hero__grid>div:first-child{padding:24px 0 clamp(48px,7vh,80px)}
 /* Y el arco baja hasta el filo. `max-height:100%` es el freno: sin él, una
    columna ancha con `aspect-ratio:4/5` pide más alto del que hay y el arco se
    sale por arriba, que es peor que el defecto que vino a arreglar. */
-.hero .foto--arco{align-self:end;max-height:100%}
-/* ── El hero de /merida pide más ancho de texto que el de la portada (#16, A)
-   «El arte de amar a tu» tiene que entrar en **un** renglón de 900 px para
-   arriba, y con el reparto de la portada no entraba: medido a nueve anchos entre
-   901 y 1440, al `h1` le faltaban entre **46 y 72 px**. La orden pide ensanchar
-   la columna de texto **antes** de tocar el tamaño de letra, y eso es lo que se
-   hace: el `clamp()` de `.display-xl` **no se toca**, que además es el de la
-   portada y esto no tiene por qué llegar allá.
-
-   Dos ajustes y los dos van en la misma dirección: 1,15fr → 1,32fr y la
-   canaleta de `clamp(40px,6vw,96px)` a `clamp(32px,3.5vw,64px)`. Se reparte
-   entre los dos para que la foto pague menos: solo con la columna habría que
-   llegar a 1,45fr. Los números medidos, a 1440: el `h1` pasa de 695 a 822 px
-   —pide 762, así que sobran 60— y la foto del arco de 514 a 424, un 17 % menos
-   de ancho. El antes y el después están en `docs/informes/16/`.
-
-   Es una clase propia y no un cambio a `.hero__grid` porque el hero de la
-   portada **no tiene este problema**: su titular es más corto y su foto es el
-   recorte de cuerpo entero, que a 424 px se vería apretado. Un cambio en
-   `.hero__grid` habría movido las dos páginas para arreglar una. */
-.hero__grid--taller{grid-template-columns:1.32fr .68fr;gap:clamp(32px,3.5vw,64px)}
+/* #23: el alto es la pantalla menos la cabecera y los 48 px, escrito y no
+   heredado de la rejilla, para que las dos páginas den la misma caja aunque la
+   columna de texto mida distinto. `100vh` antes, de respaldo, como en `.hero`. */
+.hero .foto--arco{align-self:end;height:calc(100vh - var(--header-h) - 48px);height:calc(100dvh - var(--header-h) - 48px);width:100%}
+/* (La columna ancha del taller, `.hero__grid--taller` de la #16, se fue en la
+   #23: los dos héroes son el mismo. El titular del taller pasó a tres
+   renglones; ver `.hero-taller__atu`.) */
 .hero-sub{margin-top:var(--s4);font-size:clamp(18px,1.5vw,21px);line-height:1.6;color:var(--gris);max-width:40ch}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:var(--s5)}
 .hero-micro{margin-top:var(--s4);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}
@@ -436,7 +457,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 #facilitador .grid-2.centro,#quien .grid-2.centro{align-items:end}
 #facilitador .foto--libre,#quien .foto--libre{align-self:end;margin-bottom:0}
 #facilitador,#quien{padding-bottom:0}
-#facilitador .grid-2>div:last-child,#quien .grid-2>div:last-child{padding-bottom:clamp(40px,5vh,64px)}
+#facilitador .grid-2>div:last-child,#quien .grid-2>div:last-child{padding-bottom:clamp(96px,12vh,144px)}
 #porque .foto-tarjeta{max-width:480px}
 #programa .sello{margin-top:var(--s5)}
 #programa .lista--2{margin-top:0}
@@ -512,36 +533,46 @@ a,button{-webkit-tap-highlight-color:transparent}
 }
 .oscuro .lista{border-color:var(--hair-oscura)}.oscuro .lista li{border-color:var(--hair-oscura)}.oscuro .lista h3{color:var(--crema)}.oscuro .lista p{color:rgba(250,247,241,.75)}.oscuro .lista .n{color:color-mix(in oklab, var(--crema) 70%, transparent)}
 
-/* ── Pasos · número en círculo + línea (512) ────────────────────────── */
-/* ── Las tres filas se alinean entre columnas (orden #12, G) ──────────────
-   Con cuatro núcleos los títulos medían casi lo mismo y nadie lo notaba. Con
-   cinco, «Definir estrategias» entra en una línea y los otros cuatro en dos, y
-   entonces su párrafo arrancaba 30 px más arriba que el de al lado. `subgrid`
-   hace que las tres filas —el ícono, el título y el texto— sean las mismas
-   filas para las cinco columnas, así que los párrafos empiezan todos a la misma
-   altura sin fijarle un alto a nada. Donde no haya `subgrid`, la declaración se
-   descarta y queda el mismo apilado de antes: el `span 3` sigue dando una fila
-   de cinco. ─────────────────────────────────────────────────────────────── */
-/* ── Tres más dos (orden #20-bis) ─────────────────────────────────────────
-   Dirección partió `#programa` en dos secciones (#20, A.5) y pidió los núcleos
-   «3 + 2»: una fila de tres y otra de dos. Es la misma grilla que ya tenía la
-   pantalla de menos de 1100, ahora en todas. La línea entre núcleos se apaga
-   en todos los anchos: en una fila de tres el tercero apuntaría a nada.
-   Medido a 1440×900: la sección queda en 844 (con los cinco en fila medía 693;
-   la opción literal «dos columnas, 3 a la izquierda y 2 a la derecha» mide
-   1076 y no entra). ──────────────────────────────────────────────────────── */
-.pasos{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto 1fr;gap:var(--s5);margin-top:var(--s7)}
-.paso__line{display:none}
-.paso{display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:var(--s3);align-content:start}
-.paso__head{display:flex;align-items:center;gap:16px}
-/* El número, sin el círculo naranja que lo envolvía: en una línea de tiempo el
-   círculo compite con el ícono que tiene al lado (orden #07, A). */
-.paso__num{font-family:var(--display);font-weight:500;font-size:12px;color:var(--gris);letter-spacing:.06em;flex:none;font-variant-numeric:tabular-nums}
-.paso__line{flex:1;height:1px;background:var(--hair);margin-right:calc(var(--s5) * -1)}
-.paso h3{font-family:var(--display);font-weight:400;font-size:clamp(19px,1.6vw,23px);line-height:1.25;color:var(--tinta)}
-.paso h3 b{display:block;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
-.paso p{font-size:15.5px;line-height:1.7;color:var(--gris)}
-.paso p+p{margin-top:8px}
+/* ── Núcleos · la línea de tiempo de «Cuatro etapas» de 512 (orden #23, D) ─
+   Medido en 512.com.uy a 1440×900: círculo de 44 px con borde de 1 px del
+   acento y el número adentro; una línea de 1 px que une cada círculo con el
+   siguiente; columnas de 294 con 48 de separación; título 30/300, texto 16/300.
+
+   Acá, con cinco columnas en vez de cuatro (~230 px cada una):
+   · el círculo es el mismo, con borde de 1 px `--teal`, y adentro va **el
+     ícono de Lucía** de cada núcleo a 20 px en `--teal` (`Glifo.tsx`) en lugar
+     del número;
+   · la línea es de 1 px `--hair` y va del borde del círculo al siguiente,
+     atravesando la separación; el último no tiene;
+   · debajo, «01»…«05» en 12 px `--gris` con tracking, el título en **24/400**
+     (30 no entra en ~230 px) y el texto en 16;
+   · 40 px entre columnas. Sin naranja (D26).
+
+   `subgrid` para las filas, por lo de la #12 G: con títulos de uno y dos
+   renglones, los párrafos arrancan todos a la misma altura.
+
+   Debajo de 1100 px la misma línea va en **vertical**: el círculo a la
+   izquierda, la línea que baja al siguiente y el texto a la derecha. */
+.nucleos{list-style:none;margin:var(--s7) 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:auto auto auto 1fr;column-gap:40px}
+.nucleo{position:relative;display:grid;grid-row:span 4;grid-template-rows:subgrid;align-content:start}
+.nucleo__circulo{width:44px;height:44px;border:1px solid var(--teal);border-radius:50%;display:grid;place-items:center;color:var(--teal);background:var(--crema)}
+.nucleo__circulo svg{display:block}
+.nucleo__linea{position:absolute;top:22px;left:44px;right:-40px;height:1px;background:var(--hair)}
+.nucleo:last-child .nucleo__linea{display:none}
+.nucleo__num{margin-top:var(--s4);font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:.18em;color:var(--gris);font-variant-numeric:tabular-nums}
+.nucleo h3{margin-top:12px;font-family:var(--display);font-weight:400;font-size:24px;line-height:1.25;color:var(--tinta)}
+.nucleo h3 b{display:block;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
+.nucleo p{margin-top:12px;font-size:16px;line-height:1.7;color:var(--gris)}
+@media (max-width:1100px){
+  .nucleos{grid-template-columns:1fr;grid-template-rows:none;row-gap:var(--s5)}
+  .nucleo{grid-row:auto;grid-template-rows:none;grid-template-columns:44px 1fr;column-gap:var(--s4)}
+  .nucleo__circulo{grid-column:1;grid-row:1 / span 3}
+  .nucleo__circulo{align-self:start}
+  .nucleo__num,.nucleo h3,.nucleo p{grid-column:2}
+  .nucleo__num{margin-top:0;align-self:center;line-height:44px}
+  .nucleo h3{margin-top:0}
+  .nucleo__linea{top:44px;left:22px;right:auto;bottom:calc(var(--s5) * -1);width:1px;height:auto}
+}
 .receso{margin-top:var(--s5);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)}
 
 /* ── Hechos · la franja ─────────────────────────────────────────────── */
@@ -556,6 +587,25 @@ a,button{-webkit-tap-highlight-color:transparent}
    reposo, hairline al pasar, y el foco lo pone la regla global de D26. La
    diferencia con `.contacto .grande a` es el color de la línea, porque acá el
    fondo es claro. */
+/* ── La banda de hechos del taller (orden #23, B) ────────────────────────
+   Salió de «¿Te suena?» y es lo que «AHORA» es en la portada: una banda entre
+   el hero y la primera sección, con su mismo `padding` (`--s5`) y una sola
+   fila a escritorio. `--calido`, sin foto, íconos teal y etiquetas en tinta
+   —la tinta es de la auditoría del #33, cuando la franja estaba sobre la foto;
+   sobre cálido plano se queda por lo mismo que allá: se lee como el valor—.
+   Sin las hairlines ni el margen de cuando era una fila dentro de la sección:
+   el borde lo pone el cambio de color. */
+.hechos-banda{background:var(--calido);--velo:var(--calido);padding:var(--s5) 0}
+.hechos-banda .hechos{border:0;margin:0;padding:0}
+.hechos-banda .hechos div span{color:var(--tinta)}
+/* A escritorio, la celda compacta de la #20: el ícono a la izquierda y las dos
+   líneas a su derecha. Es lo que deja la banda en una fila del alto de «AHORA». */
+@media (min-width:1101px){
+  .hechos-banda .hechos>div{display:grid;grid-template-columns:40px 1fr;column-gap:12px;align-items:center}
+  .hechos-banda .hechos>div>svg,.hechos-banda .hechos>div>img{grid-row:1 / span 2;align-self:center;margin-bottom:0}
+  .hechos-banda .hechos div span{grid-column:2;align-self:end}
+  .hechos-banda .hechos div b{grid-column:2;margin-top:2px;align-self:start}
+}
 .hechos div b a{color:inherit;border-bottom:1px solid transparent;transition:border-color .32s var(--ease)}
 .hechos div b a:hover{border-color:var(--gris)}
 
@@ -681,7 +731,6 @@ a,button{-webkit-tap-highlight-color:transparent}
 .eyebrow--icono{display:flex;align-items:center;gap:10px}
 .eyebrow--icono img{flex:none}
 .hechos div img{margin-bottom:12px}
-.paso__icono{flex:none}
 
 /* ── Fotografía de fondo, bajo un velo (orden #05, D) ────────────────────
    El velo va sobre la foto y debajo del texto. Su color es el de la sección
@@ -768,10 +817,6 @@ a,button{-webkit-tap-highlight-color:transparent}
    píxel pintado —foto + velo— a 12 px; el número y cómo se midió están en
    `codice-tokens.css`. Solo se usa en esta sección. */
 .suena-fondo .eyebrow,.suena-fondo .lista .n{color:var(--ocre-texto)}
-/* Auditoría del #33 (1): con el encuadre de Lucía el pelo del chico queda
-   detrás de la franja de hechos, y las etiquetas grises de 11 px caían a
-   3,69–4,31. En tinta, como el resto del texto de esta sección: 0 bajo AA. */
-.suena-fondo .hechos div span{color:var(--tinta)}
 
 /* ── El eyebrow: ni ámbar ni naranja, y los dos números están acá ────────
    (Los hex de abajo van **sin numeral** a propósito: `check:tokens` lee un `#`
@@ -822,26 +867,15 @@ a,button{-webkit-tap-highlight-color:transparent}
    paddings verticales: 28 → 24 arriba y abajo devuelve los 5 px y 3 más. */
 @media (min-width:901px){.bloque-cita--ancha{max-width:84%;padding-block:24px}}
 
-/* ── Y la sección entera dentro de 100 vh a escritorio (regla de la #20 A) ─
-   La franja de hechos incluida. Los números salen de la orden: paddings
-   verticales a `clamp(40px,5vh,64px)`, el `gap` de la grilla a `--s5`, la
-   franja compacta —ícono y rótulo en la misma línea, que es lo que la hace
-   bajar de tres renglones a dos— y la cita con 28 px. Lo medido está en el
-   informe; si algo sobra, también. */
+/* ── El ritmo de adentro de «¿Te suena?» a escritorio (de la #20 A) ─────
+   El `gap` de la grilla a `--s5` y la cita con su margen. El padding de la
+   sección y la franja compacta se fueron en la #23: el primero volvió al aire
+   de todas, y la franja es su propia banda (`.hechos-banda`). */
 @media (min-width:1101px){
-  .suena-fondo{padding-top:clamp(40px,5vh,64px);padding-bottom:clamp(40px,5vh,64px)}
-  .suena-fondo .grid-2{gap:var(--s5);margin-top:var(--s5)}
+  .suena-fondo .grid-2{gap:var(--s5)}
   .suena-fondo .lista{margin-top:var(--s4)}
   .suena-fondo .lista li{padding:16px 0}
   .suena-fondo .bloque-cita{margin-top:var(--s5)}
-  .suena-fondo .hechos{padding-block:clamp(14px,1.8vh,20px);margin-top:var(--s4)}
-  /* La franja compacta: el ícono a la izquierda y las dos líneas a su derecha,
-     en vez de ícono arriba / rótulo / valor en tres renglones. Son ~46 px por
-     celda y es lo que hace que la sección entre en la ventana. */
-  .suena-fondo .hechos>div{display:grid;grid-template-columns:40px 1fr;column-gap:12px;align-items:center}
-  .suena-fondo .hechos>div>svg,.suena-fondo .hechos>div>img{grid-row:1 / span 2;align-self:center}
-  .suena-fondo .hechos div span{grid-column:2;align-self:end}
-  .suena-fondo .hechos div b{grid-column:2;margin-top:2px;align-self:start}
 }
 
 .foto-tarjeta{border-radius:12px;overflow:hidden;background:var(--calido)}
@@ -869,8 +903,8 @@ a,button{-webkit-tap-highlight-color:transparent}
      debajo de 1440. */
   .hero{min-height:0;max-height:none;padding:calc(var(--header-h) + 40px) 0 clamp(48px,7vh,80px)}
   .hero__grid{grid-template-columns:1fr;gap:var(--s5)}
-  .hero__grid>div:first-child{padding-bottom:0}
-  .hero .foto--arco{align-self:auto;max-height:none}
+  .hero__grid>div:first-child{padding:0}
+  .hero .foto--arco{align-self:auto;max-height:none;height:auto;width:100%}
   .hero .foto{aspect-ratio:4/5;max-height:none;max-width:420px;margin-top:8px}
   .grid-2{grid-template-columns:1fr;gap:var(--s5)}
   /* Apilado, el recorte pasa **debajo** del texto para poder seguir apoyado en
@@ -890,7 +924,7 @@ a,button{-webkit-tap-highlight-color:transparent}
   .fondo-foto--suena img{object-position:52% 40%}
   .plan{grid-template-columns:1fr;gap:var(--s5)}
 }
-@media (max-width:700px){.pasos{grid-template-columns:1fr}.ft__grid{grid-template-columns:1fr}}
+@media (max-width:700px){.ft__grid{grid-template-columns:1fr}}
 @media (max-width:600px){
   /* ── «¿Te suena?» en el teléfono (auditoría del #33, 2) ─────────────────
      La sección mide ~375×2200: ningún recorte muestra la cara entera si la

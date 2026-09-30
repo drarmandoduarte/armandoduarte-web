@@ -173,6 +173,8 @@ export const PENDIENTES = [
   ['#suena h2', 'desconocido?', 'cola de «¿El niño dulce que criaste se volvió un desconocido?» a 1440, 390 y 375', 1],
   ['#preguntas h2', 'silencio.', 'cola de «Siete preguntas que te haces en silencio.» a 390 y 375', 1],
   ['#programa h3', 'Comprender', 'renglón del medio del Núcleo 3, «Comprender nuestra familia», a 1440 y 900', 1],
+  ['#programa h3', 'adolescencia', 'cola del Núcleo 1, «Estudiar la adolescencia». Desde la #23 (D) el título va a 24 px en columnas de 227 (cinco en fila, las dos medidas de la orden): no entra en un renglón, y en dos cualquier corte deja una palabra sola. A 1440, 390 y 375', 1],
+  ['#programa h3', 'cambios', 'cola del Núcleo 5, «Realizar los cambios», por lo mismo que el Núcleo 1. A 1440', 1],
   ['#reservar h2', 'padres', 'el cierre («El amor incondicional no es la ausencia de límites…») mide siete renglones a 375, y `text-wrap: balance` de Chromium sólo trabaja hasta seis', 1],
   ['#reservar h2', 'conscientes.', 'el mismo cierre, último renglón, a 375', 1],
 ];
