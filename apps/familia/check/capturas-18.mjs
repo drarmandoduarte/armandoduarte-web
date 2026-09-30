@@ -170,6 +170,22 @@ for (const pantalla of PANTALLAS) {
     const archivo = `${pantalla.nombre}-${ancho}.jpg`;
     await p.screenshot({ path: join(SALIDA, archivo), type: 'jpeg', quality: 86, fullPage: true });
 
+    /* El zoom al borde del brazo izquierdo, a 1440 (auditoría del PR #32,
+       decisión 2): la esquina de abajo a la izquierda del panel, con la línea
+       del pie adentro, al doble de tamaño. Es donde se veía el corte seco. */
+    if (pantalla.nombre === '01-entrar-correo' && ancho === 1440) {
+      const caja = await p.evaluate(() => {
+        const r = document.querySelector('.panel').getBoundingClientRect();
+        return { x: 0, y: Math.round(r.bottom - 300), width: 360, height: 340 };
+      });
+      const zoom = await ctx.newPage();
+      await zoom.setViewportSize({ width: 720, height: 680 });
+      const recorte = (await p.screenshot({ clip: caja, type: 'png' })).toString('base64');
+      await zoom.setContent(`<body style="margin:0"><img width="720" height="680" style="image-rendering:pixelated" src="data:image/png;base64,${recorte}"></body>`);
+      await zoom.screenshot({ path: join(SALIDA, 'zoom-brazo-izquierdo-1440.jpg'), type: 'jpeg', quality: 90 });
+      await zoom.close();
+    }
+
     /* A · el botón principal a la vista sin desplazar, a 375 (solo /entrar). */
     const botonALaVista = pantalla.nombre === '01-entrar-correo'
       ? await p.evaluate(() => {

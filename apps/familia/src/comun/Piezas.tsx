@@ -79,8 +79,15 @@ function Cabecera() {
  * facilitador» de `/merida`.
  *
  * El busto es la imagen más pesada de la pantalla y, en escritorio, el LCP. Por
- * eso: **un solo WebP de 560** (42 KB; el panel nunca lo muestra a más de
- * ~470 px), `loading` normal y `fetchpriority="high"`. Con `alt` vacío porque
+ * eso: **un solo WebP**, `loading` normal y `fetchpriority="high"`.
+ *
+ * Es el recorte de **900** (67 KB) y no el de 560 (42 KB), por decisión de
+ * dirección (auditoría del PR #32, 30/9): la foto termina en seco en los dos
+ * brazos, y con el de 560 a ~470 px el corte del brazo izquierdo quedaba a la
+ * vista a 1440. Con el de 900 el busto ocupa **el ancho entero del panel** y
+ * los dos cortes coinciden con sus bordes. Premium primero: 25 KB más, en una
+ * pantalla que se visita una vez por sesión y que en el teléfono no la baja
+ * (`usar-ancho.ts`). Con `alt` vacío porque
  * es ambiente: el nombre de Armando ya lo dice el wordmark de al lado, y un
  * lector de pantalla no gana nada con oír «Armando Duarte» dos veces seguidas.
  *
@@ -92,15 +99,17 @@ function PanelDeArmando() {
   return (
     <aside className="panel" aria-hidden="true">
       <p className="panel__firma">{t('web:comun.marca.tagline')}</p>
-      <img
-        className="panel__busto"
-        src="/img/armando/medio-cuerpo-560.webp"
-        width={560}
-        height={676}
-        alt=""
-        fetchPriority="high"
-        decoding="async"
-      />
+      <div className="panel__foto">
+        <img
+          className="panel__busto"
+          src="/img/armando/medio-cuerpo-900.webp"
+          width={900}
+          height={1087}
+          alt=""
+          fetchPriority="high"
+          decoding="async"
+        />
+      </div>
     </aside>
   );
 }

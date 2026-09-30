@@ -6,7 +6,7 @@ Orden Códice #18, «La entrada a la altura de la web». Rama `mi-espacio/04-la-
 
 ## Qué se hizo
 
-**A · dos mitades a ≥ 1100.** A la izquierda, el panel `--calido` a sangre, con «Construyendo familias fuertes» en Great Vibes y el busto (`medio-cuerpo`) apoyado en el borde de abajo. A la derecha, la columna de 420. Por debajo de 1100 el panel no se monta y queda el retrato circular de 64 px arriba del título. A 375 no hay scroll horizontal y el botón principal se ve sin desplazar (lo mide el script).
+**A · dos mitades a ≥ 1100.** A la izquierda, el panel `--calido` a sangre, con «Construyendo familias fuertes» en Great Vibes y el busto (`medio-cuerpo`, recorte de 900) llenando el panel de borde a borde, apoyado en la línea del pie. A la derecha, la columna de 420. Por debajo de 1100 el panel no se monta y queda el retrato circular de 64 px arriba del título. A 375 no hay scroll horizontal y el botón principal se ve sin desplazar (lo mide el script).
 
 **B · la columna, de arriba abajo.**
 - Cabecera con el wordmark y «← Volver a la web», los dos hacia `armandoduarte.com`.
@@ -79,5 +79,11 @@ El punto que falta **no está en las imágenes**. Medido sin retrato: 75. Sin re
    - (b) pedir otra vuelta sobre el marco.
 
    Ya se probaron las palancas de las imágenes.
-2. **El corte izquierdo del busto a ≥ 1100.** La foto termina en seco en los dos brazos. El derecho quedó contra el borde del panel y no se ve. El izquierdo, abajo, sí se ve (ver `01-entrar-correo-1440.jpg`). Se resuelve estirando la foto al ancho entero del panel, pero eso pide el recorte de 900 (67 KB contra 42) y la orden fija 560 como máximo.
-3. **El color de la firma.** Va en `--tinta` porque en esta pantalla el naranja es solo del botón (B.2). En el pie de la web es naranja. Si dirección la quiere en otro color, es un renglón.
+2. **El color de la firma.** Va en `--tinta` porque en esta pantalla el naranja es solo del botón (B.2). En el pie de la web es naranja. Si dirección la quiere en otro color, es un renglón.
+
+## Auditoría del CEO (30/9 02:05) · aplicada
+
+- **Performance 75: aceptado.** Firma en `--tinta`: se queda. El «Un momento…» eterno va en la orden #22.
+- **Decisión 2, el busto:** pasa al recorte de **900** (`medio-cuerpo-900.webp`, 67 KB; el de 560 se borró de `public/`). Ahora **llena el panel de borde a borde**: el corte del brazo izquierdo coincide con el borde de la pantalla y el del derecho con el cambio a crema. Se ve en `zoom-brazo-izquierdo-1440.jpg`, que es la esquina de abajo a la izquierda del panel al doble, con la línea del pie adentro.
+- **Lo que costó la primera vuelta, dicho:** con la foto a `width:100%` en el flujo, a 1440 medía 782 px de alto, estiraba la fila y mandaba el pie debajo del pliegue (la captura medía 1073 en una pantalla de 900). Ahora la foto vive en una caja que toma el espacio que queda debajo de la firma, sin aportar altura, y la llena con `object-fit:cover` anclada arriba. Las capturas vuelven a medir la pantalla exacta: 1440×900 y 1100×800.
+- El marco en el teléfono no cambia: a < 1100 el panel no se monta y el busto no se descarga (`usar-ancho.ts`).

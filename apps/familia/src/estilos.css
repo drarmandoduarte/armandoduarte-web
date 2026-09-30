@@ -111,13 +111,22 @@ img,svg{display:block;max-width:100%}
 /* La firma, en la Great Vibes de la web. En `--tinta` y no en naranja: en esta
    pantalla el naranja es del botón y de nadie más (D26). */
 .panel__firma{font-family:var(--script);font-weight:400;font-size:var(--script-size);line-height:1.1;color:var(--tinta);text-align:center;padding:0 32px}
-/* El busto se apoya en el borde de abajo, y va contra el borde DERECHO del
-   panel: el archivo termina en seco en el hombro derecho (x = 560, desde la
-   mitad de la foto para abajo). Centrado, ese corte quedaba como una línea
-   vertical en medio del cálido; contra el borde, coincide con el cambio a
-   crema y se lee como un apoyo, no como un recorte — la misma regla que la
-   #19 (B) aplicó al borde de abajo en «Sobre el facilitador». */
-.panel__busto{width:min(86%,470px);height:auto;margin-top:32px;align-self:flex-end}
+/* El busto llena el panel de borde a borde (#18, decisión 2 del PR #32). La
+   foto termina en seco en los dos brazos: centrada o contra un solo borde,
+   alguno de los dos cortes quedaba a la vista como una línea en medio del
+   cálido. Llenando el ancho, el izquierdo coincide con el borde de la pantalla
+   y el derecho con el cambio a crema.
+
+   Y el panel NO decide la altura de la página. La primera versión ponía la
+   foto a `width:100%` en el flujo: a 1440 medía 782 px de alto, estiraba la
+   fila y mandaba el pie debajo del pliegue (la captura medía 1073 de 900). Por
+   eso la foto vive en una caja que toma **el espacio que queda** debajo de la
+   firma (`flex:1 1 0`, sin aportar altura propia) y la llena con
+   `object-fit:cover` anclado arriba: siempre cubre el ancho, la cabeza queda
+   entera, y lo que sobra se recorta abajo, contra la línea del pie — que es
+   donde un corte se lee como apoyo (la regla de la #19 B). */
+.panel__foto{position:relative;flex:1 1 0;min-height:0;width:100%;margin-top:32px}
+.panel__busto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
 
 .titulo{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,44px);line-height:1.1;letter-spacing:-.01em;color:var(--tinta);text-wrap:balance}
 /* La palabra acentuada (B.2): teal, nunca naranja — el naranja es del botón. */
