@@ -6,6 +6,7 @@ import {
 } from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
 import { BotonPrincipal, Campo, Selector, Titulo } from '../comun/Piezas';
+import { CampoWhatsApp } from '../comun/CampoWhatsApp';
 import { CabeceraDeContenido } from '../comun/Marco';
 import { EnlaceInterno, useNavegar } from '../comun/navegacion';
 import { RUTAS, WEB } from '../rutas';
@@ -215,8 +216,9 @@ function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: () => P
           error={error('nombre')} onChange={cambiar('nombre')} />
         <Campo id="apellido" rotulo={t('miEspacio.apellido')} value={datos.apellido} autoComplete="family-name"
           error={error('apellido')} onChange={cambiar('apellido')} />
-        <Campo id="whatsapp" rotulo={t('miEspacio.whatsapp')} ayuda={t('miEspacio.whatsappAyuda')}
-          value={datos.whatsapp} type="tel" inputMode="tel" autoComplete="tel" error={error('whatsapp')} onChange={cambiar('whatsapp')} />
+        <CampoWhatsApp id="whatsapp" rotulo={t('miEspacio.whatsapp')} ayuda={t('miEspacio.whatsappAyuda')}
+          valor={datos.whatsapp} paisSugerido={datos.pais || null} error={errores.whatsapp}
+          alCambiar={(v) => cambiar('whatsapp')({ target: { value: v } })} />
         <Selector id="pais" rotulo={t('miEspacio.pais')} value={datos.pais} autoComplete="country"
           error={error('pais')} onChange={cambiar('pais')}
           opciones={[{ valor: '', texto: t('miEspacio.sinElegir') }, ...paises.map((x) => ({ valor: x.codigo, texto: x.nombre }))]} />

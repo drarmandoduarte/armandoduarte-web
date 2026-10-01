@@ -105,7 +105,8 @@ describe('Tus datos: el perfil', () => {
     guardar();
     expect(await screen.findByText(t('miEspacio.guardado'))).toBeTruthy();
     expect(pedidos.find((p) => p.ruta === '/api/yo' && p.metodo === 'POST')?.cuerpo).toEqual({
-      nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 000 0000', pais: 'MX',
+      /* #32: el WhatsApp viaja en E.164. */
+      nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+529990000000', pais: 'MX',
       ciudad: 'Mérida', anio_nacimiento: 1984, nivel_educativo: 'prefiero_no_decir',
     });
   });

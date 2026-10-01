@@ -101,7 +101,14 @@
     "nombre": "Nombre",
     "apellido": "Apellido",
     "whatsapp": "WhatsApp",
-    "whatsappAyuda": "Con la clave de tu país, por ejemplo +52 999 123 4567.",
+    "whatsappAyuda": "Te avisamos todo lo de tu taller por WhatsApp.",
+    "whatsappCampo": {
+      "pais": "País del número",
+      "paisElegido": "País del número: {{pais}} ({{prefijo}})",
+      "buscar": "Busca tu país",
+      "lista": "Países",
+      "sinResultados": "No encontramos ese país."
+    },
     "pais": "País",
     "guardar": "Guardar",
     "guardando": "Guardando…",
@@ -161,7 +168,8 @@
     "errores": {
       "nombre": "Escribe tu nombre.",
       "apellido": "Escribe tu apellido.",
-      "whatsapp": "Escribe tu WhatsApp con la clave de tu país.",
+      "whatsapp": "Escribe tu WhatsApp.",
+      "whatsappPais": "Ese número no parece de {{pais}}. Revisa que esté completo.",
       "largo": "Es demasiado largo.",
       "sinLugares": "Ya no quedan lugares en este taller.",
       "edicionCerrada": "Este taller ya no recibe inscripciones."

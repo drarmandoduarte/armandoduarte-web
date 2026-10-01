@@ -45,14 +45,17 @@ describe('los datos para anotarse', () => {
   });
 
   it('valida solo lo que se pidió, con claves de i18n', () => {
+    /* #32: vacío pide el número; uno que no es de su país lo dice por el país. */
     expect(validarDatosParaAnotarse({ nombre: '', whatsapp: '12' }, ['nombre', 'whatsapp']))
-      .toEqual({ nombre: 'miEspacio.errores.nombre', whatsapp: 'miEspacio.errores.whatsapp' });
+      .toEqual({ nombre: 'miEspacio.errores.nombre', whatsapp: 'miEspacio.errores.whatsappPais' });
+    expect(validarDatosParaAnotarse({ whatsapp: '' }, ['whatsapp'])).toEqual({ whatsapp: 'miEspacio.errores.whatsapp' });
     expect(validarDatosParaAnotarse({ apellido: 'x'.repeat(81) }, ['apellido'])).toEqual({ apellido: 'miEspacio.errores.largo' });
     expect(validarDatosParaAnotarse({}, [])).toEqual({});
   });
 
-  it('a la API viaja solo lo pedido, recortado', () => {
+  it('a la API viaja solo lo pedido, recortado; el WhatsApp en E.164 (#32)', () => {
     expect(datosParaEnviar({ nombre: ' Laura ', apellido: 'X', whatsapp: '+52 1' }, ['nombre'])).toEqual({ nombre: 'Laura' });
+    expect(datosParaEnviar({ whatsapp: '+52 999 123 4567' }, ['whatsapp'])).toEqual({ whatsapp: '+529991234567' });
   });
 });
 

@@ -206,8 +206,9 @@ describe('#29 C: sin los tres datos, primero /empezar — y el taller espera', (
 
     expect(await screen.findByRole('button', { name: t('miEspacio.confirmarLugar') })).toBeTruthy();
     expect(window.location.pathname).toBe(`/me-anoto/${SLUG}`);
+    /* #32: el WhatsApp viaja en E.164. */
     expect(pedidos.find((p) => p.ruta === '/api/yo' && p.cuerpo)?.cuerpo).toEqual({
-      nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 123 4567', pais: 'MX',
+      nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+529991234567', pais: 'MX',
     });
   });
 

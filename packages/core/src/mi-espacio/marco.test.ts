@@ -67,7 +67,7 @@ describe('/empezar: validar y enviar', () => {
   it('los tres obligatorios se piden; ciudad no', () => {
     expect(validarEmpezar(lleno)).toEqual({});
     expect(validarEmpezar({ ...lleno, nombre: ' ', apellido: '', whatsapp: '12' })).toEqual({
-      nombre: 'miEspacio.errores.nombre', apellido: 'miEspacio.errores.apellido', whatsapp: 'miEspacio.errores.whatsapp',
+      nombre: 'miEspacio.errores.nombre', apellido: 'miEspacio.errores.apellido', whatsapp: 'miEspacio.errores.whatsappPais',
     });
   });
 
@@ -78,7 +78,8 @@ describe('/empezar: validar y enviar', () => {
   });
 
   it('la ciudad vacía no viaja (null borraría la de Mis datos); con texto, recortada', () => {
-    expect(empezarParaEnviar({ ...lleno, nombre: ' Ana ' })).toEqual({ nombre: 'Ana', apellido: 'Pérez', whatsapp: '+52 999 123 4567', pais: 'MX' });
+    /* #32: el WhatsApp viaja en E.164. */
+    expect(empezarParaEnviar({ ...lleno, nombre: ' Ana ' })).toEqual({ nombre: 'Ana', apellido: 'Pérez', whatsapp: '+529991234567', pais: 'MX' });
     expect(empezarParaEnviar({ ...lleno, ciudad: ' Mérida ' }).ciudad).toBe('Mérida');
   });
 });

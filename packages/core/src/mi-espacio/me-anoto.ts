@@ -12,7 +12,7 @@
  *
  * Los errores son **claves de i18n** (`miEspacio.errores.*`), no textos.
  */
-import { telefonoParaWa } from '../panel/listas';
+import { whatsappE164, whatsappValido } from './whatsapp';
 import { TELEFONO_GABY, enlaceWhatsApp } from '../web/contacto';
 import { PATRON_DE_SLUG } from '../panel/cursos';
 import { ciudadDeZona, esZonaValida, horaCorta, horaDeParedDe } from '../panel/zonas';
@@ -69,7 +69,7 @@ export function datosQueFaltan(
   const faltan: DatoParaAnotarse[] = [];
   if (!persona?.nombre?.trim()) faltan.push('nombre');
   if (!persona?.apellido?.trim()) faltan.push('apellido');
-  if (!telefonoParaWa(persona?.whatsapp)) faltan.push('whatsapp');
+  if (!whatsappValido(persona?.whatsapp)) faltan.push('whatsapp');
   return faltan;
 }
 
@@ -82,7 +82,8 @@ export function validarDatosParaAnotarse(
   for (const campo of pedidos) {
     const valor = (entrada[campo] ?? '').trim();
     if (campo === 'whatsapp') {
-      if (!telefonoParaWa(valor)) errores.whatsapp = 'miEspacio.errores.whatsapp';
+      if (!valor) errores.whatsapp = 'miEspacio.errores.whatsapp';
+      else if (!whatsappValido(valor)) errores.whatsapp = 'miEspacio.errores.whatsappPais';
     } else if (valor.length === 0) {
       errores[campo] = `miEspacio.errores.${campo}`;
     } else if (valor.length > 80) {
@@ -98,7 +99,11 @@ export function datosParaEnviar(
   pedidos: readonly DatoParaAnotarse[],
 ): Partial<DatosParaAnotarse> {
   const salida: Partial<DatosParaAnotarse> = {};
-  for (const campo of pedidos) salida[campo] = (entrada[campo] ?? '').trim();
+  for (const campo of pedidos) {
+    const valor = (entrada[campo] ?? '').trim();
+    /* #32: el WhatsApp viaja en E.164 (`+529991234567`). */
+    salida[campo] = campo === 'whatsapp' ? (whatsappE164(valor) ?? valor) : valor;
+  }
   return salida;
 }
 
