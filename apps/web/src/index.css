@@ -368,9 +368,9 @@ a,button{-webkit-tap-highlight-color:transparent}
    arco de 520 a 257 px del borde, taller con 424 a 371, y en las dos el rótulo a
    158 px de la cabecera. Ahora, a 1440×900:
 
-   · el **arco** arranca a 48 px de la línea de la cabecera y apoya en el borde
-     de abajo del hero: 900 − 76 − 48 = **776** de alto, y el ancho sale del
-     4/5 de siempre (621);
+   · el **arco** arranca a 48 px de la línea de la cabecera y —desde la
+     #23-ter— termina a 48 px del borde de abajo del hero: 900 − 76 − 96 =
+     **728** de alto, y el ancho sale del 4/5 de siempre (582);
    · el **rótulo** arranca a 72 px de la cabecera (y≈148): la columna de texto
      va arriba y no centrada, con los 24 px que le faltan al padding de 48.
 
@@ -402,7 +402,14 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* #23: el alto es la pantalla menos la cabecera y los 48 px, escrito y no
    heredado de la rejilla, para que las dos páginas den la misma caja aunque la
    columna de texto mida distinto. `100vh` antes, de respaldo, como en `.hero`. */
-.hero .foto--arco{align-self:end;height:calc(100vh - var(--header-h) - 48px);height:calc(100dvh - var(--header-h) - 48px);width:100%}
+/* #23-ter: el arco ya no apoya en el borde de la sección. Deja abajo el mismo
+   aire que arriba —48 px desde la cabecera, 48 px hasta el filo— y mide lo que
+   queda entre los dos: a 1440×900, 900 − 76 − 96 = **728**. Dirección: «la foto
+   de Armando en los héroes que no toque ahí; que quede el mismo margen de
+   arriba a abajo». El margen va en el arco y no en el padding de la sección
+   para que el hero siga midiendo la pantalla y la columna de texto no cambie.
+   Lo vigila `e2e/heroes-iguales.spec.ts` (con `margin-bottom:0`, cae). */
+.hero .foto--arco{align-self:end;height:calc(100vh - var(--header-h) - 96px);height:calc(100dvh - var(--header-h) - 96px);margin-bottom:48px;width:100%}
 /* (La columna ancha del taller, `.hero__grid--taller` de la #16, se fue en la
    #23: los dos héroes son el mismo. El titular del taller pasó a tres
    renglones; ver `.hero-taller__atu`.) */
@@ -418,6 +425,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 .hero .foto{aspect-ratio:4/5}
 .foto--arco{background:var(--calido);border-radius:260px 260px 12px 12px;overflow:hidden}
 .foto--arco img{object-fit:cover;object-position:center top}
+/* #23-ter: en el hero el busto apoya en el borde de abajo del arco —el corte del
+   traje coincide con el filo del panel cálido— y si el arco es más bajo que la
+   foto, lo que se recorta es arriba, nunca el corte. El busto no se escala. */
+.hero .foto--arco img{object-position:center bottom}
 .foto--libre{background:transparent;border-radius:0;overflow:visible}
 /* ── Los siete que vivían en un `style=` inline, hasta la orden #10 ─────
    Los movió la CSP: `style-src 'self'` bloquea el atributo `style`, y sin ellos
@@ -925,7 +936,7 @@ a,button{-webkit-tap-highlight-color:transparent}
   .hero{min-height:0;max-height:none;padding:calc(var(--header-h) + 40px) 0 clamp(48px,7vh,80px)}
   .hero__grid{grid-template-columns:1fr;gap:var(--s5)}
   .hero__grid>div:first-child{padding:0}
-  .hero .foto--arco{align-self:auto;max-height:none;height:auto;width:100%}
+  .hero .foto--arco{align-self:auto;max-height:none;height:auto;margin-bottom:0;width:100%}
   .hero .foto{aspect-ratio:4/5;max-height:none;max-width:420px;margin-top:8px}
   .grid-2{grid-template-columns:1fr;gap:var(--s5)}
   /* Apilado, el recorte pasa **debajo** del texto para poder seguir apoyado en
