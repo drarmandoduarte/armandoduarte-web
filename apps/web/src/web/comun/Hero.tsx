@@ -32,6 +32,7 @@ export function Hero({
   bajada,
   botones,
   datos,
+  debajo,
   fotoAlt,
 }: {
   /** El contenido del `.eyebrow`: texto, o ícono y texto. */
@@ -42,6 +43,9 @@ export function Hero({
   botones: ReactNode;
   /** La línea de datos de abajo, separados por «·». */
   datos: string[];
+  /** Un enlace de texto debajo de la línea de datos (#25: «Ver el programa ↓»
+   *  en `/merida`). No es un botón: no compite con los de arriba. */
+  debajo?: ReactNode;
   fotoAlt: string;
 }) {
   return (
@@ -55,6 +59,7 @@ export function Hero({
           <p className="hero-micro">
             {datos.map((d) => <span key={d}>{d}</span>)}
           </p>
+          {debajo}
         </div>
         <FotoArco clase="foto foto--arco">
           <Retrato

@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { TELEFONO_GABY } from '@codice/core';
-import { BotonWhatsApp } from '../comun/BotonWhatsApp';
+import { enlaceReservarMiLugar } from '../comun/mi-espacio';
 import { Seccion } from '../comun/Seccion';
 
 /**
@@ -20,14 +19,15 @@ export function Taller() {
           </h2>
           <p className="lead u-mt-4 reveal" data-d="2">{t('inicio.taller.lead')}</p>
           <div className="hero-cta reveal" data-d="3">
-            <a href="/merida" className="btn btn--naranja">
+            {/* Orden #28: la tarjeta reserva en la app, como el hero de /merida.
+                Sobre teal el principal es crema (D26: el naranja es del hero);
+                WhatsApp ya está en la cabecera y en /merida. */}
+            <a href={enlaceReservarMiLugar()} className="btn btn--naranja">
+              {t('inicio.taller.cta')} <span className="btn-arrow">→</span>
+            </a>
+            <a href="/merida#programa" className="btn">
               {t('inicio.taller.ctaPrograma')} <span className="btn-arrow">→</span>
             </a>
-            <BotonWhatsApp
-              telefono={TELEFONO_GABY}
-              mensaje={t('comun.mensajes.reservar')}
-              texto={t('inicio.taller.ctaWhatsapp')}
-            />
           </div>
         </div>
         <ul className="ficha reveal" data-d="2">

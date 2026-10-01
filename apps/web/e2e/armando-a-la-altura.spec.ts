@@ -9,7 +9,9 @@ import { PUERTO_PORT } from '../playwright.config';
  * foto, porque cada una tenía su alto propio y la fila alineaba abajo. Desde la
  * #26 manda la columna de texto; esto afirma, a 1440×900 y 1920×1080:
  *
- *   · arriba: figura e `<img>` arrancan donde arranca la columna de texto;
+ *   · arriba: la figura arranca el aire del rótulo por debajo de la columna
+ *     de texto, y la `<img>` las 55 filas de halo por encima de la figura
+ *     (orden #28; hasta la #28 las dos arrancaban en el borde del rótulo);
  *   · abajo: terminan donde termina la columna, que es el filo de la sección;
  *   · el ancho no pasa de la columna;
  *   · **Armando entero**: la imagen se pinta a escala, sin recortar
@@ -62,6 +64,7 @@ for (const vp of VIEWPORTS) {
         const escala = Math.min(ri.width / img.naturalWidth, ri.height / img.naturalHeight);
         return {
           figura: r(figura), img: ri, texto: r(texto), rotulo: r(rotulo), seccion: r(s),
+          aire: parseFloat(getComputedStyle(s).getPropertyValue('--aire-rotulo')),
           columnaFoto: (getComputedStyle(figura.parentElement!).gridTemplateColumns.split(' ').map(parseFloat)[0]) || columna,
           pintado: { alto: img.naturalHeight * escala, ancho: img.naturalWidth * escala },
         };
@@ -72,8 +75,12 @@ for (const vp of VIEWPORTS) {
       expect(m.img.height, 'la imagen mide 0').toBeGreaterThan(300);
 
       const px = (n: number) => Math.round(n);
-      expect(px(m.figura.top), `${nombre}: la foto no arranca a la altura del rótulo`).toBe(px(m.texto.top));
-      expect(px(m.img.top), `${nombre}: la imagen no arranca a la altura del rótulo`).toBe(px(m.rotulo.top));
+      /* Desde la #28 la figura baja el aire del rótulo (`--aire-rotulo`) y la
+         imagen sube por encima de la figura las 55 filas de halo del archivo:
+         lo que se alinea es lo que se ve —pelo y letras—, y eso lo mide en
+         píxeles `pelo-a-la-altura-del-rotulo.spec.ts`. Acá quedan las cajas. */
+      expect(m.figura.top - m.texto.top, `${nombre}: la foto no baja el aire del rótulo`).toBeCloseTo(m.aire, 0);
+      expect(m.img.top, `${nombre}: la fila 55 del archivo no cae en el borde de la figura`).toBeCloseTo(m.figura.top - (55 / 2791) * m.img.height, 0);
       expect(px(m.figura.bottom), `${nombre}: la foto no termina donde termina el texto`).toBe(px(m.texto.bottom));
       expect(px(m.img.bottom), `${nombre}: Armando no apoya en el filo de la sección`).toBe(px(m.seccion.bottom));
       expect(m.img.width, `${nombre}: la foto pasa el ancho de su columna`).toBeLessThanOrEqual(m.columnaFoto + 0.5);

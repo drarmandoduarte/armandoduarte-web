@@ -13,13 +13,15 @@
       "taller": "El taller · Mérida",
       "libros": "Libros",
       "programa": "Construyendo Familias Fuertes",
-      "contacto": "Contacto"
+      "contacto": "Contacto",
+      "miEspacio": "Mi espacio"
     },
     "cabecera": {
       "abrirMenu": "Abrir menú",
       "menu": "Menú",
       "whatsapp": "WhatsApp",
-      "whatsappAria": "Escribir por WhatsApp"
+      "whatsappAria": "Escribir por WhatsApp",
+      "miEspacio": "Mi espacio"
     },
     "menu": {
       "aria": "Menú principal",
@@ -78,7 +80,7 @@
       "meta1": "Fiesta Inn Mérida",
       "meta2": "Jueves 5 de noviembre",
       "meta3": "8:30 a 13:00",
-      "cta": "Ver el taller"
+      "cta": "Reservar mi lugar"
     },
     "quien": {
       "eyebrow": "Quién soy",
@@ -116,8 +118,8 @@
       "titulo1": "El arte de amar",
       "titulo2": "a tu adolescente.",
       "lead": "Descodifica su cerebro, sana la distancia emocional y conviértete en la guía que tu hijo necesita. Cuatro horas y media, en vivo, con cupo limitado.",
+      "cta": "Reservar mi lugar",
       "ctaPrograma": "Ver el programa",
-      "ctaWhatsapp": "Reservar por WhatsApp",
       "fichaFechaClave": "Fecha",
       "fichaFechaValor": "Jueves 5 de noviembre de 2026",
       "fichaHorarioClave": "Horario",
@@ -185,7 +187,8 @@
       "micro1": "4 horas y media",
       "micro2": "8:30 a 13:00",
       "micro3": "Jueves 5 de noviembre",
-      "fotoAlt": "Armando Duarte"
+      "fotoAlt": "Armando Duarte",
+      "ctaWhatsapp": "Prefiero escribir por WhatsApp"
     },
     "hechos": {
       "fechaClave": "Fecha",
@@ -297,7 +300,8 @@
       "precio": "$1,170",
       "moneda": "MXN",
       "por": "por persona · inversión única",
-      "cta": "Asegurar mi lugar",
+      "cta": "Reservar mi lugar",
+      "ctaWhatsapp": "Prefiero escribir por WhatsApp",
       "incluye1": "Acceso al taller completo, 4 horas y media",
       "incluye2": "Workbook de trabajo",
       "incluye3": "Cuaderno y pluma",
@@ -322,8 +326,8 @@
       "eyebrow": "Reservar",
       "titulo": "El amor incondicional no es la ausencia de límites. Es la presencia de unos padres conscientes.",
       "lead": "No dejes que los años más determinantes de la vida de tu hijo transcurran entre el distanciamiento y la fricción.",
-      "ctaAsegurar": "Asegurar mi lugar",
-      "ctaConocer": "Conocer a Armando"
+      "ctaReservar": "Reservar mi lugar",
+      "ctaWhatsapp": "Prefiero escribir por WhatsApp"
     }
   },
   "privacidad": {
