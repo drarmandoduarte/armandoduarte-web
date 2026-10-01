@@ -90,7 +90,7 @@ export interface Banco {
   cierre(): Promise<void>;
 }
 
-/** Un Postgres limpio con el entorno de Supabase y las seis migraciones aplicadas. */
+/** Un Postgres limpio con el entorno de Supabase y todas las migraciones aplicadas. */
 export async function levantarBanco(): Promise<Banco> {
   const db = new PGlite();
   await db.exec(readFileSync(BASE, 'utf8'));
@@ -131,10 +131,10 @@ export async function levantarBanco(): Promise<Banco> {
      mueve, un renombre— `readdirSync` devuelve `[]`, las migraciones «corren»
      sin error y los tests fallan después hablando de tablas que no existen. Con
      esto, el rojo dice la causa. */
-  if (archivos.length < 8) {
+  if (archivos.length < 9) {
     throw new Error(
-      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 8 `
-      + '(seis de la #13, la 007 de permisos y la 008 del panel). '
+      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 9 `
+      + '(seis de la #13, la 007 de permisos, la 008 del panel y la 009 de «me anoto»). '
       + 'O el glob no las ve, o alguien las movió: no se corrió nada.',
     );
   }
