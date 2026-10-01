@@ -41,16 +41,16 @@ export function Pantalla({
   /** El panel del equipo (#24 A): columna de escritorio, arriba y no centrada. */
   ancha?: boolean;
 }) {
-  /* Panel o retrato, nunca los dos: se monta el que corresponde al ancho y la
-     otra imagen no se descarga (ver `usar-ancho.ts`, con la medición). */
+  /* La foto solo a dos columnas: debajo no se monta y no se descarga (ver
+     `usar-ancho.ts`, con la medición). La firma va en todos los anchos. */
   const dosMitades = usarAncho(ANCHO_DE_DOS_MITADES);
   return (
     <div className={`marco${conArmando ? ' marco--con-armando' : ''}`}>
       <Cabecera />
-      {conArmando && dosMitades ? <PanelDeArmando /> : null}
+      {conArmando && dosMitades ? <ArmandoDePie /> : null}
       <main className={`marco__principal${ancha ? ' marco__principal--arriba' : ''}`}>
         <div className={`columna${ancha ? ' columna--ancha' : ''}`}>
-          {conArmando && !dosMitades ? <FirmaApilada /> : null}
+          {conArmando ? <Firma /> : null}
           {children}
         </div>
       </main>
@@ -77,62 +77,46 @@ function Cabecera() {
 }
 
 /**
- * A · el mundo de Armando, a ≥ 1100 px: el panel cálido a sangre, la firma
- * arriba y Armando de pie debajo, cortado por el borde de abajo del panel.
+ * A · Armando de pie a la izquierda, como en «Quién soy» (orden #31).
  *
- * ── Por qué `de-pie` y no el busto (orden #28, auditoría del PR #46) ─────
- * Hasta la #28 era `medio-cuerpo-900.webp`, un busto recortado en rectángulo:
- * termina en seco en los dos brazos y trae un resto de silla. Con `cover` a
- * todo el panel esos cortes coincidían con los bordes; cuando la #28 achicó a
- * Armando quedaron a la vista dentro del cálido. `de-pie` es la silueta con
- * alfa de `#quien` (1400×2791, el mismo archivo que la web): sus bordes son
- * los de Armando, sin cortes ni silla, y el único corte es el del borde del
- * panel, que se lee como apoyo (la regla de la #19 B).
+ * La #30 lo había puesto en un panel cálido con esquinas; dirección: «ese
+ * cuadro como parche no es lindo». Ahora es la composición de `#quien` en la
+ * portada: la silueta `de-pie` con alfa **sin ningún fondo** detrás, el pelo a
+ * la altura de las letras de la firma y el corte del archivo apoyado en la
+ * línea del pie. Las medidas, en `estilos.css` («/entrar como Quién soy»).
  *
- * Es la imagen más pesada de la pantalla y, en escritorio, el LCP. Por eso:
- * **un solo WebP**, `loading` normal y `fetchpriority="high"`. El de 1400 y no
- * el de 900: el panel mide 864 px de ancho a 1920. En el teléfono no se baja
- * (`usar-ancho.ts`). Con `alt` vacío porque es ambiente: el nombre de Armando
- * ya lo dice el wordmark de al lado, y un lector de pantalla no gana nada con
- * oír «Armando Duarte» dos veces seguidas.
- *
- * La firma **no** va en naranja, aunque en el pie de la web sí: en esta
- * pantalla el naranja es del botón y de nadie más (B.2, D26). Va en `--tinta`.
+ * Es la imagen más pesada de la pantalla y, en escritorio, el LCP: **un solo
+ * WebP**, `loading` normal y `fetchpriority="high"`. En el teléfono no se monta
+ * (`usar-ancho.ts`). Con `alt` vacío porque es ambiente: el nombre de Armando ya
+ * lo dice el wordmark, y un lector de pantalla no gana nada con oírlo dos veces.
  */
-function PanelDeArmando() {
-  const { t } = useTranslation();
+function ArmandoDePie() {
   return (
-    <aside className="panel" aria-hidden="true">
-      <p className="panel__firma">{t('web:comun.marca.tagline')}</p>
-      <div className="panel__foto">
-        <img
-          className="panel__armando"
-          src="/img/armando/de-pie-1400.webp"
-          width={1400}
-          height={2791}
-          alt=""
-          fetchPriority="high"
-          decoding="async"
-        />
-      </div>
-    </aside>
+    <figure className="de-pie" aria-hidden="true">
+      <img
+        className="de-pie__img"
+        src="/img/armando/de-pie-1400.webp"
+        width={1400}
+        height={2791}
+        alt=""
+        fetchPriority="high"
+        decoding="async"
+      />
+    </figure>
   );
 }
 
 /**
- * A · debajo de 1100 px no hay panel: la firma va arriba del formulario, sin
- * foto (orden #30, 3).
+ * La firma «Construyendo familias fuertes», arriba del formulario y en todos
+ * los anchos: **en el lugar del rótulo** de `#quien` (orden #31). En `--tinta`
+ * y no en naranja: en esta pantalla el naranja es del botón (D26).
  *
- * Hasta la #30 iba acá un retrato redondo de 64 px. La orden deja abrir la
- * foto al 40 % «si entra sin empujar el formulario fuera de la primera
- * pantalla», y no entra: a 390×844 el botón termina hoy en el px 627 con el
- * retrato de 64; la silueta al 40 % de la columna (140×279) más la firma lo
- * llevan a ≈ 890, debajo del pliegue. Sin foto, el teléfono además no baja
- * ninguna imagen de Armando.
+ * Debajo de 1100 px, sin foto (orden #30, 3): a 390×844 la silueta al 40 %
+ * más la firma mandaban «Enviarme el código» a ≈ 890, debajo del pliegue.
  */
-function FirmaApilada() {
+function Firma() {
   const { t } = useTranslation();
-  return <p className="firma-apilada" aria-hidden="true">{t('web:comun.marca.tagline')}</p>;
+  return <p className="firma" aria-hidden="true">{t('web:comun.marca.tagline')}</p>;
 }
 
 /**
