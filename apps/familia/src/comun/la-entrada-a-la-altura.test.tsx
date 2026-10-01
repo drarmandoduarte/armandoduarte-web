@@ -97,19 +97,20 @@ describe('B y C · el marco', () => {
     expect(document.querySelector('.panel .panel__armando')).not.toBeNull();
   });
 
-  it('EL CASO de Lighthouse: panel o retrato, nunca las dos imágenes a la vez', () => {
-    /* A ≥ 1100 el busto y no el retrato; debajo, al revés. Con los dos montados
-       el teléfono bajaba 42 KB que no mostraba, y performance caía de 76 a 71. */
+  it('EL CASO de Lighthouse: la foto solo con el panel; apilado, la firma y ninguna imagen (#30)', () => {
+    /* A ≥ 1100 la silueta del panel; debajo, ninguna imagen de Armando: la
+       firma arriba del formulario. Con dos montadas el teléfono bajaba 42 KB
+       que no mostraba, y performance caía de 76 a 71. */
     anchoDeEscritorio(true);
     const { unmount } = render(<Entrar />);
     expect(document.querySelectorAll('img[src*="/img/armando/"]')).toHaveLength(1);
-    expect(document.querySelector('.retrato-chico')).toBeNull();
+    expect(document.querySelector('.firma-apilada')).toBeNull();
     unmount();
     anchoDeEscritorio(false);
     render(<Entrar />);
-    expect(document.querySelectorAll('img[src*="/img/armando/"]')).toHaveLength(1);
+    expect(document.querySelectorAll('img[src*="/img/armando/"]')).toHaveLength(0);
     expect(document.querySelector('.panel')).toBeNull();
-    expect(document.querySelector('.retrato-chico')).not.toBeNull();
+    expect(document.querySelector('.firma-apilada')?.textContent).toBe('Construyendo familias fuertes');
   });
 });
 

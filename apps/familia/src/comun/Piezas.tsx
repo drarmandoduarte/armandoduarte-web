@@ -50,7 +50,7 @@ export function Pantalla({
       {conArmando && dosMitades ? <PanelDeArmando /> : null}
       <main className={`marco__principal${ancha ? ' marco__principal--arriba' : ''}`}>
         <div className={`columna${ancha ? ' columna--ancha' : ''}`}>
-          {conArmando && !dosMitades ? <RetratoChico /> : null}
+          {conArmando && !dosMitades ? <FirmaApilada /> : null}
           {children}
         </div>
       </main>
@@ -120,25 +120,19 @@ function PanelDeArmando() {
 }
 
 /**
- * A · a < 1100 px el panel no está y queda Armando en chico, arriba del título.
+ * A · debajo de 1100 px no hay panel: la firma va arriba del formulario, sin
+ * foto (orden #30, 3).
  *
- * `loading="lazy"` aunque se vea sin desplazar, y está medido: en el teléfono
- * el LCP es el texto de la bajada, no esta foto, y bajándola de entrada se
- * sumaba al camino del LCP en la red simulada de Lighthouse (73 con, 75 sin).
- * Con `lazy` baja apenas se pinta la pantalla, que para 5 KB es lo mismo.
+ * Hasta la #30 iba acá un retrato redondo de 64 px. La orden deja abrir la
+ * foto al 40 % «si entra sin empujar el formulario fuera de la primera
+ * pantalla», y no entra: a 390×844 el botón termina hoy en el px 627 con el
+ * retrato de 64; la silueta al 40 % de la columna (140×279) más la firma lo
+ * llevan a ≈ 890, debajo del pliegue. Sin foto, el teléfono además no baja
+ * ninguna imagen de Armando.
  */
-function RetratoChico() {
+function FirmaApilada() {
   const { t } = useTranslation();
-  return (
-    <img
-      className="retrato-chico"
-      src="/img/armando/retrato-128.webp"
-      width={64}
-      height={64}
-      alt={t('entrar.retratoAlt')}
-      loading="lazy"
-    />
-  );
+  return <p className="firma-apilada" aria-hidden="true">{t('web:comun.marca.tagline')}</p>;
 }
 
 /**
