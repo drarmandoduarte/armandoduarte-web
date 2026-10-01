@@ -490,9 +490,29 @@ a,button{-webkit-tap-highlight-color:transparent}
    Se quita el tope de 520/472: a 1067 de alto el ancho natural es 535.
    Solo desde 901 px: apilado no hay columna de texto al lado que igualar.
    Lo vigila `e2e/armando-a-la-altura.spec.ts`. */
+/* ── El pelo a la altura de las letras (orden #28, 3) ────────────────────
+   La #26 alineó **cajas** y lo que se ve quedaba ~4 px más abajo que el
+   rótulo (Germán, smoke del 1/10). Dos aires, uno de cada lado:
+
+   · **El del archivo.** `de-pie-1400.webp` tiene un halo casi transparente
+     arriba: filas 30–54 con alfa ≤ 30 (invisible sobre crema y sobre teal), y
+     el pelo de verdad arranca en la **fila 55** (alfa 216). La orden decía 38,
+     que es donde empieza el halo, no el pelo. La imagen se agranda lo justo
+     para que la fila 55 caiga en el borde de la figura —`100% / (1 − 55/2791)`
+     = 102,01 %— y, anclada abajo, el corte sigue en el filo de la sección.
+   · **El del rótulo** (`--aire-rotulo`). `Range.getClientRects()` da caja 18,
+     texto 15: (18 − 15) / 2 = 1,5 px. Pero eso es la caja de la fuente, no la
+     tinta: medido en píxeles, la primera fila de letras está a +2 px de la
+     caja en «QUIÉN SOY» (la tilde de la É) y a +4 px en «SOBRE EL
+     FACILITADOR» (las mayúsculas). Con 1,5, `#facilitador` quedaba 2 px por
+     encima; **2,5 px** deja las dos a ±1. La figura baja eso con `margin-top`
+     y, como está estirada a la fila, su borde de abajo no se mueve.
+
+   Lo vigila `e2e/pelo-a-la-altura-del-rotulo.spec.ts`, en píxeles. */
 @media (min-width:901px){
-  #facilitador .foto--libre,#quien .foto--libre{align-self:stretch;position:relative;max-width:none;width:100%}
-  #facilitador .foto--libre img,#quien .foto--libre img{position:absolute;left:0;bottom:0;width:auto;height:100%;max-width:100%;object-fit:contain;object-position:left bottom}
+  #facilitador,#quien{--aire-rotulo:2.5px}
+  #facilitador .foto--libre,#quien .foto--libre{align-self:stretch;position:relative;max-width:none;width:100%;margin-top:var(--aire-rotulo)}
+  #facilitador .foto--libre img,#quien .foto--libre img{position:absolute;left:0;bottom:0;width:auto;height:calc(100% / (1 - 55 / 2791));max-width:100%;object-fit:contain;object-position:left bottom}
 }
 #porque .foto-tarjeta{max-width:480px}
 #programa .sello{margin-top:var(--s5)}
@@ -611,8 +631,8 @@ a,button{-webkit-tap-highlight-color:transparent}
    sobre `currentColor` (`Glifo.tsx`, #23 D): alcanza con cambiar `color`.
 
    `:hover` solo donde hay mouse (`hover: hover`): en una pantalla táctil no
-   se simula nada. `:focus-within` va afuera, para teclado. Nada se mueve: 512
-   probó un `translateY` y lo sacó. */
+   se simula nada. `:focus-within` va afuera, para teclado. (Hasta la #28 acá
+   decía «nada se mueve»: la #28 midió 512 de nuevo y sí se levanta; abajo.) */
 .nucleo__circulo,.nucleo__linea{transition:background-color 420ms cubic-bezier(.16,1,.3,1),border-color 420ms cubic-bezier(.16,1,.3,1),color 420ms cubic-bezier(.16,1,.3,1)}
 @media (hover:hover){
   .nucleo:hover .nucleo__circulo{background:var(--naranja);border-color:var(--naranja);color:var(--crema)}
@@ -621,6 +641,31 @@ a,button{-webkit-tap-highlight-color:transparent}
 .nucleo:focus-within .nucleo__circulo{background:var(--naranja);border-color:var(--naranja);color:var(--crema)}
 .nucleo:focus-within .nucleo__linea{background:var(--naranja)}
 @media (prefers-reduced-motion:reduce){.nucleo__circulo,.nucleo__linea{transition:none}}
+/* ── El movimiento de 512 (orden #28) ───────────────────────────────────
+   Medido en 512.com.uy (`theme.css`): entra con opacidad 0→1 y 16 px→0 en
+   700 ms con `cubic-bezier(.16,1,.3,1)`, y al pasar el mouse se levanta 4 px
+   en 420 ms. Acá, además, **escalonado**: cada núcleo 120 ms después del
+   anterior (0/120/240/360/480), y la línea al siguiente se **dibuja** desde la
+   izquierda (`scaleX` 0→1) con el retraso del núcleo del que sale, para que la
+   secuencia se lea de izquierda a derecha.
+
+   La entrada va en `translate` y el levantarse en `transform`: son dos
+   propiedades distintas, así el retraso de la entrada no demora el hover (con
+   una sola, el núcleo 5 tardaría medio segundo en reaccionar al mouse).
+
+   Con `prefers-reduced-motion` todo es instantáneo y nada se desplaza. */
+.nucleo:nth-child(1){--demora:0s}.nucleo:nth-child(2){--demora:.12s}.nucleo:nth-child(3){--demora:.24s}.nucleo:nth-child(4){--demora:.36s}.nucleo:nth-child(5){--demora:.48s}
+.js .nucleo.reveal{translate:0 16px;transition:opacity 700ms cubic-bezier(.16,1,.3,1) var(--demora),translate 700ms cubic-bezier(.16,1,.3,1) var(--demora),transform 420ms cubic-bezier(.16,1,.3,1) 0s}
+.js .nucleo.reveal.in{translate:none}
+.nucleo__linea{transform-origin:left center}
+.js .nucleo.reveal .nucleo__linea{transform:scaleX(0);transition:transform 700ms cubic-bezier(.16,1,.3,1) var(--demora),background-color 420ms cubic-bezier(.16,1,.3,1)}
+.js .nucleo.reveal.in .nucleo__linea{transform:none}
+@media (min-width:1101px) and (prefers-reduced-motion:no-preference){
+  .nucleo:focus-within{transform:translateY(-4px)}
+}
+@media (min-width:1101px) and (hover:hover) and (prefers-reduced-motion:no-preference){
+  .nucleo:hover{transform:translateY(-4px)}
+}
 .nucleo h3{margin-top:var(--s4);font-family:var(--display);font-weight:400;font-size:24px;line-height:1.25;color:var(--tinta)}
 .nucleo h3 b{display:block;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
 .nucleo p{margin-top:12px;font-size:16px;line-height:1.7;color:var(--gris)}
@@ -631,8 +676,14 @@ a,button{-webkit-tap-highlight-color:transparent}
   .nucleo__circulo{align-self:start}
   .nucleo h3,.nucleo p{grid-column:2}
   .nucleo h3{margin-top:0}
-  .nucleo__linea{top:44px;left:22px;right:auto;bottom:calc(var(--s5) * -1);width:1px;height:auto}
+  .nucleo__linea{top:44px;left:22px;right:auto;bottom:calc(var(--s5) * -1);width:1px;height:auto;transform-origin:center top}
+  .js .nucleo.reveal .nucleo__linea{transform:scaleY(0)}
+  .js .nucleo.reveal.in .nucleo__linea{transform:none}
 }
+/* Después del bloque vertical a propósito: con la misma especificidad gana el
+   que está más abajo, y el `scaleY(0)` de arriba dejaba sin línea a quien
+   pide menos movimiento (lo cazó la captura de fidelidad a 900, #28). */
+@media (prefers-reduced-motion:reduce){.js .nucleo.reveal{translate:none}.js .nucleo.reveal .nucleo__linea{transform:none}}
 .receso{margin-top:var(--s5);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gris)}
 
 /* ── Hechos · la franja ─────────────────────────────────────────────── */
