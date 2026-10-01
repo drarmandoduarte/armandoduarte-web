@@ -8,6 +8,8 @@
 export const RUTAS = {
   entrar: '/entrar',
   miEspacio: '/mi-espacio',
+  /** El panel del equipo (orden #24 A). Solo `dueno` y `equipo`; a un cliente lo devuelve a Mi espacio. */
+  equipo: '/equipo',
 } as const;
 
 /** A dónde va alguien que llega a `/` o a una ruta que no existe. */

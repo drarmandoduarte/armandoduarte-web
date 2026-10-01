@@ -1,0 +1,67 @@
+/**
+ * Lo que devuelve `/api/equipo/*` — la forma de las funciones de la migración
+ * 008 (`panel_cursos`, `panel_inscriptos`, `panel_clientes`). Si una columna
+ * cambia allá, cambia acá.
+ */
+
+export interface EdicionDelPanel {
+  id: string;
+  inicio: string;
+  fin: string;
+  zona: string;
+  sede: string | null;
+  ciudad: string | null;
+  pais: string | null;
+  cupo: number | null;
+  precio_monto: number | null;
+  precio_moneda: string | null;
+  inscripciones_hasta: string | null;
+  estado: string;
+  /** Todas las de la edición, sin mirar territorio: el cupo es uno solo. */
+  inscriptos: number | null;
+}
+
+export interface CursoDelPanel {
+  id: string;
+  slug: string;
+  titulo: string;
+  bajada: string | null;
+  descripcion: string | null;
+  modalidad: string;
+  estado: string;
+  ediciones: EdicionDelPanel[];
+}
+
+export interface Inscripto {
+  inscripcion_id: string;
+  referencia: string;
+  nombre: string | null;
+  apellido: string | null;
+  email: string;
+  whatsapp: string | null;
+  pais: string | null;
+  inscripto_el: string;
+  estado: string;
+}
+
+export interface Cliente {
+  persona_id: string;
+  nombre: string | null;
+  apellido: string | null;
+  email: string;
+  whatsapp: string | null;
+  pais: string | null;
+  alta: string;
+  cursos: number;
+  ultimo_curso: string | null;
+  ultima_inscripcion: string | null;
+  rol: string | null;
+  territorio: string | null;
+  activo: boolean | null;
+}
+
+/** «Ana López», o el correo si todavía no completó su nombre. */
+export function nombreCompleto(p: { nombre: string | null; apellido: string | null }, respaldo: string): string {
+  const nombre = [p.nombre, p.apellido].filter(Boolean).join(' ').trim();
+  return nombre || respaldo;
+}

@@ -4,7 +4,8 @@ Nace con la orden Códice #13 (Mi espacio, PR 1). Trae **el esquema entero de v1
 con su RLS y sus tests, y nada más**: ni API, ni pantalla, ni kit.
 
 ```
-migrations/          las siete migraciones, inmutables una vez aplicadas
+migrations/          las migraciones, inmutables una vez aplicadas
+semillas/            datos de arranque (no cambian el esquema); se corren después de su migración
 supabase-base.sql    el entorno de Supabase para el banco — NO es una migración
 src/banco.ts         un Postgres de verdad, en proceso, con las migraciones puestas
 src/*.test.ts        87 tests: 83 que afirman fila por fila qué ve cada sesión
@@ -82,6 +83,7 @@ por el CEO con autorización de Germán.
 | 005 | `005_seguridad_512.sql` | `totp_backup_codes` y `security_devices`, del kit | **29/9/2026 02:34** |
 | 006 | `006_storage_comprobantes.sql` | el bucket privado `comprobantes` y sus policies | **29/9/2026 02:34** |
 | 007 | `007_permisos.sql` | los `grant` de tabla, secuencia y función que el proyecto no da solo | **29/9/2026 15:58** |
+| 008 | `008_el_panel_del_equipo.sql` | las cuatro consultas del panel `/equipo` (orden #24 A), sin tablas ni policies nuevas | **pendiente** — la corre el CEO al mergear |
 
 Las siete quedaron guardadas en el editor SQL de Supabase con el nombre de su
 archivo (`001_personas_y_miembros` … `007_permisos`).
@@ -183,3 +185,18 @@ migraciones, en un commit del PR 2.
 `rescates` (PR 3, `mi-espacio/03-rescate`), la semilla real de Mérida (PR 4), los
 `.ics` y los mails (PR 5). Y ninguna regla de negocio: ésas viven en
 `packages/core`, con test.
+
+
+## Semillas
+
+`semillas/` guarda **datos**, no esquema. Se corren en Supabase después de la
+migración que las necesita, con la misma regla de arriba (se mira la barra del
+proyecto antes de ejecutar), y se pueden correr dos veces sin duplicar nada.
+
+| # | archivo | qué trae | después de | aplicada |
+|---|---|---|---|---|
+| 001 | `001_taller_de_merida.sql` | «El arte de amar a tu adolescente», edición del 5/11/2026 8:30–13:00 `America/Merida`, Fiesta Inn Mérida, $1,170 MXN, **en borrador** | 008 | **pendiente** |
+
+Su test está en `src/el-panel-del-equipo.test.ts`: la corre dos veces sobre el
+banco y afirma el curso, la hora de pared en Mérida (14:30 UTC) y que en
+borrador nadie de afuera la ve ni se puede anotar.

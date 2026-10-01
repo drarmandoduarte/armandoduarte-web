@@ -67,6 +67,9 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { levantarBanco, sembrar, type Aal, type Banco, type Semilla } from '@codice/db';
 import { SupabaseService } from './identidad/supabase.service';
 import { RespaldoController } from './respaldo/respaldo.controller';
+import { EquipoController } from './equipo/equipo.controller';
+import { EquipoRepositorio } from './equipo/equipo.repositorio';
+import type { CursoDto, EdicionNuevaDto } from './equipo/equipo.dto';
 import { BACKUP_CODE_COUNT } from './seguridad-512/nucleo/backup-codes';
 
 /* El constructor de `SupabaseService` exige la variable, y hace bien: es la
@@ -232,7 +235,53 @@ class Consulta implements PromiseLike<Resultado> {
  * se despliega.
  */
 function clienteSobreElBanco(ejecutar: Ejecutar): SupabaseClient {
-  return { from: (tabla: string) => new Consulta(ejecutar, tabla) } as unknown as SupabaseClient;
+  return {
+    from: (tabla: string) => new Consulta(ejecutar, tabla),
+    rpc: (funcion: string, argumentos?: Record<string, unknown>) => new Llamada(ejecutar, funcion, argumentos ?? {}),
+  } as unknown as SupabaseClient;
+}
+
+/**
+ * `.rpc(nombre, { arg: valor })` → `select * from public.nombre(arg => $1)`.
+ *
+ * Como PostgREST: una función que devuelve una tabla da sus filas, y una que
+ * devuelve un escalar (`panel_cursos()`, un `jsonb`) da el valor pelado. Los
+ * argumentos van **por nombre**, igual que los manda `supabase-js`: si la API
+ * escribe `{ edicion_id }` y la función se llama con `edicion`, acá cae con el
+ * mismo `42883` que caería en producción. Entró con la orden #24 A.
+ */
+class Llamada implements PromiseLike<Resultado> {
+  constructor(
+    private readonly ejecutar: Ejecutar,
+    private readonly funcion: string,
+    private readonly argumentos: Record<string, unknown>,
+  ) {}
+
+  then<A = Resultado, B = never>(
+    alResolver?: ((valor: Resultado) => A | PromiseLike<A>) | null,
+    alFallar?: ((razon: unknown) => B | PromiseLike<B>) | null,
+  ): PromiseLike<A | B> {
+    return this.correr().then(alResolver, alFallar);
+  }
+
+  private async correr(): Promise<Resultado> {
+    if (!/^[a-z_]+$/.test(this.funcion)) throw new Error(`nombre de función raro: ${this.funcion}`);
+    const nombres = Object.keys(this.argumentos);
+    const params = nombres.map((n) => this.argumentos[n]);
+    const lista = nombres.map((n, i) => `${n} => $${i + 1}`).join(', ');
+    let filas: Record<string, unknown>[];
+    try {
+      filas = await this.ejecutar(`select * from public.${this.funcion}(${lista})`, params);
+    } catch (e) {
+      const error = e as { code?: string; message?: string };
+      return { data: null, error: { code: error.code, message: error.message ?? String(e) }, count: null };
+    }
+    const columnas = Object.keys(filas[0] ?? {});
+    if (filas.length === 1 && columnas.length === 1 && columnas[0] === this.funcion) {
+      return { data: filas[0][this.funcion], error: null, count: null };
+    }
+    return { data: filas, error: null, count: filas.length };
+  }
 }
 
 /**
@@ -287,7 +336,7 @@ afterAll(async () => {
 const servicio = (aal: Aal = 'aal1') => new ServicioContraElBanco(banco, aal);
 
 describe('el piso: el banco es el de verdad', () => {
-  it('las siete migraciones están puestas y las tablas que la API consulta existen', async () => {
+  it('las migraciones están puestas y las tablas que la API consulta existen', async () => {
     /* EL PISO, Y VA PRIMERO: todo lo de abajo afirma que una consulta anduvo.
        Sobre un banco vacío, «anduvo» y «no había nada que romper» se parecen
        demasiado. Acá se cuenta lo que el banco sí tiene. */
@@ -378,5 +427,96 @@ describe('RespaldoController, contra el esquema', () => {
        misma consulta de `cuantos` no ve los de Armando. */
     const { quedan } = await controlador().cuantos(pedidoDe(s.laura));
     expect(quedan).toBe(0);
+  });
+});
+
+describe('EquipoController (/api/equipo), contra el esquema — orden #24 A', () => {
+  const panel = (aal: Aal = 'aal2') => {
+    const servicioDelPanel = servicio(aal);
+    return new EquipoController(servicioDelPanel, new EquipoRepositorio(servicioDelPanel));
+  };
+  /** El código que viaja en el cuerpo del error, que es lo que la pantalla lee. */
+  const codigoDe = async (promesa: Promise<unknown>) => {
+    try {
+      await promesa;
+      return null;
+    } catch (e) {
+      const cuerpo = (e as { getResponse?: () => unknown }).getResponse?.() as { code?: string } | undefined;
+      return cuerpo?.code ?? (e as Error).message;
+    }
+  };
+
+  beforeAll(async () => {
+    for (const quien of [s.laura, s.pilar]) {
+      await banco.como(quien, 'aal1', () => banco.sql(
+        `insert into public.inscripciones (edicion_id, persona_id) values ($1, $2)`, [s.edicionAbierta, quien]));
+    }
+  });
+
+  it('cursos: el dueño ve los dos cursos, con la cuenta de anotados', async () => {
+    const { cursos } = await panel().cursos(pedidoDe(s.armando)) as { cursos: { id: string; ediciones: { inscriptos: number }[] }[] };
+    expect(cursos).toHaveLength(2);
+    expect(cursos.find((c) => c.id === s.cursoPublicado)?.ediciones[0].inscriptos).toBe(2);
+  });
+
+  it('inscriptos: Gabi ve a Laura y no a Pilar; el dueño ve a las dos', async () => {
+    const deGabi = await panel().inscriptos(pedidoDe(s.gabi), s.edicionAbierta) as { inscriptos: { nombre: string }[] };
+    expect(deGabi.inscriptos.map((f) => f.nombre)).toEqual(['Laura']);
+    const deArmando = await panel().inscriptos(pedidoDe(s.armando), s.edicionAbierta) as { inscriptos: { nombre: string }[] };
+    expect(deArmando.inscriptos.map((f) => f.nombre).sort()).toEqual(['Laura', 'Pilar']);
+  });
+
+  it('clientes: Diana ve a Pilar y no a Laura', async () => {
+    const { clientes } = await panel().clientes(pedidoDe(s.diana)) as { clientes: { nombre: string }[] };
+    expect(clientes.map((c) => c.nombre)).toContain('Pilar');
+    expect(clientes.map((c) => c.nombre)).not.toContain('Laura');
+  });
+
+  it('un cliente no entra al panel: 403 SOLO_EQUIPO en todas las lecturas', async () => {
+    expect(await codigoDe(panel('aal1').cursos(pedidoDe(s.laura)))).toBe('SOLO_EQUIPO');
+    expect(await codigoDe(panel('aal1').clientes(pedidoDe(s.laura)))).toBe('SOLO_EQUIPO');
+    expect(await codigoDe(panel('aal1').inscriptos(pedidoDe(s.laura), s.edicionAbierta))).toBe('SOLO_EQUIPO');
+  });
+
+  it('crear y editar un curso; un slug repetido es 409 SLUG_REPETIDO', async () => {
+    const curso: CursoDto = {
+      titulo: 'Taller de otoño', bajada: null, descripcion: null,
+      modalidad: 'en_linea', slug: 'taller-de-otono', estado: 'borrador',
+    };
+    await panel().crearCurso(pedidoDe(s.gabi), curso);
+    const [fila] = await banco.sql<{ id: string }>(`select id from public.cursos where slug = 'taller-de-otono'`);
+    await panel().editarCurso(pedidoDe(s.gabi), fila.id, { ...curso, titulo: 'Taller de otoño 2026' });
+    const [editado] = await banco.sql<{ titulo: string }>(`select titulo from public.cursos where id = $1`, [fila.id]);
+    expect(editado.titulo).toBe('Taller de otoño 2026');
+    expect(await codigoDe(panel().crearCurso(pedidoDe(s.gabi), curso))).toBe('SLUG_REPETIDO');
+  });
+
+  it('crear una edición con zona IANA; con una zona inventada la base dice NO_VALIDO', async () => {
+    const edicion: EdicionNuevaDto = {
+      curso_id: s.cursoBorrador,
+      inicio: '2026-12-01T15:00:00.000Z', fin: '2026-12-01T18:00:00.000Z', zona: 'America/Merida',
+      sede: 'En línea', ciudad: null, pais: null, cupo: 30, precio_monto: 500, precio_moneda: 'MXN',
+      inscripciones_hasta: null, estado: 'abierta',
+    };
+    await panel().crearEdicion(pedidoDe(s.armando), edicion);
+    expect(await codigoDe(panel().crearEdicion(pedidoDe(s.armando), { ...edicion, zona: 'Marte/Olimpo' }))).toBe('NO_VALIDO');
+  });
+
+  it('sumar al equipo: Gabi no puede (SOLO_DUENO); el dueño suma a Laura y después la quita', async () => {
+    expect(await codigoDe(panel().sumar(pedidoDe(s.gabi), { persona_id: s.laura, territorio: 'mexico' }))).toBe('SOLO_DUENO');
+    await panel().sumar(pedidoDe(s.armando), { persona_id: s.laura, territorio: 'mexico' });
+    expect(await servicio('aal2').rolDe(s.laura, s.laura)).toBe('equipo');
+    await panel().quitar(pedidoDe(s.armando), s.laura);
+    expect(await servicio('aal2').rolDe(s.laura, s.laura)).toBe('cliente');
+    /* Y se la puede volver a sumar: la fila desactivada se reactiva. */
+    await panel().sumar(pedidoDe(s.armando), { persona_id: s.laura, territorio: 'internacional' });
+    const [fila] = await banco.sql<{ activo: boolean; territorio: string }>(
+      `select activo, territorio from public.miembros where user_id = $1`, [s.laura]);
+    expect(fila).toEqual({ activo: true, territorio: 'internacional' });
+  });
+
+  it('el dueño no se quita ni se cambia a sí mismo', async () => {
+    expect(await codigoDe(panel().quitar(pedidoDe(s.armando), s.armando))).toBe('NO_VALIDO');
+    expect(await codigoDe(panel().sumar(pedidoDe(s.armando), { persona_id: s.armando, territorio: 'mexico' }))).toBe('NO_VALIDO');
   });
 });

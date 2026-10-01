@@ -114,11 +114,172 @@
     "cerrarOtrasSesiones": "Cerrar las otras sesiones",
     "cerrandoOtrasSesiones": "Cerrando…",
     "otrasSesionesCerradas": "Listo. Las demás sesiones se cerraron.",
-    "cerrarOtrasAyuda": "Si entraste desde una computadora que no es tuya, esto la deja afuera."
+    "cerrarOtrasAyuda": "Si entraste desde una computadora que no es tuya, esto la deja afuera.",
+    "panelDelEquipo": "Panel del equipo"
   },
   "pasoReciente": {
     "titulo": "Confirma otra vez",
     "bajada": "Para esto necesitamos que escribas el código de tu autenticador ahora mismo.",
     "confirmar": "Confirmar"
+  },
+  "equipo": {
+    "titulo": "Panel del [equipo]",
+    "bajada": "Los cursos, quién se anotó y quién está registrado. Cada quien ve lo de su territorio.",
+    "volver": "Mi espacio",
+    "pestanas": {
+      "cursos": "Cursos",
+      "inscriptos": "Inscriptos",
+      "clientes": "Clientes"
+    },
+    "cargando": "Cargando…",
+    "errorAlCargar": "No pudimos traer los datos. Vuelve a intentarlo en un momento.",
+    "reintentar": "Reintentar",
+    "cursos": {
+      "nuevo": "Nuevo curso",
+      "vacio": "Todavía no hay cursos. Crea el primero.",
+      "editar": "Editar",
+      "nuevaEdicion": "Nueva edición",
+      "sinEdiciones": "Este curso no tiene ediciones todavía.",
+      "edicionEncabezados": {
+        "fecha": "Fecha",
+        "lugar": "Lugar",
+        "inscriptos": "Inscriptos",
+        "precio": "Precio",
+        "estado": "Estado"
+      },
+      "horario": "{{fecha}} a {{fin}}",
+      "enZona": "hora de {{zona}}"
+    },
+    "curso": {
+      "tituloNuevo": "Nuevo curso",
+      "tituloEditar": "Editar curso",
+      "titulo": "Título",
+      "bajada": "Bajada",
+      "bajadaAyuda": "Una línea que acompaña al título.",
+      "descripcion": "Descripción",
+      "modalidad": "Modalidad",
+      "slug": "Dirección en la web",
+      "slugAyuda": "Se propone sola desde el título. Solo minúsculas, números y guiones.",
+      "estado": "Estado"
+    },
+    "edicion": {
+      "tituloNuevo": "Nueva edición de «{{curso}}»",
+      "tituloEditar": "Editar edición de «{{curso}}»",
+      "inicio": "Empieza",
+      "fin": "Termina",
+      "horaAyuda": "Hora de la zona de la edición.",
+      "zona": "Zona horaria",
+      "zonaAyuda": "Nombre IANA, por ejemplo America/Merida.",
+      "sede": "Sede",
+      "ciudad": "Ciudad",
+      "pais": "País (código de dos letras)",
+      "cupo": "Cupo",
+      "cupoAyuda": "Déjalo vacío si no hay tope.",
+      "precio": "Precio (MXN)",
+      "hasta": "Inscripciones hasta",
+      "hastaAyuda": "Pasada esta hora nadie más se puede anotar. Vacío: nadie se puede anotar.",
+      "estado": "Estado"
+    },
+    "modalidades": {
+      "presencial": "Presencial",
+      "en_linea": "En línea"
+    },
+    "estadosCurso": {
+      "borrador": "Borrador",
+      "publicado": "Publicado",
+      "archivado": "Archivado"
+    },
+    "estadosEdicion": {
+      "abierta": "Abierta",
+      "cerrada": "Cerrada",
+      "realizada": "Realizada"
+    },
+    "estadosInscripcion": {
+      "pendiente_de_pago": "Pendiente de pago",
+      "en_revision": "En revisión",
+      "confirmada": "Confirmada",
+      "anulada": "Anulada"
+    },
+    "guardar": "Guardar",
+    "guardando": "Guardando…",
+    "cancelar": "Cancelar",
+    "guardado": "Listo, guardado.",
+    "nadaSeBorra": "Nada se borra desde acá: un curso se archiva y una edición se cierra.",
+    "inscriptos": {
+      "edicion": "Edición",
+      "elegir": "Elige una edición",
+      "sinEdiciones": "Todavía no hay ediciones.",
+      "buscar": "Buscar",
+      "buscarAyuda": "Por nombre, correo o referencia.",
+      "exportar": "Exportar CSV",
+      "vacio": "Nadie se anotó todavía en esta edición.",
+      "sinResultados": "Nadie coincide con la búsqueda.",
+      "cuantos": "{{cuantos}} de {{total}}",
+      "encabezados": {
+        "referencia": "Referencia",
+        "nombre": "Nombre",
+        "correo": "Correo",
+        "whatsapp": "WhatsApp",
+        "pais": "País",
+        "fecha": "Inscripción",
+        "estado": "Estado"
+      },
+      "saludo": "Hola {{nombre}}, te escribimos por tu lugar en «{{curso}}». ",
+      "escribirle": "Escribirle a {{nombre}} por WhatsApp"
+    },
+    "clientes": {
+      "buscar": "Buscar",
+      "buscarAyuda": "Por nombre, correo o WhatsApp.",
+      "exportar": "Exportar CSV",
+      "vacio": "Todavía no hay nadie registrado.",
+      "sinResultados": "Nadie coincide con la búsqueda.",
+      "cuantos": "{{cuantos}} de {{total}}",
+      "encabezados": {
+        "nombre": "Nombre",
+        "correo": "Correo",
+        "whatsapp": "WhatsApp",
+        "pais": "País",
+        "alta": "Alta",
+        "cursos": "Cursos",
+        "equipo": "Equipo"
+      },
+      "ultimo": "Último: {{curso}}",
+      "esEquipo": "Equipo · {{territorio}}",
+      "esDueno": "Dueño",
+      "sumar": "Sumar al equipo",
+      "quitar": "Quitar del equipo",
+      "territorio": "Territorio",
+      "confirmarSumar": "Sumar a {{nombre}}",
+      "confirmarQuitar": "Sí, quitar a {{nombre}}",
+      "quitarAviso": "Deja de ver el panel. No se borra nada: queda en el registro.",
+      "sinNombre": "Sin nombre",
+      "saludo": "Hola {{nombre}}, te escribimos del equipo de Armando Duarte."
+    },
+    "territorios": {
+      "mexico": "México",
+      "internacional": "Internacional",
+      "todos": "Todos"
+    },
+    "errores": {
+      "tituloFalta": "Escribe el título.",
+      "tituloLargo": "El título es muy largo (hasta 140 caracteres).",
+      "bajadaLarga": "La bajada es muy larga (hasta 280 caracteres).",
+      "slugFalta": "Falta la dirección.",
+      "slugForma": "Solo minúsculas, números y guiones, sin espacios.",
+      "slugRepetido": "Ya hay un curso con esa dirección.",
+      "modalidad": "Elige la modalidad.",
+      "estado": "Elige el estado.",
+      "zona": "Esa zona no existe. Usa un nombre IANA, como America/Merida.",
+      "inicioFalta": "Falta cuándo empieza.",
+      "finFalta": "Falta cuándo termina.",
+      "fechaForma": "Esa fecha no existe.",
+      "finAntes": "Tiene que terminar después de empezar.",
+      "hastaDespues": "Las inscripciones no pueden cerrar después de que termine.",
+      "pais": "Usa el código de dos letras, como MX.",
+      "cupo": "El cupo es un número entero, de 1 para arriba.",
+      "precio": "Escribe el precio con punto y hasta dos decimales, como 1170 o 1170.50.",
+      "sinPermiso": "No tienes permiso para esto.",
+      "generico": "No pudimos guardar. Revisa los datos e inténtalo otra vez."
+    }
   }
 }

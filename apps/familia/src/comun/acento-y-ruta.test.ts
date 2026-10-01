@@ -55,6 +55,14 @@ describe('rutaQueCorresponde', () => {
     expect(rutaQueCorresponde({ ...base, haySesion: false, hayYo: false, decision: null, rutaActual: '/mi-espacio' })).toBe('/entrar');
   });
 
+  it('#24 A: el equipo se queda en /equipo; un cliente que escribe /equipo va a /mi-espacio', () => {
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/equipo', esEquipo: true })).toBeNull();
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/equipo', esEquipo: false })).toBe('/mi-espacio');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/equipo' })).toBe('/mi-espacio');
+    /* Y sin sesión, /equipo manda a la entrada como cualquier otra. */
+    expect(rutaQueCorresponde({ ...base, haySesion: false, hayYo: false, decision: null, rutaActual: '/equipo' })).toBe('/entrar');
+  });
+
   it('los estados intermedios no mueven la URL', () => {
     expect(rutaQueCorresponde({ ...base, cargando: true })).toBeNull();
     expect(rutaQueCorresponde({ ...base, hayYo: false, decision: 'esperando' })).toBeNull();

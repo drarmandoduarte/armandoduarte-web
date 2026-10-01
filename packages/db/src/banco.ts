@@ -64,6 +64,8 @@ export function migracionesEnOrden(): string[] {
 export interface Banco {
   /** Corre SQL crudo como superusuario y devuelve las filas. */
   sql<T = Record<string, unknown>>(consulta: string, params?: unknown[]): Promise<T[]>;
+  /** Un archivo SQL entero, con varias sentencias y sin parámetros: una semilla, como se corre en Supabase. */
+  script(texto: string): Promise<void>;
   /**
    * Corre algo como ese usuario, con el rol `authenticated` —el mismo con el que
    * PostgREST atiende al navegador, y por lo tanto el único que choca contra la
@@ -129,10 +131,10 @@ export async function levantarBanco(): Promise<Banco> {
      mueve, un renombre— `readdirSync` devuelve `[]`, las migraciones «corren»
      sin error y los tests fallan después hablando de tablas que no existen. Con
      esto, el rojo dice la causa. */
-  if (archivos.length < 7) {
+  if (archivos.length < 8) {
     throw new Error(
-      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 7 `
-      + '(seis de la #13 y la 007 de permisos). '
+      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 8 `
+      + '(seis de la #13, la 007 de permisos y la 008 del panel). '
       + 'O el glob no las ve, o alguien las movió: no se corrió nada.',
     );
   }
@@ -176,7 +178,11 @@ export async function levantarBanco(): Promise<Banco> {
   const comoServicio = <T>(hacer: () => Promise<T>) =>
     conSesion(JSON.stringify({ role: 'service_role' }), 'service_role', hacer);
 
-  return { sql, como, comoAnonimo, comoServicio, cierre: () => db.close() };
+  async function script(texto: string): Promise<void> {
+    await db.exec(texto);
+  }
+
+  return { sql, script, como, comoAnonimo, comoServicio, cierre: () => db.close() };
 }
 
 /* ── Sembrado ──────────────────────────────────────────────────────────────── */

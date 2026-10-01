@@ -9,6 +9,8 @@ import { Enrolar } from './entrar/Enrolar';
 import { Reto } from './entrar/Reto';
 import { CodigosDeRespaldo } from './entrar/CodigosDeRespaldo';
 import { MiEspacio } from './mi-espacio/MiEspacio';
+import { Panel } from './equipo/Panel';
+import { RUTAS } from './rutas';
 import { variablesQueFaltan } from './supabase';
 
 /**
@@ -49,6 +51,7 @@ export function App() {
       hayYo: !!yo,
       decision,
       rutaActual: window.location.pathname,
+      esEquipo: yo?.tipo === 'equipo',
     });
     if (destino) window.history.replaceState(null, '', destino);
   }, [cargando, sesion, yo, decision]);
@@ -161,6 +164,13 @@ export function App() {
         <p className="bajada" role="status">{t('comun.cargando')}</p>
       </Pantalla>
     );
+  }
+
+  /* `/equipo` (#24 A): el panel, solo para el equipo. A un cliente que escribe
+     `/equipo` se le muestra Mi espacio y `rutaQueCorresponde()` corrige la URL:
+     nunca ve un error. La API y la base lo frenan igual (`SOLO_EQUIPO`, RLS). */
+  if (window.location.pathname === RUTAS.equipo && yo.tipo === 'equipo') {
+    return <Panel yo={yo} />;
   }
 
   return (

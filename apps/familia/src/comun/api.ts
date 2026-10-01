@@ -46,6 +46,8 @@ export class ErrorDeApi extends Error {
     readonly detalle: string,
     /** Minutos de frescura que pidió `@PasoReciente`, si vino. */
     readonly minutos?: number,
+    /** El `code` que mandó el servidor tal cual (`SLUG_REPETIDO`, `SOLO_EQUIPO`…), para las pantallas que lo leen. */
+    readonly codigoDelServidor?: string,
   ) {
     super(`${codigo} (${estado})`);
     this.name = 'ErrorDeApi';
@@ -127,6 +129,7 @@ export async function api<T>(
     respuesta.status,
     typeof cuerpo.message === 'string' ? cuerpo.message : respuesta.statusText,
     typeof cuerpo.minutos === 'number' ? cuerpo.minutos : undefined,
+    typeof cuerpo.code === 'string' ? cuerpo.code : undefined,
   );
 }
 

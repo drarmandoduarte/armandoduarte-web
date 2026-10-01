@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
 import { BotonPrincipal, Campo, Pantalla, Titulo } from '../comun/Piezas';
+import { RUTAS } from '../rutas';
 
 /**
  * PANTALLA 5 · `/mi-espacio` — lo mínimo de la #15.
@@ -39,6 +40,12 @@ export function MiEspacio({
           : t('miEspacio.saludoSinNombre')}
       />
       <p className="bajada">{t('miEspacio.bajada')}</p>
+      {/* #24 A: a quien es del equipo le aparece arriba la entrada al panel. */}
+      {esEquipo ? (
+        <p className="u-mt-4">
+          <a href={RUTAS.equipo} className="btn btn--ancho">{t('miEspacio.panelDelEquipo')} <span aria-hidden="true">→</span></a>
+        </p>
+      ) : null}
 
       <SeccionDeDatos yo={yo} recargar={recargar} />
       {esEquipo ? <SeccionDeSeguridad alRegenerar={alRegenerar} /> : null}

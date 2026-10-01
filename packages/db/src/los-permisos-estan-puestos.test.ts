@@ -63,7 +63,11 @@ const FUNCIONES = [
 
 describe('la 007 pone los permisos que el proyecto no da solo', () => {
   let banco: Banco;
-  beforeAll(async () => { banco = await levantarBanco(); });
+  /* 120 s, como los otros archivos del banco. Con el tope por defecto (10 s),
+     en la gate —todos los paquetes a la vez y, desde la #24, un archivo de
+     tests más en éste— levantar el banco se pasó y los cuatro tests quedaron
+     «saltados»: el rojo hablaba del reloj, no de los permisos. */
+  beforeAll(async () => { banco = await levantarBanco(); }, 120_000);
   afterAll(async () => { await banco?.cierre(); });
 
   it('EL PISO, PRIMERO: las diez tablas existen y el banco NO regala permisos', async () => {

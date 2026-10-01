@@ -18,15 +18,35 @@ alguien lo va a leer en el PR. Ése es el punto.
 | paquete | piso |
 |---|---|
 | `@codice/ui` | 31 |
-| `@codice/core` | 23 |
+| `@codice/core` | 39 |
 | `@codice/prompts` | 3 |
-| `@codice/db` | 87 |
+| `@codice/db` | 107 |
 | `@codice/web` | 63 |
-| `@codice/familia` | 83 |
-| `@codice/api` | 62 |
+| `@codice/familia` | 89 |
+| `@codice/api` | 70 |
 | `@codice/navegador` | 40 |
 
 
+
+## Lo que trae la orden #24 A — `db` 87 → 107, `core` 23 → 39, `api` 62 → 70, `familia` 83 → 89
+
+- **`@codice/db` (+20)**, `src/el-panel-del-equipo.test.ts`: las cuatro funciones
+  de la 008 con dueño, equipo México, equipo internacional y cliente; lo que el
+  panel escribe (cursos, ediciones, sumar y quitar del equipo, auditoría); y la
+  semilla del taller de Mérida corrida dos veces. Mutaciones: `panel_inscriptos`
+  como `security definer` → caen 4 (Gabi ve a Pilar…); sin el filtro de miembro
+  → caen 2 (el cliente ve su fila); `inscriptos_de_edicion` sin freno → cae 1.
+- **`@codice/core` (+16)**, `src/panel/panel.test.ts`: hora de pared ↔ instante
+  por zona (D15, con horario de verano), validaciones de curso y edición, CSV
+  con BOM y fórmulas desarmadas, búsqueda, WhatsApp y qué botón de equipo ve
+  cada rol.
+- **`@codice/api` (+8)**, en `las-consultas-corren-contra-la-base.spec.ts`:
+  `EquipoController` contra el banco (con `rpc` en el traductor). Mutaciones: el
+  argumento de `panel_inscriptos` mal nombrado y leer con `service_role` → cae
+  «Gabi ve a Laura y no a Pilar».
+- **`@codice/familia` (+6)**: `equipo/el-panel-del-equipo.test.tsx` (5) y la
+  ruta `/equipo` en `acento-y-ruta.test.ts` (1). Mutación: la columna de equipo
+  para todos → cae «el equipo (no dueño) no ve la columna».
 
 ## Lo que trae la orden #23-bis — `@codice/navegador` 39 → 40
 

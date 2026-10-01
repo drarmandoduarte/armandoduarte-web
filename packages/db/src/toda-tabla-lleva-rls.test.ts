@@ -78,10 +78,13 @@ const PENDIENTES: Record<string, string> = {
      PENDIENTES». Nadie se acordó de venir; lo mandó el rojo. La lista se queda
      acá vacía porque la próxima migración pendiente tiene que volver a
      escribirse, no inventarse un mecanismo nuevo. */
+  '008_el_panel_del_equipo.sql':
+    'orden #24 A: las cuatro consultas del panel del equipo. La corre el CEO cuando se mergee el PR, '
+    + 'y en el mismo paso la semilla `semillas/001_taller_de_merida.sql`',
 };
 
 describe('las migraciones', () => {
-  it('son siete, numeradas de tres dígitos y en orden', async () => {
+  it('son ocho, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -90,6 +93,7 @@ describe('las migraciones', () => {
       '005_seguridad_512.sql',
       '006_storage_comprobantes.sql',
       '007_permisos.sql',
+      '008_el_panel_del_equipo.sql',
     ]);
   });
 
