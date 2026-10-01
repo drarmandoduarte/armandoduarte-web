@@ -11,7 +11,8 @@ import { PUERTO } from '../playwright.config';
  *     en rectángulo —que dejaba a la vista los cortes de los brazos—;
  *   · **la fila 55 del archivo** (donde arranca el pelo) cae en el borde de
  *     arriba de la figura, ±1 px;
- *   · el ancho de la imagen = el ancho del panel, ±1 px;
+ *   · el ancho de la imagen = el 78 % del ancho del panel, ±1 px, y centrada
+ *     (auditoría del PR #46: así los brazos terminan dentro del panel);
  *   · la figura llega al borde de abajo del panel y la imagen sigue más abajo:
  *     **el corte es el borde del panel**;
  *   · **la cara entera**: de la fila 55 a la 755 (escaladas) queda dentro del
@@ -81,8 +82,11 @@ for (const vp of VIEWPORTS) {
     const escala = m.img.height / ALTO_DEL_ARCHIVO;
     const pelo = m.img.top + FILA_DEL_PELO * escala;
     expect(Math.abs(pelo - m.figura.top), `la fila ${FILA_DEL_PELO} (el pelo) cae en ${pelo.toFixed(1)}, el borde de la figura en ${m.figura.top.toFixed(1)}`).toBeLessThanOrEqual(1);
-    expect(Math.abs(m.img.width - m.panel.width), `la foto mide ${m.img.width.toFixed(1)} de ancho y el panel ${m.panel.width.toFixed(1)}`).toBeLessThanOrEqual(1);
-    expect(Math.abs(m.img.left - m.panel.left), 'la foto no arranca en el borde del panel').toBeLessThanOrEqual(1);
+    expect(Math.abs(m.img.width - 0.78 * m.panel.width), `la foto mide ${m.img.width.toFixed(1)} de ancho y el 78 % del panel es ${(0.78 * m.panel.width).toFixed(1)}`).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs((m.img.left + m.img.right) / 2 - (m.panel.left + m.panel.right) / 2),
+      'la foto no está centrada en el panel',
+    ).toBeLessThanOrEqual(1);
 
     expect(Math.abs(m.figura.bottom - m.panel.bottom), `la figura termina en ${m.figura.bottom}, el panel en ${m.panel.bottom}`).toBeLessThanOrEqual(1);
     expect(m.recorta, 'el panel tiene que recortar: el corte de abajo es su borde').toBe('hidden');
@@ -93,6 +97,6 @@ for (const vp of VIEWPORTS) {
 
     expect(m.firma.bottom, `la firma (${m.firma.top.toFixed(0)}–${m.firma.bottom.toFixed(0)}) se cruza con Armando (desde ${m.figura.top.toFixed(0)})`).toBeLessThanOrEqual(m.figura.top);
 
-    console.log(`${vp.width}: foto ${m.img.width.toFixed(0)} de ancho (panel ${m.panel.width.toFixed(0)}) · pelo y=${pelo.toFixed(1)} · figura ${m.figura.top.toFixed(0)}–${m.figura.bottom.toFixed(0)} · cara hasta ${finDeLaCara.toFixed(0)} · firma ${m.firma.top.toFixed(0)}–${m.firma.bottom.toFixed(0)}`);
+    console.log(`${vp.width}: foto ${m.img.width.toFixed(0)} de ancho (panel ${m.panel.width.toFixed(0)}, ${(100 * m.img.width / m.panel.width).toFixed(1)} %) desde x=${m.img.left.toFixed(0)} · pelo y=${pelo.toFixed(1)} · figura ${m.figura.top.toFixed(0)}–${m.figura.bottom.toFixed(0)} · cara hasta ${finDeLaCara.toFixed(0)} · firma ${m.firma.top.toFixed(0)}–${m.firma.bottom.toFixed(0)}`);
   });
 }

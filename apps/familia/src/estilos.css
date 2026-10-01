@@ -120,11 +120,14 @@ img,svg{display:block;max-width:100%}
    · la figura arranca en **y = 192** —la línea de la cabecera (72) más los
      120 px que dejan pasar la firma, que termina en el 172 a 1440 y en el 183
      a 1920— y llega al borde de abajo del panel;
-   · la imagen ocupa **el ancho del panel** y su alto sale del ancho;
+   · la imagen ocupa **el 78 % del ancho del panel, centrada** (auditoría del
+     PR #46): a todo el ancho los brazos se salían por los costados; al 78 %
+     terminan solos, con su alfa, dentro del cálido. Su alto sale del ancho;
    · **la fila 55 del archivo** (donde arranca el pelo: 30–54 es un halo de
      alfa ≤ 30, medido en la #28 A) cae en el borde de arriba de la figura.
-     Por eso `margin-top` negativo de 55/1400 **del ancho** —un margen en %
-     se mide sobre el ancho del contenedor, que es el del panel— y no
+     Por eso `margin-top` negativo de 55/1400 **del ancho de la foto** (el
+     78 % del panel: un margen en % se mide sobre el ancho del contenedor, que
+     es el del panel) y no
      `object-position: top`, que dejaría el halo arriba y el pelo 25 px más
      abajo;
    · el halo (filas 0–54) queda **por encima** de la figura, sin recortar:
@@ -139,7 +142,7 @@ img,svg{display:block;max-width:100%}
 @media (min-width:1100px){
   .marco--con-armando .panel{position:relative}
   .marco--con-armando .panel__foto{position:absolute;top:calc(72px + 120px);bottom:0;left:0;right:0;margin-top:0}
-  .marco--con-armando .panel__armando{position:absolute;top:0;left:0;width:100%;height:auto;margin-top:calc(-100% * 55 / 1400)}
+  .marco--con-armando .panel__armando{position:absolute;top:0;left:11%;width:78%;height:auto;margin-top:calc(-78% * 55 / 1400)}
 }
 
 .titulo{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,44px);line-height:1.1;letter-spacing:-.01em;color:var(--tinta);text-wrap:balance}
