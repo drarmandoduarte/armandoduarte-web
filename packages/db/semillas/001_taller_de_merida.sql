@@ -9,7 +9,14 @@
 --
 -- ORDEN QUE LA APROBÓ: Códice #24, PR A, punto 1.
 --
--- APLICADA: —
+-- APLICADA: 30/9/2026 21:58 (UY), en `armandoduarte-familia`, desde db747a1,
+--   después de la 008 y en la misma sesión. Corrida por el CEO con autorización
+--   de Germán. Verificado contra la base: el curso en **borrador**, **una**
+--   edición (no duplicó), 5/11/2026 8:30 hora de Mérida, `America/Merida`,
+--   Fiesta Inn Mérida, 1170.00 MXN, edición abierta. Guardada en el editor SQL
+--   como `semilla_02_taller_de_merida` (el nombre del editor no es el del
+--   archivo: la `semilla_01` del editor es el alta de Armando como dueño).
+--   Fuente: `03 Producto/mi-espacio/infraestructura-2026-09-29.md`, «30/9 21:55».
 --
 -- ── Una semilla no es una migración ─────────────────────────────────────────
 -- No cambia el esquema: carga una fila de datos. Por eso vive en `semillas/` y

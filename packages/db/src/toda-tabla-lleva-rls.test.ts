@@ -77,10 +77,9 @@ const PENDIENTES: Record<string, string> = {
      completó la cabecera, y este test se puso rojo diciendo «se borra la fila de
      PENDIENTES». Nadie se acordó de venir; lo mandó el rojo. La lista se queda
      acá vacía porque la próxima migración pendiente tiene que volver a
-     escribirse, no inventarse un mecanismo nuevo. */
-  '008_el_panel_del_equipo.sql':
-    'orden #24 A: las cuatro consultas del panel del equipo. La corre el CEO cuando se mergee el PR, '
-    + 'y en el mismo paso la semilla `semillas/001_taller_de_merida.sql`',
+     escribirse, no inventarse un mecanismo nuevo. (Y otra vez el 30/9 a las
+     21:55, con la 008: completada su cabecera en la #24 B, el rojo pidió
+     borrar esta fila.) */
 };
 
 describe('las migraciones', () => {
