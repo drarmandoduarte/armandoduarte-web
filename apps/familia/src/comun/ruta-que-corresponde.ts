@@ -1,5 +1,5 @@
 import { rutaInternaSegura, slugDeMeAnoto } from '@codice/core';
-import { RUTAS } from '../rutas';
+import { LUGARES_CON_SESION, RUTAS } from '../rutas';
 import type { DecisionDePantalla } from './decision-de-pantalla';
 
 /**
@@ -29,6 +29,16 @@ import type { DecisionDePantalla } from './decision-de-pantalla';
  *     se sigue como siempre. Y nunca `/entrar`, que con sesión sería un rulo;
  *   · `/me-anoto/<slug>` con sesión es un lugar: ahí se queda, como `/equipo`.
  *
+ * ── Y desde la #29, la barra lateral y la primera entrada ───────────────
+ *   · `/talleres`, `/mis-talleres` y `/mis-datos` son lugares, como
+ *     `/mi-espacio`;
+ *   · si a la ficha le falta nombre, apellido o WhatsApp (`faltanDatos`,
+ *     que decide `necesitaEmpezar()` de `core`), **primero `/empezar`**, antes
+ *     que cualquier otra ruta y antes que el destino guardado — que no se usa
+ *     ni se olvida: espera ahí y es adonde se va al terminar;
+ *   · con los datos completos, `/empezar` no es un lugar: va a Inicio (o al
+ *     destino guardado, si hay).
+ *
  * Devuelve la ruta a la que hay que ir, o `null` si la actual ya está bien.
  */
 export function rutaQueCorresponde(estado: {
@@ -41,6 +51,8 @@ export function rutaQueCorresponde(estado: {
   esEquipo?: boolean;
   /** El `?ir=` que se guardó al llegar a `/entrar` (#24 B). Se vuelve a validar acá. */
   destinoGuardado?: string | null;
+  /** #29 C: a la ficha le falta nombre, apellido o WhatsApp (`necesitaEmpezar()`). */
+  faltanDatos?: boolean;
 }): string | null {
   if (estado.cargando) return null;
   const enMeAnoto = slugDeMeAnoto(estado.rutaActual) !== null;
@@ -50,6 +62,12 @@ export function rutaQueCorresponde(estado: {
     return estado.rutaActual === RUTAS.entrar ? null : RUTAS.entrar;
   }
   if (!estado.hayYo || estado.decision !== 'pasar') return null;
+
+  /* #29 C: antes que nada, completar los datos. El destino guardado se queda
+     esperando (lo cuida `App.tsx`, que no lo olvida mientras falten). */
+  if (estado.faltanDatos === true) {
+    return estado.rutaActual === RUTAS.empezar ? null : RUTAS.empezar;
+  }
 
   const guardado = rutaInternaSegura(estado.destinoGuardado);
   const caminoGuardado = guardado?.split(/[?#]/)[0] ?? null;
@@ -61,6 +79,7 @@ export function rutaQueCorresponde(estado: {
      que escribe `/equipo` se lo lleva a Mi espacio, sin error. Y
      `/me-anoto/<slug>` es un lugar para cualquiera con sesión (#24 B). */
   if (enMeAnoto) return null;
+  if (LUGARES_CON_SESION.includes(estado.rutaActual)) return null;
   const sePuedeQuedar = estado.rutaActual === RUTAS.equipo && estado.esEquipo === true;
   const destino = sePuedeQuedar ? RUTAS.equipo : RUTAS.miEspacio;
   return destino !== estado.rutaActual ? destino : null;

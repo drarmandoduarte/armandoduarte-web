@@ -59,7 +59,8 @@ beforeEach(() => {
     if (ruta === '/api/talleres/inscribirme') return json({ referencia: 'AD-0042', ya_estaba: false, cobro: null });
     return json({});
   }));
-  window.history.replaceState(null, '', '/mi-espacio');
+  /* #29: «Tus datos» vive en su propia pantalla. */
+  window.history.replaceState(null, '', '/mis-datos');
   window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 });
 afterEach(() => {
@@ -137,7 +138,7 @@ describe('«Completa tu perfil», después de «Me anoto»', () => {
   it('si faltan datos del perfil, la tarjeta suave con el enlace a «Tus datos»; no bloquea nada', async () => {
     await anotarse();
     expect(screen.getByText(t('miEspacio.perfil.completaTitulo'))).toBeTruthy();
-    expect((screen.getByRole('link', { name: t('miEspacio.perfil.completaEnlace') }) as HTMLAnchorElement).getAttribute('href')).toBe('#tus-datos');
+    expect((screen.getByRole('link', { name: t('miEspacio.perfil.completaEnlace') }) as HTMLAnchorElement).getAttribute('href')).toBe('/mis-datos');
   });
 
   it('con el perfil completo, no aparece', async () => {

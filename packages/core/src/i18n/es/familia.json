@@ -225,6 +225,68 @@
       }
     }
   },
+  "marco": {
+    "navegacion": "Mi espacio",
+    "irAInicio": "Mi espacio · ir a Inicio",
+    "inicio": "Inicio",
+    "talleres": "Talleres",
+    "misTalleres": "Mis talleres",
+    "misDatos": "Mis datos",
+    "panel": "Panel del equipo",
+    "salir": "Salir",
+    "volverALaWeb": "Volver a la web",
+    "plegar": "Plegar la barra",
+    "desplegar": "Desplegar la barra",
+    "menu": "Menú",
+    "cerrarMenu": "Cerrar el menú"
+  },
+  "paginas": {
+    "talleres": "Talleres [abiertos]",
+    "talleresBajada": "Elige un taller y aparta tu lugar.",
+    "misTalleres": "Mis [talleres]",
+    "misTalleresBajada": "Tus inscripciones, su estado y tu comprobante.",
+    "misTalleresVacio": "Todavía no te anotaste a ningún taller.",
+    "verTalleres": "Ver los talleres abiertos",
+    "misDatos": "Mis [datos]",
+    "misDatosBajada": "Con estos datos te avisamos todo lo de tus talleres."
+  },
+  "inicio": {
+    "proximoTitulo": "Tu próximo taller",
+    "proximoVer": "Verlo en Mis talleres",
+    "proximoAbierto": "Todavía no te anotaste. El próximo con lugares:",
+    "proximoNinguno": "Por ahora no hay talleres con inscripciones abiertas.",
+    "datosTitulo": "Tus datos",
+    "datosCompletos": "Completos",
+    "datosFaltan": "Faltan: {{lista}}",
+    "datosCompletar": "Completar mis datos",
+    "datosVer": "Ver mis datos",
+    "campos": {
+      "nombre": "nombre",
+      "apellido": "apellido",
+      "whatsapp": "WhatsApp",
+      "pais": "país",
+      "ciudad": "ciudad"
+    },
+    "ayudaTitulo": "¿Necesitas ayuda?",
+    "ayudaTexto": "Gaby te responde por WhatsApp.",
+    "ayudaBoton": "Escribir a Gaby",
+    "ayudaMensaje": "Hola, tengo una pregunta sobre Mi espacio.",
+    "panelTitulo": "Panel del equipo",
+    "enRevision_one": "{{count}} comprobante en revisión",
+    "enRevision_other": "{{count}} comprobantes en revisión",
+    "sinRevision": "Nada en revisión.",
+    "enRevisionError": "No pudimos contar los comprobantes.",
+    "panelIr": "Ir al panel"
+  },
+  "empezar": {
+    "titulo": "Antes de [empezar]",
+    "bajada": "Dos minutos: lo necesitamos para avisarte sobre tu lugar.",
+    "ciudadOpcional": "Ciudad (opcional)",
+    "paraQue": "¿Para qué pedimos esto?",
+    "guardar": "Guardar y entrar",
+    "guardando": "Guardando…",
+    "error": "No pudimos guardar tus datos. Vuelve a intentarlo."
+  },
   "pasoReciente": {
     "titulo": "Confirma otra vez",
     "bajada": "Para esto necesitamos que escribas el código de tu autenticador ahora mismo.",

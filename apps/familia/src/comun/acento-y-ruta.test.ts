@@ -91,6 +91,40 @@ describe('rutaQueCorresponde', () => {
     expect(rutaQueCorresponde({ ...base, decision: 'reto', destinoGuardado: '/me-anoto/el-arte' })).toBeNull();
   });
 
+  it('#29: /talleres, /mis-talleres y /mis-datos son lugares; una ruta inventada va a Inicio', () => {
+    for (const lugar of ['/talleres', '/mis-talleres', '/mis-datos', '/mi-espacio']) {
+      expect(rutaQueCorresponde({ ...base, rutaActual: lugar }), lugar).toBeNull();
+    }
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/ajustes' })).toBe('/mi-espacio');
+    /* Sin sesión, cualquiera de ellas manda a la entrada. */
+    expect(rutaQueCorresponde({ ...base, haySesion: false, hayYo: false, decision: null, rutaActual: '/mis-datos' })).toBe('/entrar');
+  });
+
+  it('#29 C · EL CASO: sin nombre, apellido o WhatsApp, primero /empezar — desde cualquier ruta, también el equipo', () => {
+    for (const desde of ['/entrar', '/', '/mi-espacio', '/talleres', '/mis-datos', '/me-anoto/el-arte']) {
+      expect(rutaQueCorresponde({ ...base, rutaActual: desde, faltanDatos: true }), desde).toBe('/empezar');
+    }
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/equipo', esEquipo: true, faltanDatos: true })).toBe('/empezar');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/empezar', faltanDatos: true })).toBeNull();
+  });
+
+  it('#29 C: el ?ir= sobrevive a /empezar — primero los datos, después el taller', () => {
+    expect(rutaQueCorresponde({ ...base, destinoGuardado: '/me-anoto/el-arte', faltanDatos: true })).toBe('/empezar');
+    /* Ya completos, desde /empezar se va al destino guardado. */
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/empezar', destinoGuardado: '/me-anoto/el-arte', faltanDatos: false }))
+      .toBe('/me-anoto/el-arte');
+  });
+
+  it('#29 C: con los datos completos, /empezar nunca — escrita a mano, va a Inicio', () => {
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/empezar', faltanDatos: false })).toBe('/mi-espacio');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/mi-espacio', faltanDatos: false })).toBeNull();
+  });
+
+  it('#29 C: en los estados intermedios tampoco se manda a /empezar', () => {
+    expect(rutaQueCorresponde({ ...base, decision: 'reto', faltanDatos: true })).toBeNull();
+    expect(rutaQueCorresponde({ ...base, hayYo: false, decision: 'esperando', faltanDatos: true })).toBeNull();
+  });
+
   it('los estados intermedios no mueven la URL', () => {
     expect(rutaQueCorresponde({ ...base, cargando: true })).toBeNull();
     expect(rutaQueCorresponde({ ...base, hayYo: false, decision: 'esperando' })).toBeNull();

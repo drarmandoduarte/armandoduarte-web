@@ -72,7 +72,8 @@ beforeEach(() => {
       return new Response(JSON.stringify({
         rol: 'cliente',
         tipo: 'cliente',
-        persona: { id: 'p-1', nombre: null, apellido: null, whatsapp: null, pais: null },
+        /* Ficha completa: si no, la pantalla sería `/empezar` (#29 C). */
+        persona: { id: 'p-1', nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 000 0000', pais: 'MX' },
       }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
     return new Response('{}', { status: 404 });

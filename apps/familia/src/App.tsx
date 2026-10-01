@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSesion } from './comun/sesion';
 import { api } from './comun/api';
-import { slugDeMeAnoto } from '@codice/core';
+import { necesitaEmpezar, slugDeMeAnoto } from '@codice/core';
 import { rutaQueCorresponde } from './comun/ruta-que-corresponde';
 import { destinoGuardado, guardarDestinoDeLaUrl, olvidarDestino } from './comun/destino';
 import { Pantalla } from './comun/Piezas';
@@ -10,7 +10,11 @@ import { Entrar } from './entrar/Entrar';
 import { Enrolar } from './entrar/Enrolar';
 import { Reto } from './entrar/Reto';
 import { CodigosDeRespaldo } from './entrar/CodigosDeRespaldo';
-import { MiEspacio } from './mi-espacio/MiEspacio';
+import { PaginaDeMisDatos, PaginaDeMisTalleres, PaginaDeTalleres } from './mi-espacio/MiEspacio';
+import { Inicio } from './mi-espacio/Inicio';
+import { Empezar } from './mi-espacio/Empezar';
+import { Marco } from './comun/Marco';
+import { ProveedorDeNavegacion } from './comun/navegacion';
 import { Panel } from './equipo/Panel';
 import { RUTAS } from './rutas';
 import { variablesQueFaltan } from './supabase';
@@ -26,7 +30,8 @@ import { variablesQueFaltan } from './supabase';
  * escrita otra vez y con más superficie—. Con estados, la única forma de llegar
  * a una pantalla es que la sesión esté en la condición que la produce.
  *
- * Las dos rutas que sí existen (`/entrar` y `/mi-espacio`) viven en `rutas.ts`
+ * Las rutas que sí existen (`/entrar`, `/mi-espacio` y, desde la #29, los
+ * lugares de la barra lateral y `/empezar`) viven en `rutas.ts`
  * y las usa el `vercel.json` para servir el `index.html` en cualquiera: es una
  * SPA y el servidor no sabe de estados.
  *
@@ -44,6 +49,22 @@ export function App() {
    *  vuelve a pintar: sin esto, al llegar a `/me-anoto/<slug>` después de
    *  entrar, la pantalla seguía mostrando lo de la ruta anterior. */
   const [ruta, setRuta] = useState(() => window.location.pathname);
+  /** #29 C: a la ficha le falta nombre, apellido o WhatsApp → primero `/empezar`. Lo decide `core`. */
+  const faltanDatos = yo ? necesitaEmpezar(yo.persona) : false;
+
+  /* #29: la barra lateral navega sin recargar (ver `comun/navegacion.tsx`).
+     `pushState` y no `replaceState`: entre Talleres y Mis datos el «atrás»
+     del navegador sí tiene que volver. */
+  const navegar = useCallback((destino: string) => {
+    window.history.pushState(null, '', destino);
+    setRuta(window.location.pathname);
+    window.scrollTo({ top: 0 });
+  }, []);
+  useEffect(() => {
+    const alVolver = () => setRuta(window.location.pathname);
+    window.addEventListener('popstate', alVolver);
+    return () => window.removeEventListener('popstate', alVolver);
+  }, []);
 
   /* F · la URL dice dónde está la persona: `/mi-espacio` cuando entró,
      `/entrar` cuando no. Quién decide es `rutaQueCorresponde()`, pura y con
@@ -63,14 +84,17 @@ export function App() {
       rutaActual: window.location.pathname,
       esEquipo: yo?.tipo === 'equipo',
       destinoGuardado: guardado,
+      faltanDatos,
     });
-    if (sesion && yo && decision === 'pasar') olvidarDestino();
+    /* El destino se olvida cuando se usa, y no mientras falten los datos:
+       ahí espera a que `/empezar` termine (#29 C). */
+    if (sesion && yo && decision === 'pasar' && !faltanDatos) olvidarDestino();
     if (destino) {
       window.history.replaceState(null, '', destino);
       guardarDestinoDeLaUrl();
     }
     setRuta(window.location.pathname);
-  }, [cargando, sesion, yo, decision]);
+  }, [cargando, sesion, yo, decision, faltanDatos, ruta]);
 
   /* Lo primero, antes que cualquier pantalla: si falta una variable, se dice
      SU NOMBRE. Quien va a leer esto es dirección cargando el proyecto en
@@ -182,20 +206,34 @@ export function App() {
     );
   }
 
+  /* #29 C: sin nombre, apellido o WhatsApp, `/empezar` antes que cualquier
+     otra pantalla — también mientras la URL todavía no cambió, para que no
+     asome un segundo otra cosa. */
+  if (faltanDatos) return <Empezar yo={yo} recargar={recargar} />;
+
+  const esEquipo = yo.tipo === 'equipo';
+  const slug = slugDeMeAnoto(ruta);
   /* `/equipo` (#24 A): el panel, solo para el equipo. A un cliente que escribe
-     `/equipo` se le muestra Mi espacio y `rutaQueCorresponde()` corrige la URL:
+     `/equipo` se le muestra Inicio y `rutaQueCorresponde()` corrige la URL:
      nunca ve un error. La API y la base lo frenan igual (`SOLO_EQUIPO`, RLS). */
-  if (ruta === RUTAS.equipo && yo.tipo === 'equipo') {
-    return <Panel yo={yo} />;
-  }
+  const enElPanel = ruta === RUTAS.equipo && esEquipo;
+  const pagina = enElPanel ? <Panel yo={yo} />
+    : slug !== null || ruta === RUTAS.talleres ? <PaginaDeTalleres key={ruta} yo={yo} slugElegido={slug} recargar={recargar} />
+      : ruta === RUTAS.misTalleres ? <PaginaDeMisTalleres yo={yo} />
+        : ruta === RUTAS.misDatos ? <PaginaDeMisDatos yo={yo} recargar={recargar} alRegenerar={setCodigosNuevos} />
+          : <Inicio yo={yo} />;
 
   return (
-    <MiEspacio
-      yo={yo}
-      slugElegido={slugDeMeAnoto(ruta)}
-      recargar={recargar}
-      alSalir={() => void salir('deliberada')}
-      alRegenerar={setCodigosNuevos}
-    />
+    <ProveedorDeNavegacion navegar={navegar}>
+      <Marco
+        ruta={enElPanel ? RUTAS.equipo : ruta}
+        esEquipo={esEquipo}
+        correo={sesion?.user?.email ?? null}
+        alSalir={() => void salir('deliberada')}
+        ancha={enElPanel}
+      >
+        {pagina}
+      </Marco>
+    </ProveedorDeNavegacion>
   );
 }

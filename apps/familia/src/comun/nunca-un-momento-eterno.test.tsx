@@ -42,7 +42,10 @@ const t = (clave: string) => i18n.t(clave);
 beforeEach(() => {
   falso.sesion = sesion;
   vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
-    rol: 'cliente', tipo: 'cliente', persona: null,
+    /* Con la ficha completa: sin nombre, apellido o WhatsApp la pantalla sería
+       `/empezar` (#29 C), y lo que se prueba acá es la espera, no la ficha. */
+    rol: 'cliente', tipo: 'cliente',
+    persona: { id: 'p-1', nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 000 0000', pais: 'MX' },
   }), { status: 200, headers: { 'Content-Type': 'application/json' } })));
 });
 

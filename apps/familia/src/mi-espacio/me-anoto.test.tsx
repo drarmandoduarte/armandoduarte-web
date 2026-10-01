@@ -46,14 +46,16 @@ const taller = (campos: Record<string, unknown> = {}) => ({
 });
 const otro = taller({ edicion_id: '22222222-2222-4222-8222-222222222222', curso_slug: 'otro-taller', curso_titulo: 'Otro taller', lugares: null });
 
-let respuestas: { yo: object; talleres: object; inscribirme: { status: number; cuerpo: object } };
+let respuestas: { yo: object; talleres: object; inscribirme: { status: number; cuerpo: object }; guardarYo?: () => void };
 let pedidos: { ruta: string; cuerpo: unknown }[];
 
 beforeEach(() => {
   falso.sesion = sesion;
   pedidos = [];
   respuestas = {
-    yo: { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: 'Prueba', apellido: null, whatsapp: null, pais: 'MX', zona_horaria: 'America/Merida' } },
+    /* Ficha completa: desde la #29 C, sin nombre, apellido o WhatsApp se pasa
+       antes por `/empezar` (lo prueba el último bloque de este archivo). */
+    yo: { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 123 4567', pais: 'MX', zona_horaria: 'America/Merida' } },
     talleres: { abiertos: [taller(), otro], mios: [] },
     inscribirme: { status: 200, cuerpo: { referencia: 'AD-0042', ya_estaba: false, cobro: null } },
   };
@@ -62,6 +64,7 @@ beforeEach(() => {
     pedidos.push({ ruta, cuerpo: opciones?.body ? JSON.parse(opciones.body) : undefined });
     const json = (cuerpo: object, status = 200) =>
       new Response(JSON.stringify(cuerpo), { status, headers: { 'Content-Type': 'application/json' } });
+    if (ruta === '/api/yo' && opciones?.body) { respuestas.guardarYo?.(); return json({ ok: true }); }
     if (ruta === '/api/yo') return json(respuestas.yo);
     if (ruta === '/api/talleres') return json(respuestas.talleres);
     if (ruta === '/api/talleres/inscribirme') return json(respuestas.inscribirme.cuerpo, respuestas.inscribirme.status);
@@ -81,27 +84,25 @@ afterEach(() => {
 const naranjas = () => document.querySelectorAll('.btn--naranja').length;
 
 describe('/me-anoto/<slug> abre «Me anoto» con ese taller', () => {
-  it('el paso viene abierto y pide solo lo que falta (apellido y WhatsApp, no el nombre)', async () => {
+  it('el paso viene abierto y, con la ficha completa (#29 C), no pide ningún dato', async () => {
     render(<App />);
     expect(await screen.findByRole('button', { name: t('miEspacio.confirmarLugar') })).toBeTruthy();
-    expect(screen.queryByLabelText(t('miEspacio.nombre'), { selector: '#anotarse-nombre' })).toBeNull();
-    expect(screen.getByLabelText(t('miEspacio.apellido'), { selector: '#anotarse-apellido' })).toBeTruthy();
-    expect(document.getElementById('anotarse-whatsapp')).not.toBeNull();
+    for (const id of ['anotarse-nombre', 'anotarse-apellido', 'anotarse-whatsapp']) {
+      expect(document.getElementById(id), id).toBeNull();
+    }
     /* «Quedan 12» se dice (≤ 15); del otro, sin tope, no se dice número. */
     expect(screen.getByText(t('miEspacio.quedanLugares', { count: 12 }))).toBeTruthy();
     expect(naranjas(), 'un solo naranja: «Confirmar mi lugar»').toBe(1);
   });
 
-  it('confirmar manda los datos que faltaban y muestra la referencia; sin cobro, el enlace a Gaby', async () => {
+  it('confirmar manda la edición y muestra la referencia; sin cobro, el enlace a Gaby', async () => {
     render(<App />);
-    fireEvent.change(await screen.findByLabelText(t('miEspacio.apellido'), { selector: '#anotarse-apellido' }), { target: { value: 'Prueba' } });
-    fireEvent.change(document.getElementById('anotarse-whatsapp')!, { target: { value: '+52 999 123 4567' } });
-    fireEvent.click(screen.getByRole('button', { name: t('miEspacio.confirmarLugar') }));
+    fireEvent.click(await screen.findByRole('button', { name: t('miEspacio.confirmarLugar') }));
 
     expect(await screen.findByText('AD-0042')).toBeTruthy();
     expect(screen.getByText(t('miEspacio.listo'))).toBeTruthy();
     const pedido = pedidos.find((p) => p.ruta === '/api/talleres/inscribirme');
-    expect(pedido?.cuerpo).toEqual({ edicion_id: taller().edicion_id, apellido: 'Prueba', whatsapp: '+52 999 123 4567' });
+    expect(pedido?.cuerpo).toEqual({ edicion_id: taller().edicion_id });
 
     expect(screen.getByText(t('miEspacio.cobroPorWhatsapp'))).toBeTruthy();
     const gaby = screen.getByRole('link', { name: t('miEspacio.escribirAGaby') }) as HTMLAnchorElement;
@@ -139,9 +140,9 @@ describe('/me-anoto/<slug> abre «Me anoto» con ese taller', () => {
   });
 });
 
-describe('sin slug: Mi espacio con la lista', () => {
-  it('ningún paso abierto, el primer «Me anoto» en naranja y «Guardar» en contorno: un naranja', async () => {
-    window.history.replaceState(null, '', '/mi-espacio');
+describe('sin slug: Talleres con la lista (#29: su propia pantalla)', () => {
+  it('ningún paso abierto, el primer «Me anoto» en naranja y el otro en contorno: un naranja', async () => {
+    window.history.replaceState(null, '', '/talleres');
     render(<App />);
     const botones = await screen.findAllByRole('button', { name: t('miEspacio.meAnoto') });
     expect(botones).toHaveLength(2);
@@ -150,13 +151,12 @@ describe('sin slug: Mi espacio con la lista', () => {
     expect(naranjas()).toBe(1);
   });
 
-  it('sin talleres abiertos, «Guardar» vuelve a ser el principal', async () => {
-    window.history.replaceState(null, '', '/mi-espacio');
+  it('sin talleres abiertos, se dice, y la pantalla no tiene naranja (no hay nada que hacer)', async () => {
+    window.history.replaceState(null, '', '/talleres');
     respuestas.talleres = { abiertos: [], mios: [] };
     render(<App />);
     expect(await screen.findByText(t('miEspacio.talleresVacio'))).toBeTruthy();
-    expect(naranjas()).toBe(1);
-    expect(screen.getByRole('button', { name: t('miEspacio.guardar') }).className).toContain('btn--naranja');
+    expect(naranjas()).toBe(0);
   });
 });
 
@@ -183,5 +183,51 @@ describe('?ir= (orden #24 B, a)', () => {
     render(<App />);
     await waitFor(() => expect(window.location.pathname).toBe('/mi-espacio'));
     expect(window.location.host).toBe('localhost:3000');
+  });
+});
+
+describe('#29 C: sin los tres datos, primero /empezar — y el taller espera', () => {
+  it('EL CASO: llega a /me-anoto/<slug> sin apellido ni WhatsApp → /empezar; al guardar, de vuelta al taller', async () => {
+    respuestas.yo = { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: 'Prueba', apellido: null, whatsapp: null, pais: 'MX' } };
+    respuestas.guardarYo = () => {
+      respuestas.yo = { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 123 4567', pais: 'MX' } };
+    };
+    window.history.replaceState(null, '', '/entrar?ir=%2Fme-anoto%2F' + SLUG);
+    render(<App />);
+    expect(await screen.findByRole('button', { name: t('empezar.guardar') })).toBeTruthy();
+    await waitFor(() => expect(window.location.pathname).toBe('/empezar'));
+    /* El destino no se olvidó: espera a que termine /empezar. */
+    expect(window.sessionStorage.getItem('codice.destino-despues-de-entrar')).toBe(`/me-anoto/${SLUG}`);
+    expect(naranjas(), 'un botón: «Guardar y entrar»').toBe(1);
+
+    fireEvent.change(document.getElementById('empezar-apellido')!, { target: { value: 'Prueba' } });
+    fireEvent.change(document.getElementById('empezar-whatsapp')!, { target: { value: '+52 999 123 4567' } });
+    fireEvent.click(screen.getByRole('button', { name: t('empezar.guardar') }));
+
+    expect(await screen.findByRole('button', { name: t('miEspacio.confirmarLugar') })).toBeTruthy();
+    expect(window.location.pathname).toBe(`/me-anoto/${SLUG}`);
+    expect(pedidos.find((p) => p.ruta === '/api/yo' && p.cuerpo)?.cuerpo).toEqual({
+      nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 123 4567', pais: 'MX',
+    });
+  });
+
+  it('los tres son obligatorios: sin ellos no se manda nada y cada campo lo dice', async () => {
+    respuestas.yo = { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: null, apellido: null, whatsapp: null, pais: null } };
+    window.history.replaceState(null, '', '/mi-espacio');
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: t('empezar.guardar') }));
+    expect(await screen.findByText(t('miEspacio.errores.nombre'))).toBeTruthy();
+    expect(screen.getByText(t('miEspacio.errores.apellido'))).toBeTruthy();
+    expect(screen.getByText(t('miEspacio.errores.whatsapp'))).toBeTruthy();
+    expect(pedidos.some((p) => p.ruta === '/api/yo' && p.cuerpo)).toBe(false);
+    /* País, México por defecto. */
+    expect((document.getElementById('empezar-pais') as HTMLSelectElement).value).toBe('MX');
+  });
+
+  it('con los tres datos, /empezar escrita a mano va a Inicio', async () => {
+    window.history.replaceState(null, '', '/empezar');
+    render(<App />);
+    await waitFor(() => expect(window.location.pathname).toBe('/mi-espacio'));
+    expect(screen.queryByRole('button', { name: t('empezar.guardar') })).toBeNull();
   });
 });
