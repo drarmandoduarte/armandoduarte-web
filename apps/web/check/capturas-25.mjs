@@ -8,7 +8,8 @@
  *
  * A 1440×900 y 375×812: la cabecera (con «Mi espacio →»; a 375, el menú abierto
  * con «Mi espacio» primero), el pie, el hero de `/merida`, su cierre
- * «Reservar» y la banda «AHORA» de la portada. Imprime a dónde va cada enlace
+ * «Reservar», «Lo que te llevas» e «Inversión» (auditoría del #41) y la banda
+ * «AHORA» de la portada. Imprime a dónde va cada enlace
  * a la app, que es lo que no se ve en una foto.
  */
 import { chromium } from '@playwright/test';
@@ -62,6 +63,9 @@ for (const [ancho, alto] of [[1440, 900], [375, 812]]) {
     const p = await abrir('/merida', ancho, alto);
     await p.screenshot({ path: join(SALIDA, `hero-taller-${ancho}.jpg`), type: 'jpeg', quality: 86 });
     await guardar(p.locator('#reservar'), `reservar-taller-${ancho}.jpg`);
+    /* Auditoría del #41: «Lo que te llevas» e «Inversión» también reservan en la app. */
+    await guardar(p.locator('#llevas .hero-cta'), `llevas-taller-${ancho}.jpg`);
+    await guardar(p.locator('#inversion .plan'), `inversion-taller-${ancho}.jpg`);
     const naranjas = await p.evaluate(() => [...document.querySelectorAll('#inicio .btn--naranja, #reservar .btn--naranja')].length);
     console.log(`merida ${ancho}: botones naranja en hero + cierre = ${naranjas} (uno por pantalla)`);
     await p.close();

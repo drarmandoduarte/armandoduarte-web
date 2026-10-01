@@ -42,13 +42,27 @@ describe('la web no nombra Vercel (orden #25)', () => {
     }
   });
 
-  it('EL PISO: /merida reserva en la app (hero, cierre y offers.url) y la portada desde «AHORA»', () => {
+  it('EL PISO: /merida reserva en la app (hero, «Lo que te llevas», «Inversión», cierre y offers.url) y la portada desde «AHORA»', () => {
     const reservar = `${APP}/entrar?ir=%2Fme-anoto%2Fel-arte-de-amar-a-tu-adolescente`;
     const merida = paginas.find((p) => p.archivo === 'merida.html')!.html;
-    expect(entradas(merida).filter((h) => h === reservar).length, 'hero y cierre de /merida').toBe(2);
+    expect(entradas(merida).filter((h) => h === reservar).length, 'hero, «Lo que te llevas», «Inversión» y cierre de /merida').toBe(4);
     expect(merida, 'el Event no dice dónde se reserva').toContain(`"url":"${reservar}"`);
     const portada = paginas.find((p) => p.archivo === 'index.html')!.html;
     expect(entradas(portada), 'la banda «AHORA»').toContain(reservar);
+  });
+
+  it('«Lo que te llevas» e «Inversión» reservan en la app; Inversión deja WhatsApp en contorno (auditoría del #41)', () => {
+    const reservar = `${APP}/entrar?ir=%2Fme-anoto%2Fel-arte-de-amar-a-tu-adolescente`;
+    const merida = paginas.find((p) => p.archivo === 'merida.html')!.html;
+    const seccion = (id: string) => merida.match(new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</section>`))?.[0] ?? '';
+    const inversion = seccion('inversion');
+    const llevas = seccion('llevas');
+    expect(inversion.length, 'no encontré la sección #inversion').toBeGreaterThan(200);
+    expect(llevas.length, 'no encontré la sección #llevas').toBeGreaterThan(200);
+    expect(entradas(inversion), '«Inversión» no lleva a la app').toContain(reservar);
+    expect(inversion, '«Inversión» perdió WhatsApp como secundario').toMatch(/href="https:\/\/wa\.me\/[^"]+"[^>]*class="btn"/);
+    expect(entradas(llevas), '«Lo que te llevas» no lleva a la app').toContain(reservar);
+    expect(llevas, '«Lo que te llevas» lleva solo el botón principal').not.toContain('wa.me');
   });
 
   it('ningún vercel.app en el HTML publicado', () => {

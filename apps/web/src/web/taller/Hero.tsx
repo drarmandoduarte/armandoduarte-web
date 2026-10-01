@@ -84,6 +84,14 @@ export function Hero() {
          (orden #12, A). Con cuatro, a 375 la línea se parte en tres renglones
          y deja de leerse como una línea de hechos. */
       datos={[t('taller.hero.micro1'), t('taller.hero.micro2'), t('taller.hero.micro3')]}
+      /* Auditoría del #41: «Ver el programa» vuelve, pero como enlace de texto
+         en el cromo neutro, debajo de la línea de datos: dos botones y un
+         naranja siguen siendo el tope del hero. */
+      debajo={(
+        <a href="#programa" className="hero-enlace">
+          {t('taller.hero.ctaPrograma')} <span aria-hidden="true">↓</span>
+        </a>
+      )}
       fotoAlt={t('taller.hero.fotoAlt')}
     />
   );

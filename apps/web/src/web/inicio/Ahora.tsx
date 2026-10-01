@@ -21,7 +21,9 @@ export function Ahora() {
       <div className="container ahora__row reveal">
         <span className="ahora__pill">{t('inicio.ahora.pill')}</span>
         <div>
-          <p className="ahora__t">{t('inicio.ahora.titulo')}</p>
+          {/* Auditoría del #41: el título lleva a `/merida`; la acción de la
+              derecha es reservar. */}
+          <p className="ahora__t"><a href="/merida">{t('inicio.ahora.titulo')}</a></p>
           <p className="ahora__meta">
             <span>{t('inicio.ahora.meta1')}</span>
             <span>{t('inicio.ahora.meta2')}</span>

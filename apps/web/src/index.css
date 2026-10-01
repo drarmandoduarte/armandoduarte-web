@@ -421,6 +421,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:var(--s5)}
 .hero-micro{margin-top:var(--s4);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}
 .hero-micro span+span::before{content:'·';margin:0 .8em;color:var(--gris-claro)}
+/* Auditoría del #41 · «Ver el programa ↓»: enlace de texto en el cromo neutro,
+   debajo de la línea de datos; no es un tercer botón. Acento solo en hover. */
+.hero-enlace{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:12px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta);text-decoration:underline;text-decoration-color:var(--gris-claro);text-underline-offset:6px;transition:color .32s,text-decoration-color .32s}
+.hero-enlace:hover{color:var(--naranja-texto);text-decoration-color:currentColor}
 .foto{border-radius:12px;overflow:hidden;background:var(--calido);position:relative}
 .foto img{width:100%;height:100%;object-fit:cover}
 /* `78vh` era el tope de cuando el hero medía como mucho 880 px. Ahora el hero
@@ -504,6 +508,9 @@ a,button{-webkit-tap-highlight-color:transparent}
 .ahora__row{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s5);align-items:center}
 .ahora__pill{font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);background:color-mix(in oklab, var(--crema) 70%, transparent);padding:8px 14px;border-radius:999px;white-space:nowrap}
 .ahora__t{font-family:var(--display);font-weight:400;font-size:clamp(20px,2vw,26px);line-height:1.2;color:var(--crema)}
+/* Auditoría del #41: el título lleva a /merida; subrayado fino para que se lea enlace. */
+.ahora__t a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;text-decoration-color:color-mix(in oklab, var(--crema) 50%, transparent);transition:text-decoration-color .32s}
+.ahora__t a:hover{text-decoration-color:var(--crema)}
 .ahora__meta{margin-top:6px;font-size:14px;color:rgba(250,247,241,.7)}.ahora .link{color:var(--crema)}.ahora .link:hover{color:var(--crema)}.ahora .dato{color:color-mix(in oklab, var(--crema) 70%, transparent);border-color:color-mix(in oklab, var(--crema) 70%, transparent)}
 .ahora__meta span+span::before{content:'·';margin:0 .6em;color:rgba(250,247,241,.7)}
 
@@ -999,6 +1006,10 @@ a,button{-webkit-tap-highlight-color:transparent}
   /* A este ancho «Escribir por WhatsApp» en versalitas con .18em no entra en
      una línea: el botón toma la columna entera en vez de partirse en dos. */
   .btn{padding:16px 22px;width:100%}
+  /* Auditoría del #41: dentro de la tarjeta de precio la columna mide ~277 px a
+     375 y «Prefiero escribir por WhatsApp» no entra en una línea: desbordaba la
+     página 21 px. Ahí, y solo ahí, el botón se parte en dos renglones. */
+  .plan .btn{white-space:normal;text-align:center;line-height:1.5;padding:14px 18px}
   .hero-cta,.cta-row{flex-direction:column;align-items:stretch}
   .hechos{grid-template-columns:1fr}
   .ficha li{grid-template-columns:1fr;gap:4px}
