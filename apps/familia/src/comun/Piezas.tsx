@@ -78,21 +78,23 @@ function Cabecera() {
 
 /**
  * A · el mundo de Armando, a ≥ 1100 px: el panel cálido a sangre, la firma
- * arriba y el busto apoyado en el borde de abajo, como en «Sobre el
- * facilitador» de `/merida`.
+ * arriba y Armando de pie debajo, cortado por el borde de abajo del panel.
  *
- * El busto es la imagen más pesada de la pantalla y, en escritorio, el LCP. Por
- * eso: **un solo WebP**, `loading` normal y `fetchpriority="high"`.
+ * ── Por qué `de-pie` y no el busto (orden #28, auditoría del PR #46) ─────
+ * Hasta la #28 era `medio-cuerpo-900.webp`, un busto recortado en rectángulo:
+ * termina en seco en los dos brazos y trae un resto de silla. Con `cover` a
+ * todo el panel esos cortes coincidían con los bordes; cuando la #28 achicó a
+ * Armando quedaron a la vista dentro del cálido. `de-pie` es la silueta con
+ * alfa de `#quien` (1400×2791, el mismo archivo que la web): sus bordes son
+ * los de Armando, sin cortes ni silla, y el único corte es el del borde del
+ * panel, que se lee como apoyo (la regla de la #19 B).
  *
- * Es el recorte de **900** (67 KB) y no el de 560 (42 KB), por decisión de
- * dirección (auditoría del PR #32, 30/9): la foto termina en seco en los dos
- * brazos, y con el de 560 a ~470 px el corte del brazo izquierdo quedaba a la
- * vista a 1440. Con el de 900 el busto ocupa **el ancho entero del panel** y
- * los dos cortes coinciden con sus bordes. Premium primero: 25 KB más, en una
- * pantalla que se visita una vez por sesión y que en el teléfono no la baja
- * (`usar-ancho.ts`). Con `alt` vacío porque
- * es ambiente: el nombre de Armando ya lo dice el wordmark de al lado, y un
- * lector de pantalla no gana nada con oír «Armando Duarte» dos veces seguidas.
+ * Es la imagen más pesada de la pantalla y, en escritorio, el LCP. Por eso:
+ * **un solo WebP**, `loading` normal y `fetchpriority="high"`. El de 1400 y no
+ * el de 900: el panel mide 864 px de ancho a 1920. En el teléfono no se baja
+ * (`usar-ancho.ts`). Con `alt` vacío porque es ambiente: el nombre de Armando
+ * ya lo dice el wordmark de al lado, y un lector de pantalla no gana nada con
+ * oír «Armando Duarte» dos veces seguidas.
  *
  * La firma **no** va en naranja, aunque en el pie de la web sí: en esta
  * pantalla el naranja es del botón y de nadie más (B.2, D26). Va en `--tinta`.
@@ -104,10 +106,10 @@ function PanelDeArmando() {
       <p className="panel__firma">{t('web:comun.marca.tagline')}</p>
       <div className="panel__foto">
         <img
-          className="panel__busto"
-          src="/img/armando/medio-cuerpo-900.webp"
-          width={900}
-          height={1087}
+          className="panel__armando"
+          src="/img/armando/de-pie-1400.webp"
+          width={1400}
+          height={2791}
           alt=""
           fetchPriority="high"
           decoding="async"
