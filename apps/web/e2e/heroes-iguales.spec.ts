@@ -10,6 +10,11 @@ import { PUERTO_PORT } from '../playwright.config';
  * **la misma caja de arco** (x, y, ancho, alto) en las dos páginas, a 1440×900 y
  * a 1920×1080, y además dónde está a 1440×900, que es lo que fija la orden.
  *
+ * Desde la #23-ter el arco no apoya en el borde del hero: deja **el mismo aire
+ * arriba y abajo**, 48 px desde la cabecera y 48 px hasta el filo de la
+ * sección, en los dos héroes y los dos viewports. Y el busto sigue apoyado en
+ * el borde de abajo del arco (0 px): el corte del traje es el filo del panel.
+ *
  * Qué NO mira, dicho para que el verde no se lea de más: debajo de 900 px el
  * hero apila y el arco va debajo del texto, con su propio alto; ahí la orden no
  * fija caja.
@@ -22,6 +27,10 @@ const VIEWPORTS = [
 async function medir(page: import('@playwright/test').Page, ruta: string) {
   await page.goto(`http://127.0.0.1:${PUERTO_PORT}${ruta}`, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
+  await page.waitForFunction(() => {
+    const img = document.querySelector('.hero .foto--arco img') as HTMLImageElement | null;
+    return !!img?.complete && img.naturalWidth > 0;
+  });
   return page.evaluate(() => {
     const caja = (sel: string) => {
       const el = document.querySelector(sel);
@@ -35,6 +44,26 @@ async function medir(page: import('@playwright/test').Page, ruta: string) {
       titulo: getComputedStyle(document.querySelector('.hero h1') as Element).fontSize,
       cabecera: Math.round((document.getElementById('hd') as HTMLElement).getBoundingClientRect().bottom),
       hero: caja('.hero'),
+      /* Dónde cae la última fila de la foto (el corte del traje), no la caja
+         del <img>: la caja llena el arco siempre; lo que se ve depende de
+         `object-fit:cover` y del `object-position` vertical. */
+      busto: (() => {
+        const img = document.querySelector('.hero .foto--arco img') as HTMLImageElement | null;
+        if (!img || !img.naturalWidth) return null;
+        const r = img.getBoundingClientRect();
+        const estilo = getComputedStyle(img);
+        const cubre = estilo.objectFit === 'cover';
+        const contiene = estilo.objectFit === 'contain';
+        const escala = cubre
+          ? Math.max(r.width / img.naturalWidth, r.height / img.naturalHeight)
+          : contiene ? Math.min(r.width / img.naturalWidth, r.height / img.naturalHeight) : r.height / img.naturalHeight;
+        const altoPintado = img.naturalHeight * escala;
+        const [, posY = '50%'] = estilo.objectPosition.split(' ');
+        const desplazamiento = posY.endsWith('%')
+          ? (r.height - altoPintado) * (parseFloat(posY) / 100)
+          : parseFloat(posY);
+        return { corte: Math.round(r.y + desplazamiento + altoPintado) };
+      })(),
     };
   });
 }
@@ -55,10 +84,18 @@ for (const vp of VIEWPORTS) {
     expect(taller.titulo, 'el título del taller no tiene el mismo tamaño que el de la portada').toBe(portada.titulo);
 
     for (const [nombre, m] of [['portada', portada], ['taller', taller]] as const) {
-      /* Lo que fija la orden: arco a 48 px de la cabecera y apoyado abajo,
-         rótulo a 72. */
-      expect(m.arco!.y - m.cabecera, `${nombre}: el arco no arranca a 48 px de la cabecera`).toBe(48);
-      expect(m.arco!.y + m.arco!.alto, `${nombre}: el arco no apoya en el borde de abajo del hero`).toBe(m.hero!.y + m.hero!.alto);
+      /* Lo que fija la orden: el hero mide la pantalla; el arco deja 48 px
+         arriba (desde la cabecera) y 48 abajo (hasta el filo del hero), con el
+         busto apoyado en su borde de abajo; el rótulo a 72. */
+      expect(m.hero!.alto, `${nombre}: el hero no mide la pantalla`).toBe(vp.height);
+      const arriba = m.arco!.y - m.cabecera;
+      const abajo = m.hero!.y + m.hero!.alto - (m.arco!.y + m.arco!.alto);
+      /* Abajo primero: sin el margen de abajo el arco, que va `align-self:end`,
+         baja entero y el rojo de «arriba» mentiría sobre la causa. */
+      expect(abajo, `${nombre}: el arco no deja 48 px abajo (hasta el filo del hero)`).toBe(48);
+      expect(arriba, `${nombre}: el arco no deja 48 px arriba (desde la cabecera)`).toBe(48);
+      expect(m.busto, `${nombre}: el arco no tiene busto`).not.toBeNull();
+      expect(m.busto!.corte, `${nombre}: el corte del busto no apoya en el borde de abajo del arco`).toBe(m.arco!.y + m.arco!.alto);
       expect(m.rotulo!.y - m.cabecera, `${nombre}: el rótulo no arranca a 72 px de la cabecera`).toBe(72);
     }
   });
