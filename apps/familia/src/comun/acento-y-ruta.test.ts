@@ -63,6 +63,34 @@ describe('rutaQueCorresponde', () => {
     expect(rutaQueCorresponde({ ...base, haySesion: false, hayYo: false, decision: null, rutaActual: '/equipo' })).toBe('/entrar');
   });
 
+  it('#24 B: sin sesión en /me-anoto/<slug>, a /entrar con ?ir= para no perder el taller', () => {
+    expect(rutaQueCorresponde({ ...base, haySesion: false, hayYo: false, decision: null, rutaActual: '/me-anoto/el-arte' }))
+      .toBe('/entrar?ir=%2Fme-anoto%2Fel-arte');
+    /* Ya en /entrar (con o sin ?ir=), no se toca: el ?ir= se queda en la barra. */
+    expect(rutaQueCorresponde({ ...base, haySesion: false, hayYo: false, decision: null, rutaActual: '/entrar' })).toBeNull();
+  });
+
+  it('#24 B: después de entrar, al destino guardado y no a /mi-espacio — también desde / (Google)', () => {
+    expect(rutaQueCorresponde({ ...base, destinoGuardado: '/me-anoto/el-arte' })).toBe('/me-anoto/el-arte');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/', destinoGuardado: '/me-anoto/el-arte' })).toBe('/me-anoto/el-arte');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/me-anoto/el-arte', destinoGuardado: '/me-anoto/el-arte' })).toBeNull();
+  });
+
+  it('#24 B · LA MUTACIÓN DE LA ORDEN: ?ir=https://otro.sitio (y sus disfraces) → Mi espacio', () => {
+    for (const malo of ['https://otro.sitio', '//otro.sitio', '/\\otro.sitio', 'javascript:alert(1)', '/entrar']) {
+      expect(rutaQueCorresponde({ ...base, destinoGuardado: malo }), malo).toBe('/mi-espacio');
+    }
+  });
+
+  it('#24 B: con sesión, /me-anoto/<slug> es un lugar; un slug sin forma no lo es', () => {
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/me-anoto/el-arte' })).toBeNull();
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/me-anoto/El Arte' })).toBe('/mi-espacio');
+  });
+
+  it('#24 B: el destino guardado espera al segundo paso: en el reto no se navega', () => {
+    expect(rutaQueCorresponde({ ...base, decision: 'reto', destinoGuardado: '/me-anoto/el-arte' })).toBeNull();
+  });
+
   it('los estados intermedios no mueven la URL', () => {
     expect(rutaQueCorresponde({ ...base, cargando: true })).toBeNull();
     expect(rutaQueCorresponde({ ...base, hayYo: false, decision: 'esperando' })).toBeNull();

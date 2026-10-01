@@ -77,14 +77,16 @@ const PENDIENTES: Record<string, string> = {
      completó la cabecera, y este test se puso rojo diciendo «se borra la fila de
      PENDIENTES». Nadie se acordó de venir; lo mandó el rojo. La lista se queda
      acá vacía porque la próxima migración pendiente tiene que volver a
-     escribirse, no inventarse un mecanismo nuevo. */
-  '008_el_panel_del_equipo.sql':
-    'orden #24 A: las cuatro consultas del panel del equipo. La corre el CEO cuando se mergee el PR, '
-    + 'y en el mismo paso la semilla `semillas/001_taller_de_merida.sql`',
+     escribirse, no inventarse un mecanismo nuevo. (Y otra vez el 30/9 a las
+     21:55, con la 008: completada su cabecera en la #24 B, el rojo pidió
+     borrar esta fila.) */
+  '009_me_anoto.sql':
+    'orden #24 B: el cupo cumplido por la base y las tres consultas de «me anoto». La corre el CEO '
+    + 'cuando se mergee el PR, ANTES de que el preview se use: sin ella, Mi espacio no lista talleres',
 };
 
 describe('las migraciones', () => {
-  it('son ocho, numeradas de tres dígitos y en orden', async () => {
+  it('son nueve, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -94,6 +96,7 @@ describe('las migraciones', () => {
       '006_storage_comprobantes.sql',
       '007_permisos.sql',
       '008_el_panel_del_equipo.sql',
+      '009_me_anoto.sql',
     ]);
   });
 

@@ -70,6 +70,8 @@ import { RespaldoController } from './respaldo/respaldo.controller';
 import { EquipoController } from './equipo/equipo.controller';
 import { EquipoRepositorio } from './equipo/equipo.repositorio';
 import type { CursoDto, EdicionNuevaDto } from './equipo/equipo.dto';
+import { TalleresController } from './talleres/talleres.controller';
+import { TalleresRepositorio } from './talleres/talleres.repositorio';
 import { BACKUP_CODE_COUNT } from './seguridad-512/nucleo/backup-codes';
 
 /* El constructor de `SupabaseService` exige la variable, y hace bien: es la
@@ -518,5 +520,90 @@ describe('EquipoController (/api/equipo), contra el esquema — orden #24 A', ()
   it('el dueño no se quita ni se cambia a sí mismo', async () => {
     expect(await codigoDe(panel().quitar(pedidoDe(s.armando), s.armando))).toBe('NO_VALIDO');
     expect(await codigoDe(panel().sumar(pedidoDe(s.armando), { persona_id: s.armando, territorio: 'mexico' }))).toBe('NO_VALIDO');
+  });
+});
+
+describe('TalleresController (/api/talleres), contra el esquema — orden #24 B', () => {
+  const talleres = () => {
+    const servicioDelCliente = servicio('aal1');
+    return new TalleresController(servicioDelCliente, new TalleresRepositorio(servicioDelCliente));
+  };
+  const codigoDe = async (promesa: Promise<unknown>) => {
+    try {
+      await promesa;
+      return null;
+    } catch (e) {
+      const cuerpo = (e as { getResponse?: () => unknown }).getResponse?.() as { code?: string } | undefined;
+      return cuerpo?.code ?? (e as Error).message;
+    }
+  };
+  /* Dos personas nuevas, recién entradas: solo el correo y el país. Las de la
+     semilla ya las usaron los bloques de arriba (Laura terminó en el equipo). */
+  let rosa: string;
+  let sofia: string;
+  let llena: string;
+  let cerrada: string;
+
+  beforeAll(async () => {
+    const nueva = async (email: string) => {
+      const [u] = await banco.sql<{ id: string }>(`insert into auth.users (email) values ($1) returning id`, [email]);
+      await banco.sql(`update public.personas set pais = 'MX' where id = $1`, [u.id]);
+      return u.id;
+    };
+    rosa = await nueva('rosa@ejemplo.mx');
+    sofia = await nueva('sofia@ejemplo.mx');
+    const edicion = async (cupo: number, estado: string) => {
+      const [e] = await banco.sql<{ id: string }>(
+        `insert into public.ediciones (curso_id, inicio, fin, zona, cupo, inscripciones_hasta, estado)
+         values ($1, now() + interval '60 days', now() + interval '60 days 3 hours', 'America/Merida', $2,
+                 now() + interval '30 days', $3) returning id`, [s.cursoPublicado, cupo, estado]);
+      return e.id;
+    };
+    llena = await edicion(1, 'abierta');
+    cerrada = await edicion(10, 'cerrada');
+  });
+
+  it('sin los datos que faltan no se anota: 400 FALTAN_DATOS, y no queda inscripción', async () => {
+    expect(await codigoDe(talleres().inscribirme(pedidoDe(rosa), { edicion_id: s.edicionAbierta }))).toBe('FALTAN_DATOS');
+    const [{ n }] = await banco.sql<{ n: number }>(`select count(*)::int as n from public.inscripciones where persona_id = $1`, [rosa]);
+    expect(n).toBe(0);
+  });
+
+  it('con los datos, se anota: completa la ficha, devuelve AD- y, sin cuenta cargada, cobro nulo', async () => {
+    const r = await talleres().inscribirme(pedidoDe(rosa), {
+      edicion_id: s.edicionAbierta, nombre: 'Rosa', apellido: 'Prueba', whatsapp: '+52 999 123 4567',
+    });
+    expect(r.referencia).toMatch(/^AD-\d{4,}$/);
+    expect(r.ya_estaba).toBe(false);
+    expect(r.cobro, 'datos_de_cobro está vacía: la pantalla ofrece WhatsApp').toBeNull();
+    const [ficha] = await banco.sql(`select nombre, apellido, whatsapp from public.personas where id = $1`, [rosa]);
+    expect(ficha).toEqual({ nombre: 'Rosa', apellido: 'Prueba', whatsapp: '+52 999 123 4567' });
+  });
+
+  it('la segunda vez devuelve la misma referencia con ya_estaba; con la cuenta cargada, la trae', async () => {
+    /* Una cuenta de PRUEBA, sembrada como superusuario: ninguna CLABE real entra al repo. */
+    await banco.sql(`insert into public.datos_de_cobro (banco, titular, clabe, concepto_sugerido)
+                     values ('Banco de prueba', 'Titular de prueba', '000000000000000000', 'Tu referencia')`);
+    const primera = await banco.sql<{ referencia: string }>(
+      `select referencia from public.inscripciones where persona_id = $1`, [rosa]);
+    const r = await talleres().inscribirme(pedidoDe(rosa), { edicion_id: s.edicionAbierta });
+    expect(r).toMatchObject({ referencia: primera[0].referencia, ya_estaba: true });
+    expect(r.cobro).toEqual({ banco: 'Banco de prueba', titular: 'Titular de prueba', clabe: '000000000000000000', concepto_sugerido: 'Tu referencia' });
+  });
+
+  it('cupo lleno: 409 SIN_LUGARES; edición cerrada: 409 EDICION_CERRADA', async () => {
+    await talleres().inscribirme(pedidoDe(rosa), { edicion_id: llena });
+    const conDatos = { nombre: 'Sofía', apellido: 'Prueba', whatsapp: '+52 999 765 4321' };
+    expect(await codigoDe(talleres().inscribirme(pedidoDe(sofia), { edicion_id: llena, ...conDatos }))).toBe('SIN_LUGARES');
+    expect(await codigoDe(talleres().inscribirme(pedidoDe(sofia), { edicion_id: cerrada, ...conDatos }))).toBe('EDICION_CERRADA');
+  });
+
+  it('GET: Rosa ve sus talleres y su referencia; Sofía no ve nada de Rosa', async () => {
+    const deRosa = await talleres().talleres(pedidoDe(rosa)) as { abiertos: { edicion_id: string; mi_referencia: string | null }[]; mios: unknown[] };
+    expect(deRosa.mios).toHaveLength(2);
+    expect(deRosa.abiertos.find((t) => t.edicion_id === s.edicionAbierta)?.mi_referencia).toMatch(/^AD-/);
+    const deSofia = await talleres().talleres(pedidoDe(sofia)) as typeof deRosa;
+    expect(deSofia.mios).toEqual([]);
+    expect(deSofia.abiertos.every((t) => t.mi_referencia === null)).toBe(true);
   });
 });

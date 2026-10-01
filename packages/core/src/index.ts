@@ -39,3 +39,11 @@ export {
 } from './panel/listas';
 export { TERRITORIOS, accionDeEquipo, esTerritorio } from './panel/equipo';
 export type { Territorio, Rol, FilaDePersona } from './panel/equipo';
+
+// ── Mi espacio: «Me anoto» (orden #24 B) ─────────────────────────────────────
+export {
+  rutaInternaSegura, PREFIJO_ME_ANOTO, slugDeMeAnoto, DATOS_PARA_ANOTARSE, datosQueFaltan,
+  validarDatosParaAnotarse, datosParaEnviar, UMBRAL_DE_LUGARES, estadoDelTaller, fechasDelTaller,
+  edicionElegida, edicionPrincipal, ESTADOS_DE_INSCRIPCION, claveDeEstado, enlaceParaPedirLosDatosDeCobro,
+} from './mi-espacio/me-anoto';
+export type { DatoParaAnotarse, DatosParaAnotarse, EstadoDelTaller } from './mi-espacio/me-anoto';

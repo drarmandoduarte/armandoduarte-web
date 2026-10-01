@@ -10,7 +10,12 @@
 -- ORDEN QUE LA APROBÓ: Códice #24, PR A (`mi-espacio/06-el-panel`), aprobada por
 -- dirección el 30/9/2026.
 --
--- APLICADA: —
+-- APLICADA: 30/9/2026 21:55 (UY), en `armandoduarte-familia`, desde db747a1.
+--   Corrida por el CEO con autorización de Germán, desde `main` (merge del PR
+--   #37), texto idéntico al archivo (7708 caracteres). Verificado contra la
+--   base: `panel_clientes`, `panel_cursos` y `panel_inscriptos` presentes.
+--   Guardada en el editor SQL como `008_el_panel_del_equipo`. Fuente:
+--   `03 Producto/mi-espacio/infraestructura-2026-09-29.md`, «30/9 21:55».
 --
 -- ── Por qué funciones y no consultas armadas en la API ─────────────────────
 -- Porque así **cada consulta del panel se prueba en el banco** con los cuatro

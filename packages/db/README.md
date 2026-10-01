@@ -69,10 +69,13 @@ regla que la próxima vez no va a frenar nada.
 
 ## Estado de las migraciones
 
-**LAS SIETE ESTÁN APLICADAS.** Las seis de la #13 el 29/9/2026 a las 02:34
+**LAS OCHO ESTÁN APLICADAS.** Las seis de la #13 el 29/9/2026 a las 02:34
 (hora de Uruguay), desde el commit `fd93eab`; la 007 el mismo día a las 15:58,
-desde `c3a485e`, en su propia sesión. Todas en `armandoduarte-familia`, corridas
-por el CEO con autorización de Germán.
+desde `c3a485e`, en su propia sesión; la 008 el 30/9/2026 a las 21:55, desde
+`db747a1` (`main` con el PR #37), y tres minutos después la semilla
+`semillas/001_taller_de_merida.sql` (guardada en el editor como
+`semilla_02_taller_de_merida`). Todas en `armandoduarte-familia`, corridas por el
+CEO con autorización de Germán.
 
 | # | archivo | qué trae | aplicada |
 |---|---|---|---|
@@ -83,7 +86,7 @@ por el CEO con autorización de Germán.
 | 005 | `005_seguridad_512.sql` | `totp_backup_codes` y `security_devices`, del kit | **29/9/2026 02:34** |
 | 006 | `006_storage_comprobantes.sql` | el bucket privado `comprobantes` y sus policies | **29/9/2026 02:34** |
 | 007 | `007_permisos.sql` | los `grant` de tabla, secuencia y función que el proyecto no da solo | **29/9/2026 15:58** |
-| 008 | `008_el_panel_del_equipo.sql` | las cuatro consultas del panel `/equipo` (orden #24 A), sin tablas ni policies nuevas | **pendiente** — la corre el CEO al mergear |
+| 008 | `008_el_panel_del_equipo.sql` | las cuatro consultas del panel `/equipo` (orden #24 A), sin tablas ni policies nuevas | **30/9/2026 21:55** |
 
 Las siete quedaron guardadas en el editor SQL de Supabase con el nombre de su
 archivo (`001_personas_y_miembros` … `007_permisos`).

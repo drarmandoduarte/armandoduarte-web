@@ -335,3 +335,28 @@ img,svg{display:block;max-width:100%}
    existían: no hacían nada. Entran con la #24 A porque el panel los usa. */
 .u-mt-4{margin-top:var(--s4)}
 .u-mt-6{margin-top:var(--s6)}
+
+/* ── Talleres abiertos, «Me anoto» y Mis talleres (orden #24 B) ──────────
+   Misma anatomía que `.curso` del panel: filete arriba, sin caja. El taller
+   elegido por `/me-anoto/<slug>` se marca con el filete en teal, sin otro
+   color: el naranja es del botón (D26). */
+.talleres{list-style:none;margin:16px 0 0;padding:0}
+.taller{padding:24px 0;border-top:1px solid var(--hair)}
+.taller:first-child{border-top:0;padding-top:8px}
+.taller--elegido{border-top-color:var(--teal)}
+.taller__titulo{font-family:var(--display);font-weight:400;font-size:21px;line-height:1.3;color:var(--tinta)}
+.taller__dato{margin-top:4px;font-size:15px;line-height:1.5;color:var(--tinta)}
+.taller__dia{margin-top:8px}
+.taller__dato--suave{color:var(--gris)}
+.taller__precio{font-family:var(--display);font-weight:500;letter-spacing:.02em}
+.taller__lugares{margin-top:10px;font-size:14px;font-weight:600;color:var(--teal)}
+.taller__estado{margin-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.paso{margin-top:16px}
+.referencia{margin-top:24px;display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;padding:16px 18px;background:var(--calido);border-radius:2px}
+.referencia__rotulo{width:100%;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gris)}
+.referencia__valor{flex:1;font-family:var(--display);font-size:28px;font-weight:500;letter-spacing:.06em;color:var(--tinta)}
+.cobro{margin-top:24px}
+.cobro__datos{margin-top:12px;display:grid;grid-template-columns:max-content 1fr;gap:10px 16px;font-size:15px;line-height:1.45}
+.cobro__datos dt{color:var(--gris)}
+.cobro__datos dd{color:var(--tinta);min-width:0;overflow-wrap:anywhere}
+.cobro__clabe{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums;letter-spacing:.04em}

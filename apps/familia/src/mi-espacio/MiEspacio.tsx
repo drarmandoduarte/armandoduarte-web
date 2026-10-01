@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { edicionElegida, edicionPrincipal } from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
 import { BotonPrincipal, Campo, Pantalla, Titulo } from '../comun/Piezas';
 import { RUTAS } from '../rutas';
+import {
+  ConfirmacionDeLugar, MisTalleres, TalleresAbiertos, type Confirmacion, type TallerAbierto, type TallerMio,
+} from './Talleres';
 
 /**
  * PANTALLA 5 · `/mi-espacio` — lo mínimo de la #15.
@@ -11,19 +15,45 @@ import { RUTAS } from '../rutas';
  * Seguridad: cuántos códigos de respaldo quedan, regenerarlos y cerrar las
  * otras sesiones.
  *
+ * ── Lo que sumó la #24 B ────────────────────────────────────────────────
+ * Arriba de «Tus datos»: **«Talleres abiertos»** (con «Me anoto») y **«Mis
+ * talleres»** (solo si hay alguno: a quien recién entra no se le muestra una
+ * lista vacía debajo de la otra). Al anotarse, la confirmación con la
+ * referencia y los datos para transferir ocupa el lugar de la lista.
+ *
  * ── Lo que NO está, y es a propósito ────────────────────────────────────
- * Ni catálogo, ni inscripción, ni pagos, ni comprobantes. La orden #15 es «la
- * puerta»: que una persona pueda entrar, salir y proteger su cuenta. Todo lo
- * demás llega con las órdenes que lo pidan, y agregarlo ahora sería adivinar
- * qué forma va a tener.
+ * Ni pagos ni comprobantes: el comprobante es la orden siguiente.
  */
+/** Lo que trae `GET /api/talleres`, con su estado de carga. Nunca «cargando» para siempre (#22): un fallo es `error`. */
+type Talleres =
+  | { estado: 'cargando' }
+  | { estado: 'error' }
+  | { estado: 'listo'; abiertos: TallerAbierto[]; mios: TallerMio[] };
+
+function useTalleres() {
+  const [talleres, setTalleres] = useState<Talleres>({ estado: 'cargando' });
+  const leer = useCallback(async () => {
+    try {
+      const r = await api<{ abiertos: TallerAbierto[]; mios: TallerMio[] }>('talleres');
+      setTalleres({ estado: 'listo', abiertos: r.abiertos, mios: r.mios });
+    } catch {
+      setTalleres({ estado: 'error' });
+    }
+  }, []);
+  useEffect(() => { void leer(); }, [leer]);
+  return { talleres, leer };
+}
+
 export function MiEspacio({
   yo,
+  slugElegido = null,
   alSalir,
   alRegenerar,
   recargar,
 }: {
   yo: Yo;
+  /** El taller de `/me-anoto/<slug>`, si se llegó por ahí (#24 B). */
+  slugElegido?: string | null;
   alSalir: () => void;
   /** Sube los códigos nuevos a `App`, que es quien muestra la pantalla 4. */
   alRegenerar: (codigos: string[]) => void;
@@ -31,6 +61,14 @@ export function MiEspacio({
 }) {
   const { t } = useTranslation();
   const esEquipo = yo.tipo === 'equipo';
+  const { talleres, leer } = useTalleres();
+  const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
+
+  /* D26: un naranja por pantalla. Si hay un «Me anoto» que lo lleva, «Guardar»
+     de «Tus datos» —que además está apagado hasta que exista guardar— pasa a
+     contorno. */
+  const hayMeAnotoPrincipal = talleres.estado === 'listo'
+    && edicionPrincipal(talleres.abiertos, edicionElegida(talleres.abiertos, slugElegido)?.edicion_id ?? null) !== null;
 
   return (
     <Pantalla>
@@ -47,7 +85,37 @@ export function MiEspacio({
         </p>
       ) : null}
 
-      <SeccionDeDatos yo={yo} recargar={recargar} />
+      {confirmacion ? (
+        <ConfirmacionDeLugar c={confirmacion} yo={yo} alCerrar={() => setConfirmacion(null)} />
+      ) : talleres.estado === 'cargando' ? (
+        <section className="seccion"><p className="nota" role="status">{t('miEspacio.talleresCargando')}</p></section>
+      ) : talleres.estado === 'error' ? (
+        <section className="seccion">
+          <h2 className="subtitulo">{t('miEspacio.talleresTitulo')}</h2>
+          <p className="error" role="alert">{t('miEspacio.talleresError')}</p>
+          <div className="fila">
+            <button type="button" className="btn btn--ancho" onClick={() => void leer()}>{t('comun.reintentar')}</button>
+          </div>
+        </section>
+      ) : (
+        <TalleresAbiertos
+          talleres={talleres.abiertos}
+          slugElegido={slugElegido}
+          yo={yo}
+          alConfirmar={(c) => {
+            setConfirmacion(c);
+            window.scrollTo({ top: 0 });
+            /* La ficha pudo cambiar (nombre, apellido, WhatsApp) y la lista
+               también (su referencia, un lugar menos). */
+            void recargar();
+            void leer();
+          }}
+          alCambiar={() => void leer()}
+        />
+      )}
+      {talleres.estado === 'listo' && talleres.mios.length > 0 ? <MisTalleres mios={talleres.mios} yo={yo} /> : null}
+
+      <SeccionDeDatos yo={yo} recargar={recargar} principal={!hayMeAnotoPrincipal && !confirmacion} />
       {esEquipo ? <SeccionDeSeguridad alRegenerar={alRegenerar} /> : null}
 
       <div className="seccion">
@@ -72,7 +140,7 @@ export function MiEspacio({
  * porque la orden pide que la pantalla lo tenga; el botón queda apagado y lo
  * dice. La ruta llega con la orden que la pida, y entonces esta nota se borra.
  */
-function SeccionDeDatos({ yo }: { yo: Yo; recargar: () => Promise<void> }) {
+function SeccionDeDatos({ yo, principal }: { yo: Yo; recargar: () => Promise<void>; principal: boolean }) {
   const { t } = useTranslation();
   const p = yo.persona;
   const faltan = !p?.nombre || !p?.apellido || !p?.whatsapp || !p?.pais;
@@ -97,9 +165,13 @@ function SeccionDeDatos({ yo }: { yo: Yo; recargar: () => Promise<void> }) {
         onChange={(e) => setPais(e.target.value)} />
       <div className="fila">
         {/* Apagado hasta que exista `PATCH /api/yo`. Ver la nota de arriba. */}
-        <BotonPrincipal type="button" disabled>
-          {t('miEspacio.guardar')}
-        </BotonPrincipal>
+        {principal ? (
+          <BotonPrincipal type="button" disabled>
+            {t('miEspacio.guardar')}
+          </BotonPrincipal>
+        ) : (
+          <button type="button" className="btn btn--ancho" disabled>{t('miEspacio.guardar')}</button>
+        )}
       </div>
     </section>
   );
