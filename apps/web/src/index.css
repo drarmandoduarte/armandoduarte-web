@@ -560,6 +560,28 @@ a,button{-webkit-tap-highlight-color:transparent}
 .nucleo__circulo svg{display:block}
 .nucleo__linea{position:absolute;top:22px;left:44px;right:-40px;height:1px;background:var(--hair)}
 .nucleo:last-child .nucleo__linea{display:none}
+/* ── El núcleo se pinta al pasar el mouse (orden #23-bis) ────────────────
+   Lo de «Cuatro etapas» de 512: pasar por **cualquier parte de la columna**
+   rellena el círculo. En 512 con su propio acento; acá (decisión del CEO,
+   30/9 13:40) el círculo se rellena de `--naranja`, el borde pasa a naranja y
+   el glifo a `--crema` —3,86 sobre el naranja, gráfico, pide 3—, y la línea al
+   núcleo siguiente también se pinta, para que se lea como secuencia. En reposo
+   todo sigue teal: el naranja de hover es el que D26 ya permite.
+
+   El glifo cambia de color sin tocar ningún archivo porque ya es una máscara
+   sobre `currentColor` (`Glifo.tsx`, #23 D): alcanza con cambiar `color`.
+
+   `:hover` solo donde hay mouse (`hover: hover`): en una pantalla táctil no
+   se simula nada. `:focus-within` va afuera, para teclado. Nada se mueve: 512
+   probó un `translateY` y lo sacó. */
+.nucleo__circulo,.nucleo__linea{transition:background-color 420ms cubic-bezier(.16,1,.3,1),border-color 420ms cubic-bezier(.16,1,.3,1),color 420ms cubic-bezier(.16,1,.3,1)}
+@media (hover:hover){
+  .nucleo:hover .nucleo__circulo{background:var(--naranja);border-color:var(--naranja);color:var(--crema)}
+  .nucleo:hover .nucleo__linea{background:var(--naranja)}
+}
+.nucleo:focus-within .nucleo__circulo{background:var(--naranja);border-color:var(--naranja);color:var(--crema)}
+.nucleo:focus-within .nucleo__linea{background:var(--naranja)}
+@media (prefers-reduced-motion:reduce){.nucleo__circulo,.nucleo__linea{transition:none}}
 .nucleo h3{margin-top:var(--s4);font-family:var(--display);font-weight:400;font-size:24px;line-height:1.25;color:var(--tinta)}
 .nucleo h3 b{display:block;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
 .nucleo p{margin-top:12px;font-size:16px;line-height:1.7;color:var(--gris)}

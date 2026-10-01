@@ -24,9 +24,15 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/web` | 63 |
 | `@codice/familia` | 83 |
 | `@codice/api` | 62 |
-| `@codice/navegador` | 39 |
+| `@codice/navegador` | 40 |
 
 
+
+## Lo que trae la orden #23-bis — `@codice/navegador` 39 → 40
+
+`e2e/nucleo-se-pinta.spec.ts`: con el mouse sobre el núcleo 3, el círculo y la
+línea en `--naranja` y el glifo en `--crema`; en reposo, teal. Mutación: sin la
+regla de hover → cae.
 
 ## Lo que trae la orden #23 — `@codice/web` 62 → 63 y `@codice/navegador` 38 → 39
 
