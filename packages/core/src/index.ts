@@ -39,3 +39,8 @@ export {
 } from './panel/listas';
 export { TERRITORIOS, accionDeEquipo, esTerritorio } from './panel/equipo';
 export type { Territorio, Rol, FilaDePersona } from './panel/equipo';
+
+// ── La puerta desde la web a Mi espacio (orden #25) ──────────────────────────
+export {
+  APP_FAMILIA, SLUG_DEL_TALLER_DE_MERIDA, RUTA_RESERVAR_MERIDA, baseDeLaApp, enlaceAMiEspacio,
+} from './web/mi-espacio';
