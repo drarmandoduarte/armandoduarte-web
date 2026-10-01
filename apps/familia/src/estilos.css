@@ -127,6 +127,30 @@ img,svg{display:block;max-width:100%}
    donde un corte se lee como apoyo (la regla de la #19 B). */
 .panel__foto{position:relative;flex:1 1 0;min-height:0;width:100%;margin-top:32px}
 .panel__busto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
+/* ── Armando más chico, entero, encuadrado por la cabecera (orden #28, 4) ──
+   Germán en el smoke del 1/10: «demasiado grande; debería estar con el borde
+   de la línea del header». Con `cover` a 1440 la cara ocupaba casi la mitad
+   del panel y el busto se cortaba al pecho.
+
+   Ahora la figura arranca **en la línea de la cabecera** (72 px, el borde de
+   abajo de `.cab__dentro`) y termina en el borde de abajo del panel, en
+   absoluto: no le aporta altura a nada. El busto se pinta **entero** adentro
+   (`contain`, anclado abajo y centrado). La firma se queda donde estaba.
+
+   Entero a todo el alto de la figura (742 px a 1440×900) el busto arrancaba en
+   la línea y tapaba la firma (126–172 px). Por eso, como decía la orden, se
+   limita a `calc(100% − 120px)`: a 1440×900 se pinta en 515×622 desde el
+   px 192, 20 px por debajo de la firma (126–172); a 1920×1080, 664×802
+   desde el 192, y la firma termina en el 183.
+
+   Lo que esto deja ver, dicho: la foto termina en seco en los dos brazos, y
+   con el busto más angosto que el panel los dos cortes quedan dentro del
+   cálido (era la razón del `cover` de la #18). Está en la captura de la #28 B. */
+@media (min-width:1100px){
+  .marco--con-armando .panel{position:relative}
+  .marco--con-armando .panel__foto{position:absolute;top:72px;bottom:0;left:0;right:0;margin-top:0}
+  .marco--con-armando .panel__busto{top:auto;bottom:0;left:0;right:0;width:100%;height:100%;max-height:calc(100% - 120px);object-fit:contain;object-position:center bottom}
+}
 
 .titulo{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,44px);line-height:1.1;letter-spacing:-.01em;color:var(--tinta);text-wrap:balance}
 /* La palabra acentuada (B.2): teal, nunca naranja — el naranja es del botón. */
