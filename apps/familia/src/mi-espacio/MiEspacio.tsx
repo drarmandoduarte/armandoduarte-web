@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { edicionElegida, edicionPrincipal } from '@codice/core';
+import { edicionElegida, edicionPrincipal, principalDeMiEspacio, puedeDeclarar } from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
 import { BotonPrincipal, Campo, Pantalla, Titulo } from '../comun/Piezas';
 import { RUTAS } from '../rutas';
 import {
   ConfirmacionDeLugar, MisTalleres, TalleresAbiertos, type Confirmacion, type TallerAbierto, type TallerMio,
 } from './Talleres';
+import type { Cobro } from './Comprobante';
 
 /**
  * PANTALLA 5 · `/mi-espacio` — lo mínimo de la #15.
@@ -21,21 +22,22 @@ import {
  * lista vacía debajo de la otra). Al anotarse, la confirmación con la
  * referencia y los datos para transferir ocupa el lugar de la lista.
  *
- * ── Lo que NO está, y es a propósito ────────────────────────────────────
- * Ni pagos ni comprobantes: el comprobante es la orden siguiente.
+ * ── Lo que sumó la #27 C ────────────────────────────────────────────────
+ * En «Mis talleres», el pago de cada uno: el estado con palabras de persona,
+ * «Ya transferí, subo mi comprobante» y «Ver mi comprobante».
  */
 /** Lo que trae `GET /api/talleres`, con su estado de carga. Nunca «cargando» para siempre (#22): un fallo es `error`. */
 type Talleres =
   | { estado: 'cargando' }
   | { estado: 'error' }
-  | { estado: 'listo'; abiertos: TallerAbierto[]; mios: TallerMio[] };
+  | { estado: 'listo'; abiertos: TallerAbierto[]; mios: TallerMio[]; cobro: Cobro | null };
 
 function useTalleres() {
   const [talleres, setTalleres] = useState<Talleres>({ estado: 'cargando' });
   const leer = useCallback(async () => {
     try {
-      const r = await api<{ abiertos: TallerAbierto[]; mios: TallerMio[] }>('talleres');
-      setTalleres({ estado: 'listo', abiertos: r.abiertos, mios: r.mios });
+      const r = await api<{ abiertos: TallerAbierto[]; mios: TallerMio[]; cobro?: Cobro | null }>('talleres');
+      setTalleres({ estado: 'listo', abiertos: r.abiertos, mios: r.mios, cobro: r.cobro ?? null });
     } catch {
       setTalleres({ estado: 'error' });
     }
@@ -64,11 +66,18 @@ export function MiEspacio({
   const { talleres, leer } = useTalleres();
   const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
 
-  /* D26: un naranja por pantalla. Si hay un «Me anoto» que lo lleva, «Guardar»
-     de «Tus datos» —que además está apagado hasta que exista guardar— pasa a
-     contorno. */
+  /* D26: un naranja por pantalla. Lo decide `principalDeMiEspacio()` (#27 C):
+     si vino por `/me-anoto/<slug>`, «Me anoto»; si no, pagar lo que debe va
+     antes que anotarse a otro, y anotarse antes que «Guardar». Y si la persona
+     abre un paso (anotarse o subir el comprobante), ése pasa a ser el foco. */
+  const [foco, setFoco] = useState<'me-anoto' | 'pago' | null>(null);
   const hayMeAnotoPrincipal = talleres.estado === 'listo'
     && edicionPrincipal(talleres.abiertos, edicionElegida(talleres.abiertos, slugElegido)?.edicion_id ?? null) !== null;
+  const hayPagoPendiente = talleres.estado === 'listo'
+    && talleres.mios.some((m) => puedeDeclarar(m.estado) && Boolean(m.inscripcion_id));
+  const principal = confirmacion
+    ? null
+    : foco ?? principalDeMiEspacio({ vinoAAnotarse: Boolean(slugElegido), hayMeAnoto: hayMeAnotoPrincipal, hayPagoPendiente });
 
   return (
     <Pantalla>
@@ -102,7 +111,10 @@ export function MiEspacio({
           talleres={talleres.abiertos}
           slugElegido={slugElegido}
           yo={yo}
+          naranja={principal === 'me-anoto'}
+          alAbrir={() => setFoco('me-anoto')}
           alConfirmar={(c) => {
+            setFoco(null);
             setConfirmacion(c);
             window.scrollTo({ top: 0 });
             /* La ficha pudo cambiar (nombre, apellido, WhatsApp) y la lista
@@ -113,9 +125,18 @@ export function MiEspacio({
           alCambiar={() => void leer()}
         />
       )}
-      {talleres.estado === 'listo' && talleres.mios.length > 0 ? <MisTalleres mios={talleres.mios} yo={yo} /> : null}
+      {talleres.estado === 'listo' && talleres.mios.length > 0 ? (
+        <MisTalleres
+          mios={talleres.mios}
+          yo={yo}
+          cobro={talleres.cobro}
+          naranja={principal === 'pago'}
+          alAbrir={() => setFoco('pago')}
+          alDeclarar={() => { setFoco(null); void leer(); }}
+        />
+      ) : null}
 
-      <SeccionDeDatos yo={yo} recargar={recargar} principal={!hayMeAnotoPrincipal && !confirmacion} />
+      <SeccionDeDatos yo={yo} recargar={recargar} principal={principal === 'guardar'} />
       {esEquipo ? <SeccionDeSeguridad alRegenerar={alRegenerar} /> : null}
 
       <div className="seccion">

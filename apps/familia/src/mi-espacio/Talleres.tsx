@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  claveDeEstado, datosParaEnviar, datosQueFaltan, edicionElegida, edicionPrincipal,
+  claveDeEstado, datosParaEnviar, datosQueFaltan, edicionElegida, edicionPrincipal, puedeDeclarar, tonoDeEstado,
   enlaceParaPedirLosDatosDeCobro, estadoDelTaller, fechaCorta, fechasDelTaller, formatearPrecio,
   validarDatosParaAnotarse, type DatoParaAnotarse, type DatosParaAnotarse,
 } from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
+import { abrirEnOtraPestana } from '../comun/abrir';
 import { BotonPrincipal, Campo } from '../comun/Piezas';
+import { PasoDeComprobante, type Cobro } from './Comprobante';
 
 /**
  * «Talleres abiertos», «Me anoto» y «Mis talleres» — orden #24 B.
@@ -53,6 +55,12 @@ export interface TallerMio {
   sede: string | null;
   ciudad: string | null;
   estado: string;
+  /* #27 C.1: lo que la API le suma a cada fila para el comprobante. */
+  inscripcion_id?: string;
+  precio_monto?: number | string | null;
+  precio_moneda?: string | null;
+  motivo_rechazo?: string | null;
+  tiene_comprobante?: boolean;
 }
 
 /** Lo que devuelve `POST /api/talleres/inscribirme`. */
@@ -96,15 +104,21 @@ export function TalleresAbiertos({
   talleres,
   slugElegido,
   yo,
+  naranja = true,
   alConfirmar,
   alCambiar,
+  alAbrir,
 }: {
   talleres: TallerAbierto[];
   slugElegido: string | null;
   yo: Yo;
+  /** #27: si otra acción de la pantalla lleva el naranja (pagar), acá todo va en contorno (D26). */
+  naranja?: boolean;
   alConfirmar: (c: Confirmacion) => void;
   /** Algo cambió del lado de la base (sin lugares, cerrada): hay que volver a leer. */
   alCambiar: () => void;
+  /** La persona abrió el paso de «Me anoto»: esta sección pasa a ser la principal. */
+  alAbrir?: () => void;
 }) {
   const { t } = useTranslation();
   const zona = zonaDeLaPersona(yo);
@@ -142,6 +156,7 @@ export function TalleresAbiertos({
                       <PasoDeMeAnoto
                         taller={taller}
                         yo={yo}
+                        naranja={naranja}
                         alCancelar={() => setAbierta(null)}
                         alConfirmar={alConfirmar}
                         alCambiar={alCambiar}
@@ -150,8 +165,8 @@ export function TalleresAbiertos({
                       <div className="fila">
                         <button
                           type="button"
-                          className={`btn btn--ancho${abierta === null && principal === taller.edicion_id ? ' btn--naranja' : ''}`}
-                          onClick={() => setAbierta(taller.edicion_id)}
+                          className={`btn btn--ancho${naranja && abierta === null && principal === taller.edicion_id ? ' btn--naranja' : ''}`}
+                          onClick={() => { setAbierta(taller.edicion_id); alAbrir?.(); }}
                         >
                           {t('miEspacio.meAnoto')}
                         </button>
@@ -175,12 +190,14 @@ export function TalleresAbiertos({
 function PasoDeMeAnoto({
   taller,
   yo,
+  naranja,
   alCancelar,
   alConfirmar,
   alCambiar,
 }: {
   taller: TallerAbierto;
   yo: Yo;
+  naranja: boolean;
   alCancelar: () => void;
   alConfirmar: (c: Confirmacion) => void;
   alCambiar: () => void;
@@ -244,9 +261,15 @@ function PasoDeMeAnoto({
         </>
       ) : null}
       <div className="fila">
-        <BotonPrincipal cargando={enviando} textoCargando={t('miEspacio.anotando')}>
-          {t('miEspacio.confirmarLugar')}
-        </BotonPrincipal>
+        {naranja ? (
+          <BotonPrincipal cargando={enviando} textoCargando={t('miEspacio.anotando')}>
+            {t('miEspacio.confirmarLugar')}
+          </BotonPrincipal>
+        ) : (
+          <button type="submit" className="btn btn--ancho" disabled={enviando}>
+            {enviando ? t('miEspacio.anotando') : t('miEspacio.confirmarLugar')}
+          </button>
+        )}
         <button type="button" className="enlace" onClick={alCancelar} disabled={enviando}>
           {t('comun.cancelar')}
         </button>
@@ -334,26 +357,100 @@ export function ConfirmacionDeLugar({ c, yo, alCerrar }: { c: Confirmacion; yo: 
   );
 }
 
-export function MisTalleres({ mios, yo }: { mios: TallerMio[]; yo: Yo }) {
+/**
+ * «Mis talleres» — y, desde la #27 C.1, el pago de cada uno.
+ *
+ * El estado con palabras de persona («Falta tu pago», «Comprobante recibido…»),
+ * el motivo si el equipo rechazó el comprobante, «Ya transferí, subo mi
+ * comprobante» cuando falta el pago (en el mismo lugar, sin cambiar de
+ * pantalla) y «Ver mi comprobante» cuando hay uno. Qué se ofrece lo decide
+ * `@codice/core` (`puedeDeclarar`); si se puede, la base.
+ */
+export function MisTalleres({
+  mios,
+  yo,
+  cobro = null,
+  naranja = false,
+  alDeclarar,
+  alAbrir,
+}: {
+  mios: TallerMio[];
+  yo: Yo;
+  cobro?: Cobro | null;
+  /** Si «pagar» es la acción principal de la pantalla (D26): el primero que espera pago lleva el naranja. */
+  naranja?: boolean;
+  /** Se declaró un pago: hay que volver a leer la lista. */
+  alDeclarar?: () => void;
+  /** Se abrió el paso de subir: esta sección pasa a ser la principal. */
+  alAbrir?: () => void;
+}) {
   const { t } = useTranslation();
   const zona = zonaDeLaPersona(yo);
+  const [abierta, setAbierta] = useState<string | null>(null);
+  const [recibido, setRecibido] = useState<string | null>(null);
+  const [errorAlVer, setErrorAlVer] = useState<string | null>(null);
+  const primeraQueEspera = mios.find((m) => puedeDeclarar(m.estado) && m.inscripcion_id)?.referencia ?? null;
+
+  async function ver(m: TallerMio) {
+    setErrorAlVer(null);
+    const ok = await abrirEnOtraPestana(async () =>
+      (await api<{ url: string }>(`pagos/comprobante/${m.inscripcion_id}`)).url);
+    if (!ok) setErrorAlVer(m.referencia);
+  }
+
   return (
     <section className="seccion" aria-labelledby="mis-talleres-titulo" id="mis-talleres">
       <h2 className="subtitulo" id="mis-talleres-titulo">{t('miEspacio.misTalleresTitulo')}</h2>
       <ul className="talleres">
-        {mios.map((m) => (
-          <li key={m.referencia} className="taller">
-            <h3 className="taller__titulo">{m.curso_titulo}</h3>
-            <Fecha t={m} zona={zona} />
-            <p className="taller__dato taller__dato--suave">
-              {t('miEspacio.inscriptoEl', { fecha: fechaCorta(m.inscripto_el, zona ?? m.zona) })}
-            </p>
-            <p className="taller__estado">
-              <span className="tabla__ref">{m.referencia}</span>
-              <span className={`chip${m.estado === 'confirmada' ? ' chip--confirmada' : ''}`}>{t(claveDeEstado(m.estado))}</span>
-            </p>
-          </li>
-        ))}
+        {mios.map((m) => {
+          const espera = puedeDeclarar(m.estado) && Boolean(m.inscripcion_id);
+          return (
+            <li key={m.referencia} className="taller">
+              <h3 className="taller__titulo">{m.curso_titulo}</h3>
+              <Fecha t={m} zona={zona} />
+              <p className="taller__dato taller__dato--suave">
+                {t('miEspacio.inscriptoEl', { fecha: fechaCorta(m.inscripto_el, zona ?? m.zona) })}
+              </p>
+              <p className="taller__estado">
+                <span className="tabla__ref">{m.referencia}</span>
+                <span className={`estado estado--${tonoDeEstado(m.estado)}`}>{t(claveDeEstado(m.estado))}</span>
+              </p>
+              {espera && m.motivo_rechazo ? (
+                <p className="aviso u-mt-3" role="status">{t('miEspacio.comprobante.rechazado', { motivo: m.motivo_rechazo })}</p>
+              ) : null}
+              {recibido === m.referencia ? <p className="exito" role="status">{t('miEspacio.comprobante.recibido')}</p> : null}
+              {espera && abierta === m.referencia ? (
+                <PasoDeComprobante
+                  inscripcionId={m.inscripcion_id!}
+                  referencia={m.referencia}
+                  precioMonto={m.precio_monto ?? null}
+                  moneda={m.precio_moneda ?? null}
+                  zona={zona}
+                  cobro={cobro}
+                  naranja={naranja}
+                  alCancelar={() => setAbierta(null)}
+                  alTerminar={() => { setAbierta(null); setRecibido(m.referencia); alDeclarar?.(); }}
+                />
+              ) : espera ? (
+                <div className="fila">
+                  <button
+                    type="button"
+                    className={`btn btn--ancho${naranja && abierta === null && primeraQueEspera === m.referencia ? ' btn--naranja' : ''}`}
+                    onClick={() => { setAbierta(m.referencia); setRecibido(null); alAbrir?.(); }}
+                  >
+                    {t('miEspacio.comprobante.subir')}
+                  </button>
+                </div>
+              ) : null}
+              {m.tiene_comprobante && m.inscripcion_id && abierta !== m.referencia ? (
+                <div className="fila fila--suelta fila--izquierda">
+                  <button type="button" className="enlace" onClick={() => void ver(m)}>{t('miEspacio.comprobante.ver')}</button>
+                  {errorAlVer === m.referencia ? <p className="error" role="alert">{t('miEspacio.comprobante.verError')}</p> : null}
+                </div>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

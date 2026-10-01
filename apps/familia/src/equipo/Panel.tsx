@@ -89,7 +89,7 @@ export function Panel({ yo }: { yo: Yo }) {
         ) : pestana === 'cursos' ? (
           <Cursos cursos={cursos} alCambiar={cargar} />
         ) : pestana === 'inscriptos' ? (
-          <Inscriptos cursos={cursos} />
+          <Inscriptos cursos={cursos} yo={yo} />
         ) : (
           <Clientes yo={yo} />
         )}

@@ -42,6 +42,19 @@ export interface Inscripto {
   pais: string | null;
   inscripto_el: string;
   estado: string;
+  /* #27 C: el libro de la inscripción, de `libro_de_edicion()` (010). Nulos si no tiene renglones. */
+  ultimo_tipo: string | null;
+  ultimo_el: string | null;
+  ultimo_por: string | null;
+  ultima_nota: string | null;
+  monto_declarado: number | string | null;
+  moneda_declarada: string | null;
+  fecha_transferencia: string | null;
+  banco: string | null;
+  ultimos4_o_folio: string | null;
+  comprobante_path: string | null;
+  monto_confirmado: number | string | null;
+  moneda_confirmada: string | null;
 }
 
 export interface Cliente {
