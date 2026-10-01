@@ -58,6 +58,27 @@ const PROHIBIDOS = [
 ];
 
 /**
+ * **La única excepción**, con su forma exacta — orden #27 C.1.
+ *
+ * El comprobante sube directo a Storage con la sesión del cliente, porque la
+ * función de Vercel tiene tope de 4,5 MB por cuerpo y el bucket acepta 5 (el
+ * porqué entero está en `mi-espacio/subir-comprobante.ts`). Es una **escritura**
+ * a la carpeta de una inscripción propia, que decide la policy de la 006; no
+ * lee nada que el guard del kit debiera cuidar.
+ *
+ * La excepción no es «ese archivo puede usar `.storage`»: es **esta llamada,
+ * una vez, en ese archivo**. Se borra del código antes de barrer, y lo que
+ * quede —otro `.from(`, un `.rpc(`, un `.storage.from(…).download(`— cae igual
+ * que en cualquier otro archivo. Y su piso: si la llamada desaparece o se
+ * duplica, el test lo dice, para que la excepción no sobreviva a lo que la
+ * justificaba.
+ */
+const EXCEPCION = {
+  archivo: join('mi-espacio', 'subir-comprobante.ts'),
+  forma: new RegExp('supabase\\.storage\\.from\\(BUCKET_DE_COMPROBANTES\\)\\.upload\\(', 'g'),
+};
+
+/**
  * Piso medido el 29/9, no estimado.
  *
  * Son los archivos de `apps/familia/src` sin contar el núcleo del kit. Sube con
@@ -105,10 +126,11 @@ export function soloCodigo(fuente: string): string {
 
 describe('Mi espacio no le habla a la base desde el navegador', () => {
   const archivos = archivosDe(SRC);
-  const codigo = archivos.map((a) => ({
-    archivo: relative(SRC, a),
-    texto: soloCodigo(readFileSync(a, 'utf8')),
-  }));
+  const codigo = archivos.map((a) => {
+    const archivo = relative(SRC, a);
+    const texto = soloCodigo(readFileSync(a, 'utf8'));
+    return { archivo, texto: archivo === EXCEPCION.archivo ? texto.replace(EXCEPCION.forma, ' ') : texto };
+  });
 
   it('EL PISO, PRIMERO: el barrido leyó la app', () => {
     expect(
@@ -141,6 +163,15 @@ describe('Mi espacio no le habla a la base desde el navegador', () => {
       + 'Una lectura directa esquiva el guard del kit —segundo paso, paso reciente, roles— y lo '
       + 'hace en silencio, porque funciona.',
     ).toEqual([]);
+  });
+
+  it('la excepción del comprobante (#27 C) es UNA llamada, y está', () => {
+    const fuente = soloCodigo(readFileSync(join(SRC, EXCEPCION.archivo), 'utf8'));
+    expect(
+      fuente.match(EXCEPCION.forma)?.length ?? 0,
+      `${EXCEPCION.archivo}: la subida directa a Storage tiene que estar exactamente una vez. Si se fue, `
+      + 'la excepción sobra y se borra de este test; si hay dos, la segunda no está declarada.',
+    ).toBe(1);
   });
 
   it('y el barrido sabe distinguir el código de la prosa', () => {

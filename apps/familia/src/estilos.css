@@ -360,3 +360,35 @@ img,svg{display:block;max-width:100%}
 .cobro__datos dt{color:var(--gris)}
 .cobro__datos dd{color:var(--tinta);min-width:0;overflow-wrap:anywhere}
 .cobro__clabe{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+
+/* ── El estado de un pago (orden #27 C) ───────────────────────────────────
+   Un punto de color y la palabra: el estado lo dice el texto, el punto ayuda a
+   barrer la lista. Teal confirmada, ámbar en revisión, gris pendiente, tinta
+   anulada. Medido sobre crema: teal 7,74 · gris 4,99 · tinta 13,19 · ámbar
+   2,76. El ámbar no llega a 3:1 como gráfico, así que lleva un anillo de
+   ámbar mezclado con tinta (≈ 6,4, aproximado en sRGB). */
+.estado{display:inline-flex;align-items:center;gap:8px;font-size:14px;line-height:1.4;color:var(--tinta)}
+.estado::before{content:'';width:9px;height:9px;border-radius:50%;flex:none;background:var(--gris)}
+.estado--confirmada::before{background:var(--teal)}
+.estado--en_revision::before{background:var(--ambar);box-shadow:0 0 0 1px color-mix(in oklab, var(--ambar) 45%, var(--tinta))}
+.estado--anulada::before{background:var(--tinta)}
+.u-mt-3{margin-top:var(--s3)}
+.fila--izquierda{align-items:flex-start}
+
+/* ── Inscriptos: revisar pagos (orden #27 C.2) ────────────────────────────
+   «Confirmar» en teal relleno: es una acción de fila, no el botón que hace
+   avanzar la pantalla, así que no es naranja (D26). «Rechazar», contorno. */
+.btn--teal{background:var(--teal);border-color:var(--teal);color:var(--crema)}
+.btn--teal:hover:not(:disabled){background:color-mix(in oklab, var(--teal) 86%, var(--tinta));border-color:var(--teal)}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.filtro{
+  display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 14px;border:1px solid var(--hair);border-radius:999px;
+  background:var(--superficie);font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--gris);cursor:pointer;
+}
+.filtro:hover{border-color:var(--hair-hover);color:var(--tinta)}
+.filtro--activo{border-color:var(--tinta);color:var(--tinta)}
+.filtro__cuenta{font-variant-numeric:tabular-nums;font-weight:500;color:var(--gris)}
+.tabla__estado{min-width:220px}
+.tabla__acciones{min-width:220px}
+.acciones{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+

@@ -8,6 +8,13 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../identidad/supabase.service';
 
+/** Los campos de `libro_de_edicion()` (010) de una inscripción sin renglones. */
+const LIBRO_VACIO = {
+  ultimo_tipo: null, ultimo_el: null, ultimo_por: null, ultima_nota: null,
+  monto_declarado: null, moneda_declarada: null, fecha_transferencia: null, banco: null,
+  ultimos4_o_folio: null, comprobante_path: null, monto_confirmado: null, moneda_confirmada: null,
+};
+
 /**
  * Lo que el panel del equipo lee y escribe — orden #24 A.
  *
@@ -35,10 +42,28 @@ export class EquipoRepositorio {
     return Array.isArray(data) ? data : [];
   }
 
+  /**
+   * Inscriptos con su libro: `panel_inscriptos()` (008) y `libro_de_edicion()`
+   * (010), juntadas por `inscripcion_id`. Las dos corren con el token de quien
+   * pide, así que las dos traen las mismas filas —las de su territorio—; una
+   * inscripción sin libro trae los campos del libro en nulo (#27 C.2).
+   */
   async inscriptos(token: string, edicionId: string): Promise<unknown[]> {
-    const { data, error } = await this.supabase.comoElUsuario(token).rpc('panel_inscriptos', { edicion: edicionId });
-    if (error) throw this.traducir(error, 'leer los inscriptos');
-    return data ?? [];
+    const cliente = this.supabase.comoElUsuario(token);
+    const [filas, libro] = await Promise.all([
+      cliente.rpc('panel_inscriptos', { edicion: edicionId }),
+      cliente.rpc('libro_de_edicion', { edicion: edicionId }),
+    ]);
+    if (filas.error) throw this.traducir(filas.error, 'leer los inscriptos');
+    if (libro.error) throw this.traducir(libro.error, 'leer el libro de los inscriptos');
+    const porInscripcion = new Map(
+      ((libro.data ?? []) as { inscripcion_id: string }[]).map((l) => [l.inscripcion_id, l]),
+    );
+    return ((filas.data ?? []) as { inscripcion_id: string }[]).map((f) => ({
+      ...LIBRO_VACIO,
+      ...porInscripcion.get(f.inscripcion_id),
+      ...f,
+    }));
   }
 
   async clientes(token: string): Promise<unknown[]> {

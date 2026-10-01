@@ -13,7 +13,15 @@
 -- o una policy nueva, es una migración en su propio commit, con test en el
 -- banco».
 --
--- APLICADA: —
+-- APLICADA: 30/9/2026 23:35 (UY), en `armandoduarte-familia`, desde 965b812.
+--   Guardada en el editor SQL como `009_me_anoto`. Corrida por el CEO con
+--   autorización de Germán, desde la rama `mi-espacio/07-me-anoto` (PR #39)
+--   ANTES del merge, a propósito: sin ella «Talleres abiertos» falla. Texto
+--   idéntico al archivo (9774 caracteres). Verificado contra la base:
+--   `lugares_de_edicion`, `inscripcion_respeta_el_cupo`, `talleres_abiertos`,
+--   `mis_talleres`, `inscribirme` y el trigger
+--   `inscripciones_cupo_antes_de_la_referencia` presentes. Fuente:
+--   `03 Producto/mi-espacio/infraestructura-2026-09-29.md`, «30/9 23:35».
 --
 -- ── El hueco que esta migración cierra ─────────────────────────────────────
 -- La orden pide que nadie se anote «a una edición sin cupo». La 003 no lo

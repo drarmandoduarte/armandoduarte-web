@@ -152,9 +152,9 @@
     "misTalleresTitulo": "Mis talleres",
     "inscriptoEl": "Te anotaste el {{fecha}}",
     "estados": {
-      "pendiente_de_pago": "Pendiente de pago",
-      "en_revision": "Pago en revisión",
-      "confirmada": "Confirmado",
+      "pendiente_de_pago": "Falta tu pago",
+      "en_revision": "Comprobante recibido, lo estamos revisando",
+      "confirmada": "Tu lugar está confirmado",
       "anulada": "Anulada",
       "desconocido": "—"
     },
@@ -165,6 +165,36 @@
       "largo": "Es demasiado largo.",
       "sinLugares": "Ya no quedan lugares en este taller.",
       "edicionCerrada": "Este taller ya no recibe inscripciones."
+    },
+    "comprobante": {
+      "subir": "Ya transferí, subo mi comprobante",
+      "titulo": "Tu comprobante",
+      "archivo": "Comprobante (foto o PDF)",
+      "archivoAyuda": "JPG, PNG o PDF, hasta 5 MB.",
+      "fecha": "Fecha de la transferencia",
+      "monto": "Monto que transferiste",
+      "montoAyuda": "En {{moneda}}.",
+      "banco": "Banco desde el que transferiste",
+      "folio": "Últimos 4 dígitos o folio (opcional)",
+      "comparar": "Para que compares, estos son los datos para transferir:",
+      "enviar": "Enviar comprobante",
+      "enviando": "Enviando…",
+      "recibido": "Recibimos tu comprobante. Lo estamos revisando y te avisamos por correo.",
+      "rechazado": "Revisamos tu comprobante y no pudimos confirmarlo: {{motivo}}",
+      "ver": "Ver mi comprobante",
+      "verError": "No pudimos abrir el comprobante. Vuelve a intentarlo.",
+      "errores": {
+        "falta": "Elige el archivo de tu comprobante.",
+        "tipo": "Ese archivo no es JPG, PNG ni PDF.",
+        "pesado": "El archivo pesa más de 5 MB. Prueba con una foto más liviana o con un PDF.",
+        "fecha": "Escribe la fecha de la transferencia.",
+        "fechaFutura": "La fecha no puede ser después de hoy.",
+        "monto": "Escribe el monto que transferiste.",
+        "banco": "Escribe el banco desde el que transferiste.",
+        "subida": "No pudimos subir el archivo. Revisa tu conexión y vuelve a intentarlo.",
+        "declarar": "No pudimos registrar tu comprobante. Vuelve a intentarlo.",
+        "yaDeclarado": "Ya recibimos un comprobante para este taller."
+      }
     }
   },
   "pasoReciente": {
@@ -272,10 +302,55 @@
         "whatsapp": "WhatsApp",
         "pais": "País",
         "fecha": "Inscripción",
-        "estado": "Estado"
+        "estado": "Estado",
+        "acciones": "Acciones",
+        "ultimoMovimiento": "Último movimiento",
+        "montoDeclarado": "Monto declarado",
+        "montoConfirmado": "Monto confirmado"
       },
       "saludo": "Hola {{nombre}}, te escribimos por tu lugar en «{{curso}}». ",
-      "escribirle": "Escribirle a {{nombre}} por WhatsApp"
+      "escribirle": "Escribirle a {{nombre}} por WhatsApp",
+      "filtro": "Mostrar",
+      "filtros": {
+        "todos": "Todos",
+        "en_revision": "En revisión",
+        "confirmada": "Confirmadas",
+        "pendiente_de_pago": "Pendientes"
+      },
+      "historial": "{{tipo}} el {{fecha}} por {{quien}}",
+      "historialSinQuien": "{{tipo}} el {{fecha}}",
+      "tiposDelLibro": {
+        "declarado": "Declarado",
+        "confirmado": "Confirmado",
+        "rechazado": "Rechazado",
+        "anulado": "Anulado"
+      },
+      "declaro": "Declaró {{monto}} · {{banco}} · {{fecha}}",
+      "pago": {
+        "ver": "Ver",
+        "confirmar": "Confirmar",
+        "rechazar": "Rechazar",
+        "anular": "Anular",
+        "monto": "Monto recibido",
+        "nota": "Nota interna (opcional)",
+        "motivo": "Motivo",
+        "motivoAyuda": "Es lo que va a leer {{nombre}}.",
+        "siConfirmar": "Sí, confirmar",
+        "siRechazar": "Rechazar el pago",
+        "siAnular": "Anular la inscripción",
+        "confirmarAviso": "{{nombre}} recibe un correo con su lugar confirmado.",
+        "anularAviso": "La inscripción queda anulada. No se borra nada: queda en el libro.",
+        "hecho": "Listo.",
+        "correoNoSalio": "Quedó hecho, pero el correo no salió: avísale por WhatsApp.",
+        "errores": {
+          "motivo": "Escribe el motivo: es lo que va a leer la persona.",
+          "largo": "El motivo es demasiado largo (hasta 500 caracteres).",
+          "noEnRevision": "Ese pago ya no está en revisión. Recarga la lista.",
+          "sinPermiso": "No tienes permiso para esto.",
+          "generico": "No pudimos guardar. Vuelve a intentarlo.",
+          "ver": "No pudimos abrir el comprobante."
+        }
+      }
     },
     "clientes": {
       "buscar": "Buscar",
@@ -330,6 +405,19 @@
       "precio": "Escribe el precio con punto y hasta dos decimales, como 1170 o 1170.50.",
       "sinPermiso": "No tienes permiso para esto.",
       "generico": "No pudimos guardar. Revisa los datos e inténtalo otra vez."
+    }
+  },
+  "correos": {
+    "saludo": "Hola, {{nombre}}:",
+    "saludoSinNombre": "Hola:",
+    "firma": "Equipo de Armando Duarte",
+    "confirmado": {
+      "asunto": "Tu lugar en {{curso}} está confirmado · {{referencia}}",
+      "cuerpo": "Recibimos tu pago y tu lugar en «{{curso}}» está confirmado.\n\nReferencia: {{referencia}}\nCuándo: {{fecha}}, {{horario}} (hora de {{ciudad}})\nDónde: {{sede}}\n\nTodo lo de tu taller está en Mi espacio: {{enlace}}\n\nNos vemos pronto."
+    },
+    "rechazado": {
+      "asunto": "Revisamos tu comprobante de {{curso}} · {{referencia}}",
+      "cuerpo": "Revisamos el comprobante que subiste para «{{curso}}» (referencia {{referencia}}) y no pudimos confirmarlo:\n\n{{motivo}}\n\nPuedes subir otro desde Mi espacio: {{enlace}}\n\nSi tienes dudas, escríbenos por WhatsApp."
     }
   }
 }
