@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { edicionElegida, edicionPrincipal, principalDeMiEspacio, puedeDeclarar } from '@codice/core';
+import {
+  NIVELES_EDUCATIVOS, edadDesdeAnio, edicionElegida, edicionPrincipal, paisesParaElegir, perfilParaEnviar,
+  principalDeMiEspacio, puedeDeclarar, validarPerfil, type CampoDelPerfil, type PerfilEntrada,
+} from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
-import { BotonPrincipal, Campo, Pantalla, Titulo } from '../comun/Piezas';
-import { RUTAS } from '../rutas';
+import { BotonPrincipal, Campo, Pantalla, Selector, Titulo } from '../comun/Piezas';
+import { RUTAS, WEB } from '../rutas';
 import {
   ConfirmacionDeLugar, MisTalleres, TalleresAbiertos, type Confirmacion, type TallerAbierto, type TallerMio,
 } from './Talleres';
@@ -149,51 +152,97 @@ export function MiEspacio({
 }
 
 /**
- * Los datos de la persona.
+ * «Tus datos» — y, desde la #27 D, el perfil: país, ciudad, año de nacimiento
+ * y nivel educativo. **Todo opcional**; «Guardar» es uno y guarda todo junto
+ * (`POST /api/yo`). La edad se calcula al lado del año y nunca se pide la
+ * fecha. Debajo, en gris, para qué se piden y el enlace al aviso de privacidad
+ * (`armandoduarte.com/privacidad#perfil`).
  *
- * Se piden **solo si faltan**, y el aviso lo dice con su porqué: sin WhatsApp
- * no hay forma de avisarle de su taller, que es para lo que dejó el dato. Un
- * formulario que aparece completo y sin explicación se lee como un trámite.
- *
- * ── Nota de alcance, que va escrita ────────────────────────────────────
- * **Guardar todavía no está implementado**: la #15 no trae el `PATCH /api/yo`
- * —su sección B enumera cuatro rutas y ésa no está—. El formulario se dibuja
- * porque la orden pide que la pantalla lo tenga; el botón queda apagado y lo
- * dice. La ruta llega con la orden que la pida, y entonces esta nota se borra.
+ * Qué es válido lo dice `@codice/core` (`validarPerfil`); la base lo vuelve a
+ * mirar con los `check` de la 001 y la 011.
  */
-function SeccionDeDatos({ yo, principal }: { yo: Yo; recargar: () => Promise<void>; principal: boolean }) {
-  const { t } = useTranslation();
+function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: () => Promise<void>; principal: boolean }) {
+  const { t, i18n } = useTranslation();
   const p = yo.persona;
   const faltan = !p?.nombre || !p?.apellido || !p?.whatsapp || !p?.pais;
+  const [datos, setDatos] = useState<PerfilEntrada>(() => ({
+    nombre: p?.nombre ?? '',
+    apellido: p?.apellido ?? '',
+    whatsapp: p?.whatsapp ?? '',
+    pais: p?.pais ?? '',
+    ciudad: p?.ciudad ?? '',
+    anio_nacimiento: p?.anio_nacimiento ? String(p.anio_nacimiento) : '',
+    nivel_educativo: p?.nivel_educativo ?? '',
+  }));
+  const [errores, setErrores] = useState<Partial<Record<CampoDelPerfil, string>>>({});
+  const [estado, setEstado] = useState<'quieto' | 'guardando' | 'guardado' | 'error'>('quieto');
+  const paises = useMemo(() => paisesParaElegir(i18n.language || 'es'), [i18n.language]);
 
-  const [nombre, setNombre] = useState(p?.nombre ?? '');
-  const [apellido, setApellido] = useState(p?.apellido ?? '');
-  const [whatsapp, setWhatsapp] = useState(p?.whatsapp ?? '');
-  const [pais, setPais] = useState(p?.pais ?? '');
+  const cambiar = (campo: CampoDelPerfil) => (e: { target: { value: string } }) => {
+    setDatos((d) => ({ ...d, [campo]: e.target.value }));
+    setEstado('quieto');
+  };
+  const anio = /^\d{4}$/.test(datos.anio_nacimiento.trim()) ? Number(datos.anio_nacimiento.trim()) : null;
+  const edad = edadDesdeAnio(anio);
+
+  async function guardar(evento: React.FormEvent) {
+    evento.preventDefault();
+    const encontrados = validarPerfil(datos);
+    setErrores(encontrados);
+    if (Object.keys(encontrados).length > 0) return;
+    setEstado('guardando');
+    try {
+      await api('yo', { metodo: 'POST', cuerpo: perfilParaEnviar(datos) });
+      setEstado('guardado');
+      await recargar();
+    } catch {
+      setEstado('error');
+    }
+  }
+
+  const error = (campo: CampoDelPerfil) => (errores[campo] ? t(errores[campo]!) : null);
 
   return (
-    <section className="seccion">
-      <h2 className="subtitulo">{t('miEspacio.datosTitulo')}</h2>
+    <section className="seccion" id="tus-datos" aria-labelledby="tus-datos-titulo">
+      <h2 className="subtitulo" id="tus-datos-titulo">{t('miEspacio.datosTitulo')}</h2>
       {faltan ? <p className="nota">{t('miEspacio.datosFaltan')}</p> : null}
-      <Campo id="nombre" rotulo={t('miEspacio.nombre')} value={nombre} autoComplete="given-name"
-        onChange={(e) => setNombre(e.target.value)} />
-      <Campo id="apellido" rotulo={t('miEspacio.apellido')} value={apellido} autoComplete="family-name"
-        onChange={(e) => setApellido(e.target.value)} />
-      <Campo id="whatsapp" rotulo={t('miEspacio.whatsapp')} ayuda={t('miEspacio.whatsappAyuda')}
-        value={whatsapp} type="tel" inputMode="tel" autoComplete="tel"
-        onChange={(e) => setWhatsapp(e.target.value)} />
-      <Campo id="pais" rotulo={t('miEspacio.pais')} value={pais} autoComplete="country-name"
-        onChange={(e) => setPais(e.target.value)} />
-      <div className="fila">
-        {/* Apagado hasta que exista `PATCH /api/yo`. Ver la nota de arriba. */}
-        {principal ? (
-          <BotonPrincipal type="button" disabled>
-            {t('miEspacio.guardar')}
-          </BotonPrincipal>
-        ) : (
-          <button type="button" className="btn btn--ancho" disabled>{t('miEspacio.guardar')}</button>
-        )}
-      </div>
+      <form onSubmit={guardar} noValidate>
+        <Campo id="nombre" rotulo={t('miEspacio.nombre')} value={datos.nombre} autoComplete="given-name"
+          error={error('nombre')} onChange={cambiar('nombre')} />
+        <Campo id="apellido" rotulo={t('miEspacio.apellido')} value={datos.apellido} autoComplete="family-name"
+          error={error('apellido')} onChange={cambiar('apellido')} />
+        <Campo id="whatsapp" rotulo={t('miEspacio.whatsapp')} ayuda={t('miEspacio.whatsappAyuda')}
+          value={datos.whatsapp} type="tel" inputMode="tel" autoComplete="tel" error={error('whatsapp')} onChange={cambiar('whatsapp')} />
+        <Selector id="pais" rotulo={t('miEspacio.pais')} value={datos.pais} autoComplete="country"
+          error={error('pais')} onChange={cambiar('pais')}
+          opciones={[{ valor: '', texto: t('miEspacio.sinElegir') }, ...paises.map((x) => ({ valor: x.codigo, texto: x.nombre }))]} />
+        <Campo id="ciudad" rotulo={t('miEspacio.ciudad')} value={datos.ciudad} autoComplete="address-level2"
+          maxLength={120} error={error('ciudad')} onChange={cambiar('ciudad')} />
+        <Campo id="anio_nacimiento" rotulo={t('miEspacio.anioNacimiento')} value={datos.anio_nacimiento}
+          inputMode="numeric" maxLength={4} autoComplete="bday-year"
+          ayuda={edad !== null ? t('miEspacio.edad', { edad }) : t('miEspacio.anioAyuda')}
+          error={error('anio_nacimiento')} onChange={cambiar('anio_nacimiento')} />
+        <Selector id="nivel_educativo" rotulo={t('miEspacio.nivelEducativo')} value={datos.nivel_educativo}
+          error={error('nivel_educativo')} onChange={cambiar('nivel_educativo')}
+          opciones={[{ valor: '', texto: t('miEspacio.sinElegir') }, ...NIVELES_EDUCATIVOS.map((n) => ({ valor: n, texto: t(`miEspacio.niveles.${n}`) }))]} />
+        <p className="nota nota--para-que">
+          <b>{t('miEspacio.perfil.paraQue')}</b> {t('miEspacio.perfil.paraQueTexto')}{' '}
+          <a className="enlace" href={`${WEB}/privacidad#perfil`}>{t('miEspacio.perfil.aviso')}</a>
+        </p>
+        <div className="fila">
+          {principal ? (
+            <BotonPrincipal cargando={estado === 'guardando'} textoCargando={t('miEspacio.guardando')}>
+              {t('miEspacio.guardar')}
+            </BotonPrincipal>
+          ) : (
+            <button type="submit" className="btn btn--ancho" disabled={estado === 'guardando'}>
+              {estado === 'guardando' ? t('miEspacio.guardando') : t('miEspacio.guardar')}
+            </button>
+          )}
+        </div>
+        {estado === 'guardado' ? <p className="exito" role="status">{t('miEspacio.guardado')}</p> : null}
+        {estado === 'error' ? <p className="error" role="alert">{t('miEspacio.errorAlGuardar')}</p> : null}
+      </form>
     </section>
   );
 }

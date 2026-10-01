@@ -28,6 +28,11 @@ export function Privacidad() {
 
       <h2 className="display-s u-mt-6">{t('privacidad.datosTitulo')}</h2>
       <p className="body u-mt-3">{t('privacidad.datosTexto')}</p>
+      {/* #27 D.4: el perfil de Mi espacio, con ancla para el enlace de «Tus
+          datos» («¿Para qué pedimos esto?»). Texto exacto de la orden. */}
+      <p className="body u-mt-3" id="perfil">
+        <b>{t('privacidad.perfilTitulo')}</b>{t('privacidad.perfilAntes')}<b>{t('privacidad.perfilOpcional')}</b>{t('privacidad.perfilDespues')}
+      </p>
 
       <h2 className="display-s u-mt-6">{t('privacidad.usoTitulo')}</h2>
       <p className="body u-mt-3">{t('privacidad.usoTexto')}</p>

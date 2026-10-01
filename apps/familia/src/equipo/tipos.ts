@@ -64,6 +64,11 @@ export interface Cliente {
   email: string;
   whatsapp: string | null;
   pais: string | null;
+  /* #27 D: el perfil (011). El año viaja en crudo; la pantalla muestra la edad. */
+  ciudad: string | null;
+  anio_nacimiento: number | null;
+  nivel_educativo: string | null;
+  cuantas_notas: number;
   alta: string;
   cursos: number;
   ultimo_curso: string | null;

@@ -33,9 +33,9 @@ import { Panel } from './Panel';
 import type { Yo } from '../comun/api';
 
 const CLIENTES = [
-  { persona_id: 'u-armando', nombre: 'Armando', apellido: 'Duarte', email: 'armando@x.mx', whatsapp: '+52 999 000 0000', pais: 'MX', alta: '2026-09-29T10:00:00Z', cursos: 0, ultimo_curso: null, ultima_inscripcion: null, rol: 'dueno', territorio: 'todos', activo: true },
-  { persona_id: 'u-gabi', nombre: 'Gabi', apellido: 'Ruiz', email: 'gabi@x.mx', whatsapp: null, pais: 'MX', alta: '2026-09-29T11:00:00Z', cursos: 0, ultimo_curso: null, ultima_inscripcion: null, rol: 'equipo', territorio: 'mexico', activo: true },
-  { persona_id: 'u-ana', nombre: 'Ana', apellido: 'López', email: 'ana@ejemplo.mx', whatsapp: '+52 999 123 4567', pais: 'MX', alta: '2026-09-30T12:00:00Z', cursos: 1, ultimo_curso: 'El arte de amar a tu adolescente', ultima_inscripcion: '2026-09-30T13:00:00Z', rol: null, territorio: null, activo: null },
+  { persona_id: 'u-armando', nombre: 'Armando', apellido: 'Duarte', email: 'armando@x.mx', whatsapp: '+52 999 000 0000', pais: 'MX', ciudad: null, anio_nacimiento: null, nivel_educativo: null, cuantas_notas: 0, alta: '2026-09-29T10:00:00Z', cursos: 0, ultimo_curso: null, ultima_inscripcion: null, rol: 'dueno', territorio: 'todos', activo: true },
+  { persona_id: 'u-gabi', nombre: 'Gabi', apellido: 'Ruiz', email: 'gabi@x.mx', whatsapp: null, pais: 'MX', ciudad: null, anio_nacimiento: null, nivel_educativo: null, cuantas_notas: 0, alta: '2026-09-29T11:00:00Z', cursos: 0, ultimo_curso: null, ultima_inscripcion: null, rol: 'equipo', territorio: 'mexico', activo: true },
+  { persona_id: 'u-ana', nombre: 'Ana', apellido: 'López', email: 'ana@ejemplo.mx', whatsapp: '+52 999 123 4567', pais: 'MX', ciudad: 'Mérida', anio_nacimiento: 1984, nivel_educativo: 'licenciatura', cuantas_notas: 1, alta: '2026-09-30T12:00:00Z', cursos: 1, ultimo_curso: 'El arte de amar a tu adolescente', ultima_inscripcion: '2026-09-30T13:00:00Z', rol: null, territorio: null, activo: null },
 ];
 
 const yo = (rol: 'dueno' | 'equipo', id: string): Yo => ({
@@ -58,7 +58,10 @@ describe('Clientes', () => {
     expect(within(gabi).getByRole('button', { name: 'Quitar del equipo' })).toBeTruthy();
     /* «Armando Duarte» está también en la cabecera: se toma el de la tabla. */
     const armando = screen.getAllByText('Armando Duarte').map((e) => e.closest('tr')).find(Boolean) as HTMLElement;
-    expect(within(armando).queryByRole('button')).toBeNull();
+    /* Desde la #27 D toda fila lleva «Abrir» (la ficha): lo que no lleva la del
+       dueño es ningún botón de equipo sobre sí mismo. */
+    expect(within(armando).queryByRole('button', { name: /equipo/i })).toBeNull();
+    expect(within(armando).getByRole('button', { name: /Abrir/ })).toBeTruthy();
   });
 
   it('sumar pide territorio y confirmación, y manda lo elegido', async () => {
@@ -89,6 +92,9 @@ describe('Clientes', () => {
     expect(falso.descargas).toHaveLength(1);
     expect(falso.descargas[0].contenido.startsWith('\uFEFF')).toBe(true);
     expect(falso.descargas[0].contenido).toContain('Ana López,ana@ejemplo.mx');
+    /* #27 D: la edad, calculada; nunca el año crudo. */
+    expect(falso.descargas[0].contenido).toMatch(/,Mérida,\d{2},Licenciatura,/);
+    expect(falso.descargas[0].contenido).not.toContain('1984');
     expect(falso.descargas[0].contenido).not.toContain('Gabi');
   });
 });

@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  TERRITORIOS, aCsv, accionDeEquipo, coincide, enlaceDeSaludo, fechaCorta, nombreDeArchivo, type Rol,
+  TERRITORIOS, aCsv, accionDeEquipo, coincide, edadDesdeAnio, enlaceDeSaludo, fechaCorta, nombreDeArchivo, type Rol,
 } from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
 import { Campo, Selector } from '../comun/Piezas';
 import { descargar } from './descargar';
+import { FichaDeCliente } from './FichaDeCliente';
 import { nombreCompleto, type Cliente } from './tipos';
 
 /**
@@ -32,6 +33,8 @@ export function Clientes({ yo }: { yo: Yo }) {
   const [confirmando, setConfirmando] = useState<Confirmando>(null);
   const [trabajando, setTrabajando] = useState(false);
   const [fallo, setFallo] = useState<string | null>(null);
+  /* #27 D.3: la ficha abierta (una por vez), debajo de su fila. */
+  const [abierta, setAbierta] = useState<string | null>(null);
 
   const cargar = useCallback(async () => {
     setError(false);
@@ -46,7 +49,7 @@ export function Clientes({ yo }: { yo: Yo }) {
 
   const rol: Rol = yo.rol;
   const miId = yo.persona?.id ?? '';
-  const visibles = (filas ?? []).filter((f) => coincide([f.nombre, f.apellido, f.email, f.whatsapp], consulta));
+  const visibles = (filas ?? []).filter((f) => coincide([f.nombre, f.apellido, f.email, f.whatsapp, f.ciudad], consulta));
   const conColumnaDeEquipo = rol === 'dueno';
 
   async function confirmar() {
@@ -70,9 +73,12 @@ export function Clientes({ yo }: { yo: Yo }) {
   }
 
   const exportar = () => {
-    const encabezados = ['nombre', 'correo', 'whatsapp', 'pais', 'alta', 'cursos'].map((k) => t(`equipo.clientes.encabezados.${k}`));
+    /* #27 D.3: ciudad, edad (calculada; nunca el año) y nivel. */
+    const encabezados = ['nombre', 'correo', 'whatsapp', 'pais', 'ciudad', 'edad', 'nivel', 'alta', 'cursos']
+      .map((k) => t(`equipo.clientes.encabezados.${k}`));
     const csv = aCsv(encabezados, visibles.map((f) => [
-      nombreCompleto(f, ''), f.email, f.whatsapp, f.pais, f.alta, f.cursos,
+      nombreCompleto(f, ''), f.email, f.whatsapp, f.pais, f.ciudad, edadDesdeAnio(f.anio_nacimiento),
+      f.nivel_educativo ? t(`miEspacio.niveles.${f.nivel_educativo}`) : null, f.alta, f.cursos,
     ]));
     descargar(nombreDeArchivo('clientes', new Date()), csv);
   };
@@ -102,7 +108,7 @@ export function Clientes({ yo }: { yo: Yo }) {
             <table className="tabla">
               <thead>
                 <tr>
-                  {['nombre', 'correo', 'whatsapp', 'pais', 'alta', 'cursos'].map((k) => (
+                  {['nombre', 'correo', 'whatsapp', 'pais', 'ciudad', 'edad', 'nivel', 'alta', 'cursos', 'notas'].map((k) => (
                     <th key={k} scope="col">{t(`equipo.clientes.encabezados.${k}`)}</th>
                   ))}
                   {conColumnaDeEquipo ? <th scope="col">{t('equipo.clientes.encabezados.equipo')}</th> : null}
@@ -115,15 +121,26 @@ export function Clientes({ yo }: { yo: Yo }) {
                   const enlace = enlaceDeSaludo(f.whatsapp, t('equipo.clientes.saludo', { nombre: f.nombre ?? '' }).replace(' ,', ','));
                   const esta = confirmando?.persona === f.persona_id ? confirmando : null;
                   return (
-                    <tr key={f.persona_id}>
+                    <Fragment key={f.persona_id}>
+                    <tr>
                       <td>{nombre}</td>
                       <td><a className="enlace" href={`mailto:${f.email}`}>{f.email}</a></td>
                       <td>{enlace ? <a className="enlace" href={enlace} target="_blank" rel="noopener">{f.whatsapp}</a> : (f.whatsapp ?? '—')}</td>
                       <td>{f.pais ?? '—'}</td>
+                      <td>{f.ciudad ?? '—'}</td>
+                      <td className="tabla__numero">{edadDesdeAnio(f.anio_nacimiento) ?? '—'}</td>
+                      <td>{f.nivel_educativo ? t(`miEspacio.niveles.${f.nivel_educativo}`) : '—'}</td>
                       <td className="tabla__numero">{fechaCorta(f.alta, ZONA_DEL_EQUIPO)}</td>
                       <td>
                         {f.cursos}
                         {f.ultimo_curso ? <span className="tabla__sub">{t('equipo.clientes.ultimo', { curso: f.ultimo_curso })}</span> : null}
+                      </td>
+                      <td>
+                        <button type="button" className="enlace" aria-expanded={abierta === f.persona_id}
+                          aria-label={t(abierta === f.persona_id ? 'equipo.clientes.cerrar' : 'equipo.clientes.abrirAria', { nombre })}
+                          onClick={() => setAbierta(abierta === f.persona_id ? null : f.persona_id)}>
+                          {abierta === f.persona_id ? t('equipo.clientes.cerrar') : `${t('equipo.clientes.abrir')} (${f.cuantas_notas ?? 0})`}
+                        </button>
                       </td>
                       {conColumnaDeEquipo ? (
                         <td className="tabla__equipo">
@@ -157,6 +174,14 @@ export function Clientes({ yo }: { yo: Yo }) {
                         </td>
                       ) : null}
                     </tr>
+                    {abierta === f.persona_id ? (
+                      <tr className="tabla__ficha">
+                        <td colSpan={conColumnaDeEquipo ? 11 : 10}>
+                          <FichaDeCliente personaId={f.persona_id} nombre={nombre} alAgregar={() => void cargar()} />
+                        </td>
+                      </tr>
+                    ) : null}
+                    </Fragment>
                   );
                 })}
               </tbody>

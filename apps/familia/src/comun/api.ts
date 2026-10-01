@@ -143,6 +143,10 @@ export interface Yo {
     pais: string | null;
     /** IANA, o nulo si la persona no la cargó (#24 B, para la fecha en su hora). */
     zona_horaria?: string | null;
+    /** #27 D: el perfil, todo opcional. */
+    ciudad?: string | null;
+    anio_nacimiento?: number | null;
+    nivel_educativo?: string | null;
   } | null;
   rol: 'dueno' | 'equipo' | 'cliente';
   tipo: 'equipo' | 'cliente';

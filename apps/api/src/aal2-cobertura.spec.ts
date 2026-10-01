@@ -104,6 +104,7 @@ describe('Cobertura del segundo paso (AAL2) — guardián', () => {
       + 'devolvió menos de las que hay, la metadata no se leyó y nada de lo que sigue afirma nada.',
     ).toEqual([
       'GET /equipo/clientes',
+      'GET /equipo/clientes/:id',
       'GET /equipo/cursos',
       'GET /equipo/inscriptos/:edicion',
       'GET /pagos/comprobante/:inscripcion',
@@ -111,6 +112,7 @@ describe('Cobertura del segundo paso (AAL2) — guardián', () => {
       'GET /salud',
       'GET /talleres',
       'GET /yo',
+      'POST /equipo/clientes/:id/notas',
       'POST /equipo/cursos',
       'POST /equipo/cursos/:id',
       'POST /equipo/ediciones',
@@ -123,6 +125,7 @@ describe('Cobertura del segundo paso (AAL2) — guardián', () => {
       'POST /respaldo/usar',
       'POST /sesiones/cerrar-las-otras',
       'POST /talleres/inscribirme',
+      'POST /yo',
     ]);
   });
 

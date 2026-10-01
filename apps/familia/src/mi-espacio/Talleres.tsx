@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  claveDeEstado, datosParaEnviar, datosQueFaltan, edicionElegida, edicionPrincipal, puedeDeclarar, tonoDeEstado,
+  claveDeEstado, datosParaEnviar, datosQueFaltan, edicionElegida, edicionPrincipal, perfilIncompleto, puedeDeclarar, tonoDeEstado,
   enlaceParaPedirLosDatosDeCobro, estadoDelTaller, fechaCorta, fechasDelTaller, formatearPrecio,
   validarDatosParaAnotarse, type DatoParaAnotarse, type DatosParaAnotarse,
 } from '@codice/core';
@@ -350,6 +350,14 @@ export function ConfirmacionDeLugar({ c, yo, alCerrar }: { c: Confirmacion; yo: 
           </div>
         </div>
       )}
+      {/* #27 D.2: si faltan los datos del perfil, una tarjeta suave. No bloquea nada. */}
+      {perfilIncompleto(yo.persona) ? (
+        <div className="tarjeta-suave">
+          <p className="tarjeta-suave__titulo">{t('miEspacio.perfil.completaTitulo')}</p>
+          <p className="nota">{t('miEspacio.perfil.completaTexto')}</p>
+          <a className="enlace" href="#tus-datos">{t('miEspacio.perfil.completaEnlace')}</a>
+        </div>
+      ) : null}
       <div className="fila fila--suelta">
         <button type="button" className="enlace" onClick={alCerrar}>{t('miEspacio.verMisTalleres')}</button>
       </div>
