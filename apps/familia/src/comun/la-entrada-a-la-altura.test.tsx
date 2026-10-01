@@ -94,7 +94,7 @@ describe('B y C · el marco', () => {
     expect(document.querySelector('.panel')).toBeNull();
     unmount();
     render(<Entrar />);
-    expect(document.querySelector('.panel .panel__busto')).not.toBeNull();
+    expect(document.querySelector('.panel .panel__armando')).not.toBeNull();
   });
 
   it('EL CASO de Lighthouse: panel o retrato, nunca las dos imágenes a la vez', () => {

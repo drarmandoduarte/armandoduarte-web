@@ -1087,3 +1087,15 @@ sacándole el problema de encima al formato.
 
 Los cuatro naranja de «Cuatro núcleos» siguen siendo los PNG de Lucía: ésos ya
 llegaban a 2× y no había motivo para tocarlos.
+
+### 16. Los e2e de `apps/familia` no corren en la gate · **pendiente: orden propia, chica** (dirección, 1/10/2026)
+
+El guardián de guardianes levanta Chromium solo para `apps/web`
+(`@codice/navegador`). `apps/familia/e2e/entrar-armando.spec.ts` (orden #28 B)
+se corre a mano contra el build, igual que F.4. Dirección lo aceptó por hoy en
+la auditoría del PR #46 y lo deja para una orden propia: **meter los e2e de
+`apps/familia` en la gate**, con su reporte, su piso en `qa/piso-de-tests.md`
+y F.4 en `qa/skips-permitidos.md` (necesita un preview de verdad).
+
+El caso: un test que nadie corre es un test que no existe, y éste ya tiene
+mutaciones que dependen de que alguien se acuerde.
