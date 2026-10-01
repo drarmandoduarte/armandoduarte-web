@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSesion } from './comun/sesion';
 import { api } from './comun/api';
+import { slugDeMeAnoto } from '@codice/core';
 import { rutaQueCorresponde } from './comun/ruta-que-corresponde';
+import { destinoGuardado, guardarDestinoDeLaUrl, olvidarDestino } from './comun/destino';
 import { Pantalla } from './comun/Piezas';
 import { Entrar } from './entrar/Entrar';
 import { Enrolar } from './entrar/Enrolar';
@@ -38,6 +40,10 @@ export function App() {
   const { cargando, sesion, yo, decision, recargar, salir, marcarVerificado } = useSesion();
   /** Los diez códigos recién generados, mientras la pantalla 4 los muestra. */
   const [codigosNuevos, setCodigosNuevos] = useState<string[] | null>(null);
+  /** La ruta que la pantalla pinta. Es estado (#24 B) porque `replaceState` no
+   *  vuelve a pintar: sin esto, al llegar a `/me-anoto/<slug>` después de
+   *  entrar, la pantalla seguía mostrando lo de la ruta anterior. */
+  const [ruta, setRuta] = useState(() => window.location.pathname);
 
   /* F · la URL dice dónde está la persona: `/mi-espacio` cuando entró,
      `/entrar` cuando no. Quién decide es `rutaQueCorresponde()`, pura y con
@@ -45,6 +51,10 @@ export function App() {
      del navegador no tiene que volver a una pantalla de entrada que ya no
      corresponde. */
   useEffect(() => {
+    /* #24 B: el `?ir=` de `/entrar` se guarda antes de decidir, y se olvida
+       en cuanto se lo usa (ver `comun/destino.ts`). */
+    guardarDestinoDeLaUrl();
+    const guardado = destinoGuardado();
     const destino = rutaQueCorresponde({
       cargando,
       haySesion: !!sesion,
@@ -52,8 +62,14 @@ export function App() {
       decision,
       rutaActual: window.location.pathname,
       esEquipo: yo?.tipo === 'equipo',
+      destinoGuardado: guardado,
     });
-    if (destino) window.history.replaceState(null, '', destino);
+    if (sesion && yo && decision === 'pasar') olvidarDestino();
+    if (destino) {
+      window.history.replaceState(null, '', destino);
+      guardarDestinoDeLaUrl();
+    }
+    setRuta(window.location.pathname);
   }, [cargando, sesion, yo, decision]);
 
   /* Lo primero, antes que cualquier pantalla: si falta una variable, se dice
@@ -169,13 +185,14 @@ export function App() {
   /* `/equipo` (#24 A): el panel, solo para el equipo. A un cliente que escribe
      `/equipo` se le muestra Mi espacio y `rutaQueCorresponde()` corrige la URL:
      nunca ve un error. La API y la base lo frenan igual (`SOLO_EQUIPO`, RLS). */
-  if (window.location.pathname === RUTAS.equipo && yo.tipo === 'equipo') {
+  if (ruta === RUTAS.equipo && yo.tipo === 'equipo') {
     return <Panel yo={yo} />;
   }
 
   return (
     <MiEspacio
       yo={yo}
+      slugElegido={slugDeMeAnoto(ruta)}
       recargar={recargar}
       alSalir={() => void salir('deliberada')}
       alRegenerar={setCodigosNuevos}

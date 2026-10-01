@@ -1,3 +1,4 @@
+import { rutaInternaSegura, slugDeMeAnoto } from '@codice/core';
 import { RUTAS } from '../rutas';
 import type { DecisionDePantalla } from './decision-de-pantalla';
 
@@ -19,6 +20,15 @@ import type { DecisionDePantalla } from './decision-de-pantalla';
  *     estados de la misma sesión (lo explica `App.tsx`), y moverla ahí sería
  *     inventarles una dirección.
  *
+ * ── Y desde la #24 B, a dónde quería ir (`?ir=`) ─────────────────────────
+ *   · sin sesión en `/me-anoto/<slug>` → `/entrar?ir=/me-anoto/<slug>`: quien
+ *     llega desde «Reservar mi lugar» no pierde el taller por tener que entrar;
+ *   · con sesión y `pasar`, si hay un destino guardado (el `?ir=` de `/entrar`,
+ *     que sobrevive al ida y vuelta de Google) → ahí, y no a `/mi-espacio`.
+ *     Solo si `rutaInternaSegura()` lo acepta: cualquier otra cosa se ignora y
+ *     se sigue como siempre. Y nunca `/entrar`, que con sesión sería un rulo;
+ *   · `/me-anoto/<slug>` con sesión es un lugar: ahí se queda, como `/equipo`.
+ *
  * Devuelve la ruta a la que hay que ir, o `null` si la actual ya está bien.
  */
 export function rutaQueCorresponde(estado: {
@@ -29,15 +39,29 @@ export function rutaQueCorresponde(estado: {
   rutaActual: string;
   /** Si quien entró es del equipo. Sin `yo`, falso. */
   esEquipo?: boolean;
+  /** El `?ir=` que se guardó al llegar a `/entrar` (#24 B). Se vuelve a validar acá. */
+  destinoGuardado?: string | null;
 }): string | null {
   if (estado.cargando) return null;
+  const enMeAnoto = slugDeMeAnoto(estado.rutaActual) !== null;
+
+  if (!estado.haySesion) {
+    if (enMeAnoto) return `${RUTAS.entrar}?ir=${encodeURIComponent(estado.rutaActual)}`;
+    return estado.rutaActual === RUTAS.entrar ? null : RUTAS.entrar;
+  }
+  if (!estado.hayYo || estado.decision !== 'pasar') return null;
+
+  const guardado = rutaInternaSegura(estado.destinoGuardado);
+  const caminoGuardado = guardado?.split(/[?#]/)[0] ?? null;
+  if (guardado && caminoGuardado !== RUTAS.entrar) {
+    return caminoGuardado === estado.rutaActual ? null : guardado;
+  }
+
   /* `/equipo` es un lugar para el equipo (#24 A): ahí se queda. A un cliente
-     que escribe `/equipo` se lo lleva a Mi espacio, sin error. */
+     que escribe `/equipo` se lo lleva a Mi espacio, sin error. Y
+     `/me-anoto/<slug>` es un lugar para cualquiera con sesión (#24 B). */
+  if (enMeAnoto) return null;
   const sePuedeQuedar = estado.rutaActual === RUTAS.equipo && estado.esEquipo === true;
-  const destino = !estado.haySesion
-    ? RUTAS.entrar
-    : estado.hayYo && estado.decision === 'pasar'
-      ? sePuedeQuedar ? RUTAS.equipo : RUTAS.miEspacio
-      : null;
-  return destino && destino !== estado.rutaActual ? destino : null;
+  const destino = sePuedeQuedar ? RUTAS.equipo : RUTAS.miEspacio;
+  return destino !== estado.rutaActual ? destino : null;
 }

@@ -10,6 +10,9 @@ export const RUTAS = {
   miEspacio: '/mi-espacio',
   /** El panel del equipo (orden #24 A). Solo `dueno` y `equipo`; a un cliente lo devuelve a Mi espacio. */
   equipo: '/equipo',
+  /** «Me anoto» con un taller elegido: `/me-anoto/<slug>` (orden #24 B). El
+   *  prefijo y cómo se lee el slug viven en `@codice/core` (`slugDeMeAnoto`). */
+  meAnoto: '/me-anoto',
 } as const;
 
 /** A dónde va alguien que llega a `/` o a una ruta que no existe. */

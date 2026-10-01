@@ -141,6 +141,8 @@ export interface Yo {
     apellido: string | null;
     whatsapp: string | null;
     pais: string | null;
+    /** IANA, o nulo si la persona no la cargó (#24 B, para la fecha en su hora). */
+    zona_horaria?: string | null;
   } | null;
   rol: 'dueno' | 'equipo' | 'cliente';
   tipo: 'equipo' | 'cliente';
