@@ -26,15 +26,15 @@ import { Seccion } from '../comun/Seccion';
  */
 export function Programa() {
   const { t } = useTranslation();
-  /* El cuarto valor es el ícono. Los cuatro primeros son los PNG de Lucía; el
+  /* El tercer valor es el ícono. Los cuatro primeros son los PNG de Lucía; el
      quinto, `cambios.svg`, llegó con los insumos de la #12 en el mismo estilo.
      Desde la #23 (D) se dibuja solo el glifo, en teal (`Glifo.tsx`). */
   const nucleos = [
-    ['01', '1', 'uno', 'cerebro'],
-    ['02', '2', 'dos', 'emociones'],
-    ['03', '3', 'tres', 'comunicacion'],
-    ['04', '3', 'cuatro', 'victorias'],
-    ['05', '3', 'cinco', 'cambios'],
+    ['01', 'uno', 'cerebro'],
+    ['02', 'dos', 'emociones'],
+    ['03', 'tres', 'comunicacion'],
+    ['04', 'cuatro', 'victorias'],
+    ['05', 'cinco', 'cambios'],
   ] as const;
 
   return (
@@ -48,8 +48,10 @@ export function Programa() {
           «01»: con «NÚCLEO 1» eran dos numeraciones seguidas, y el nombre que
           usa Armando es el segundo (auditoría del PR #35). */}
       <ol className="nucleos">
-        {nucleos.map(([n, demora, clave, icono]) => (
-          <li className="nucleo reveal" data-d={demora} key={n}>
+        {/* Cada núcleo entra 120 ms después del anterior (#28): el retraso
+            vive en `index.css` («El movimiento de 512»), no en `data-d`. */}
+        {nucleos.map(([n, clave, icono]) => (
+          <li className="nucleo reveal" key={n}>
             <span className="nucleo__circulo"><Glifo nombre={icono} lado={20} /></span>
             <span className="nucleo__linea" aria-hidden="true" />
             <h3><b>{t(`taller.programa.${clave}.rotulo`)}</b>{t(`taller.programa.${clave}.titulo`)}</h3>

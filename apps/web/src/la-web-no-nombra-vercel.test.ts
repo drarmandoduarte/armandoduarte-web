@@ -51,6 +51,17 @@ describe('la web no nombra Vercel (orden #25)', () => {
     expect(entradas(portada), 'la banda «AHORA»').toContain(reservar);
   });
 
+  it('la tarjeta del taller en la portada reserva en la app, con el programa en contorno y sin WhatsApp (orden #28)', () => {
+    const reservar = `${APP}/entrar?ir=%2Fme-anoto%2Fel-arte-de-amar-a-tu-adolescente`;
+    const portada = paginas.find((p) => p.archivo === 'index.html')!.html;
+    const taller = portada.match(/<section[^>]*id="taller"[\s\S]*?<\/section>/)?.[0] ?? '';
+    expect(taller.length, 'no encontré la sección #taller de la portada').toBeGreaterThan(200);
+    expect(entradas(taller), '«Reservar mi lugar» de la tarjeta del taller no lleva a la app').toEqual([reservar]);
+    expect(taller, 'el principal tiene que ser el que reserva').toMatch(/href="https:\/\/familia\.armandoduarte\.com\/entrar[^"]*"[^>]*class="btn btn--naranja"/);
+    expect(taller, '«Ver el programa» va en contorno a /merida#programa').toMatch(/href="\/merida#programa"[^>]*class="btn"/);
+    expect(taller, 'la tarjeta del taller ya no lleva WhatsApp').not.toContain('wa.me');
+  });
+
   it('«Lo que te llevas» e «Inversión» reservan en la app; Inversión deja WhatsApp en contorno (auditoría del #41)', () => {
     const reservar = `${APP}/entrar?ir=%2Fme-anoto%2Fel-arte-de-amar-a-tu-adolescente`;
     const merida = paginas.find((p) => p.archivo === 'merida.html')!.html;
