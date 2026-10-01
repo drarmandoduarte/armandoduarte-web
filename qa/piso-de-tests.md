@@ -24,7 +24,7 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/web` | 63 |
 | `@codice/familia` | 89 |
 | `@codice/api` | 70 |
-| `@codice/navegador` | 39 |
+| `@codice/navegador` | 40 |
 
 
 
@@ -47,6 +47,12 @@ alguien lo va a leer en el PR. Ése es el punto.
 - **`@codice/familia` (+6)**: `equipo/el-panel-del-equipo.test.tsx` (5) y la
   ruta `/equipo` en `acento-y-ruta.test.ts` (1). Mutación: la columna de equipo
   para todos → cae «el equipo (no dueño) no ve la columna».
+
+## Lo que trae la orden #23-bis — `@codice/navegador` 39 → 40
+
+`e2e/nucleo-se-pinta.spec.ts`: con el mouse sobre el núcleo 3, el círculo y la
+línea en `--naranja` y el glifo en `--crema`; en reposo, teal. Mutación: sin la
+regla de hover → cae.
 
 ## Lo que trae la orden #23 — `@codice/web` 62 → 63 y `@codice/navegador` 38 → 39
 
