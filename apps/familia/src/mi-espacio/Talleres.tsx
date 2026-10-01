@@ -9,6 +9,8 @@ import { api, ErrorDeApi, type Yo } from '../comun/api';
 import { abrirEnOtraPestana } from '../comun/abrir';
 import { BotonPrincipal, Campo } from '../comun/Piezas';
 import { PasoDeComprobante, type Cobro } from './Comprobante';
+import { EnlaceInterno } from '../comun/navegacion';
+import { RUTAS } from '../rutas';
 
 /**
  * «Talleres abiertos», «Me anoto» y «Mis talleres» — orden #24 B.
@@ -88,7 +90,7 @@ const precio = (t: TallerAbierto) =>
   formatearPrecio(t.precio_monto === null ? null : Number(t.precio_monto), t.precio_moneda);
 
 /** El día, el horario en la zona de la edición y, si hace falta, en la de la persona. */
-function Fecha({ t, zona }: { t: { inicio: string; fin: string; zona: string; ciudad: string | null }; zona: string | null }) {
+export function Fecha({ t, zona }: { t: { inicio: string; fin: string; zona: string; ciudad: string | null }; zona: string | null }) {
   const { t: tr } = useTranslation();
   const f = fechasDelTaller(t, zona);
   return (
@@ -108,6 +110,7 @@ export function TalleresAbiertos({
   alConfirmar,
   alCambiar,
   alAbrir,
+  sinTitulo = false,
 }: {
   talleres: TallerAbierto[];
   slugElegido: string | null;
@@ -119,6 +122,8 @@ export function TalleresAbiertos({
   alCambiar: () => void;
   /** La persona abrió el paso de «Me anoto»: esta sección pasa a ser la principal. */
   alAbrir?: () => void;
+  /** #29: en su propia pantalla el título es el de la pantalla; el de la sección queda para el lector. */
+  sinTitulo?: boolean;
 }) {
   const { t } = useTranslation();
   const zona = zonaDeLaPersona(yo);
@@ -131,7 +136,7 @@ export function TalleresAbiertos({
 
   return (
     <section className="seccion" aria-labelledby="talleres-titulo">
-      <h2 className="subtitulo" id="talleres-titulo">{t('miEspacio.talleresTitulo')}</h2>
+      <h2 className={sinTitulo ? 'solo-lectura' : 'subtitulo'} id="talleres-titulo">{t('miEspacio.talleresTitulo')}</h2>
       {slugElegido && !elegida ? <p className="nota u-mt-4">{t('miEspacio.tallerNoEncontrado')}</p> : null}
       {talleres.length === 0 ? <p className="nota u-mt-4">{t('miEspacio.talleresVacio')}</p> : (
         <ul className="talleres">
@@ -355,7 +360,8 @@ export function ConfirmacionDeLugar({ c, yo, alCerrar }: { c: Confirmacion; yo: 
         <div className="tarjeta-suave">
           <p className="tarjeta-suave__titulo">{t('miEspacio.perfil.completaTitulo')}</p>
           <p className="nota">{t('miEspacio.perfil.completaTexto')}</p>
-          <a className="enlace" href="#tus-datos">{t('miEspacio.perfil.completaEnlace')}</a>
+          {/* #29: «Tus datos» vive en su propia pantalla. */}
+          <EnlaceInterno a={RUTAS.misDatos} className="enlace">{t('miEspacio.perfil.completaEnlace')}</EnlaceInterno>
         </div>
       ) : null}
       <div className="fila fila--suelta">
@@ -381,6 +387,7 @@ export function MisTalleres({
   naranja = false,
   alDeclarar,
   alAbrir,
+  sinTitulo = false,
 }: {
   mios: TallerMio[];
   yo: Yo;
@@ -391,6 +398,8 @@ export function MisTalleres({
   alDeclarar?: () => void;
   /** Se abrió el paso de subir: esta sección pasa a ser la principal. */
   alAbrir?: () => void;
+  /** #29: en su propia pantalla el título es el de la pantalla; el de la sección queda para el lector. */
+  sinTitulo?: boolean;
 }) {
   const { t } = useTranslation();
   const zona = zonaDeLaPersona(yo);
@@ -408,7 +417,7 @@ export function MisTalleres({
 
   return (
     <section className="seccion" aria-labelledby="mis-talleres-titulo" id="mis-talleres">
-      <h2 className="subtitulo" id="mis-talleres-titulo">{t('miEspacio.misTalleresTitulo')}</h2>
+      <h2 className={sinTitulo ? 'solo-lectura' : 'subtitulo'} id="mis-talleres-titulo">{t('miEspacio.misTalleresTitulo')}</h2>
       <ul className="talleres">
         {mios.map((m) => {
           const espera = puedeDeclarar(m.estado) && Boolean(m.inscripcion_id);

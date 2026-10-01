@@ -84,7 +84,8 @@ beforeEach(() => {
     if (ruta === '/api/pagos/declarar') return json(respuestas.declarar.cuerpo, respuestas.declarar.status);
     return json({});
   }));
-  window.history.replaceState(null, '', '/mi-espacio');
+  /* #29: «Mis talleres» vive en su propia pantalla. */
+  window.history.replaceState(null, '', '/mis-talleres');
   window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 });
 
@@ -211,10 +212,18 @@ describe('un naranja por pantalla (D26)', () => {
     expect(naranjas()).toEqual([t('miEspacio.comprobante.enviar')]);
   });
 
-  it('con el pago en revisión, el naranja vuelve a «Me anoto»', async () => {
+  it('#29: con el pago en revisión, Mis talleres no tiene naranja — no hay nada que pagar', async () => {
     respuestas.talleres = { abiertos: [abierto], mios: [mio({ estado: 'en_revision' })], cobro: COBRO };
     render(<App />);
     await screen.findByText('Comprobante recibido, lo estamos revisando');
+    expect(naranjas()).toEqual([]);
+  });
+
+  it('#29: «Me anoto» lleva su naranja en Talleres, que es su pantalla, aunque haya un pago pendiente', async () => {
+    respuestas.talleres = { abiertos: [abierto], mios: [mio()], cobro: COBRO };
+    window.history.replaceState(null, '', '/talleres');
+    render(<App />);
+    await screen.findAllByRole('button', { name: t('miEspacio.meAnoto') });
     expect(naranjas()).toEqual([t('miEspacio.meAnoto')]);
   });
 });

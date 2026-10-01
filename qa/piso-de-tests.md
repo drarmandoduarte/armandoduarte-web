@@ -18,15 +18,29 @@ alguien lo va a leer en el PR. Ése es el punto.
 | paquete | piso |
 |---|---|
 | `@codice/ui` | 31 |
-| `@codice/core` | 39 |
+| `@codice/core` | 96 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 107 |
 | `@codice/web` | 63 |
-| `@codice/familia` | 89 |
+| `@codice/familia` | 160 |
 | `@codice/api` | 70 |
 | `@codice/navegador` | 40 |
 
 
+
+## Lo que trae la orden #29 — `core` 39 → 96, `familia` 89 → 160
+
+- **`@codice/core`**: `src/mi-espacio/marco.test.ts` (+11) — `necesitaEmpezar`,
+  `faltanEnLaFicha`, `proximoTaller`, `edicionesVigentes`, `validarEmpezar` y
+  `empezarParaEnviar`. El resto de la diferencia son los tests de la #27 (C y
+  D: comprobante y perfil), que entraron sin subir el piso; se suben acá para
+  que un archivo que desaparezca se note.
+- **`@codice/familia`**: `src/comun/el-marco.test.tsx` (+12: la barra para
+  cliente y equipo, el activo por ruta, navegar sin recargar, plegar que se
+  recuerda, el cajón con el foco atrapado, Inicio), los casos de `/empezar` en
+  `acento-y-ruta.test.ts` (+5) y en `me-anoto.test.tsx` (+3). Mutaciones:
+  quitar el chequeo de datos → caen 2; el panel para todos → caen 2; sin trampa
+  de foco → cae 1; sin guardar el plegado → cae 1. Más los de la #27.
 
 ## Lo que trae la orden #24 A — `db` 87 → 107, `core` 23 → 39, `api` 62 → 70, `familia` 83 → 89
 

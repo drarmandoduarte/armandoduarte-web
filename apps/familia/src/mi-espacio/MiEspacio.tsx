@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  NIVELES_EDUCATIVOS, edadDesdeAnio, edicionElegida, edicionPrincipal, paisesParaElegir, perfilParaEnviar,
-  principalDeMiEspacio, puedeDeclarar, validarPerfil, type CampoDelPerfil, type PerfilEntrada,
+  NIVELES_EDUCATIVOS, edadDesdeAnio, paisesParaElegir, perfilParaEnviar, puedeDeclarar, validarPerfil,
+  type CampoDelPerfil, type PerfilEntrada,
 } from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
-import { BotonPrincipal, Campo, Pantalla, Selector, Titulo } from '../comun/Piezas';
+import { BotonPrincipal, Campo, Selector, Titulo } from '../comun/Piezas';
+import { CabeceraDeContenido } from '../comun/Marco';
+import { EnlaceInterno, useNavegar } from '../comun/navegacion';
 import { RUTAS, WEB } from '../rutas';
 import {
   ConfirmacionDeLugar, MisTalleres, TalleresAbiertos, type Confirmacion, type TallerAbierto, type TallerMio,
@@ -13,21 +15,24 @@ import {
 import type { Cobro } from './Comprobante';
 
 /**
- * PANTALLA 5 · `/mi-espacio` — lo mínimo de la #15.
+ * Las pantallas de Mi espacio por dentro — orden #29, B.
  *
- * Saludo, los datos que falten, cerrar sesión. Y si es equipo, además
- * Seguridad: cuántos códigos de respaldo quedan, regenerarlos y cerrar las
- * otras sesiones.
+ * Hasta la #28 todo esto era **una** pantalla (`/mi-espacio`): saludo, talleres
+ * abiertos, mis talleres, tus datos, seguridad y cerrar sesión, apilados. La
+ * #29 lo reparte en los lugares de la barra lateral, **cada uno tal cual era**:
  *
- * ── Lo que sumó la #24 B ────────────────────────────────────────────────
- * Arriba de «Tus datos»: **«Talleres abiertos»** (con «Me anoto») y **«Mis
- * talleres»** (solo si hay alguno: a quien recién entra no se le muestra una
- * lista vacía debajo de la otra). Al anotarse, la confirmación con la
- * referencia y los datos para transferir ocupa el lugar de la lista.
+ *   · `/talleres` — «Talleres abiertos» de la #24 B, con «Me anoto»;
+ *   · `/mis-talleres` — «Mis talleres» de la #24 B + #27 C (estado, comprobante);
+ *   · `/mis-datos` — «Tus datos» de la #18 + #27 D y, para el equipo, Seguridad;
+ *   · Inicio (`/mi-espacio`) es nuevo y vive en `Inicio.tsx`.
  *
- * ── Lo que sumó la #27 C ────────────────────────────────────────────────
- * En «Mis talleres», el pago de cada uno: el estado con palabras de persona,
- * «Ya transferí, subo mi comprobante» y «Ver mi comprobante».
+ * «Cerrar sesión» pasó a la barra («Salir»). El marco lo pone `App.tsx`.
+ *
+ * ── Un naranja por pantalla (D26), ahora que son varias ─────────────────
+ * Cada pantalla tiene su acción principal y nada más: en Talleres, «Me anoto»;
+ * en Mis talleres, pagar lo que se debe; en Mis datos, «Guardar». Lo que antes
+ * decidía `principalDeMiEspacio()` entre las tres ya no hace falta decidirlo:
+ * no están en la misma pantalla.
  */
 /** Lo que trae `GET /api/talleres`, con su estado de carga. Nunca «cargando» para siempre (#22): un fallo es `error`. */
 type Talleres =
@@ -35,7 +40,7 @@ type Talleres =
   | { estado: 'error' }
   | { estado: 'listo'; abiertos: TallerAbierto[]; mios: TallerMio[]; cobro: Cobro | null };
 
-function useTalleres() {
+export function useTalleres() {
   const [talleres, setTalleres] = useState<Talleres>({ estado: 'cargando' });
   const leer = useCallback(async () => {
     try {
@@ -49,75 +54,48 @@ function useTalleres() {
   return { talleres, leer };
 }
 
-export function MiEspacio({
-  yo,
-  slugElegido = null,
-  alSalir,
-  alRegenerar,
-  recargar,
-}: {
+/** Cargando o error, igual en las dos pantallas de talleres. */
+function EstadoDeLaLista({ talleres, leer }: { talleres: Talleres; leer: () => Promise<void> }) {
+  const { t } = useTranslation();
+  if (talleres.estado === 'cargando') {
+    return <section className="seccion"><p className="nota" role="status">{t('miEspacio.talleresCargando')}</p></section>;
+  }
+  return (
+    <section className="seccion">
+      <p className="error" role="alert">{t('miEspacio.talleresError')}</p>
+      <div className="fila">
+        <button type="button" className="btn btn--ancho" onClick={() => void leer()}>{t('comun.reintentar')}</button>
+      </div>
+    </section>
+  );
+}
+
+/** `/talleres` y `/me-anoto/<slug>`: los talleres abiertos, y al anotarse, la confirmación. */
+export function PaginaDeTalleres({ yo, slugElegido = null, recargar }: {
   yo: Yo;
   /** El taller de `/me-anoto/<slug>`, si se llegó por ahí (#24 B). */
   slugElegido?: string | null;
-  alSalir: () => void;
-  /** Sube los códigos nuevos a `App`, que es quien muestra la pantalla 4. */
-  alRegenerar: (codigos: string[]) => void;
   recargar: () => Promise<void>;
 }) {
   const { t } = useTranslation();
-  const esEquipo = yo.tipo === 'equipo';
+  const navegar = useNavegar();
   const { talleres, leer } = useTalleres();
   const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
 
-  /* D26: un naranja por pantalla. Lo decide `principalDeMiEspacio()` (#27 C):
-     si vino por `/me-anoto/<slug>`, «Me anoto»; si no, pagar lo que debe va
-     antes que anotarse a otro, y anotarse antes que «Guardar». Y si la persona
-     abre un paso (anotarse o subir el comprobante), ése pasa a ser el foco. */
-  const [foco, setFoco] = useState<'me-anoto' | 'pago' | null>(null);
-  const hayMeAnotoPrincipal = talleres.estado === 'listo'
-    && edicionPrincipal(talleres.abiertos, edicionElegida(talleres.abiertos, slugElegido)?.edicion_id ?? null) !== null;
-  const hayPagoPendiente = talleres.estado === 'listo'
-    && talleres.mios.some((m) => puedeDeclarar(m.estado) && Boolean(m.inscripcion_id));
-  const principal = confirmacion
-    ? null
-    : foco ?? principalDeMiEspacio({ vinoAAnotarse: Boolean(slugElegido), hayMeAnoto: hayMeAnotoPrincipal, hayPagoPendiente });
-
   return (
-    <Pantalla>
-      <Titulo
-        texto={yo.persona?.nombre
-          ? t('miEspacio.saludo', { nombre: yo.persona.nombre })
-          : t('miEspacio.saludoSinNombre')}
-      />
-      <p className="bajada">{t('miEspacio.bajada')}</p>
-      {/* #24 A: a quien es del equipo le aparece arriba la entrada al panel. */}
-      {esEquipo ? (
-        <p className="u-mt-4">
-          <a href={RUTAS.equipo} className="btn btn--ancho">{t('miEspacio.panelDelEquipo')} <span aria-hidden="true">→</span></a>
-        </p>
-      ) : null}
-
+    <>
+      <CabeceraDeContenido titulo={<Titulo texto={t('paginas.talleres')} />} bajada={t('paginas.talleresBajada')} />
       {confirmacion ? (
-        <ConfirmacionDeLugar c={confirmacion} yo={yo} alCerrar={() => setConfirmacion(null)} />
-      ) : talleres.estado === 'cargando' ? (
-        <section className="seccion"><p className="nota" role="status">{t('miEspacio.talleresCargando')}</p></section>
-      ) : talleres.estado === 'error' ? (
-        <section className="seccion">
-          <h2 className="subtitulo">{t('miEspacio.talleresTitulo')}</h2>
-          <p className="error" role="alert">{t('miEspacio.talleresError')}</p>
-          <div className="fila">
-            <button type="button" className="btn btn--ancho" onClick={() => void leer()}>{t('comun.reintentar')}</button>
-          </div>
-        </section>
+        <ConfirmacionDeLugar c={confirmacion} yo={yo} alCerrar={() => navegar(RUTAS.misTalleres)} />
+      ) : talleres.estado !== 'listo' ? (
+        <EstadoDeLaLista talleres={talleres} leer={leer} />
       ) : (
         <TalleresAbiertos
           talleres={talleres.abiertos}
           slugElegido={slugElegido}
           yo={yo}
-          naranja={principal === 'me-anoto'}
-          alAbrir={() => setFoco('me-anoto')}
+          sinTitulo
           alConfirmar={(c) => {
-            setFoco(null);
             setConfirmacion(c);
             window.scrollTo({ top: 0 });
             /* La ficha pudo cambiar (nombre, apellido, WhatsApp) y la lista
@@ -128,26 +106,52 @@ export function MiEspacio({
           alCambiar={() => void leer()}
         />
       )}
-      {talleres.estado === 'listo' && talleres.mios.length > 0 ? (
+    </>
+  );
+}
+
+/** `/mis-talleres`: mis inscripciones, su estado y el comprobante (#24 B + #27 C). */
+export function PaginaDeMisTalleres({ yo }: { yo: Yo }) {
+  const { t } = useTranslation();
+  const { talleres, leer } = useTalleres();
+  return (
+    <>
+      <CabeceraDeContenido titulo={<Titulo texto={t('paginas.misTalleres')} />} bajada={t('paginas.misTalleresBajada')} />
+      {talleres.estado !== 'listo' ? (
+        <EstadoDeLaLista talleres={talleres} leer={leer} />
+      ) : talleres.mios.length === 0 ? (
+        <section className="seccion">
+          <p className="nota">{t('paginas.misTalleresVacio')}</p>
+          <p className="u-mt-4"><EnlaceInterno a={RUTAS.talleres} className="enlace">{t('paginas.verTalleres')} →</EnlaceInterno></p>
+        </section>
+      ) : (
         <MisTalleres
           mios={talleres.mios}
           yo={yo}
           cobro={talleres.cobro}
-          naranja={principal === 'pago'}
-          alAbrir={() => setFoco('pago')}
-          alDeclarar={() => { setFoco(null); void leer(); }}
+          sinTitulo
+          naranja={talleres.mios.some((m) => puedeDeclarar(m.estado) && Boolean(m.inscripcion_id))}
+          alDeclarar={() => void leer()}
         />
-      ) : null}
+      )}
+    </>
+  );
+}
 
-      <SeccionDeDatos yo={yo} recargar={recargar} principal={principal === 'guardar'} />
-      {esEquipo ? <SeccionDeSeguridad alRegenerar={alRegenerar} /> : null}
-
-      <div className="seccion">
-        <button type="button" className="btn btn--ancho" onClick={alSalir}>
-          {t('comun.cerrarSesion')}
-        </button>
-      </div>
-    </Pantalla>
+/** `/mis-datos`: «Tus datos» (#18 + #27 D) y, para el equipo, Seguridad. */
+export function PaginaDeMisDatos({ yo, recargar, alRegenerar }: {
+  yo: Yo;
+  recargar: () => Promise<void>;
+  /** Sube los códigos nuevos a `App`, que es quien muestra la pantalla 4. */
+  alRegenerar: (codigos: string[]) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <>
+      <CabeceraDeContenido titulo={<Titulo texto={t('paginas.misDatos')} />} bajada={t('paginas.misDatosBajada')} />
+      <SeccionDeDatos yo={yo} recargar={recargar} principal />
+      {yo.tipo === 'equipo' ? <SeccionDeSeguridad alRegenerar={alRegenerar} /> : null}
+    </>
   );
 }
 
@@ -204,7 +208,7 @@ function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: () => P
 
   return (
     <section className="seccion" id="tus-datos" aria-labelledby="tus-datos-titulo">
-      <h2 className="subtitulo" id="tus-datos-titulo">{t('miEspacio.datosTitulo')}</h2>
+      <h2 className="solo-lectura" id="tus-datos-titulo">{t('miEspacio.datosTitulo')}</h2>
       {faltan ? <p className="nota">{t('miEspacio.datosFaltan')}</p> : null}
       <form onSubmit={guardar} noValidate>
         <Campo id="nombre" rotulo={t('miEspacio.nombre')} value={datos.nombre} autoComplete="given-name"

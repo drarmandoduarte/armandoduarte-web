@@ -69,3 +69,13 @@ export {
   validarPerfil, perfilParaEnviar, perfilIncompleto,
 } from './mi-espacio/perfil';
 export type { NivelEducativo, PerfilEntrada, CampoDelPerfil } from './mi-espacio/perfil';
+export {
+  DATOS_DE_LA_FICHA,
+  edicionesVigentes,
+  empezarParaEnviar,
+  validarEmpezar,
+  faltanEnLaFicha,
+  necesitaEmpezar,
+  proximoTaller,
+} from './mi-espacio/marco';
+export type { DatoDeLaFicha, EmpezarEntrada, CampoDeEmpezar } from './mi-espacio/marco';
