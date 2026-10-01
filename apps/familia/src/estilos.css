@@ -93,57 +93,70 @@ img,svg{display:block;max-width:100%}
 /* ── A · el panel de Armando, solo en `/entrar` y solo a ≥ 1100 ───────────
    Cuál de las dos imágenes existe lo decide `usarAncho()` en `Piezas.tsx`, no
    el CSS: una imagen escondida con `display:none` se descarga igual. */
-.retrato-chico{width:64px;height:64px;border-radius:50%;object-fit:cover;margin-bottom:24px;background:var(--calido)}
+.firma-apilada{font-family:var(--script);font-weight:400;font-size:var(--script-size);line-height:1.1;color:var(--tinta);margin-bottom:24px}
 
+/* ── /entrar y /empezar dentro de los márgenes (orden #30) ───────────────
+   Hasta la #30 el panel cálido sangraba hasta el borde izquierdo de la
+   pantalla (a 1918: x = 0 → 862) mientras la cabecera y el pie vivían en su
+   contenedor (x = 258 → 1660), y Armando medía 660 de ancho. Ahora toda la
+   pantalla respeta el mismo contenedor que la cabecera:
+
+     | margen | panel 45 % | 80 | formulario 55 % | margen |
+
+   donde «45 %» y «55 %» son del contenedor menos los 80 del medio, y el
+   contenedor es el mismo `min(90%, 1400px, 100% − 40px)` de `.cab__dentro` y
+   `.pie__dentro`. Las columnas salen de la grilla de `.marco`, así que el borde
+   izquierdo del panel ES el de la línea de la cabecera, no una copia de él.
+
+   La cabecera deja de ser absoluta (ya no hay nada que pase por detrás) y el
+   panel deja 24 px de aire contra su línea y contra la del pie. */
 @media (min-width:1100px){
-  .marco--con-armando{grid-template-columns:45fr 55fr;grid-template-rows:1fr auto}
-  .marco--con-armando .cab{position:absolute;inset:0 0 auto 0}
-  .marco--con-armando .panel{
-    display:flex;flex-direction:column;align-items:center;justify-content:space-between;
-    grid-column:1;grid-row:1;background:var(--calido);
-    padding:calc(72px + clamp(32px,6vh,72px)) 0 0;overflow:hidden;
+  .marco--con-armando{
+    --contenedor:min(90%,1400px,calc(100% - 40px));
+    grid-template-columns:minmax(0,1fr) calc((var(--contenedor) - 80px) * .45) 80px calc((var(--contenedor) - 80px) * .55) minmax(0,1fr);
+    grid-template-rows:auto 1fr auto;
   }
-  .marco--con-armando .marco__principal{grid-column:2;grid-row:1;padding-top:calc(72px + 40px)}
-  /* El pie, de lado a lado (B.10): el panel termina donde empieza, así que el
-     busto queda apoyado sobre la línea del pie. */
-  .marco--con-armando .pie{grid-column:1 / -1;grid-row:2;padding-top:24px}
+  .marco--con-armando .cab{grid-column:1 / -1;grid-row:1}
+  .marco--con-armando .panel{
+    grid-column:2;grid-row:2;margin-top:24px;
+    display:flex;flex-direction:column;align-items:center;
+    background:var(--calido);border-radius:12px;overflow:hidden;
+    /* La firma, a la misma altura que tenía (la cabecera más 6vh): el panel
+       ahora arranca 24 px más abajo. */
+    padding-top:calc(clamp(32px,6vh,72px) - 24px);
+    /* Alto: el de la fila, siempre (auditoría del PR #49). Se estira hasta el
+       pie, que trae sus 24 px de aire arriba de la línea; Armando no le aporta
+       altura (va en absoluto) y se escala a lo que haya. */
+  }
+  .marco--con-armando .marco__principal{grid-column:4;grid-row:2;justify-content:flex-start;padding:40px 0 56px}
+  .marco--con-armando .pie{grid-column:1 / -1;grid-row:3;padding-top:24px}
 }
 /* La firma, en la Great Vibes de la web. En `--tinta` y no en naranja: en esta
    pantalla el naranja es del botón y de nadie más (D26). */
 .panel__firma{font-family:var(--script);font-weight:400;font-size:var(--script-size);line-height:1.1;color:var(--tinta);text-align:center;padding:0 32px}
-/* ── Armando de pie, debajo de la firma, cortado por el panel (orden #28) ──
-   Germán en el smoke del 1/10: el busto de la #18 era «demasiado grande». El
-   primer arreglo de la #28 lo achicó entero con `contain` y dejó a la vista
-   los dos cortes rectos de los brazos y un resto de silla (auditoría del PR
-   #46). Ahora es `de-pie`, la silueta con alfa de `#quien`:
+/* ── Armando: escalado por alto, el corte apoyado en el borde (orden #30) ──
+   Primera versión (PR #49): al 55 % del ancho, con el panel a la medida de
+   Armando; a 1920 eso dejaba una franja crema entre el panel y el pie. La
+   auditoría del CEO lo dio vuelta: **el panel llega siempre hasta 24 px sobre
+   la línea del pie y Armando se escala por alto**.
 
-   · la figura arranca en **y = 192** —la línea de la cabecera (72) más los
-     120 px que dejan pasar la firma, que termina en el 172 a 1440 y en el 183
-     a 1920— y llega al borde de abajo del panel;
-   · la imagen ocupa **el 78 % del ancho del panel, centrada** (auditoría del
-     PR #46): a todo el ancho los brazos se salían por los costados; al 78 %
-     terminan solos, con su alfa, dentro del cálido. Su alto sale del ancho;
-   · **la fila 55 del archivo** (donde arranca el pelo: 30–54 es un halo de
-     alfa ≤ 30, medido en la #28 A) cae en el borde de arriba de la figura.
-     Por eso `margin-top` negativo de 55/1400 **del ancho de la foto** (el
-     78 % del panel: un margen en % se mide sobre el ancho del contenedor, que
-     es el del panel) y no
-     `object-position: top`, que dejaría el halo arriba y el pelo 25 px más
-     abajo;
-   · el halo (filas 0–54) queda **por encima** de la figura, sin recortar:
-     sobre el cálido es una sombra suave, y recortarlo en el 192 dibujaba una
-     línea recta sobre la cabeza (se vio en la primera captura de esta
-     corrección). Abajo corta el panel, que ya es `overflow:hidden`: el corte
-     es su borde, y se lee como apoyo (la regla de la #19 B).
+   · La figura va de 48 px debajo de la firma al borde de abajo del panel.
+   · La foto mide `100% / (1 − 55/2791)` de ese alto, anclada abajo: la fila
+     55 del archivo (donde arranca el pelo; 30–54 es un halo de alfa ≤ 30,
+     #28 A) cae en el borde de arriba de la figura —48 px bajo la firma— y la
+     última fila (el corte, a la altura de los muslos) **en el borde del
+     panel**. El ancho sale del alto (`width:auto`), centrado.
+   · Tope: el 70 % del ancho de la columna. Medido, no manda ni a 1440×900
+     (55,6 %) ni a 1920×1080 (65,7 %); empieza a mandar cuando el alto de la
+     figura pasa de ~1,37 veces el ancho del panel (una pantalla de 2560×1440,
+     por ejemplo). Si manda, `contain` pinta a Armando más chico **pero
+     apoyado abajo**: el corte sigue en el borde y lo que crece es el aire
+     entre la firma y el pelo. Se eligió eso y no lo contrario (pelo a 48 y el
+     corte flotando), que es justo lo que la auditoría pidió evitar.
 
    Lo vigila `e2e/entrar-armando.spec.ts`. */
-.panel__foto{position:relative;flex:1 1 0;min-height:0;width:100%;margin-top:32px}
-.panel__armando{display:block;width:100%;height:auto}
-@media (min-width:1100px){
-  .marco--con-armando .panel{position:relative}
-  .marco--con-armando .panel__foto{position:absolute;top:calc(72px + 120px);bottom:0;left:0;right:0;margin-top:0}
-  .marco--con-armando .panel__armando{position:absolute;top:0;left:11%;width:78%;height:auto;margin-top:calc(-78% * 55 / 1400)}
-}
+.panel__foto{position:relative;width:100%;margin-top:48px;flex:1 1 0;min-height:0}
+.panel__armando{position:absolute;bottom:0;left:0;right:0;margin:0 auto;height:calc(100% / (1 - 55 / 2791));width:auto;max-width:70%;object-fit:contain;object-position:center bottom}
 
 .titulo{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,44px);line-height:1.1;letter-spacing:-.01em;color:var(--tinta);text-wrap:balance}
 /* La palabra acentuada (B.2): teal, nunca naranja — el naranja es del botón. */
