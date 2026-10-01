@@ -17,7 +17,7 @@ import { levantarBanco, migracionesEnOrden, type Banco } from './banco';
 /** Las diez tablas que la orden #13 deja. El número es medido, no estimado. */
 const TABLAS_ESPERADAS = [
   'auditoria', 'cursos', 'datos_de_cobro', 'ediciones', 'inscripciones',
-  'miembros', 'pagos_libro', 'personas', 'security_devices', 'totp_backup_codes',
+  'miembros', 'notas_de_persona', 'pagos_libro', 'personas', 'security_devices', 'totp_backup_codes',
 ];
 
 let banco: Banco;
@@ -85,10 +85,14 @@ const PENDIENTES: Record<string, string> = {
   '010_el_libro_en_el_panel.sql':
     'orden #27 C: el último renglón del libro y la firma del equipo para Inscriptos. La corre el CEO '
     + 'cuando se mergee el PR C: sin ella, Inscriptos no lista (la API la llama junto con la 008)',
+  '011_el_perfil.sql':
+    'orden #27 D: el perfil (ciudad, año de nacimiento, nivel educativo), las notas del equipo y '
+    + 'panel_clientes con las columnas nuevas. La corre el CEO ANTES de desplegar el PR D: sin ella, '
+    + 'GET /api/yo da 42703 y nadie entra a Mi espacio',
 };
 
 describe('las migraciones', () => {
-  it('son diez, numeradas de tres dígitos y en orden', async () => {
+  it('son once, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -100,6 +104,7 @@ describe('las migraciones', () => {
       '008_el_panel_del_equipo.sql',
       '009_me_anoto.sql',
       '010_el_libro_en_el_panel.sql',
+      '011_el_perfil.sql',
     ]);
   });
 
