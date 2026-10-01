@@ -69,12 +69,13 @@ regla que la próxima vez no va a frenar nada.
 
 ## Estado de las migraciones
 
-**LAS OCHO ESTÁN APLICADAS.** Las seis de la #13 el 29/9/2026 a las 02:34
+**LAS NUEVE ESTÁN APLICADAS.** Las seis de la #13 el 29/9/2026 a las 02:34
 (hora de Uruguay), desde el commit `fd93eab`; la 007 el mismo día a las 15:58,
 desde `c3a485e`, en su propia sesión; la 008 el 30/9/2026 a las 21:55, desde
 `db747a1` (`main` con el PR #37), y tres minutos después la semilla
 `semillas/001_taller_de_merida.sql` (guardada en el editor como
-`semilla_02_taller_de_merida`). Todas en `armandoduarte-familia`, corridas por el
+`semilla_02_taller_de_merida`); la 009 el 30/9/2026 a las 23:35, desde `965b812`
+(la rama del PR #39, antes del merge). Todas en `armandoduarte-familia`, corridas por el
 CEO con autorización de Germán.
 
 | # | archivo | qué trae | aplicada |
@@ -87,6 +88,7 @@ CEO con autorización de Germán.
 | 006 | `006_storage_comprobantes.sql` | el bucket privado `comprobantes` y sus policies | **29/9/2026 02:34** |
 | 007 | `007_permisos.sql` | los `grant` de tabla, secuencia y función que el proyecto no da solo | **29/9/2026 15:58** |
 | 008 | `008_el_panel_del_equipo.sql` | las cuatro consultas del panel `/equipo` (orden #24 A), sin tablas ni policies nuevas | **30/9/2026 21:55** |
+| 009 | `009_me_anoto.sql` | el cupo cumplido por la base y las tres consultas de «me anoto» (orden #24 B) | **30/9/2026 23:35** |
 
 Las siete quedaron guardadas en el editor SQL de Supabase con el nombre de su
 archivo (`001_personas_y_miembros` … `007_permisos`).

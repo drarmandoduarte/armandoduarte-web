@@ -79,10 +79,9 @@ const PENDIENTES: Record<string, string> = {
      acá vacía porque la próxima migración pendiente tiene que volver a
      escribirse, no inventarse un mecanismo nuevo. (Y otra vez el 30/9 a las
      21:55, con la 008: completada su cabecera en la #24 B, el rojo pidió
-     borrar esta fila.) */
-  '009_me_anoto.sql':
-    'orden #24 B: el cupo cumplido por la base y las tres consultas de «me anoto». La corre el CEO '
-    + 'cuando se mergee el PR, ANTES de que el preview se use: sin ella, Mi espacio no lista talleres',
+     borrar esta fila. Y una tercera el 1/10, con la 009 —corrida el 30/9 a
+     las 23:35, antes del merge del #39—: completada su cabecera en el PR C de
+     la #27, el rojo pidió borrar su fila.) */
 };
 
 describe('las migraciones', () => {
