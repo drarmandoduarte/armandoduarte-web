@@ -10,12 +10,13 @@ import { PUERTO } from '../playwright.config';
  *   · **el panel no sangra**: su borde izquierdo es el del contenedor, el de
  *     la línea de la cabecera;
  *   · 80 px del panel a la columna del formulario;
- *   · 24 px de aire, como mínimo, contra la línea de la cabecera y la del pie;
+ *   · 24 px de aire, como mínimo, contra la línea de la cabecera, y **el panel
+ *     llega siempre a 24 px ±1 de la línea del pie** (auditoría del PR #49);
  *   · esquinas de 12 px;
- *   · Armando (`de-pie`) al **55 % ±1** del ancho del panel, centrado;
+ *   · Armando (`de-pie`) escalado por alto, centrado: **el corte del archivo
+ *     apoyado en el borde del panel ±1, o el ancho en su tope del 70 %**;
  *   · **el pelo** (fila 55 del archivo) a **48 px ±1** del borde de abajo de la
- *     firma;
- *   · el corte de abajo es el borde del panel (la foto llega hasta él);
+ *     firma, mientras el tope no mande;
  *   · nada se cruza: la firma con el pelo, el panel con el formulario.
  *
  * Qué NO mira: `/empezar`, que usa el mismo molde (`Pantalla conArmando`) pero
@@ -37,7 +38,7 @@ const ALTO_DEL_ARCHIVO = 2791;
 const FILA_DEL_PELO = 55;
 
 for (const vp of VIEWPORTS) {
-  test(`/entrar a ${vp.width}×${vp.height}: el panel dentro del contenedor y Armando al 55 %`, async ({ page }) => {
+  test(`/entrar a ${vp.width}×${vp.height}: el panel dentro del contenedor, hasta el pie, y Armando apoyado en su borde`, async ({ page }) => {
     await page.setViewportSize(vp);
     await page.goto(`http://127.0.0.1:${PUERTO}/entrar`, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
@@ -61,6 +62,7 @@ for (const vp of VIEWPORTS) {
         columna: caja('.columna'),
         firma: caja('.panel__firma'),
         img: caja('.panel img'),
+        ajuste: getComputedStyle(img).objectFit,
       };
     });
 
@@ -73,19 +75,31 @@ for (const vp of VIEWPORTS) {
     expect(Math.abs(m.panel.left - m.cabecera.left), `el panel sangra fuera del contenedor: arranca en x=${m.panel.left.toFixed(1)} y la línea de la cabecera en x=${m.cabecera.left.toFixed(1)}`).toBeLessThanOrEqual(0.5);
     expect(Math.abs(m.columna.left - (m.panel.right + 80)), `del panel (${m.panel.right.toFixed(1)}) al formulario (${m.columna.left.toFixed(1)}) no hay 80 px`).toBeLessThanOrEqual(1);
     expect(m.panel.top, `el panel arranca ${(m.panel.top - m.cabecera.bottom).toFixed(1)} px debajo de la línea de la cabecera (mínimo 24)`).toBeGreaterThanOrEqual(m.cabecera.bottom + 24 - 0.5);
-    expect(m.panel.bottom, `el panel termina ${(m.pie.top - m.panel.bottom).toFixed(1)} px arriba de la línea del pie (mínimo 24)`).toBeLessThanOrEqual(m.pie.top - 24 + 0.5);
+    expect(Math.abs(m.panel.bottom - (m.pie.top - 24)), `el panel termina ${(m.pie.top - m.panel.bottom).toFixed(1)} px arriba de la línea del pie (tiene que llegar a 24)`).toBeLessThanOrEqual(1);
     expect(m.radio, 'las esquinas del panel').toBe('12px');
 
-    expect(Math.abs(m.img.width - 0.55 * m.panel.width), `Armando mide ${m.img.width.toFixed(1)} de ancho y el 55 % del panel es ${(0.55 * m.panel.width).toFixed(1)}`).toBeLessThanOrEqual(1);
+    /* Lo pintado y no la caja: con `contain`, si el tope del 70 % manda, la
+       caja es más alta que Armando. */
+    const escala = m.ajuste === 'contain'
+      ? Math.min(m.img.width / 1400, m.img.height / ALTO_DEL_ARCHIVO)
+      : m.img.height / ALTO_DEL_ARCHIVO;
+    const pintado = { width: 1400 * escala, height: ALTO_DEL_ARCHIVO * escala, bottom: m.img.bottom };
+    const enElTope = Math.abs(pintado.width - 0.7 * m.panel.width) <= 1;
+    expect(pintado.width, `Armando mide ${pintado.width.toFixed(1)} de ancho y el tope es el 70 % (${(0.7 * m.panel.width).toFixed(1)})`).toBeLessThanOrEqual(0.7 * m.panel.width + 1);
+    expect(
+      Math.abs(pintado.bottom - m.panel.bottom) <= 1 || enElTope,
+      `el corte del archivo no se apoya en el borde del panel: termina en ${pintado.bottom.toFixed(1)} y el panel en ${m.panel.bottom.toFixed(1)}`,
+    ).toBe(true);
     expect(Math.abs((m.img.left + m.img.right) / 2 - (m.panel.left + m.panel.right) / 2), 'Armando no está centrado en el panel').toBeLessThanOrEqual(1);
 
-    const pelo = m.img.top + FILA_DEL_PELO * (m.img.height / ALTO_DEL_ARCHIVO);
-    expect(Math.abs(pelo - (m.firma.bottom + 48)), `el pelo está ${(pelo - m.firma.bottom).toFixed(1)} px debajo de la firma (48)`).toBeLessThanOrEqual(1);
-    expect(m.img.bottom, 'la foto termina antes del borde del panel: el corte no es el del panel').toBeGreaterThanOrEqual(m.panel.bottom - 1);
+    const pelo = pintado.bottom - pintado.height + FILA_DEL_PELO * escala;
+    if (!enElTope) {
+      expect(Math.abs(pelo - (m.firma.bottom + 48)), `el pelo está ${(pelo - m.firma.bottom).toFixed(1)} px debajo de la firma (48)`).toBeLessThanOrEqual(1);
+    }
 
     expect(m.firma.bottom, 'la firma se cruza con el pelo').toBeLessThanOrEqual(pelo);
     expect(m.panel.right, 'el panel se cruza con el formulario').toBeLessThan(m.columna.left);
 
-    console.log(`${vp.width}: panel x ${m.panel.left.toFixed(0)}–${m.panel.right.toFixed(0)}, y ${m.panel.top.toFixed(0)}–${m.panel.bottom.toFixed(0)} · cabecera ${m.cabecera.left.toFixed(0)}/${m.cabecera.bottom.toFixed(0)} · pie ${m.pie.top.toFixed(0)} · formulario x ${m.columna.left.toFixed(0)} · Armando ${m.img.width.toFixed(0)} (${(100 * m.img.width / m.panel.width).toFixed(1)} %) · pelo ${(pelo - m.firma.bottom).toFixed(1)} bajo la firma`);
+    console.log(`${vp.width}: panel x ${m.panel.left.toFixed(0)}–${m.panel.right.toFixed(0)}, y ${m.panel.top.toFixed(0)}–${m.panel.bottom.toFixed(0)} · cabecera ${m.cabecera.left.toFixed(0)}/${m.cabecera.bottom.toFixed(0)} · pie ${m.pie.top.toFixed(0)} · formulario x ${m.columna.left.toFixed(0)} · Armando ${pintado.width.toFixed(0)}×${pintado.height.toFixed(0)} (${(100 * pintado.width / m.panel.width).toFixed(1)} %${enElTope ? ', en el tope' : ''}), corte en ${pintado.bottom.toFixed(1)} · pelo ${(pelo - m.firma.bottom).toFixed(1)} bajo la firma`);
   });
 }

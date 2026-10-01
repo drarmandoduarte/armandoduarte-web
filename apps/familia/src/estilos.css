@@ -118,17 +118,15 @@ img,svg{display:block;max-width:100%}
   }
   .marco--con-armando .cab{grid-column:1 / -1;grid-row:1}
   .marco--con-armando .panel{
-    grid-column:2;grid-row:2;align-self:start;margin-top:24px;
+    grid-column:2;grid-row:2;margin-top:24px;
     display:flex;flex-direction:column;align-items:center;
     background:var(--calido);border-radius:12px;overflow:hidden;
     /* La firma, a la misma altura que tenía (la cabecera más 6vh): el panel
        ahora arranca 24 px más abajo. */
     padding-top:calc(clamp(32px,6vh,72px) - 24px);
-    /* Alto: el de su contenido (la firma y Armando), con techo en lo que queda
-       de pantalla: 72 de cabecera, 24 de aire y 86 del pie, que ya trae sus
-       24 de aire arriba de la línea (24 + 18 + 1 + 18,7 de texto + 24 de
-       abajo, medido a 1440). Ver «Armando» abajo. */
-    max-height:calc(100svh - 72px - 24px - 86px);
+    /* Alto: el de la fila, siempre (auditoría del PR #49). Se estira hasta el
+       pie, que trae sus 24 px de aire arriba de la línea; Armando no le aporta
+       altura (va en absoluto) y se escala a lo que haya. */
   }
   .marco--con-armando .marco__principal{grid-column:4;grid-row:2;justify-content:flex-start;padding:40px 0 56px}
   .marco--con-armando .pie{grid-column:1 / -1;grid-row:3;padding-top:24px}
@@ -136,27 +134,29 @@ img,svg{display:block;max-width:100%}
 /* La firma, en la Great Vibes de la web. En `--tinta` y no en naranja: en esta
    pantalla el naranja es del botón y de nadie más (D26). */
 .panel__firma{font-family:var(--script);font-weight:400;font-size:var(--script-size);line-height:1.1;color:var(--tinta);text-align:center;padding:0 32px}
-/* ── Armando: al 55 %, centrado, el pelo a 48 px de la firma (orden #30) ──
-   La silueta `de-pie` de la #28 B, más chica: **55 % del ancho de la
-   columna**, centrada. **La fila 55 del archivo** (donde arranca el pelo;
-   30–54 es un halo de alfa ≤ 30, medido en la #28 A) queda a **48 px** del
-   borde de abajo de la firma: la figura empieza 48 px debajo de la firma y la
-   foto sube 55/1400 de su ancho (`margin-top` en %, que se mide sobre el ancho
-   de la figura: 55 % de él). El halo queda en esos 48 px, como sombra suave.
+/* ── Armando: escalado por alto, el corte apoyado en el borde (orden #30) ──
+   Primera versión (PR #49): al 55 % del ancho, con el panel a la medida de
+   Armando; a 1920 eso dejaba una franja crema entre el panel y el pie. La
+   auditoría del CEO lo dio vuelta: **el panel llega siempre hasta 24 px sobre
+   la línea del pie y Armando se escala por alto**.
 
-   **El corte de abajo es el borde del panel**, siempre, y por eso el panel
-   mide lo que mide su contenido en vez de estirarse hasta el pie:
-   · a 1440×900 y a 1920×1080 Armando entra entero (termina en el 808 y en el
-     869): con un panel estirado hasta el pie, el corte recto del archivo (a
-     la altura de los muslos) quedaba flotando 30 y 125 px por encima del
-     borde. Con el panel a la medida, el borde de abajo del panel es el corte
-     del archivo, y debajo queda crema hasta el pie;
-   · en una pantalla más baja (1440×800, por ejemplo) no entra, y el techo
-     del panel (`max-height`) lo corta 24 px arriba de la línea del pie.
+   · La figura va de 48 px debajo de la firma al borde de abajo del panel.
+   · La foto mide `100% / (1 − 55/2791)` de ese alto, anclada abajo: la fila
+     55 del archivo (donde arranca el pelo; 30–54 es un halo de alfa ≤ 30,
+     #28 A) cae en el borde de arriba de la figura —48 px bajo la firma— y la
+     última fila (el corte, a la altura de los muslos) **en el borde del
+     panel**. El ancho sale del alto (`width:auto`), centrado.
+   · Tope: el 70 % del ancho de la columna. Medido, no manda ni a 1440×900
+     (55,6 %) ni a 1920×1080 (65,7 %); empieza a mandar cuando el alto de la
+     figura pasa de ~1,37 veces el ancho del panel (una pantalla de 2560×1440,
+     por ejemplo). Si manda, `contain` pinta a Armando más chico **pero
+     apoyado abajo**: el corte sigue en el borde y lo que crece es el aire
+     entre la firma y el pelo. Se eligió eso y no lo contrario (pelo a 48 y el
+     corte flotando), que es justo lo que la auditoría pidió evitar.
 
    Lo vigila `e2e/entrar-armando.spec.ts`. */
-.panel__foto{position:relative;width:100%;margin-top:48px;flex:none}
-.panel__armando{display:block;width:55%;height:auto;margin:calc(-55% * 55 / 1400) auto 0}
+.panel__foto{position:relative;width:100%;margin-top:48px;flex:1 1 0;min-height:0}
+.panel__armando{position:absolute;bottom:0;left:0;right:0;margin:0 auto;height:calc(100% / (1 - 55 / 2791));width:auto;max-width:70%;object-fit:contain;object-position:center bottom}
 
 .titulo{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,44px);line-height:1.1;letter-spacing:-.01em;color:var(--tinta);text-wrap:balance}
 /* La palabra acentuada (B.2): teal, nunca naranja — el naranja es del botón. */

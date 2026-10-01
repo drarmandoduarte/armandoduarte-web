@@ -8,30 +8,35 @@ Capturas antes/después de `/entrar` a 1440, 1920 y 390, más `/empezar` despué
   - El borde izquierdo del panel es el de la línea de la cabecera.
   - El panel tiene esquinas de 12 px y deja 24 px de aire bajo la cabecera.
   - El formulario arranca 80 px después del panel.
-- **Armando** (la silueta `de-pie`) va al **55 %** del ancho del panel, centrado, con el pelo (fila 55) a **48 px** de la firma. La firma no se movió.
-- **Panel a la medida, no estirado.** A 1440 y a 1920 Armando entra entero. Si el panel se estirara hasta el pie, el corte recto del archivo (a los muslos) quedaría flotando 30 y 125 px por encima del borde. Por eso el panel mide lo que mide su contenido y su borde inferior es el corte. Tiene un techo (24 px sobre la línea del pie) que lo corta solo en pantallas más bajas.
+- **Ajuste de la auditoría del PR #49: el panel llega siempre hasta 24 px sobre la línea del pie y Armando se escala por alto.** La figura va de 48 px bajo la firma al borde del panel. La foto mide `100% / (1 − 55/2791)` de ese alto, anclada abajo: la fila 55 (el pelo) cae 48 px bajo la firma y la última fila (el corte del archivo) en el borde del panel. El ancho sale del alto, centrado, con tope en el 70 % de la columna. La firma no se movió.
 - **Apilado (< 1100): firma arriba del formulario, sin foto.** La foto al 40 % no entra: con ella y la firma, a 390×844 «Enviarme el código» bajaba de y = 627 a ≈ 890, por debajo del pliegue. Sin foto queda en y = 570. Se fue el retrato redondo de 64 px.
 
-| | panel x | panel y | línea cabecera | línea pie | formulario x | Armando | pelo bajo la firma |
+| | panel x | panel y | línea pie | formulario x | Armando | corte | pelo bajo la firma |
 |---|---|---|---|---|---|---|---|
-| 1440×900 | 72–619 | 96–808 | 72 / 72 | 838 | 699 | 301 (55,0 %) | 48,0 |
-| 1920×1080 | 260–854 | 96–869 | 260 / 72 | 1018 | 934 | 327 (55,0 %) | 48,0 |
+| 1440×900 | 72 (= cabecera) – 619 | 96–814 | 838 | 699 | 304×606 (55,6 %) | 814,3 = borde | 48,0 |
+| 1920×1080 | 260 (= cabecera) – 854 | 96–994 | 1018 | 934 | 391×779 (65,8 %) | 994,3 = borde | 48,0 |
+| 2560×1440 | — | — | — | — | 416 (**70,0 %, tope**) | = borde | **352** |
 
 ## Test
 
-`apps/familia/e2e/entrar-armando.spec.ts`, reescrito para la #30, a 1440 y 1920. Comprueba:
+`apps/familia/e2e/entrar-armando.spec.ts`, a 1440 y 1920. Comprueba:
 - `panel.left = cabecera.left` (±0,5) y `panel.right + 80 = formulario.left` (±1);
-- 24 px como mínimo contra las dos líneas, y radio de 12 px;
-- Armando al 55 % ±1 y centrado, y el pelo a 48 ±1 bajo la firma;
-- que la foto llega al borde del panel y que nada se cruza.
+- **`panel.bottom = pie.top − 24` (±1)**, al menos 24 px bajo la cabecera, y radio de 12 px;
+- con el rectángulo **pintado** (con `contain` la caja no es lo que se ve): **el corte apoyado en el borde del panel (±1), o el ancho en el tope del 70 %**, y nunca más que el tope;
+- Armando centrado, y el pelo a 48 ±1 bajo la firma mientras el tope no mande;
+- que nada se cruza.
 
-**Mutación:** con el panel a todo el ancho (`grid-column: 1 / 3`) cae en «el panel sangra fuera del contenedor: arranca en x=0.0 y la línea de la cabecera en x=72.0» (y x=260.0 a 1920). Al devolverlo, verde.
+**Mutaciones:**
+- con el panel a todo el ancho cae en «el panel sangra fuera del contenedor: arranca en x=0.0 y la línea de la cabecera en x=72.0»;
+- **volviendo a «el panel mide lo que mide Armando»** (la versión anterior del PR) cae en «el panel termina 30.0 px arriba de la línea del pie (tiene que llegar a 24)» a 1440, y 148,9 a 1920.
+
+En los dos casos, al devolver el archivo volvió a verde.
 
 `la-entrada-a-la-altura.test.tsx` cambió: apilado ya no hay ninguna imagen de Armando, sí la firma.
 
 ## Lo que decide dirección
 
-1. **El corte a dos mitades sigue en 1100 px, no en 900.** Es el de la #18; la orden nombra «< 900» como apilado. Entre 900 y 1099 la pantalla también queda apilada (firma, sin foto). Bajarlo a 900 deja el formulario en una columna de ≈ 410 px al lado del panel: se puede, pero es otra decisión.
-2. **El formulario va alineado a la izquierda de su columna**, porque las 80 px se miden hasta él. A 1920 queda aire a la derecha.
-3. **A 1920 queda crema entre el borde del panel y el pie** (de 869 a 1018), porque el panel termina donde termina Armando. La alternativa es estirar el panel, y entonces el corte del archivo se ve flotando.
+1. *(aceptada)* El corte a dos mitades sigue en 1100 px.
+2. *(aceptada)* El formulario va alineado a la izquierda de su columna.
+3. **Cuando manda el tope del 70 %.** Pasa cuando el alto disponible supera ~1,37 veces el ancho del panel; en las pantallas medidas, solo a 2560×1440 (`entrar-2560-despues.jpg`). No se pueden cumplir las dos cosas: con el pelo a 48 px de la firma, Armando más angosto es más bajo y el corte quedaría flotando. Elegí que el corte siga apoyado en el borde (es lo que la auditoría pidió evitar) y lo que crece es el aire entre la firma y el pelo: **352 px a 2560×1440**. Si molesta, la salida es subir el tope (al 80 %, calculado, el aire baja a ≈ 236) o bajar la firma en pantallas altas: es decisión de dirección.
 4. `retrato-128.webp` quedó sin uso en `apps/familia/public`. No lo borré.
