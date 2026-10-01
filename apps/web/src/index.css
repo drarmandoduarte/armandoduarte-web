@@ -469,6 +469,23 @@ a,button{-webkit-tap-highlight-color:transparent}
 #facilitador .foto--libre,#quien .foto--libre{align-self:end;margin-bottom:0}
 #facilitador,#quien{padding-bottom:0}
 #facilitador .grid-2>div:last-child,#quien .grid-2>div:last-child{padding-bottom:clamp(96px,12vh,144px)}
+/* ── Armando a la altura del texto (orden #26) ───────────────────────────
+   Hasta acá la foto tenía su alto propio —el del archivo a 520 o 472 de
+   ancho— y la fila alineaba abajo, así que la foto y el texto nunca medían lo
+   mismo: en `#quien` Armando arrancaba 30 px por debajo del rótulo y en
+   `#facilitador` el rótulo 10 px por debajo de Armando (medido por el CEO a
+   2056). Ahora **manda el texto**: la figura se estira a la fila
+   (`align-self:stretch`) y la imagen va en absoluto adentro, así que no le
+   aporta un píxel de alto a la fila. La imagen mide el alto de la figura y el
+   ancho sale de ese alto (`width:auto`; el `de-pie` es 1400×2791), sin pasar de
+   la columna. Arriba toca el rótulo, abajo el filo de la sección; entera.
+   Se quita el tope de 520/472: a 1067 de alto el ancho natural es 535.
+   Solo desde 901 px: apilado no hay columna de texto al lado que igualar.
+   Lo vigila `e2e/armando-a-la-altura.spec.ts`. */
+@media (min-width:901px){
+  #facilitador .foto--libre,#quien .foto--libre{align-self:stretch;position:relative;max-width:none;width:100%}
+  #facilitador .foto--libre img,#quien .foto--libre img{position:absolute;left:0;bottom:0;width:auto;height:100%;max-width:100%;object-fit:contain;object-position:left bottom}
+}
 #porque .foto-tarjeta{max-width:480px}
 #programa .sello{margin-top:var(--s5)}
 #programa .lista--2{margin-top:0}
@@ -883,7 +900,7 @@ a,button{-webkit-tap-highlight-color:transparent}
    en ocre como en la captura de Lucía, sin tocar el velo ni el tamaño. El ocre
    no es un acento naranja, así que `check:acento` no tiene nada que decir. */
 
-/* ── La cita: tarjeta cálida translúcida, al 84 % ────────────────────────
+/* ── La cita: tarjeta cálida translúcida (al 84 % hasta la #26) ──────────
    Como en la captura de Lucía: se ve la remera del chico detrás. El 80 % y el
    `blur(6px)` son los de la orden, y se miden igual que todo lo demás. Sin
    barra lateral.
@@ -897,7 +914,11 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* Al 84 % la cita envuelve un renglón más y la sección pasaba a 905 px a
    1440×900 (`check:altura`). Por el orden de la #20 (A.5), primero los
    paddings verticales: 28 → 24 arriba y abajo devuelve los 5 px y 3 más. */
-@media (min-width:901px){.bloque-cita--ancha{max-width:84%;padding-block:24px}}
+/* #26: la cita pasa a **todo el ancho del contenedor**, como la lista de
+   arriba. Dirección, en el smoke de producción: «el banner en crema que ocupe
+   el mismo ancho que las cosas». Es la única `.bloque-cita--ancha` del sitio
+   (`taller/Suena.tsx`). El `padding-block` de 24 se queda. */
+@media (min-width:901px){.bloque-cita--ancha{max-width:none;padding-block:24px}}
 
 /* ── El ritmo de adentro de «¿Te suena?» a escritorio (de la #20 A) ─────
    El `gap` de la grilla a `--s5` y la cita con su margen. El padding de la
