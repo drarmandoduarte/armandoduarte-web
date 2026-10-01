@@ -10,6 +10,8 @@ import { RespaldoController } from './respaldo/respaldo.controller';
 import { SesionesController } from './sesiones/sesiones.controller';
 import { EquipoController } from './equipo/equipo.controller';
 import { EquipoRepositorio } from './equipo/equipo.repositorio';
+import { TalleresController } from './talleres/talleres.controller';
+import { TalleresRepositorio } from './talleres/talleres.repositorio';
 
 /**
  * El módulo raíz de la API de Mi espacio.
@@ -26,10 +28,11 @@ import { EquipoRepositorio } from './equipo/equipo.repositorio';
  * entra algo de esta app al kit; la tercera es `seguridad-512.config.ts`.
  */
 @Module({
-  controllers: [SaludController, YoController, RespaldoController, SesionesController, EquipoController],
+  controllers: [SaludController, YoController, RespaldoController, SesionesController, EquipoController, TalleresController],
   providers: [
     SupabaseService,
     EquipoRepositorio,
+    TalleresRepositorio,
     { provide: VERIFICADOR_DE_TOKEN, useExisting: SupabaseService },
     { provide: APP_GUARD, useClass: Aal2Guard },
   ],

@@ -44,6 +44,9 @@ export class YoController {
             apellido: persona.apellido,
             whatsapp: persona.whatsapp,
             pais: persona.pais,
+            /* #24 B: la fecha de un taller se escribe en la zona de la
+               edición y, si la persona vive en otra, también en la suya (D15). */
+            zona_horaria: persona.zona_horaria,
           }
         : null,
       rol,
