@@ -89,6 +89,7 @@ CEO con autorización de Germán.
 | 007 | `007_permisos.sql` | los `grant` de tabla, secuencia y función que el proyecto no da solo | **29/9/2026 15:58** |
 | 008 | `008_el_panel_del_equipo.sql` | las cuatro consultas del panel `/equipo` (orden #24 A), sin tablas ni policies nuevas | **30/9/2026 21:55** |
 | 009 | `009_me_anoto.sql` | el cupo cumplido por la base y las tres consultas de «me anoto» (orden #24 B) | **30/9/2026 23:35** |
+| 010 | `010_el_libro_en_el_panel.sql` | `libro_de_edicion()` y `firma_del_libro()`: el último renglón del libro para Inscriptos (orden #27 C), sin tablas ni policies nuevas | pendiente (la corre el CEO después del merge del PR C) |
 
 Las siete quedaron guardadas en el editor SQL de Supabase con el nombre de su
 archivo (`001_personas_y_miembros` … `007_permisos`).

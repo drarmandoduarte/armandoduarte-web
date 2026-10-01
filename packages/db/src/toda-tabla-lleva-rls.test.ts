@@ -82,10 +82,13 @@ const PENDIENTES: Record<string, string> = {
      borrar esta fila. Y una tercera el 1/10, con la 009 —corrida el 30/9 a
      las 23:35, antes del merge del #39—: completada su cabecera en el PR C de
      la #27, el rojo pidió borrar su fila.) */
+  '010_el_libro_en_el_panel.sql':
+    'orden #27 C: el último renglón del libro y la firma del equipo para Inscriptos. La corre el CEO '
+    + 'cuando se mergee el PR C: sin ella, Inscriptos no lista (la API la llama junto con la 008)',
 };
 
 describe('las migraciones', () => {
-  it('son nueve, numeradas de tres dígitos y en orden', async () => {
+  it('son diez, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -96,6 +99,7 @@ describe('las migraciones', () => {
       '007_permisos.sql',
       '008_el_panel_del_equipo.sql',
       '009_me_anoto.sql',
+      '010_el_libro_en_el_panel.sql',
     ]);
   });
 
