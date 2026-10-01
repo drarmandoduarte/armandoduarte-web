@@ -27,3 +27,8 @@ Capturas: `apps/familia/check/capturas-27-d.mjs` (1440 y 390; `/privacidad#perfi
 - **Correr la 011 ANTES de desplegar este PR** (snippet `011_el_perfil`): la API nueva lee las columnas en `GET /api/yo` y sin ellas nadie entra a Mi espacio.
 - **`/privacidad` dice cosas que ya no son ciertas** y la orden no pidió tocarlas: «Este sitio no tiene formularios» (Mi espacio sí los tiene) y «Última actualización: 12 de septiembre de 2026». Texto de dirección/Armando.
 - Las capturas de fidelidad de `/privacidad` van a chocar con las del #41 (las dos cambian la página): al mergear el #41 hay que regenerarlas en esta rama.
+
+## Auditoría del CEO (PR #43) — los dos ajustes
+
+1. **Textos legales**, exactos a la auditoría, en `web.json`: `privacidad.lead`, `datosTexto`, `comparteAntes`/`comparteDespues`, `cookiesTexto`, `cambiosTexto`; `terminos.queEsTexto`, `reservasTexto`, `actualizacion` (1 de octubre de 2026). Capturas de fidelidad de `/privacidad` y `/terminos` actualizadas con `--update-snapshots` por la auditoría del #43: antes de actualizar cayeron esas seis y ninguna otra. Renglones, acento y contraste (0 bajo umbral) verdes. La política de cancelación y devolución no se menciona: la decide Armando.
+2. **Base:** `origin/main` traído (con #39 y #40). **El #41 no está en `main`**: se mergeó en su base `web/26-armando-a-la-altura` (76ed722) cuando el #40 ya había entrado, así que su contenido quedó en esa rama. Cuando llegue a `main`, estas seis capturas se vuelven a regenerar acá (cambia la cabecera y el pie de las legales).
