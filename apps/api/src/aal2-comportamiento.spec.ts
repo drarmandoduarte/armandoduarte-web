@@ -7,6 +7,7 @@ import { SaludController } from './salud.controller';
 import { YoController } from './yo/yo.controller';
 import { RespaldoController } from './respaldo/respaldo.controller';
 import { SesionesController } from './sesiones/sesiones.controller';
+import { PagosController } from './pagos/pagos.controller';
 import type { SupabaseService } from './identidad/supabase.service';
 
 /**
@@ -153,6 +154,31 @@ describe('el guard global, sobre las rutas de esta app', () => {
     await expect(
       guard.canActivate(contexto(SesionesController as unknown as Ctor, 'cerrarLasOtras', TOKEN_AAL1, 'equipo')),
     ).rejects.toMatchObject({ response: { code: AAL2_REQUIRED_CODE } });
+  });
+
+  it('#27 C · POST /api/pagos/resolver con una cuenta de EQUIPO en aal1: 403 AAL2_REQUIRED', async () => {
+    /* La orden lo pide con estas palabras: «`resolver` sin `aal2` → 403
+       `AAL2_REQUIRED`». Lo da el guard global, antes de que el controlador
+       llegue a preguntar el rol. */
+    const { guard } = guardConVerificador();
+    await expect(
+      guard.canActivate(contexto(PagosController as unknown as Ctor, 'resolver', TOKEN_AAL1, 'equipo')),
+    ).rejects.toMatchObject({ response: { code: AAL2_REQUIRED_CODE } });
+    await expect(
+      guard.canActivate(contexto(PagosController as unknown as Ctor, 'resolver', TOKEN_AAL2, 'equipo')),
+    ).resolves.toBe(true);
+  });
+
+  it('#27 C · declarar y ver el comprobante: el CLIENTE pasa en aal1; el EQUIPO, solo con aal2', async () => {
+    const { guard } = guardConVerificador();
+    for (const metodo of ['declarar', 'comprobante']) {
+      await expect(
+        guard.canActivate(contexto(PagosController as unknown as Ctor, metodo, TOKEN_AAL1, 'cliente')),
+      ).resolves.toBe(true);
+      await expect(
+        guard.canActivate(contexto(PagosController as unknown as Ctor, metodo, TOKEN_AAL1, 'equipo')),
+      ).rejects.toMatchObject({ response: { code: AAL2_REQUIRED_CODE } });
+    }
   });
 
   it('sin token, una ruta protegida da 401 y no 403', async () => {

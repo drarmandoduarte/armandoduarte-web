@@ -59,6 +59,8 @@ tocó — se importa del núcleo.
  *    la sesión ya en `aal2`, desde Mi espacio. Generar lleva además
  *    `@PasoReciente(5)`.
  *  · `POST /api/sesiones/cerrar-las-otras` — quien la pide ya está adentro.
+ *  · `/api/pagos/*` (#27 C) — tampoco: el cliente declara y ve su comprobante
+ *    con `aal1` por la misma razón; resolver es del equipo y exige `aal2`.
  *  · `GET /api/talleres` y `POST /api/talleres/inscribirme` (#24 B) — tampoco:
  *    un cliente pasa con `aal1` por la misma razón que en `/api/yo`, y una
  *    cuenta de equipo que quiera anotarse lo hace con su segundo paso.
@@ -104,6 +106,7 @@ describe('Cobertura del segundo paso (AAL2) — guardián', () => {
       'GET /equipo/clientes',
       'GET /equipo/cursos',
       'GET /equipo/inscriptos/:edicion',
+      'GET /pagos/comprobante/:inscripcion',
       'GET /respaldo/cuantos',
       'GET /salud',
       'GET /talleres',
@@ -114,6 +117,8 @@ describe('Cobertura del segundo paso (AAL2) — guardián', () => {
       'POST /equipo/ediciones/:id',
       'POST /equipo/miembros',
       'POST /equipo/miembros/:id/quitar',
+      'POST /pagos/declarar',
+      'POST /pagos/resolver',
       'POST /respaldo/generar',
       'POST /respaldo/usar',
       'POST /sesiones/cerrar-las-otras',

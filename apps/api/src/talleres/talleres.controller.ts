@@ -25,9 +25,20 @@ export class TalleresController {
   @Get()
   async talleres(@Req() pedido: unknown) {
     const token = tokenDelPedido(pedido);
-    await usuarioDelPedido(pedido, token, this.supabase);
-    const [abiertos, mios] = await Promise.all([this.repositorio.abiertos(token), this.repositorio.mios(token)]);
-    return { abiertos, mios };
+    const usuario = await usuarioDelPedido(pedido, token, this.supabase);
+    const [abiertos, mios, pagos, cobro] = await Promise.all([
+      this.repositorio.abiertos(token),
+      this.repositorio.mios(token),
+      this.repositorio.pagosDeMisInscripciones(token, usuario.id),
+      this.repositorio.cobroVigente(token),
+    ]);
+    /* #27 C.1: cada taller propio con lo que hace falta para declarar el pago,
+       y los datos de cobro vigentes para que la persona compare. */
+    return {
+      abiertos,
+      mios: (mios as { referencia: string }[]).map((m) => ({ ...m, ...pagos.get(m.referencia) })),
+      cobro,
+    };
   }
 
   /**

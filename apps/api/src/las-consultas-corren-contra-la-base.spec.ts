@@ -72,6 +72,9 @@ import { EquipoRepositorio } from './equipo/equipo.repositorio';
 import type { CursoDto, EdicionNuevaDto } from './equipo/equipo.dto';
 import { TalleresController } from './talleres/talleres.controller';
 import { TalleresRepositorio } from './talleres/talleres.repositorio';
+import { PagosController } from './pagos/pagos.controller';
+import { PagosRepositorio } from './pagos/pagos.repositorio';
+import type { Correo, CorreoService } from './correo/correo.service';
 import { BACKUP_CODE_COUNT } from './seguridad-512/nucleo/backup-codes';
 
 /* El constructor de `SupabaseService` exige la variable, y hace bien: es la
@@ -240,7 +243,48 @@ function clienteSobreElBanco(ejecutar: Ejecutar): SupabaseClient {
   return {
     from: (tabla: string) => new Consulta(ejecutar, tabla),
     rpc: (funcion: string, argumentos?: Record<string, unknown>) => new Llamada(ejecutar, funcion, argumentos ?? {}),
+    storage: { from: (bucket: string) => almacenSobreElBanco(ejecutar, bucket) },
   } as unknown as SupabaseClient;
+}
+
+/**
+ * `.storage.from(bucket)` → filas de `storage.objects`, con la RLS de la 006 —
+ * orden #27 C. Entiende las dos cosas que la API le pide y nada más:
+ *
+ *   · `remove([ruta])` → un `delete … returning`: lo que la policy deja borrar
+ *     (hoy, nada: la 006 no tiene policy de borrado).
+ *   · `createSignedUrl(ruta, s)` → si quien pide **puede leer** la fila, una URL
+ *     de mentira (`https://firmada.invalid/…`); si no, el error que da Storage.
+ *
+ * No firma nada ni sube bytes: lo que se prueba es la pregunta que Storage le
+ * hace a la base —«¿esta sesión ve esta fila?»—, que es donde vive la regla.
+ */
+function almacenSobreElBanco(ejecutar: Ejecutar, bucket: string) {
+  const comoError = (e: unknown) => {
+    const error = e as { code?: string; message?: string };
+    return { code: error.code, message: error.message ?? String(e) };
+  };
+  return {
+    async remove(rutas: string[]) {
+      try {
+        const filas = await ejecutar(
+          `delete from storage.objects where bucket_id = $1 and name = any($2::text[]) returning name`, [bucket, rutas]);
+        return { data: filas, error: null };
+      } catch (e) {
+        return { data: null, error: comoError(e) };
+      }
+    },
+    async createSignedUrl(ruta: string, segundos: number) {
+      try {
+        const filas = await ejecutar(`select name from storage.objects where bucket_id = $1 and name = $2`, [bucket, ruta]);
+        return filas.length === 1
+          ? { data: { signedUrl: `https://firmada.invalid/${ruta}?expira=${segundos}` }, error: null }
+          : { data: null, error: { message: 'Object not found' } };
+      } catch (e) {
+        return { data: null, error: comoError(e) };
+      }
+    },
+  };
 }
 
 /**
@@ -605,5 +649,144 @@ describe('TalleresController (/api/talleres), contra el esquema — orden #24 B'
     const deSofia = await talleres().talleres(pedidoDe(sofia)) as typeof deRosa;
     expect(deSofia.mios).toEqual([]);
     expect(deSofia.abiertos.every((t) => t.mi_referencia === null)).toBe(true);
+  });
+});
+
+describe('PagosController (/api/pagos), contra el esquema — orden #27 C', () => {
+  /* Dos clientas nuevas: Clara en México y Eva en España. Las de la semilla
+     ya las usaron los bloques de arriba. */
+  let clara: string;
+  let eva: string;
+  let deClara: string;
+  let deEva: string;
+  const correos: Correo[] = [];
+  const correoDeMentira = { enviar: async (c: Correo) => { correos.push(c); return true; } } as unknown as CorreoService;
+
+  const pagos = (aal: Aal) => {
+    const servicioDePagos = servicio(aal);
+    return new PagosController(servicioDePagos, new PagosRepositorio(servicioDePagos), correoDeMentira);
+  };
+  const codigoDe = async (promesa: Promise<unknown>) => {
+    try {
+      await promesa;
+      return null;
+    } catch (e) {
+      const cuerpo = (e as { getResponse?: () => unknown }).getResponse?.() as { code?: string } | undefined;
+      return cuerpo?.code ?? (e as Error).message;
+    }
+  };
+  /** Lo que hace la pantalla antes de llamar a la API: subir con la sesión del cliente (policy de la 006). */
+  const subir = async (quien: string, inscripcion: string) => {
+    const ruta = `${inscripcion}/${crypto.randomUUID()}.pdf`;
+    await banco.como(quien, 'aal1', () => banco.sql(
+      `insert into storage.objects (bucket_id, name, owner) values ('comprobantes', $1, $2)`, [ruta, quien]));
+    return ruta;
+  };
+  const declaracion = (inscripcion: string, ruta: string, monto = 1500) => ({
+    inscripcion_id: inscripcion, comprobante_path: ruta, fecha_transferencia: '2026-10-01',
+    monto, moneda: 'MXN', banco: 'Banco de prueba', ultimos4_o_folio: '0000',
+  });
+  const estado = async (inscripcion: string) =>
+    (await banco.sql<{ e: string }>(`select public.estado_inscripcion($1) as e`, [inscripcion]))[0].e;
+
+  beforeAll(async () => {
+    const nueva = async (email: string, nombre: string, pais: string) => {
+      const [u] = await banco.sql<{ id: string }>(`insert into auth.users (email) values ($1) returning id`, [email]);
+      await banco.sql(`update public.personas set nombre = $2, pais = $3 where id = $1`, [u.id, nombre, pais]);
+      const [i] = await banco.sql<{ id: string }>(
+        `insert into public.inscripciones (edicion_id, persona_id) values ($1, $2) returning id`, [s.edicionAbierta, u.id]);
+      return [u.id, i.id];
+    };
+    [clara, deClara] = await nueva('clara@ejemplo.mx', 'Clara', 'MX');
+    [eva, deEva] = await nueva('eva@ejemplo.es', 'Eva', 'ES');
+  });
+
+  it('EL PISO, PRIMERO: las dos inscripciones están y su libro está vacío', async () => {
+    expect(await estado(deClara)).toBe('pendiente_de_pago');
+    expect(await estado(deEva)).toBe('pendiente_de_pago');
+  });
+
+  it('declarar con el archivo de la carpeta de otra inscripción: 403 RUTA_AJENA', async () => {
+    const deOtra = await subir(eva, deEva);
+    expect(await codigoDe(pagos('aal1').declarar(pedidoDe(clara), declaracion(deClara, deOtra)))).toBe('RUTA_AJENA');
+  });
+
+  it('declarar sobre la inscripción de otra persona: 403 SIN_PERMISO (la base no se la deja ver)', async () => {
+    const ruta = `${deEva}/${crypto.randomUUID()}.pdf`;
+    expect(await codigoDe(pagos('aal1').declarar(pedidoDe(clara), declaracion(deEva, ruta)))).toBe('SIN_PERMISO');
+    expect(await estado(deEva)).toBe('pendiente_de_pago');
+  });
+
+  it('si el insert falla (un monto que la base no acepta), se intenta borrar el archivo; HOY queda, porque la 006 no deja borrar', async () => {
+    const ruta = await subir(clara, deClara);
+    expect(await codigoDe(pagos('aal1').declarar(pedidoDe(clara), declaracion(deClara, ruta, -1)))).toBe('NO_VALIDO');
+    expect(await estado(deClara)).toBe('pendiente_de_pago');
+    const quedo = await banco.sql(`select 1 from storage.objects where name = $1`, [ruta]);
+    expect(quedo, 'si esto cambia, alguien agregó una policy de borrado: actualizar el informe y este test').toHaveLength(1);
+  });
+
+  it('Clara sube y declara → en revisión; una segunda declaración: 409 NO_ESPERA_COMPROBANTE', async () => {
+    const ruta = await subir(clara, deClara);
+    await expect(pagos('aal1').declarar(pedidoDe(clara), declaracion(deClara, ruta))).resolves.toEqual({ ok: true, estado: 'en_revision' });
+    expect(await estado(deClara)).toBe('en_revision');
+    const otra = await subir(clara, deClara);
+    expect(await codigoDe(pagos('aal1').declarar(pedidoDe(clara), declaracion(deClara, otra)))).toBe('NO_ESPERA_COMPROBANTE');
+  });
+
+  it('ver el comprobante: Clara el suyo; Gabi (México, aal2) también; Diana (internacional) no', async () => {
+    expect((await pagos('aal1').comprobante(pedidoDe(clara), deClara)).url).toMatch(new RegExp(`^https://firmada\\.invalid/${deClara}/`));
+    expect((await pagos('aal2').comprobante(pedidoDe(s.gabi), deClara)).url).toMatch(/^https:\/\/firmada\.invalid\//);
+    expect(await codigoDe(pagos('aal2').comprobante(pedidoDe(s.diana), deClara))).toBe('SIN_COMPROBANTE');
+  });
+
+  it('resolver: una clienta 403 SOLO_EQUIPO; Diana no la ve (404 NO_EXISTE); sin motivo, 400 FALTA_MOTIVO', async () => {
+    expect(await codigoDe(pagos('aal1').resolver(pedidoDe(eva), { inscripcion_id: deClara, tipo: 'confirmado' }))).toBe('SOLO_EQUIPO');
+    expect(await codigoDe(pagos('aal2').resolver(pedidoDe(s.diana), { inscripcion_id: deClara, tipo: 'confirmado' }))).toBe('NO_EXISTE');
+    expect(await codigoDe(pagos('aal2').resolver(pedidoDe(s.gabi), { inscripcion_id: deClara, tipo: 'rechazado' }))).toBe('FALTA_MOTIVO');
+    expect(await estado(deClara)).toBe('en_revision');
+  });
+
+  it('Gabi rechaza con motivo → pendiente; Clara lo ve en «Mis talleres» con el motivo, su id y el precio', async () => {
+    await expect(pagos('aal2').resolver(pedidoDe(s.gabi), { inscripcion_id: deClara, tipo: 'rechazado', nota: 'El monto no coincide' }))
+      .resolves.toEqual({ ok: true, correo: 'enviado' });
+    expect(await estado(deClara)).toBe('pendiente_de_pago');
+    const servicioDeClara = servicio('aal1');
+    const { mios } = await new TalleresController(servicioDeClara, new TalleresRepositorio(servicioDeClara)).talleres(pedidoDe(clara)) as unknown as {
+      mios: { inscripcion_id: string; motivo_rechazo: string | null; tiene_comprobante: boolean; precio_monto: unknown; estado: string }[];
+    };
+    expect(mios).toHaveLength(1);
+    expect(mios[0]).toMatchObject({ inscripcion_id: deClara, motivo_rechazo: 'El monto no coincide', tiene_comprobante: true, estado: 'pendiente_de_pago' });
+    expect(Number(mios[0].precio_monto)).toBe(1500);
+    expect(correos.at(-1)).toMatchObject({ para: 'clara@ejemplo.mx' });
+    expect(correos.at(-1)?.texto).toContain('El monto no coincide');
+  });
+
+  it('Clara declara otra vez y Gabi confirma → confirmada, con el monto declarado y el correo con la fecha en Mérida', async () => {
+    const ruta = await subir(clara, deClara);
+    await pagos('aal1').declarar(pedidoDe(clara), declaracion(deClara, ruta));
+    await expect(pagos('aal2').resolver(pedidoDe(s.gabi), { inscripcion_id: deClara, tipo: 'confirmado' }))
+      .resolves.toEqual({ ok: true, correo: 'enviado' });
+    expect(await estado(deClara)).toBe('confirmada');
+    const [r] = await banco.sql<{ monto: string; hecho_por: string }>(
+      `select monto, hecho_por from public.pagos_libro where inscripcion_id = $1 and tipo = 'confirmado'`, [deClara]);
+    expect(Number(r.monto)).toBe(1500);
+    expect(r.hecho_por).toBe(s.gabi);
+    expect(correos.at(-1)?.asunto).toMatch(/^Tu lugar en El arte de amar a tu hijo adolescente está confirmado · AD-/);
+  });
+
+  it('anular: Gabi no (403 SOLO_DUENO); Armando sí → anulada', async () => {
+    expect(await codigoDe(pagos('aal2').resolver(pedidoDe(s.gabi), { inscripcion_id: deClara, tipo: 'anulado', nota: 'Pidió la devolución' }))).toBe('SOLO_DUENO');
+    await pagos('aal2').resolver(pedidoDe(s.armando), { inscripcion_id: deClara, tipo: 'anulado', nota: 'Pidió la devolución' });
+    expect(await estado(deClara)).toBe('anulada');
+  });
+
+  it('Inscriptos trae el libro junto a cada fila: Gabi ve a Clara anulada, con la firma y el comprobante', async () => {
+    const servicioDelPanel = servicio('aal2');
+    const { inscriptos } = await new EquipoController(servicioDelPanel, new EquipoRepositorio(servicioDelPanel))
+      .inscriptos(pedidoDe(s.gabi), s.edicionAbierta) as { inscriptos: Record<string, unknown>[] };
+    const fila = inscriptos.find((f) => f.inscripcion_id === deClara)!;
+    expect(fila).toMatchObject({ nombre: 'Clara', estado: 'anulada', ultimo_tipo: 'anulado', ultimo_por: 'Armando', ultima_nota: 'Pidió la devolución' });
+    expect(fila.comprobante_path).toMatch(new RegExp(`^${deClara}/`));
+    expect(inscriptos.find((f) => f.inscripcion_id === deEva), 'Eva es de España: Gabi no la ve').toBeUndefined();
   });
 });

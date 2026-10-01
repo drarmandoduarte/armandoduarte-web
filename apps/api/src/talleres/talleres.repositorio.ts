@@ -1,6 +1,16 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../identidad/supabase.service';
 
+/** Lo que se le suma a cada fila de «Mis talleres» para el comprobante (orden #27 C.1). */
+export interface PagoDeMiInscripcion {
+  inscripcion_id: string;
+  precio_monto: number | string | null;
+  precio_moneda: string | null;
+  /** La nota del último renglón, si es un rechazo: lo que escribió el equipo. */
+  motivo_rechazo: string | null;
+  tiene_comprobante: boolean;
+}
+
 /** Los datos para transferir, tal como los lee el cliente: la cuenta vigente. */
 export interface DatosDeCobro {
   banco: string;
@@ -37,6 +47,45 @@ export class TalleresRepositorio {
     const { data, error } = await this.supabase.comoElUsuario(token).rpc('mis_talleres');
     if (error) throw this.traducir(error, 'leer tus talleres');
     return data ?? [];
+  }
+
+  /**
+   * Lo que «Mis talleres» necesita para el comprobante (orden #27 C.1) y
+   * `mis_talleres()` (009) no trae: el id de cada inscripción (la carpeta de
+   * Storage), el precio (para prellenar el monto), el motivo del último rechazo
+   * y si hay un comprobante para ver. Por referencia, que es la llave que
+   * `mis_talleres()` sí devuelve.
+   *
+   * Con el token de la persona y tres lecturas sencillas por inscripción: sus
+   * inscripciones (`inscripciones_leo_las_mias`), su libro
+   * (`libro_el_cliente_lee_el_suyo`) y el precio de la edición (002: lo
+   * publicado se ve). Una clienta tiene uno o dos talleres; si la edición ya no
+   * se ve (curso pasado a borrador), el precio viene en nulo y el monto no se
+   * prellena.
+   */
+  async pagosDeMisInscripciones(token: string, personaId: string): Promise<Map<string, PagoDeMiInscripcion>> {
+    const cliente = this.supabase.comoElUsuario(token);
+    const { data, error } = await cliente.from('inscripciones').select('id, referencia, edicion_id').eq('persona_id', personaId);
+    if (error) throw this.traducir(error, 'leer tus inscripciones');
+    const resultado = new Map<string, PagoDeMiInscripcion>();
+    for (const i of (data ?? []) as { id: string; referencia: string; edicion_id: string }[]) {
+      const [libro, edicion] = await Promise.all([
+        cliente.from('pagos_libro').select('orden, tipo, nota, comprobante_path').eq('inscripcion_id', i.id),
+        cliente.from('ediciones').select('precio_monto, precio_moneda').eq('id', i.edicion_id).maybeSingle(),
+      ]);
+      if (libro.error) throw this.traducir(libro.error, 'leer tus pagos');
+      const renglones = ((libro.data ?? []) as { orden: number | string; tipo: string; nota: string | null; comprobante_path: string | null }[])
+        .sort((a, b) => Number(b.orden) - Number(a.orden));
+      const precio = edicion.data as { precio_monto: number | string | null; precio_moneda: string | null } | null;
+      resultado.set(i.referencia, {
+        inscripcion_id: i.id,
+        precio_monto: precio?.precio_monto ?? null,
+        precio_moneda: precio?.precio_moneda ?? null,
+        motivo_rechazo: renglones[0]?.tipo === 'rechazado' ? renglones[0].nota : null,
+        tiene_comprobante: renglones.some((r) => r.tipo === 'declarado' && r.comprobante_path),
+      });
+    }
+    return resultado;
   }
 
   /** Completa en la ficha **solo** los datos que se mandaron (los que faltaban). */
