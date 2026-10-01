@@ -33,7 +33,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { levantarBanco, type Banco } from './banco';
 
-/** Las diez tablas de `public`, y qué puede cada rol en cada una. */
+/** Las once tablas de `public` (las diez de la #13 y las notas de la #27 D), y qué puede cada rol en cada una. */
 const ESPERADO: Record<string, { anon: string[]; authenticated: string[]; service_role: string[] }> = {
   /* La fila nace del trigger `persona_nace`, que es `security definer`: sin insert. */
   personas: { anon: [], authenticated: ['select', 'update'], service_role: ['select', 'insert', 'update', 'delete'] },
@@ -49,6 +49,8 @@ const ESPERADO: Record<string, { anon: string[]; authenticated: string[]; servic
   /* Las dos del kit: solo lectura. La 005 revocó el resto y la 007 no se lo devuelve. */
   totp_backup_codes: { anon: [], authenticated: ['select'], service_role: ['select', 'insert', 'update', 'delete'] },
   security_devices: { anon: [], authenticated: ['select'], service_role: ['select', 'insert', 'update', 'delete'] },
+  /* #27 D, la 011: solo se agrega, como el libro. Los grants viven en la 011, no en la 007. */
+  notas_de_persona: { anon: [], authenticated: ['select', 'insert'], service_role: ['select', 'insert', 'update', 'delete'] },
 };
 
 const VERBOS = ['select', 'insert', 'update', 'delete'] as const;
@@ -70,7 +72,7 @@ describe('la 007 pone los permisos que el proyecto no da solo', () => {
   beforeAll(async () => { banco = await levantarBanco(); }, 120_000);
   afterAll(async () => { await banco?.cierre(); });
 
-  it('EL PISO, PRIMERO: las diez tablas existen y el banco NO regala permisos', async () => {
+  it('EL PISO, PRIMERO: las once tablas existen y el banco NO regala permisos', async () => {
     /* Sin la primera mitad, «los permisos son exactos» sobre un esquema vacío
        es cierto por no haber mirado ninguna tabla. Sin la segunda, todo lo de
        abajo saldría verde sobre un banco que da `grant all` por default — que
@@ -80,7 +82,7 @@ describe('la 007 pone los permisos que el proyecto no da solo', () => {
         where table_schema = 'public' and table_type = 'BASE TABLE' order by 1`);
     expect(
       tablas.map((t) => t.table_name),
-      'las tablas de `public` no son las diez de la #13',
+      'las tablas de `public` no son las once (las diez de la #13 y `notas_de_persona` de la #27 D)',
     ).toEqual(Object.keys(ESPERADO).sort());
 
     /* La prueba de que el banco no regala: `anon` no puede leer `personas`. Si
@@ -121,7 +123,7 @@ describe('la 007 pone los permisos que el proyecto no da solo', () => {
     ).toEqual([]);
   });
 
-  it('`delete` a `authenticated`: en ninguna de las diez', async () => {
+  it('`delete` a `authenticated`: en ninguna de las once', async () => {
     /* Sale de la tabla de arriba, pero va escrito aparte porque es la regla que
        más barato se rompe: un `grant all` de más y se borra desde la app. */
     const conDelete: string[] = [];

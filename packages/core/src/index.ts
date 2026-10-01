@@ -62,3 +62,10 @@ export {
   FILTROS_DE_INSCRIPTOS, filtrarPorEstado, filtroInicial, accionesDePago, MOTIVO_MAXIMO, validarResolucion, tonoDeEstado,
 } from './panel/pagos';
 export type { FiltroDeInscriptos, AccionesDePago } from './panel/pagos';
+
+// ── El perfil del cliente (orden #27 D) ──────────────────────────────────────
+export {
+  PAISES_LATAM, PAISES_ISO, esPais, paisesParaElegir, NIVELES_EDUCATIVOS, ANIO_MINIMO, anioMaximo, edadDesdeAnio,
+  validarPerfil, perfilParaEnviar, perfilIncompleto,
+} from './mi-espacio/perfil';
+export type { NivelEducativo, PerfilEntrada, CampoDelPerfil } from './mi-espacio/perfil';

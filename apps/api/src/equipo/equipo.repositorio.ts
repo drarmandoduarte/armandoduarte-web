@@ -72,6 +72,61 @@ export class EquipoRepositorio {
     return data ?? [];
   }
 
+  /** ¿La base le deja ver esta persona a quien pide? (`personas_equipo_lee_su_territorio`, 001) */
+  async veoALaPersona(token: string, persona: string): Promise<boolean> {
+    const { data, error } = await this.supabase.comoElUsuario(token).from('personas').select('id').eq('id', persona).maybeSingle();
+    if (error) throw this.traducir(error, 'leer la persona');
+    return Boolean(data);
+  }
+
+  /**
+   * Las inscripciones de una persona, con el curso, la fecha y el estado
+   * (`estado_inscripcion()`, 003). Lecturas sencillas con el token de quien
+   * pide, para que corran también en el banco (`las-consultas-…spec.ts`).
+   */
+  async inscripcionesDe(token: string, persona: string): Promise<unknown[]> {
+    const cliente = this.supabase.comoElUsuario(token);
+    const { data, error } = await cliente.from('inscripciones').select('id, referencia, edicion_id, created_at').eq('persona_id', persona);
+    if (error) throw this.traducir(error, 'leer las inscripciones');
+    const filas = [];
+    for (const i of (data ?? []) as { id: string; referencia: string; edicion_id: string; created_at: string }[]) {
+      const { data: e } = await cliente.from('ediciones').select('curso_id, inicio, zona').eq('id', i.edicion_id).maybeSingle();
+      const edicion = e as { curso_id: string; inicio: string; zona: string } | null;
+      const { data: c } = edicion
+        ? await cliente.from('cursos').select('titulo').eq('id', edicion.curso_id).maybeSingle()
+        : { data: null };
+      const { data: estado } = await cliente.rpc('estado_inscripcion', { inscripcion: i.id });
+      filas.push({
+        inscripcion_id: i.id, referencia: i.referencia, inscripto_el: i.created_at,
+        curso: (c as { titulo: string } | null)?.titulo ?? null, inicio: edicion?.inicio ?? null, zona: edicion?.zona ?? null,
+        estado: typeof estado === 'string' ? estado : 'pendiente_de_pago',
+      });
+    }
+    return filas.sort((a, b) => new Date(b.inscripto_el).getTime() - new Date(a.inscripto_el).getTime());
+  }
+
+  /** Las notas, de la más nueva a la más vieja, con el nombre de quien la escribió (`firma_del_libro`, 010). */
+  async notasDe(token: string, persona: string): Promise<{ id: string; texto: string; created_at: string; autor: string | null }[]> {
+    const cliente = this.supabase.comoElUsuario(token);
+    const { data, error } = await cliente.from('notas_de_persona').select('id, autor, texto, created_at').eq('persona_id', persona);
+    if (error) throw this.traducir(error, 'leer las notas');
+    const notas = (data ?? []) as { id: string; autor: string; texto: string; created_at: string }[];
+    const firmas = new Map<string, string | null>();
+    for (const autor of new Set(notas.map((n) => n.autor))) {
+      const { data: nombre } = await cliente.rpc('firma_del_libro', { persona: autor });
+      firmas.set(autor, typeof nombre === 'string' ? nombre : null);
+    }
+    return notas
+      .map((n) => ({ id: n.id, texto: n.texto, created_at: n.created_at, autor: firmas.get(n.autor) ?? null }))
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+
+  async agregarNota(token: string, persona: string, autor: string, texto: string): Promise<void> {
+    const { error } = await this.supabase.comoElUsuario(token)
+      .from('notas_de_persona').insert({ persona_id: persona, autor, texto });
+    if (error) throw this.traducir(error, 'agregar la nota');
+  }
+
   async crearCurso(token: string, curso: Record<string, unknown>): Promise<void> {
     const { error } = await this.supabase.comoElUsuario(token).from('cursos').insert(curso);
     if (error) throw this.traducir(error, 'crear el curso');

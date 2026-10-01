@@ -195,6 +195,34 @@
         "declarar": "No pudimos registrar tu comprobante. Vuelve a intentarlo.",
         "yaDeclarado": "Ya recibimos un comprobante para este taller."
       }
+    },
+    "ciudad": "Ciudad",
+    "anioNacimiento": "Año de nacimiento",
+    "anioAyuda": "Solo el año, con cuatro cifras.",
+    "edad": "Edad: {{edad}}",
+    "nivelEducativo": "Nivel educativo",
+    "sinElegir": "Sin elegir",
+    "niveles": {
+      "primaria": "Primaria",
+      "secundaria": "Secundaria",
+      "preparatoria": "Preparatoria",
+      "licenciatura": "Licenciatura",
+      "posgrado": "Posgrado",
+      "prefiero_no_decir": "Prefiero no decir"
+    },
+    "errorAlGuardar": "No pudimos guardar tus datos. Vuelve a intentarlo.",
+    "perfil": {
+      "paraQue": "¿Para qué pedimos esto?",
+      "paraQueTexto": "Para saber a quién llegan los talleres y diseñar los próximos. Nunca se comparte.",
+      "aviso": "Aviso de privacidad",
+      "completaTitulo": "Completa tu perfil (30 segundos)",
+      "completaTexto": "País, ciudad, año de nacimiento y nivel educativo. Es opcional y nos ayuda a diseñar los próximos talleres.",
+      "completaEnlace": "Completar mis datos",
+      "errores": {
+        "pais": "Elige un país de la lista.",
+        "anio": "Escribe el año con cuatro cifras (por ejemplo, 1984).",
+        "nivel": "Elige una opción de la lista."
+      }
     }
   },
   "pasoReciente": {
@@ -354,7 +382,7 @@
     },
     "clientes": {
       "buscar": "Buscar",
-      "buscarAyuda": "Por nombre, correo o WhatsApp.",
+      "buscarAyuda": "Por nombre, correo, WhatsApp o ciudad.",
       "exportar": "Exportar CSV",
       "vacio": "Todavía no hay nadie registrado.",
       "sinResultados": "Nadie coincide con la búsqueda.",
@@ -366,7 +394,11 @@
         "pais": "País",
         "alta": "Alta",
         "cursos": "Cursos",
-        "equipo": "Equipo"
+        "equipo": "Equipo",
+        "ciudad": "Ciudad",
+        "edad": "Edad",
+        "nivel": "Nivel educativo",
+        "notas": "Notas"
       },
       "ultimo": "Último: {{curso}}",
       "esEquipo": "Equipo · {{territorio}}",
@@ -378,7 +410,28 @@
       "confirmarQuitar": "Sí, quitar a {{nombre}}",
       "quitarAviso": "Deja de ver el panel. No se borra nada: queda en el registro.",
       "sinNombre": "Sin nombre",
-      "saludo": "Hola {{nombre}}, te escribimos del equipo de Armando Duarte."
+      "saludo": "Hola {{nombre}}, te escribimos del equipo de Armando Duarte.",
+      "abrir": "Abrir",
+      "cerrar": "Cerrar",
+      "abrirAria": "Abrir la ficha de {{nombre}}",
+      "detalle": {
+        "datos": "Datos",
+        "inscripciones": "Inscripciones",
+        "sinInscripciones": "Todavía no se anotó a ningún taller.",
+        "notas": "Notas del equipo",
+        "sinNotas": "Todavía no hay notas.",
+        "nota": "Agregar una nota",
+        "notaAyuda": "La ve solo el equipo. No se borra: si te equivocas, agrega otra.",
+        "agregar": "Agregar nota",
+        "agregando": "Agregando…",
+        "notaPor": "{{fecha}} · {{quien}}",
+        "cargando": "Abriendo la ficha…",
+        "error": "No pudimos abrir la ficha.",
+        "errores": {
+          "nota": "Escribe la nota (hasta 2000 caracteres).",
+          "generico": "No pudimos guardar la nota. Vuelve a intentarlo."
+        }
+      }
     },
     "territorios": {
       "mexico": "México",

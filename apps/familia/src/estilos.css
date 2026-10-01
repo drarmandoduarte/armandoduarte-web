@@ -409,3 +409,16 @@ img,svg{display:block;max-width:100%}
 .tabla__acciones{min-width:220px}
 .acciones{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
+/* ── El perfil (orden #27 D) ─────────────────────────────────────────────
+   La tarjeta suave después de «Me anoto»: superficie cálida, sin color de
+   marca —no compite con nada—. Y la línea de «¿Para qué pedimos esto?». */
+.tarjeta-suave{margin-top:24px;padding:18px 20px;background:var(--calido);border-radius:2px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.tarjeta-suave__titulo{font-family:var(--display);font-size:15px;font-weight:500;color:var(--tinta)}
+.nota--para-que{margin-top:16px}
+.nota--para-que b{font-weight:600;color:var(--tinta)}
+.ficha{padding:20px 0 8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+.ficha__titulo{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gris)}
+.ficha__lista{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.45}
+.ficha__nota{white-space:pre-wrap}
+.tabla__ficha td{background:var(--crema)}
+
