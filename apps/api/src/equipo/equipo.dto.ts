@@ -96,3 +96,9 @@ export class SumarAlEquipoDto {
   @IsIn(['mexico', 'internacional', 'todos'])
   territorio!: string;
 }
+
+/** Una nota del equipo sobre una persona (#27 D.3): texto de 1 a 2000, como el `check` de la 011. */
+export class NotaDto {
+  @IsString() @Length(1, 2000)
+  texto!: string;
+}

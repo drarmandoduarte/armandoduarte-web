@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  NotFoundException,
   Controller,
   ForbiddenException,
   Get,
@@ -14,7 +15,7 @@ import { tokenDelPedido } from '../identidad/token';
 import { usuarioDelPedido } from '../seguridad-512/nucleo/usuario-del-pedido';
 import { esEquipo } from '../seguridad-512/nucleo/roles';
 import { EquipoRepositorio } from './equipo.repositorio';
-import { CursoDto, EdicionDto, EdicionNuevaDto, SumarAlEquipoDto } from './equipo.dto';
+import { CursoDto, EdicionDto, EdicionNuevaDto, NotaDto, SumarAlEquipoDto } from './equipo.dto';
 
 /**
  * `/api/equipo/*` — el panel del equipo, orden #24 A.
@@ -100,6 +101,40 @@ export class EquipoController {
   async clientes(@Req() pedido: unknown) {
     const { token } = await this.quienPide(pedido);
     return { clientes: await this.repositorio.clientes(token) };
+  }
+
+  /**
+   * La ficha de un cliente (#27 D.3): sus inscripciones con estado y las notas
+   * del equipo. **La API comprueba el territorio además de la RLS**: si quien
+   * pide no ve a la persona, es 404 `FUERA_DE_TERRITORIO` antes de leer nada
+   * más — y aunque se pasara, la RLS devolvería listas vacías.
+   */
+  @Get('clientes/:id')
+  async ficha(@Req() pedido: unknown, @Param('id', ParseUUIDPipe) persona: string) {
+    const { token } = await this.quienPide(pedido);
+    await this.enSuTerritorio(token, persona);
+    const [inscripciones, notas] = await Promise.all([
+      this.repositorio.inscripcionesDe(token, persona),
+      this.repositorio.notasDe(token, persona),
+    ]);
+    return { inscripciones, notas };
+  }
+
+  /** Agregar una nota. Solo se agrega: no hay ruta para editar ni borrar (011). */
+  @Post('clientes/:id/notas')
+  async agregarNota(@Req() pedido: unknown, @Param('id', ParseUUIDPipe) persona: string, @Body() cuerpo: NotaDto) {
+    const { token, id } = await this.quienPide(pedido);
+    await this.enSuTerritorio(token, persona);
+    const texto = cuerpo.texto.trim();
+    if (texto === '') throw new BadRequestException({ message: 'La nota está vacía.', code: 'NO_VALIDO' });
+    await this.repositorio.agregarNota(token, persona, id, texto);
+    return { ok: true };
+  }
+
+  private async enSuTerritorio(token: string, persona: string) {
+    if (!(await this.repositorio.veoALaPersona(token, persona))) {
+      throw new NotFoundException({ message: 'Esa persona no está en tu territorio.', code: 'FUERA_DE_TERRITORIO' });
+    }
   }
 
   @Post('miembros')

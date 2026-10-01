@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import tokens from '@codice/ui/tokens.json';
 import { RECURSOS_I18N } from '@codice/core';
 import { CANALES } from './canales';
+import { enlaceReservarMiLugar } from './mi-espacio';
 
 /**
  * El `<head>` de cada página.
@@ -128,7 +129,8 @@ const EVENTO_MERIDA = {
     price: 1170,
     priceCurrency: 'MXN',
     availability: 'https://schema.org/LimitedAvailability',
-    url: `${SITIO}/merida`,
+    /* #25: la oferta se toma en la app: entrar y caer en «Me anoto». */
+    url: enlaceReservarMiLugar(),
   },
 } as const;
 

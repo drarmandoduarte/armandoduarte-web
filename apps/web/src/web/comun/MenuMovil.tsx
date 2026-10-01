@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { enlaceWhatsApp } from '@codice/core';
 import { IconoCerrar } from './IconoCerrar';
+import { enlaceMiEspacio } from './mi-espacio';
 import type { Pagina } from './cabeza';
 
 /**
@@ -75,6 +76,11 @@ export function MenuMovil({
       <div className="ov__inner">
         <nav aria-label={t('comun.menu.secciones')}>
           <ul className="ov__list">
+            {/* #25: primer ítem, para que a 375 —donde la cabecera no tiene lugar
+                para el enlace— la puerta a Mi espacio siga a un toque. */}
+            <li>
+              <a href={enlaceMiEspacio()} data-nav>{t('comun.nav.miEspacio')}</a>
+            </li>
             {destinos.map(([href, texto]) => (
               <li key={href}>
                 <a href={href} className={activo(href)} aria-current={activo(href) && 'page'} data-nav>

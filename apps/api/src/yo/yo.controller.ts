@@ -1,8 +1,9 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, Post, Req } from '@nestjs/common';
 import { SupabaseService } from '../identidad/supabase.service';
 import { tokenDelPedido } from '../identidad/token';
 import { usuarioDelPedido } from '../seguridad-512/nucleo/usuario-del-pedido';
 import { esEquipo } from '../seguridad-512/nucleo/roles';
+import { PerfilDto } from './yo.dto';
 
 /**
  * `GET /api/yo` — quién es el que está del otro lado.
@@ -25,6 +26,8 @@ import { esEquipo } from '../seguridad-512/nucleo/roles';
  */
 @Controller('yo')
 export class YoController {
+  private readonly logger = new Logger(YoController.name);
+
   constructor(private readonly supabase: SupabaseService) {}
 
   @Get()
@@ -47,10 +50,46 @@ export class YoController {
             /* #24 B: la fecha de un taller se escribe en la zona de la
                edición y, si la persona vive en otra, también en la suya (D15). */
             zona_horaria: persona.zona_horaria,
+            /* #27 D: el perfil, todo opcional. */
+            ciudad: persona.ciudad,
+            anio_nacimiento: persona.anio_nacimiento,
+            nivel_educativo: persona.nivel_educativo,
           }
         : null,
       rol,
       tipo: esEquipo(rol) ? ('equipo' as const) : ('cliente' as const),
     };
+  }
+
+  /**
+   * `POST /api/yo` — guardar «Tus datos» (orden #27 D.2). La orden lo nombra
+   * `PATCH /api/yo`; es `POST` porque `api()` de la pantalla habla `GET` y
+   * `POST`, como el resto de esta API.
+   *
+   * Con el token de la persona: lo deja `personas_edito_la_mia` (001) y nada
+   * más. Solo se tocan los campos que vinieron; `null` borra el dato.
+   */
+  @Post()
+  async guardar(@Req() pedido: unknown, @Body() cuerpo: PerfilDto) {
+    const token = tokenDelPedido(pedido);
+    const usuario = await usuarioDelPedido(pedido, token, this.supabase);
+    if (typeof cuerpo.anio_nacimiento === 'number' && cuerpo.anio_nacimiento > new Date().getFullYear() - 14) {
+      throw new BadRequestException({ message: 'El año no es válido.', code: 'NO_VALIDO' });
+    }
+    const cambios: Record<string, string | number | null> = {};
+    for (const campo of ['nombre', 'apellido', 'whatsapp', 'pais', 'ciudad', 'anio_nacimiento', 'nivel_educativo'] as const) {
+      const valor = cuerpo[campo];
+      if (valor === undefined) continue;
+      cambios[campo] = typeof valor === 'string' ? (valor.trim() === '' ? null : valor.trim()) : valor;
+    }
+    if (Object.keys(cambios).length > 0) {
+      const { data, error } = await this.supabase.comoElUsuario(token)
+        .from('personas').update(cambios).eq('id', usuario.id).select('id');
+      if (error || (data ?? []).length === 0) {
+        this.logger.warn(`No se pudo guardar el perfil: ${error?.code ?? 'sin filas'}`);
+        throw new BadRequestException({ message: 'No pudimos guardar tus datos.', code: error?.code === '23514' ? 'NO_VALIDO' : 'DESCONOCIDO' });
+      }
+    }
+    return { ok: true };
   }
 }

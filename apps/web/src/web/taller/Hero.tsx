@@ -3,6 +3,7 @@ import { CLAVE_MENSAJE_RESERVA, TELEFONO_TALLER } from '@codice/core';
 import { BotonWhatsApp } from '../comun/BotonWhatsApp';
 import { Hero as HeroDeLaCasa } from '../comun/Hero';
 import { Icono } from '../comun/Icono';
+import { enlaceReservarMiLugar } from '../comun/mi-espacio';
 
 /** El hero del taller, con la fecha desde la orden #12 (A). */
 /**
@@ -64,24 +65,33 @@ export function Hero() {
       bajada={t('taller.hero.sub')}
       botones={(
         <>
-          {/* El mensaje sale de `CLAVE_MENSAJE_RESERVA` (#14): el enlace de
-              reservar se elegía acá y otra vez en `Taller.tsx`, y con el del pie
-              habrían sido tres. `BotonWhatsApp` dibuja, no decide. */}
+          {/* #25: «Reservar mi lugar» lleva a la app —entrar y caer en «Me
+              anoto» con este taller elegido— y es el único naranja. WhatsApp
+              queda segundo, en contorno, para quien prefiera hablar con Gaby;
+              su mensaje sigue saliendo de `CLAVE_MENSAJE_RESERVA` (#14). */}
+          <a href={enlaceReservarMiLugar()} className="btn btn--naranja">
+            {t('taller.hero.ctaReservar')} <span className="btn-arrow">→</span>
+          </a>
           <BotonWhatsApp
             telefono={TELEFONO_TALLER}
             mensaje={t(CLAVE_MENSAJE_RESERVA)}
-            texto={t('taller.hero.ctaReservar')}
-            clase="btn btn--naranja"
+            texto={t('taller.hero.ctaWhatsapp')}
+            clase="btn"
           />
-          <a href="#programa" className="btn">
-            {t('taller.hero.ctaPrograma')} <span className="btn-arrow">→</span>
-          </a>
         </>
       )}
       /* Tres datos y no cuatro: la fecha **reemplaza** a «Cupo limitado»
          (orden #12, A). Con cuatro, a 375 la línea se parte en tres renglones
          y deja de leerse como una línea de hechos. */
       datos={[t('taller.hero.micro1'), t('taller.hero.micro2'), t('taller.hero.micro3')]}
+      /* Auditoría del #41: «Ver el programa» vuelve, pero como enlace de texto
+         en el cromo neutro, debajo de la línea de datos: dos botones y un
+         naranja siguen siendo el tope del hero. */
+      debajo={(
+        <a href="#programa" className="hero-enlace">
+          {t('taller.hero.ctaPrograma')} <span aria-hidden="true">↓</span>
+        </a>
+      )}
       fotoAlt={t('taller.hero.fotoAlt')}
     />
   );

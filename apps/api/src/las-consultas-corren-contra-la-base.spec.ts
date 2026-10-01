@@ -71,6 +71,7 @@ import { EquipoController } from './equipo/equipo.controller';
 import { EquipoRepositorio } from './equipo/equipo.repositorio';
 import type { CursoDto, EdicionNuevaDto } from './equipo/equipo.dto';
 import { TalleresController } from './talleres/talleres.controller';
+import { YoController } from './yo/yo.controller';
 import { TalleresRepositorio } from './talleres/talleres.repositorio';
 import { PagosController } from './pagos/pagos.controller';
 import { PagosRepositorio } from './pagos/pagos.repositorio';
@@ -416,13 +417,13 @@ describe('SupabaseService, contra el esquema', () => {
     expect(await servicio('aal2').rolDe(s.gabi, s.gabi)).toBe('equipo');
   });
 
-  it('personaDe: devuelve la fila propia con las seis columnas que la pantalla usa', async () => {
+  it('personaDe: devuelve la fila propia con las nueve columnas que la pantalla usa (#27 D suma tres)', async () => {
     const persona = await servicio().personaDe(s.laura, s.laura);
     expect(persona).toMatchObject({ id: s.laura, nombre: 'Laura', pais: 'MX' });
     /* Que las seis columnas existan es la mitad del punto: un `zona_horaria`
        mal escrito sería otro 42703 en la misma ruta. */
     expect(Object.keys(persona as object).sort()).toEqual(
-      ['apellido', 'id', 'nombre', 'pais', 'whatsapp', 'zona_horaria']);
+      ['anio_nacimiento', 'apellido', 'ciudad', 'id', 'nivel_educativo', 'nombre', 'pais', 'whatsapp', 'zona_horaria']);
   });
 });
 
@@ -788,5 +789,72 @@ describe('PagosController (/api/pagos), contra el esquema — orden #27 C', () =
     expect(fila).toMatchObject({ nombre: 'Clara', estado: 'anulada', ultimo_tipo: 'anulado', ultimo_por: 'Armando', ultima_nota: 'Pidió la devolución' });
     expect(fila.comprobante_path).toMatch(new RegExp(`^${deClara}/`));
     expect(inscriptos.find((f) => f.inscripcion_id === deEva), 'Eva es de España: Gabi no la ve').toBeUndefined();
+  });
+});
+
+describe('El perfil y las notas (/api/yo, /api/equipo/clientes/:id), contra el esquema — orden #27 D', () => {
+  let nora: string;
+  let ines: string;
+  const codigoDe = async (promesa: Promise<unknown>) => {
+    try {
+      await promesa;
+      return null;
+    } catch (e) {
+      const cuerpo = (e as { getResponse?: () => unknown }).getResponse?.() as { code?: string } | undefined;
+      return cuerpo?.code ?? (e as Error).message;
+    }
+  };
+  const panel = (aal: Aal = 'aal2') => {
+    const servicioDelPanel = servicio(aal);
+    return new EquipoController(servicioDelPanel, new EquipoRepositorio(servicioDelPanel));
+  };
+
+  beforeAll(async () => {
+    const nueva = async (email: string, pais: string) => {
+      const [u] = await banco.sql<{ id: string }>(`insert into auth.users (email) values ($1) returning id`, [email]);
+      await banco.sql(`update public.personas set nombre = 'Prueba', pais = $2 where id = $1`, [u.id, pais]);
+      return u.id;
+    };
+    nora = await nueva('nora@ejemplo.mx', 'MX');
+    ines = await nueva('ines@ejemplo.es', 'ES');
+    await banco.sql(`insert into public.inscripciones (edicion_id, persona_id) values ($1, $2)`, [s.edicionAbierta, nora]);
+  });
+
+  it('POST /api/yo guarda el perfil con el token de la persona, y GET /api/yo lo devuelve', async () => {
+    const yo = new YoController(servicio('aal1'));
+    await expect(yo.guardar(pedidoDe(nora), { ciudad: ' Mérida ', anio_nacimiento: 1984, nivel_educativo: 'posgrado', pais: 'MX' }))
+      .resolves.toEqual({ ok: true });
+    const { persona } = await yo.yo(pedidoDe(nora)) as { persona: Record<string, unknown> };
+    expect(persona).toMatchObject({ ciudad: 'Mérida', anio_nacimiento: 1984, nivel_educativo: 'posgrado' });
+  });
+
+  it('null borra un dato; un año de hace menos de 14 o un nivel inventado no entran', async () => {
+    const yo = new YoController(servicio('aal1'));
+    await yo.guardar(pedidoDe(nora), { nivel_educativo: null });
+    const [f] = await banco.sql<{ nivel_educativo: string | null }>(`select nivel_educativo from public.personas where id = $1`, [nora]);
+    expect(f.nivel_educativo).toBeNull();
+    expect(await codigoDe(yo.guardar(pedidoDe(nora), { anio_nacimiento: new Date().getFullYear() - 10 }))).toBe('NO_VALIDO');
+    expect(await codigoDe(yo.guardar(pedidoDe(nora), { nivel_educativo: 'doctorado' }))).toBe('NO_VALIDO');
+  });
+
+  it('la ficha: Gabi ve las inscripciones de Nora con su estado; a Inés (España) no la abre: 404 FUERA_DE_TERRITORIO', async () => {
+    const { inscripciones, notas } = await panel().ficha(pedidoDe(s.gabi), nora) as { inscripciones: { estado: string; curso: string }[]; notas: unknown[] };
+    expect(inscripciones).toHaveLength(1);
+    expect(inscripciones[0]).toMatchObject({ estado: 'pendiente_de_pago', curso: 'El arte de amar a tu hijo adolescente' });
+    expect(notas).toEqual([]);
+    expect(await codigoDe(panel().ficha(pedidoDe(s.gabi), ines))).toBe('FUERA_DE_TERRITORIO');
+  });
+
+  it('notas: Gabi agrega sobre Nora y la lee firmada; sobre Inés, 404; un cliente, 403 SOLO_EQUIPO', async () => {
+    await panel().agregarNota(pedidoDe(s.gabi), nora, { texto: 'Pagó en efectivo en el taller' });
+    const { notas } = await panel().ficha(pedidoDe(s.gabi), nora) as { notas: { texto: string; autor: string | null }[] };
+    expect(notas).toEqual([expect.objectContaining({ texto: 'Pagó en efectivo en el taller', autor: 'Gabi' })]);
+    expect(await codigoDe(panel().agregarNota(pedidoDe(s.gabi), ines, { texto: 'x' }))).toBe('FUERA_DE_TERRITORIO');
+    expect(await codigoDe(panel('aal1').agregarNota(pedidoDe(nora), nora, { texto: 'x' }))).toBe('SOLO_EQUIPO');
+  });
+
+  it('Clientes trae ciudad, año, nivel y cuántas notas', async () => {
+    const { clientes } = await panel().clientes(pedidoDe(s.gabi)) as { clientes: Record<string, unknown>[] };
+    expect(clientes.find((c) => c.persona_id === nora)).toMatchObject({ ciudad: 'Mérida', anio_nacimiento: 1984, cuantas_notas: 1 });
   });
 });

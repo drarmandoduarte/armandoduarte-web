@@ -174,7 +174,7 @@ export class SupabaseService {
   async personaDe(token: string, personaId: string) {
     const { data, error } = await this.comoElUsuario(token)
       .from('personas')
-      .select('id, nombre, apellido, whatsapp, pais, zona_horaria')
+      .select('id, nombre, apellido, whatsapp, pais, zona_horaria, ciudad, anio_nacimiento, nivel_educativo')
       .eq('id', personaId)
       .maybeSingle();
     if (error) throw new UnauthorizedException('No pudimos leer tus datos.');
