@@ -47,3 +47,14 @@ export {
   edicionElegida, edicionPrincipal, ESTADOS_DE_INSCRIPCION, claveDeEstado, enlaceParaPedirLosDatosDeCobro,
 } from './mi-espacio/me-anoto';
 export type { DatoParaAnotarse, DatosParaAnotarse, EstadoDelTaller } from './mi-espacio/me-anoto';
+
+// ── El comprobante de pago (orden #27 C) ─────────────────────────────────────
+export {
+  TIPOS_DE_COMPROBANTE, TOPE_DE_COMPROBANTE, ACEPTA_COMPROBANTE, validarArchivoDeComprobante, rutaDeComprobante,
+  fechaDeHoyEn, montoDesdeTexto, validarDeclaracion, declaracionParaEnviar, puedeDeclarar, principalDeMiEspacio,
+} from './mi-espacio/comprobante';
+export type { TipoDeComprobante, DeclaracionEntrada, CampoDeDeclaracion } from './mi-espacio/comprobante';
+export {
+  FILTROS_DE_INSCRIPTOS, filtrarPorEstado, filtroInicial, accionesDePago, MOTIVO_MAXIMO, validarResolucion, tonoDeEstado,
+} from './panel/pagos';
+export type { FiltroDeInscriptos, AccionesDePago } from './panel/pagos';
