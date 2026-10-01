@@ -235,8 +235,11 @@ test.describe('los tres comportamientos siguen vivos sin React', () => {
        tanto como lo primero: hasta esta orden los dos primeros `Tab` caían en
        el header —invisible debajo del telón pero todavía tabulable— antes de
        llegar a «Cerrar». */
+    /* Nueve paradas desde la #25: «Cerrar», los siete ítems —«Mi espacio»
+       entró primero— y el WhatsApp del pie del menú. */
+    const PARADAS = 9;
     const recorrido: string[] = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < PARADAS; i++) {
       await page.keyboard.press('Tab');
       recorrido.push(await page.evaluate(() => {
         const e = document.activeElement as HTMLElement | null;
@@ -250,7 +253,8 @@ test.describe('los tres comportamientos siguen vivos sin React', () => {
       recorrido.every((x) => x.startsWith('ov:')),
       `el recorrido se salió del menú: ${recorrido.join(' → ')}`,
     ).toBe(true);
-    expect(recorrido[7], 'el último del recorrido es el WhatsApp del pie del menú')
+    expect(recorrido[1], 'el primer ítem es «Mi espacio» (#25)').toBe('ov:Mi espacio');
+    expect(recorrido[PARADAS - 1], 'el último del recorrido es el WhatsApp del pie del menú')
       .toContain('Escribir por WhatsApp');
 
     /* ── Y vuelve: el noveno Tab no se escapa a la página de atrás ────────

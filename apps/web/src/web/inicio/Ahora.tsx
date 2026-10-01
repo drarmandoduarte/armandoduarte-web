@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { enlaceReservarMiLugar } from '../comun/mi-espacio';
 
 /**
  * «Ahora» · lo destacado. Un solo bloque que cambia con lo que Armando
@@ -27,7 +28,9 @@ export function Ahora() {
             <span>{t('inicio.ahora.meta3')}</span>
           </p>
         </div>
-        <a href="/merida" className="link">{t('inicio.ahora.cta')} <span className="btn-arrow">→</span></a>
+        {/* #25: «Reservar mi lugar» a la app, con el estilo de enlace de la
+            banda: el naranja de la portada es el del hero. */}
+        <a href={enlaceReservarMiLugar()} className="link">{t('inicio.ahora.cta')} <span className="btn-arrow">→</span></a>
       </div>
     </section>
   );

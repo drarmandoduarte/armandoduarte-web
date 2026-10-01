@@ -254,6 +254,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 .hd__menu i::before,.hd__menu i::after{content:'';width:22px;height:1px;background:currentColor;transition:transform .4s var(--ease)}
 .hd__menu:hover i::before{transform:translateX(3px)}
 .hd__nav{display:none}
+/* #25 · «Mi espacio →»: el cromo neutro de la cabecera (D25), como «Menú»:
+   versalitas de 12, sin color de marca; en hover, el acento de la cabecera. */
+.hd__espacio{display:inline-flex;align-items:center;gap:8px;height:44px;font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;transition:color .32s}
+.hd__espacio:hover{color:var(--hd-acento,var(--teal))}
 .hd__wa{display:inline-flex;align-items:center;gap:12px;min-height:40px;padding:12px 20px;border:1px solid var(--hd-acento,var(--teal));border-radius:2px;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;line-height:1;color:var(--hd-acento,var(--teal));white-space:nowrap;transition:background .4s var(--ease),color .4s var(--ease),border-color .4s var(--ease)}
 .hd__wa svg{width:14px;height:14px;flex:none}
 .hd__wa:hover{background:var(--hd-acento,var(--teal));color:var(--hd-bg,var(--crema))}
@@ -989,6 +993,7 @@ a,button{-webkit-tap-highlight-color:transparent}
   .fondo-foto--suena img{object-position:50% 30%}
   .fondo-foto--suena::after{background:linear-gradient(to bottom,color-mix(in oklab, var(--crema) 86%, transparent) 80%,var(--crema))}
   :root{--header-h:64px}
+  .hd__espacio{display:none}
   .hd__menu span,.hd__wa span{display:none}.hd__wa{padding:0 13px;width:42px;justify-content:center}.hd__inner{column-gap:12px}
   .marca b{font-size:12px;letter-spacing:.24em}
   /* A este ancho «Escribir por WhatsApp» en versalitas con .18em no entra en
