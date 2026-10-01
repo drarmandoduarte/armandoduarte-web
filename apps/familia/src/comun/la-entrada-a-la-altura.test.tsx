@@ -88,29 +88,32 @@ describe('B y C · el marco', () => {
     expect(wa[0]).not.toContain(TELEFONO_TALLER);
   });
 
-  it('el panel de Armando va SOLO en /entrar; adentro, la columna sola', () => {
+  it('Armando y la firma van SOLO en /entrar (y /empezar); en las demás pantallas, la columna sola', () => {
     anchoDeEscritorio(true);
     const { unmount } = render(<Pantalla><p>x</p></Pantalla>);
-    expect(document.querySelector('.panel')).toBeNull();
+    expect(document.querySelector('.de-pie')).toBeNull();
+    expect(document.querySelector('.firma')).toBeNull();
     unmount();
     render(<Entrar />);
-    expect(document.querySelector('.panel .panel__armando')).not.toBeNull();
+    expect(document.querySelector('.de-pie .de-pie__img')).not.toBeNull();
+    /* #31: la firma encabeza el formulario, en el lugar del rótulo. */
+    expect(document.querySelector('.columna > .firma')?.textContent).toBe('Construyendo familias fuertes');
   });
 
-  it('EL CASO de Lighthouse: la foto solo con el panel; apilado, la firma y ninguna imagen (#30)', () => {
-    /* A ≥ 1100 la silueta del panel; debajo, ninguna imagen de Armando: la
-       firma arriba del formulario. Con dos montadas el teléfono bajaba 42 KB
-       que no mostraba, y performance caía de 76 a 71. */
+  it('EL CASO de Lighthouse: la foto solo a dos columnas; apilado, la firma y ninguna imagen (#30, #31)', () => {
+    /* A ≥ 1100 la silueta; debajo, ninguna imagen de Armando: la firma arriba
+       del formulario. Con dos montadas el teléfono bajaba 42 KB que no
+       mostraba, y performance caía de 76 a 71. */
     anchoDeEscritorio(true);
     const { unmount } = render(<Entrar />);
     expect(document.querySelectorAll('img[src*="/img/armando/"]')).toHaveLength(1);
-    expect(document.querySelector('.firma-apilada')).toBeNull();
+    expect(document.querySelectorAll('.firma')).toHaveLength(1);
     unmount();
     anchoDeEscritorio(false);
     render(<Entrar />);
     expect(document.querySelectorAll('img[src*="/img/armando/"]')).toHaveLength(0);
-    expect(document.querySelector('.panel')).toBeNull();
-    expect(document.querySelector('.firma-apilada')?.textContent).toBe('Construyendo familias fuertes');
+    expect(document.querySelector('.de-pie')).toBeNull();
+    expect(document.querySelector('.firma')?.textContent).toBe('Construyendo familias fuertes');
   });
 });
 
