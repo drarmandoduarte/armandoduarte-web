@@ -155,13 +155,17 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
   });
 
   it('los tres textos del 2/10 (sede, modalidad, receso) están en todos lados, y los de antes en ninguno', () => {
-    /* Contra el pedido, entre comillas latinas, como lo escribió dirección. */
+    /* Contra el pedido, entre comillas latinas, como lo escribió dirección.
+       La modalidad la ajustó Armando el mismo 2/10 a las 13:31 (orden #33 bis,
+       llegada por chat a Rodolfo): de «Modalidad Presencial» a «Presencial».
+       Ese ajuste no está escrito en la orden #33, así que se ancla como
+       literal y no se busca en el pedido. */
     const NUEVOS = {
       sede: 'Fiesta Inn CORDEMEX',
-      modalidad: 'Modalidad Presencial',
+      modalidad: 'Presencial',
       receso: 'Con un receso de 20 minutos',
     };
-    for (const [que, valor] of Object.entries(NUEVOS)) {
+    for (const [que, valor] of Object.entries({ sede: NUEVOS.sede, receso: NUEVOS.receso })) {
       expect(PEDIDO, `${que}: «${valor}» no está en el pedido del 2/10`).toContain(`«${valor}»`);
     }
     /* Cada lugar de i18n donde aparecen. */
@@ -176,7 +180,7 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
 
     /* Y lo publicado: ningún texto de antes en ningún HTML de dist (JSON-LD y
        meta incluidos), y el `Place` del Event con la sede nueva. */
-    const VIEJOS = ['Fiesta Inn Mérida', 'Sesión privada en vivo', 'entre el núcleo 2 y el 3'];
+    const VIEJOS = ['Fiesta Inn Mérida', 'Sesión privada en vivo', 'entre el núcleo 2 y el 3', 'Modalidad Presencial'];
     const paginas = RUTAS.map(({ archivo }) => ({ archivo, html: existsSync(join(DIST, archivo)) ? readFileSync(join(DIST, archivo), 'utf8') : '' }));
     for (const { archivo, html } of paginas) {
       expect(html.length, `${archivo} no está en dist: corre el build antes`).toBeGreaterThan(1000);
