@@ -39,7 +39,7 @@ Pedido de Armando, 2/10/2026. Capturas a 1440 en esta carpeta: `cabecera-1440.jp
 
 1. **Banda AHORA.** Antes de la #25 decía «Ver el taller» → `/merida`, sin WhatsApp. La orden pide «Reservar por WhatsApp» con «sus mensajes». Usé el número de la portada (Gaby) y `comun.mensajes.reservar`, igual que la tarjeta del taller. El título de la banda sigue llevando a `/merida`.
 2. **Cierre de `/merida`.** Volvió el «Conocer a Armando» que tenía antes de la #25. El botón principal ahora dice «Reservar por WhatsApp»; antes decía «Asegurar mi lugar».
-3. **«Modalidad Presencial»** queda debajo del rótulo «MODALIDAD»: se lee «MODALIDAD · Modalidad Presencial». Lo dejé literal porque es texto de Armando.
+3. ~~**«Modalidad Presencial»** queda debajo del rótulo «MODALIDAD»~~ · resuelto en la #33 bis: Armando lo ajustó a «Presencial» (2/10, 13:31).
 
 ## Pendiente para Germán
 

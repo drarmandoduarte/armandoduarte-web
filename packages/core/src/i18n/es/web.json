@@ -128,7 +128,7 @@
       "fichaLugarClave": "Lugar",
       "fichaLugarValor": "Fiesta Inn CORDEMEX",
       "fichaModalidadClave": "Modalidad",
-      "fichaModalidadValor": "Modalidad Presencial",
+      "fichaModalidadValor": "Presencial",
       "fichaInversionClave": "Inversión",
       "fichaInversionValor": "$1,170 MXN · incluye workbook, cuaderno, coffee break y tarea por WhatsApp"
     },
@@ -200,7 +200,7 @@
       "dondeValor": "Fiesta Inn CORDEMEX",
       "dondeAria": "Fiesta Inn CORDEMEX · abre en Google Maps",
       "modalidadClave": "Modalidad",
-      "modalidadValor": "Modalidad Presencial"
+      "modalidadValor": "Presencial"
     },
     "suena": {
       "eyebrow": "¿Te suena?",
