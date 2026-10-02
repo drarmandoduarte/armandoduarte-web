@@ -3,7 +3,7 @@
 --
 -- QUÉ TRAE: el primer curso del panel, para que no nazca vacío: «El arte de amar
 -- a tu adolescente» y su edición del jueves 5 de noviembre de 2026, de 8:30 a
--- 13:00 en Mérida, en el Fiesta Inn, a $1,170 MXN. **En `borrador`**: lo publica
+-- 13:00 en Mérida, en el Fiesta Inn CORDEMEX, a $1,170 MXN. **En `borrador`**: lo publica
 -- Armando desde el panel cuando lo mire. Mientras sea borrador no se ve fuera
 -- del equipo (002) y nadie se puede inscribir (003, `edicion_abierta()`).
 --
@@ -17,6 +17,11 @@
 --   como `semilla_02_taller_de_merida` (el nombre del editor no es el del
 --   archivo: la `semilla_01` del editor es el alta de Armando como dueño).
 --   Fuente: `03 Producto/mi-espacio/infraestructura-2026-09-29.md`, «30/9 21:55».
+--
+-- LA SEDE, 2/10/2026 (orden #33): Armando la escribe «Fiesta Inn CORDEMEX».
+--   La fila de la base la cambia el CEO por SQL (no es migración) y lo anota
+--   en `infraestructura`; este archivo se corrige para que el repo diga lo
+--   mismo que la base. Volver a correrla no pisa la fila existente.
 --
 -- ── Una semilla no es una migración ─────────────────────────────────────────
 -- No cambia el esquema: carga una fila de datos. Por eso vive en `semillas/` y
@@ -52,7 +57,7 @@ insert into public.ediciones
 select c.id,
        timestamp '2026-11-05 08:30' at time zone 'America/Merida',
        timestamp '2026-11-05 13:00' at time zone 'America/Merida',
-       'America/Merida', 'Fiesta Inn Mérida', 'Mérida', 'MX', null,
+       'America/Merida', 'Fiesta Inn CORDEMEX', 'Mérida', 'MX', null,
        1170.00, 'MXN',
        timestamp '2026-11-05 08:30' at time zone 'America/Merida',
        'abierta'

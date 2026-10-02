@@ -54,7 +54,8 @@
       "programa": "Hola, vi el programa del taller El arte de amar a tu adolescente y quiero reservar mi lugar.",
       "asegurar": "Hola, quiero asegurar mi lugar en el taller El arte de amar a tu adolescente.",
       "arco": "Hola, quiero ejercer mis derechos ARCO."
-    }
+    },
+    "reservarPorWhatsApp": "Reservar por WhatsApp"
   },
   "inicio": {
     "head": {
@@ -77,7 +78,7 @@
     "ahora": {
       "pill": "Ahora",
       "titulo": "El arte de amar a tu adolescente · taller presencial",
-      "meta1": "Fiesta Inn Mérida",
+      "meta1": "Fiesta Inn CORDEMEX",
       "meta2": "Jueves 5 de noviembre",
       "meta3": "8:30 a 13:00",
       "cta": "Reservar mi lugar"
@@ -125,9 +126,9 @@
       "fichaHorarioClave": "Horario",
       "fichaHorarioValor": "8:30 a 13:00 · 4 horas y media",
       "fichaLugarClave": "Lugar",
-      "fichaLugarValor": "Fiesta Inn Mérida",
+      "fichaLugarValor": "Fiesta Inn CORDEMEX",
       "fichaModalidadClave": "Modalidad",
-      "fichaModalidadValor": "Sesión privada en vivo · cupo limitado",
+      "fichaModalidadValor": "Modalidad Presencial",
       "fichaInversionClave": "Inversión",
       "fichaInversionValor": "$1,170 MXN · incluye workbook, cuaderno, coffee break y tarea por WhatsApp"
     },
@@ -173,7 +174,7 @@
   "taller": {
     "head": {
       "title": "Taller para padres de adolescentes en Mérida · El arte de amar a tu adolescente · Armando Duarte",
-      "description": "Taller presencial de 4 horas y media para padres de adolescentes. Jueves 5 de noviembre de 2026, Fiesta Inn Mérida, 8:30 a 13:00. Con Armando Duarte, cupo limitado.",
+      "description": "Taller presencial de 4 horas y media para padres de adolescentes. Jueves 5 de noviembre de 2026, Fiesta Inn CORDEMEX, 8:30 a 13:00. Con Armando Duarte, cupo limitado.",
       "ogImageAlt": "El arte de amar a tu hijo adolescente · taller en Mérida"
     },
     "hero": {
@@ -196,10 +197,10 @@
       "horarioClave": "Horario",
       "horarioValor": "8:30 a 13:00",
       "dondeClave": "Dónde",
-      "dondeValor": "Fiesta Inn Mérida",
-      "dondeAria": "Fiesta Inn Mérida · abre en Google Maps",
+      "dondeValor": "Fiesta Inn CORDEMEX",
+      "dondeAria": "Fiesta Inn CORDEMEX · abre en Google Maps",
       "modalidadClave": "Modalidad",
-      "modalidadValor": "Sesión privada en vivo"
+      "modalidadValor": "Modalidad Presencial"
     },
     "suena": {
       "eyebrow": "¿Te suena?",
@@ -251,7 +252,7 @@
         "titulo": "Realizar los cambios",
         "texto": "Llevar los acuerdos a la práctica diaria con paciencia, consistencia y autocontrol adulto."
       },
-      "receso": "Con un receso de 20 minutos entre el núcleo 2 y el 3"
+      "receso": "Con un receso de 20 minutos"
     },
     "llevas": {
       "eyebrow": "Al terminar",
@@ -327,7 +328,8 @@
       "titulo": "El amor incondicional no es la ausencia de límites. Es la presencia de unos padres conscientes.",
       "lead": "No dejes que los años más determinantes de la vida de tu hijo transcurran entre el distanciamiento y la fricción.",
       "ctaReservar": "Reservar mi lugar",
-      "ctaWhatsapp": "Prefiero escribir por WhatsApp"
+      "ctaWhatsapp": "Prefiero escribir por WhatsApp",
+      "ctaConocer": "Conocer a Armando"
     }
   },
   "privacidad": {
