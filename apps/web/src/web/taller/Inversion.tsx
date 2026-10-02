@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { TELEFONO_TALLER } from '@codice/core';
+import { MI_ESPACIO_EN_LA_WEB, TELEFONO_TALLER } from '@codice/core';
 import { BotonWhatsApp } from '../comun/BotonWhatsApp';
 import { Seccion } from '../comun/Seccion';
 import { enlaceReservarMiLugar } from '../comun/mi-espacio';
@@ -25,17 +25,29 @@ export function Inversion() {
           <div className="precio num">{t('taller.inversion.precio')} <small>{t('taller.inversion.moneda')}</small></div>
           <p className="por">{t('taller.inversion.por')}</p>
           <div className="hero-cta">
-            {/* Auditoría del #41: donde está el precio, igual que el hero —
-                reservar en la app (naranja) y WhatsApp en contorno. */}
-            <a href={enlaceReservarMiLugar()} className="btn btn--naranja">
-              {t('taller.inversion.cta')} <span className="btn-arrow">→</span>
-            </a>
-            <BotonWhatsApp
-              telefono={TELEFONO_TALLER}
-              mensaje={t('comun.mensajes.asegurar')}
-              texto={t('taller.inversion.ctaWhatsapp')}
-              clase="btn"
-            />
+            {MI_ESPACIO_EN_LA_WEB ? (
+              <>
+                {/* Auditoría del #41: donde está el precio, igual que el hero —
+                    reservar en la app (naranja) y WhatsApp en contorno. */}
+                <a href={enlaceReservarMiLugar()} className="btn btn--naranja">
+                  {t('taller.inversion.cta')} <span className="btn-arrow">→</span>
+                </a>
+                <BotonWhatsApp
+                  telefono={TELEFONO_TALLER}
+                  mensaje={t('comun.mensajes.asegurar')}
+                  texto={t('taller.inversion.ctaWhatsapp')}
+                  clase="btn"
+                />
+              </>
+            ) : (
+              /* #33: sin la app, un solo botón, como antes de la #25. */
+              <BotonWhatsApp
+                telefono={TELEFONO_TALLER}
+                mensaje={t('comun.mensajes.asegurar')}
+                texto={t('comun.reservarPorWhatsApp')}
+                clase="btn btn--naranja"
+              />
+            )}
           </div>
         </div>
         <div>

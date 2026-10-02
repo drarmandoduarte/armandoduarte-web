@@ -14,6 +14,19 @@
  */
 export const APP_FAMILIA = 'https://familia.armandoduarte.com';
 
+/* ── Las banderas de la web (orden #33) ───────────────────────────────────
+   Pedido de Armando, 2/10/2026 (vía Germán): «por ahora esconder lo de Spotify
+   en su web y dejar solo las reservas vía WhatsApp; esconder Mi espacio».
+
+   Es un apagado, no una vuelta atrás: la app sigue en `APP_FAMILIA` y quien
+   tenga el enlace entra igual. Lo que se esconde es **la puerta desde la web**.
+   Con `MI_ESPACIO_EN_LA_WEB` en `false` la web no nombra la app en ningún
+   HTML y todo «Reservar» va por WhatsApp; con `SPOTIFY_EN_LA_WEB` en `false`
+   no hay enlace a Spotify. Volver a prenderlas es un commit, cuando Armando lo
+   pida (anotado en `docs/tareas.md`). */
+export const MI_ESPACIO_EN_LA_WEB: boolean = false;
+export const SPOTIFY_EN_LA_WEB: boolean = false;
+
 /** El slug del taller de Mérida: el de la semilla de la base (`semillas/001_taller_de_merida.sql`). */
 export const SLUG_DEL_TALLER_DE_MERIDA = 'el-arte-de-amar-a-tu-adolescente';
 

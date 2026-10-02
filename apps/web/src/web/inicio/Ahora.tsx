@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { MI_ESPACIO_EN_LA_WEB, TELEFONO_GABY, enlaceWhatsApp } from '@codice/core';
 import { enlaceReservarMiLugar } from '../comun/mi-espacio';
 
 /**
@@ -31,8 +32,16 @@ export function Ahora() {
           </p>
         </div>
         {/* #25: «Reservar mi lugar» a la app, con el estilo de enlace de la
-            banda: el naranja de la portada es el del hero. */}
-        <a href={enlaceReservarMiLugar()} className="link">{t('inicio.ahora.cta')} <span className="btn-arrow">→</span></a>
+            banda: el naranja de la portada es el del hero. Sin la app (#33),
+            el mismo enlace a WhatsApp que la tarjeta del taller: el número de
+            Gaby (el de la portada) y el mensaje de reservar. */}
+        {MI_ESPACIO_EN_LA_WEB ? (
+          <a href={enlaceReservarMiLugar()} className="link">{t('inicio.ahora.cta')} <span className="btn-arrow">→</span></a>
+        ) : (
+          <a href={enlaceWhatsApp(TELEFONO_GABY, t('comun.mensajes.reservar'))} className="link" target="_blank" rel="noopener">
+            {t('comun.reservarPorWhatsApp')} <span className="btn-arrow">→</span>
+          </a>
+        )}
       </div>
     </section>
   );

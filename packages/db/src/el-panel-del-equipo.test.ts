@@ -233,7 +233,7 @@ describe('La semilla del taller de Mérida', () => {
         where c.slug = 'el-arte-de-amar-a-tu-adolescente'`,
     );
     expect(fila).toEqual({
-      estado: 'borrador', zona: 'America/Merida', sede: 'Fiesta Inn Mérida',
+      estado: 'borrador', zona: 'America/Merida', sede: 'Fiesta Inn CORDEMEX',
       precio: '1170.00', moneda: 'MXN',
       inicio_local: '2026-11-05 08:30', fin_local: '13:00',
       /* Mérida es UTC−6 todo el año: 8:30 allá son las 14:30 UTC. */

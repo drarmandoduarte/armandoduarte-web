@@ -21,12 +21,23 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 96 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 107 |
-| `@codice/web` | 63 |
+| `@codice/web` | 71 |
 | `@codice/familia` | 160 |
 | `@codice/api` | 70 |
 | `@codice/navegador` | 40 |
 
 
+
+
+## Lo que trae la orden #33 — `web` 63 → 71
+
+- **`@codice/web` (+3 de la #33)**: `la-web-no-nombra-vercel.test.ts` pasa de 5 a
+  7 —el piso de las cuatro páginas y Spotify— y cada test afirma la rama de
+  `MI_ESPACIO_EN_LA_WEB` que se publicó, con las dos escritas;
+  `lo-que-mando-armando.test.ts` pasa de 4 a 5 (los tres textos del 2/10 en
+  i18n y en `dist`). Los otros 5 ya estaban y no se había subido el piso.
+  Mutación: build con las banderas en `true` y test en `false` → caen 5; build
+  en `false` y test en `true` → caen 5.
 
 ## Lo que trae la orden #29 — `core` 39 → 96, `familia` 89 → 160
 

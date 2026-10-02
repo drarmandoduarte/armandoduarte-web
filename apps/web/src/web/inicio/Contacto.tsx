@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { TELEFONO_GABY, TELEFONO_GABY_VISIBLE, enlaceWhatsApp } from '@codice/core';
+import { SPOTIFY_EN_LA_WEB, TELEFONO_GABY, TELEFONO_GABY_VISIBLE, enlaceWhatsApp } from '@codice/core';
 import { CANALES } from '../comun/canales';
 import { Seccion } from '../comun/Seccion';
 
@@ -23,8 +23,13 @@ export function Contacto() {
           </p>
           <p className="grande u-mt-4">
             <a href={CANALES.youtube} target="_blank" rel="noopener">{t('inicio.contacto.youtube')}</a>
-            {' · '}
-            <a href={CANALES.spotify} target="_blank" rel="noopener">{t('inicio.contacto.spotify')}</a>
+            {/* #33: Spotify escondido detrás de su bandera, con su «·». */}
+            {SPOTIFY_EN_LA_WEB && (
+              <>
+                {' · '}
+                <a href={CANALES.spotify} target="_blank" rel="noopener">{t('inicio.contacto.spotify')}</a>
+              </>
+            )}
             {' · '}
             <a href={CANALES.facebook} target="_blank" rel="noopener">{t('inicio.contacto.facebook')}</a>
             {' · '}

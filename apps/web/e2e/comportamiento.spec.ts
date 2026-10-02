@@ -236,8 +236,12 @@ test.describe('los tres comportamientos siguen vivos sin React', () => {
        el header —invisible debajo del telón pero todavía tabulable— antes de
        llegar a «Cerrar». */
     /* Nueve paradas desde la #25: «Cerrar», los siete ítems —«Mi espacio»
-       entró primero— y el WhatsApp del pie del menú. */
-    const PARADAS = 9;
+       entró primero— y el WhatsApp del pie del menú. Ocho con la bandera de
+       la #33 apagada: «Mi espacio» no está y el primer ítem es «Quién soy».
+       Se lee del menú y no de `@codice/core` (Playwright no carga sus JSON):
+       que la bandera y el HTML coincidan lo afirma `la-web-no-nombra-vercel`. */
+    const conMiEspacio = (await page.locator('#ov a[data-nav]', { hasText: 'Mi espacio' }).count()) > 0;
+    const PARADAS = conMiEspacio ? 9 : 8;
     const recorrido: string[] = [];
     for (let i = 0; i < PARADAS; i++) {
       await page.keyboard.press('Tab');
@@ -253,11 +257,12 @@ test.describe('los tres comportamientos siguen vivos sin React', () => {
       recorrido.every((x) => x.startsWith('ov:')),
       `el recorrido se salió del menú: ${recorrido.join(' → ')}`,
     ).toBe(true);
-    expect(recorrido[1], 'el primer ítem es «Mi espacio» (#25)').toBe('ov:Mi espacio');
+    expect(recorrido[1], 'el primer ítem: «Mi espacio» (#25) o, con la #33, «Quién soy»')
+      .toBe(conMiEspacio ? 'ov:Mi espacio' : 'ov:Quién soy');
     expect(recorrido[PARADAS - 1], 'el último del recorrido es el WhatsApp del pie del menú')
       .toContain('Escribir por WhatsApp');
 
-    /* ── Y vuelve: el noveno Tab no se escapa a la página de atrás ────────
+    /* ── Y vuelve: el Tab después del último no se escapa a la página de atrás ────────
        Sin la trampa, acá el foco salía al «Ver el taller en Mérida» del hero —
        un botón tapado por el telón, que quien navega con teclado recorrería a
        ciegas. Es la mitad que faltaba de la accesibilidad del menú. */

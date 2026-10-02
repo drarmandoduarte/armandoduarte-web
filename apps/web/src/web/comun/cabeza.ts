@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import tokens from '@codice/ui/tokens.json';
-import { RECURSOS_I18N } from '@codice/core';
+import { MI_ESPACIO_EN_LA_WEB, RECURSOS_I18N } from '@codice/core';
 import { CANALES } from './canales';
 import { enlaceReservarMiLugar } from './mi-espacio';
 
@@ -110,7 +110,7 @@ const EVENTO_MERIDA = {
   endDate: '2026-11-05T13:00:00-06:00',
   location: {
     '@type': 'Place',
-    name: 'Fiesta Inn Mérida',
+    name: 'Fiesta Inn CORDEMEX',
     /* El mismo enlace que la franja de hechos (orden #20, E), de `CANALES`:
        una dirección escrita dos veces es una dirección que un día apunta a dos
        lugares. Google lo usa para el mapa del resultado enriquecido. */
@@ -129,8 +129,9 @@ const EVENTO_MERIDA = {
     price: 1170,
     priceCurrency: 'MXN',
     availability: 'https://schema.org/LimitedAvailability',
-    /* #25: la oferta se toma en la app: entrar y caer en «Me anoto». */
-    url: enlaceReservarMiLugar(),
+    /* #25: la oferta se toma en la app: entrar y caer en «Me anoto». Sin la
+       app (#33) no va `url`: no se inventa otro destino. */
+    ...(MI_ESPACIO_EN_LA_WEB ? { url: enlaceReservarMiLugar() } : {}),
   },
 } as const;
 
