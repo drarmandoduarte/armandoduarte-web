@@ -85,10 +85,6 @@ const PENDIENTES: Record<string, string> = {
   '010_el_libro_en_el_panel.sql':
     'orden #27 C: el último renglón del libro y la firma del equipo para Inscriptos. La corre el CEO '
     + 'cuando se mergee el PR C: sin ella, Inscriptos no lista (la API la llama junto con la 008)',
-  '011_el_perfil.sql':
-    'orden #27 D: el perfil (ciudad, año de nacimiento, nivel educativo), las notas del equipo y '
-    + 'panel_clientes con las columnas nuevas. La corre el CEO ANTES de desplegar el PR D: sin ella, '
-    + 'GET /api/yo da 42703 y nadie entra a Mi espacio',
 };
 
 describe('las migraciones', () => {
