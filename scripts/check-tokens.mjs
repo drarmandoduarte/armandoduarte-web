@@ -120,6 +120,19 @@ const MARCAS_AJENAS = [
 ];
 const TOPE_DE_MARCAS_AJENAS = 1;
 
+/* ── Las banderas del campo WhatsApp (orden Códice #32) ─────────────────
+   Las pidió dirección: SVG de `flag-icons` (MIT) en `public/banderas/`, una por
+   país con prefijo de la lista de `core`. Son colores **nacionales**, no
+   nuestros, igual que el logo de Google es de Google. No entran a la lista de
+   marcas ajenas (que tiene tope 1 a propósito): se excusa **la carpeta**, con
+   tres condiciones que no se pueden aflojar sin que esto caiga:
+     · cada archivo se llama `<iso>.svg`, dos letras minúsculas;
+     · son exactamente BANDERAS_ESPERADAS (los países con prefijo de `core`,
+       medido en `whatsapp.test.ts`): una de más es un SVG que se coló;
+     · la licencia está declarada en `docs/creditos.md`. */
+const CARPETA_DE_BANDERAS = 'apps/familia/public/banderas/';
+const BANDERAS_ESPERADAS = 242;
+
 const svgs = [];
 const juntarSvg = (dir) => {
   let entradas;
@@ -141,8 +154,20 @@ if (MARCAS_AJENAS.length > TOPE_DE_MARCAS_AJENAS) {
   process.stderr.write(`check-tokens: la lista de marcas ajenas tiene ${MARCAS_AJENAS.length} archivos y el tope es ${TOPE_DE_MARCAS_AJENAS}. Una excepción que crece deja de ser una excepción: lo decide dirección.\n`);
   process.exit(1);
 }
+const banderas = svgs.filter((a) => relative(RAIZ, a).startsWith(CARPETA_DE_BANDERAS));
+for (const a of banderas) {
+  const nombre = relative(RAIZ, a).slice(CARPETA_DE_BANDERAS.length);
+  if (!/^[a-z]{2}\.svg$/.test(nombre)) hallazgos.push(`${CARPETA_DE_BANDERAS}${nombre}  no es una bandera (<iso>.svg): no está excusado`);
+}
+if (banderas.length !== BANDERAS_ESPERADAS) {
+  hallazgos.push(`${CARPETA_DE_BANDERAS}  tiene ${banderas.length} SVG y tienen que ser ${BANDERAS_ESPERADAS} (los países con prefijo de core)`);
+}
+if (!/flag-icons/.test(readFileSync(join(RAIZ, 'docs/creditos.md'), 'utf8'))) {
+  hallazgos.push('docs/creditos.md  no declara la licencia de flag-icons (MIT), de donde salen las banderas');
+}
 for (const archivo of svgs) {
   const rel = relative(RAIZ, archivo);
+  if (rel.startsWith(CARPETA_DE_BANDERAS) && /^[a-z]{2}\.svg$/.test(rel.slice(CARPETA_DE_BANDERAS.length))) continue;
   const hex = readFileSync(archivo, 'utf8').match(HEX) ?? [];
   const excusado = MARCAS_AJENAS.some(([ruta]) => ruta === rel);
   if (excusado && hex.length === 0) {
@@ -176,4 +201,5 @@ if (hallazgos.length) {
 }
 
 process.stdout.write(`check-tokens: ${archivos} archivos recorridos, ningún hex fuera de ${DONDE_VIVEN}; `
-  + `${svgs.length} SVG en ${PUBLICO_DE_FAMILIA}, ${MARCAS_AJENAS.length} marca ajena excusada (tope ${TOPE_DE_MARCAS_AJENAS}).\n`);
+  + `${svgs.length} SVG en ${PUBLICO_DE_FAMILIA}, ${MARCAS_AJENAS.length} marca ajena excusada (tope ${TOPE_DE_MARCAS_AJENAS}) `
+  + `y ${banderas.length} banderas de flag-icons (exactas).\n`);

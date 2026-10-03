@@ -2,6 +2,7 @@ import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   TERRITORIOS, aCsv, accionDeEquipo, coincide, edadDesdeAnio, enlaceDeSaludo, fechaCorta, nombreDeArchivo, type Rol,
+  formatearWhatsapp,
 } from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
 import { Campo, Selector } from '../comun/Piezas';
@@ -125,7 +126,7 @@ export function Clientes({ yo }: { yo: Yo }) {
                     <tr>
                       <td>{nombre}</td>
                       <td><a className="enlace" href={`mailto:${f.email}`}>{f.email}</a></td>
-                      <td>{enlace ? <a className="enlace" href={enlace} target="_blank" rel="noopener">{f.whatsapp}</a> : (f.whatsapp ?? '—')}</td>
+                      <td>{enlace ? <a className="enlace" href={enlace} target="_blank" rel="noopener">{formatearWhatsapp(f.whatsapp)}</a> : (f.whatsapp ? formatearWhatsapp(f.whatsapp) : '—')}</td>
                       <td>{f.pais ?? '—'}</td>
                       <td>{f.ciudad ?? '—'}</td>
                       <td className="tabla__numero">{edadDesdeAnio(f.anio_nacimiento) ?? '—'}</td>

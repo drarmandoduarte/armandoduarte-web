@@ -12,7 +12,7 @@
  */
 import { DATOS_PARA_ANOTARSE, datosQueFaltan, validarDatosParaAnotarse } from './me-anoto';
 import { validarPerfil } from './perfil';
-import { telefonoParaWa } from '../panel/listas';
+import { whatsappE164, whatsappValido } from './whatsapp';
 
 type PersonaDeLaFicha = {
   nombre?: string | null;
@@ -38,7 +38,7 @@ export type DatoDeLaFicha = (typeof DATOS_DE_LA_FICHA)[number];
  */
 export function faltanEnLaFicha(persona: PersonaDeLaFicha): DatoDeLaFicha[] {
   return DATOS_DE_LA_FICHA.filter((campo) => {
-    if (campo === 'whatsapp') return !telefonoParaWa(persona?.whatsapp);
+    if (campo === 'whatsapp') return !whatsappValido(persona?.whatsapp);
     return !persona?.[campo]?.trim();
   });
 }
@@ -101,7 +101,8 @@ export function empezarParaEnviar(d: EmpezarEntrada): Record<string, string> {
   const cuerpo: Record<string, string> = {
     nombre: d.nombre.trim(),
     apellido: d.apellido.trim(),
-    whatsapp: d.whatsapp.trim(),
+    /* #32: se guarda E.164 (`+529991234567`). */
+    whatsapp: whatsappE164(d.whatsapp) ?? d.whatsapp.trim(),
     pais: d.pais,
   };
   if (d.ciudad.trim() !== '') cuerpo.ciudad = d.ciudad.trim();

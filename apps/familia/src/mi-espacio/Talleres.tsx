@@ -10,6 +10,7 @@ import { abrirEnOtraPestana } from '../comun/abrir';
 import { BotonPrincipal, Campo } from '../comun/Piezas';
 import { PasoDeComprobante, type Cobro } from './Comprobante';
 import { EnlaceInterno } from '../comun/navegacion';
+import { CampoWhatsApp } from '../comun/CampoWhatsApp';
 import { RUTAS } from '../rutas';
 
 /**
@@ -260,9 +261,11 @@ function PasoDeMeAnoto({
           <p className="nota">{t('miEspacio.faltanParaAnotarte')}</p>
           {faltan.includes('nombre') ? campo('nombre', { autoComplete: 'given-name', autoFocus: true }) : null}
           {faltan.includes('apellido') ? campo('apellido', { autoComplete: 'family-name' }) : null}
-          {faltan.includes('whatsapp')
-            ? campo('whatsapp', { type: 'tel', inputMode: 'tel', autoComplete: 'tel', ayuda: t('miEspacio.whatsappAyuda') })
-            : null}
+          {faltan.includes('whatsapp') ? (
+            <CampoWhatsApp id="anotarse-whatsapp" rotulo={t('miEspacio.whatsapp')} ayuda={t('miEspacio.whatsappAyuda')}
+              valor={datos.whatsapp ?? ''} paisSugerido={yo.persona?.pais ?? null} error={errores.whatsapp}
+              alCambiar={(v) => setDatos((d) => ({ ...d, whatsapp: v }))} />
+          ) : null}
         </>
       ) : null}
       <div className="fila">

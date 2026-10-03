@@ -198,6 +198,20 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
     expect(merida, 'el receso en /merida').toContain(NUEVOS.receso);
   });
 
+  it('#32: los términos dicen que se reserva por WhatsApp, no en Mi espacio', () => {
+    /* Dirección, 2/10 (cierre de la #32): con la web sin «Mi espacio» (#33),
+       los términos seguían diciendo que los lugares se reservan ahí. El texto
+       es literal de dirección. */
+    const RESERVAS = 'Los lugares en los talleres se reservan por WhatsApp con el equipo de Armando, que confirma cupo, '
+      + 'forma de pago y condiciones de cada actividad. En este sitio no se cobra nada ni se procesan pagos.';
+    expect(web.terminos.reservasTexto).toBe(RESERVAS);
+    const archivo = join(DIST, 'terminos.html');
+    const html = existsSync(archivo) ? readFileSync(archivo, 'utf8') : '';
+    expect(html.length, 'terminos.html no está en dist: corre el build antes').toBeGreaterThan(1000);
+    expect(html, 'lo publicado').toContain(RESERVAS);
+    expect(html, 'el texto de antes').not.toContain('se reservan en Mi espacio');
+  });
+
   it('y el lector de núcleos distingue una línea de núcleo de la prosa de al lado', () => {
     /* El autoexamen que hace valer al piso: si el regex matcheara cualquier
        línea, los cinco se «encontrarían» en cualquier documento. */

@@ -58,3 +58,18 @@ en el informe de la #07 con los números.
 
 *De* Padres digitalmente responsables *no existe portada publicada en ningún
 lado; su lomo dibujado en navy es nuestro, no una reproducción.*
+
+## Banderas del campo WhatsApp (Mi espacio)
+
+`apps/familia/public/banderas/<iso>.svg` — **flag-icons 7.5.0**
+(<https://github.com/lipis/flag-icons>), de Panayiotis Lipiridis, bajo licencia
+**MIT** («Copyright (c) 2013 Panayiotis Lipiridis»; el texto completo viaja con
+el paquete). Orden #32. Son las de 4:3, sin tocar, y **solo** las de los 242
+países con prefijo telefónico de la lista de `@codice/core` (`PAISES_ISO` menos
+los 7 territorios sin prefijo: AQ, BV, GS, HM, PN, TF, UM). Se sirven desde el
+mismo origen: la CSP `img-src 'self'` no cambia. Las vigila `check:tokens`
+(nombre `<iso>.svg`, exactamente 242, y esta línea).
+
+Las más pesadas son las que llevan escudo: Serbia 181 KB, Bolivia 103 KB y
+**México 85 KB**, que es la que se ve con el campo cerrado. Las demás se bajan
+recién al abrir la lista (`loading="lazy"`).

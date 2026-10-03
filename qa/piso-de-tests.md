@@ -18,14 +18,13 @@ alguien lo va a leer en el PR. Ése es el punto.
 | paquete | piso |
 |---|---|
 | `@codice/ui` | 31 |
-| `@codice/core` | 96 |
+| `@codice/core` | 102 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 107 |
 | `@codice/web` | 71 |
-| `@codice/familia` | 160 |
+| `@codice/familia` | 169 |
 | `@codice/api` | 70 |
 | `@codice/navegador` | 40 |
-
 
 
 
@@ -38,6 +37,16 @@ alguien lo va a leer en el PR. Ése es el punto.
   i18n y en `dist`). Los otros 5 ya estaban y no se había subido el piso.
   Mutación: build con las banderas en `true` y test en `false` → caen 5; build
   en `false` y test en `true` → caen 5.
+
+## Lo que trae la orden #32 — `core` 96 → 102, `familia` 160 → 169
+
+- **`@codice/core`**: `src/mi-espacio/whatsapp.test.ts` (+6) — validar por país
+  (MX, AR, ES, US), inválidos, E.164, partir y armar, formato, y el piso de los
+  países con prefijo (los 7 sin prefijo, nombrados). Mutación: volver a «de 8 a
+  15 dígitos» → cae 1 acá y 1 en `familia`.
+- **`@codice/familia`**: `src/comun/campo-whatsapp.test.tsx` (+9) — un solo
+  borde, abrir con clic y con teclado, buscar «arg», Enter, prefijo, formato,
+  pegado con «+», error con el país, y el enlace con País.
 
 ## Lo que trae la orden #29 — `core` 39 → 96, `familia` 89 → 160
 

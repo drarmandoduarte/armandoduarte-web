@@ -4,6 +4,7 @@ import {
   FILTROS_DE_INSCRIPTOS, MOTIVO_MAXIMO, aCsv, accionesDePago, coincide, enlaceDeSaludo, fechaCorta, fechaLarga,
   filtrarPorEstado, filtroInicial, formatearPrecio, montoDesdeTexto, nombreDeArchivo, tonoDeEstado, validarResolucion,
   type FiltroDeInscriptos,
+  formatearWhatsapp,
 } from '@codice/core';
 import { api, ErrorDeApi, type Yo } from '../comun/api';
 import { abrirEnOtraPestana } from '../comun/abrir';
@@ -211,8 +212,8 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
                       <td>
                         {enlace ? (
                           <a className="enlace" href={enlace} target="_blank" rel="noopener"
-                            aria-label={t('equipo.inscriptos.escribirle', { nombre })}>{f.whatsapp}</a>
-                        ) : (f.whatsapp ?? '—')}
+                            aria-label={t('equipo.inscriptos.escribirle', { nombre })}>{formatearWhatsapp(f.whatsapp)}</a>
+                        ) : (f.whatsapp ? formatearWhatsapp(f.whatsapp) : '—')}
                       </td>
                       <td>{f.pais ?? '—'}</td>
                       <td className="tabla__numero">{fecha(f.inscripto_el)}</td>

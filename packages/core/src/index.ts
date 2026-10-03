@@ -79,3 +79,15 @@ export {
   proximoTaller,
 } from './mi-espacio/marco';
 export type { DatoDeLaFicha, EmpezarEntrada, CampoDeEmpezar } from './mi-espacio/marco';
+export {
+  PAIS_DEL_WHATSAPP,
+  armarWhatsapp,
+  ejemploNacional,
+  formatearWhatsapp,
+  nacionalMientrasSeEscribe,
+  partirWhatsapp,
+  prefijoDe,
+  tienePrefijo,
+  whatsappE164,
+  whatsappValido,
+} from './mi-espacio/whatsapp';

@@ -12,7 +12,9 @@
 -- por dirección el 1/10/2026, que define el esquema con estas palabras (D.1).
 -- Es 011 y no 010 porque el PR C usó la 010 (`libro_de_edicion`).
 --
--- APLICADA: —
+-- APLICADA: 1/10/2026 16:20 (UY), en `armandoduarte-familia`, desde 157a2ff.
+--   Guardada en el editor SQL como `011_el_perfil`. Corrida por el CEO con
+--   autorización de Germán, desde `main` (157a2ff), antes de desplegar el PR D.
 --
 -- ── IMPORTANTE: se corre ANTES de desplegar el PR D ────────────────────────
 -- La API de este PR lee `ciudad`, `anio_nacimiento` y `nivel_educativo` en

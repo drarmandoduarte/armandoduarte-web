@@ -207,6 +207,10 @@ importers:
   packages/config: {}
 
   packages/core:
+    dependencies:
+      libphonenumber-js:
+        specifier: ^1.13.14
+        version: 1.13.14
     devDependencies:
       vitest:
         specifier: ^4.1.10

@@ -7,7 +7,7 @@
  * el panel. Los límites son los mismos que los `check` de la migración 011: si
  * cambian allá, cambian acá (lo dicen los dos tests).
  */
-import { telefonoParaWa } from '../panel/listas';
+import { whatsappE164, whatsappValido } from './whatsapp';
 
 /** Los 33 países de América Latina y el Caribe (CELAC), **México primero**. */
 export const PAISES_LATAM = [
@@ -83,7 +83,7 @@ export function validarPerfil(d: PerfilEntrada, hoy: Date = new Date()): Partial
   for (const campo of ['nombre', 'apellido'] as const) {
     if (d[campo].trim().length > 80) errores[campo] = 'miEspacio.errores.largo';
   }
-  if (d.whatsapp.trim() !== '' && telefonoParaWa(d.whatsapp) === null) errores.whatsapp = 'miEspacio.errores.whatsapp';
+  if (d.whatsapp.trim() !== '' && !whatsappValido(d.whatsapp)) errores.whatsapp = 'miEspacio.errores.whatsappPais';
   if (d.pais !== '' && !esPais(d.pais)) errores.pais = 'miEspacio.perfil.errores.pais';
   if (d.ciudad.trim().length > 120) errores.ciudad = 'miEspacio.errores.largo';
   if (d.anio_nacimiento.trim() !== '') {
@@ -104,7 +104,8 @@ export function perfilParaEnviar(d: PerfilEntrada) {
   return {
     nombre: texto(d.nombre),
     apellido: texto(d.apellido),
-    whatsapp: texto(d.whatsapp),
+    /* #32: se guarda E.164 (`+529991234567`). */
+    whatsapp: d.whatsapp.trim() === '' ? null : (whatsappE164(d.whatsapp) ?? d.whatsapp.trim()),
     pais: d.pais === '' ? null : d.pais,
     ciudad: texto(d.ciudad),
     anio_nacimiento: d.anio_nacimiento.trim() === '' ? null : Number(d.anio_nacimiento.trim()),

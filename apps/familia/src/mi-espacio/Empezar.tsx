@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { empezarParaEnviar, paisesParaElegir, validarEmpezar, type CampoDeEmpezar, type EmpezarEntrada } from '@codice/core';
 import { api, type Yo } from '../comun/api';
 import { BotonPrincipal, Campo, Pantalla, Selector, Titulo } from '../comun/Piezas';
+import { CampoWhatsApp } from '../comun/CampoWhatsApp';
 import { WEB } from '../rutas';
 
 /**
@@ -65,9 +66,9 @@ export function Empezar({ yo, recargar }: { yo: Yo; recargar: () => Promise<void
           required error={error('nombre')} onChange={cambiar('nombre')} />
         <Campo id="empezar-apellido" rotulo={t('miEspacio.apellido')} value={datos.apellido} autoComplete="family-name"
           required error={error('apellido')} onChange={cambiar('apellido')} />
-        <Campo id="empezar-whatsapp" rotulo={t('miEspacio.whatsapp')} ayuda={t('miEspacio.whatsappAyuda')}
-          value={datos.whatsapp} type="tel" inputMode="tel" autoComplete="tel" required
-          error={error('whatsapp')} onChange={cambiar('whatsapp')} />
+        <CampoWhatsApp id="empezar-whatsapp" rotulo={t('miEspacio.whatsapp')} ayuda={t('miEspacio.whatsappAyuda')}
+          valor={datos.whatsapp} paisSugerido={datos.pais} error={errores.whatsapp}
+          alCambiar={(v) => cambiar('whatsapp')({ target: { value: v } })} />
         <Selector id="empezar-pais" rotulo={t('miEspacio.pais')} value={datos.pais} autoComplete="country"
           error={error('pais')} onChange={cambiar('pais')}
           opciones={paises.map((x) => ({ valor: x.codigo, texto: x.nombre }))} />
