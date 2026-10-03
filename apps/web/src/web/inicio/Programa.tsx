@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { SPOTIFY_EN_LA_WEB } from '@codice/core';
 import { CANALES } from '../comun/canales';
 import { Seccion } from '../comun/Seccion';
 
@@ -9,11 +10,13 @@ import { Seccion } from '../comun/Seccion';
  */
 export function Programa() {
   const { t } = useTranslation();
+  /* #33: el podcast de Spotify se esconde con `SPOTIFY_EN_LA_WEB`, y los que
+     quedan se numeran seguidos —01, 02— para que no se lea un hueco. */
   const canales = [
-    ['01', CANALES.youtube, t('inicio.programa.unoTitulo'), t('inicio.programa.unoTexto')],
-    ['02', CANALES.spotify, t('inicio.programa.dosTitulo'), t('inicio.programa.dosTexto')],
-    ['03', CANALES.facebook, t('inicio.programa.tresTitulo'), t('inicio.programa.tresTexto')],
-  ];
+    [CANALES.youtube, t('inicio.programa.unoTitulo'), t('inicio.programa.unoTexto')],
+    ...(SPOTIFY_EN_LA_WEB ? [[CANALES.spotify, t('inicio.programa.dosTitulo'), t('inicio.programa.dosTexto')]] : []),
+    [CANALES.facebook, t('inicio.programa.tresTitulo'), t('inicio.programa.tresTexto')],
+  ].map(([href, titulo, texto], i) => [String(i + 1).padStart(2, '0'), href, titulo, texto]);
   return (
     <Seccion id="programa" tono="calido" contenedor={false}>
       <div className="container grid-2">

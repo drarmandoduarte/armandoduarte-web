@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { enlaceWhatsApp } from '@codice/core';
+import { MI_ESPACIO_EN_LA_WEB, SPOTIFY_EN_LA_WEB, enlaceWhatsApp } from '@codice/core';
 import { CANALES } from './canales';
 import { enlaceMiEspacio } from './mi-espacio';
 
@@ -60,8 +60,8 @@ export function Pie({ telefono, visible }: { telefono: string; visible: string }
             <a href="/#libros">{t('comun.nav.libros')}</a>
             <a href="/#programa">{t('comun.nav.programa')}</a>
             <a href="/#contacto">{t('comun.nav.contacto')}</a>
-            {/* #25: último de «Explorar». */}
-            <a href={enlaceMiEspacio()}>{t('comun.nav.miEspacio')}</a>
+            {/* #25: último de «Explorar». Apagado por la #33. */}
+            {MI_ESPACIO_EN_LA_WEB && <a href={enlaceMiEspacio()}>{t('comun.nav.miEspacio')}</a>}
           </div>
           <div className="ft__col">
             <h3>{t('comun.pie.talleres')}</h3>
@@ -78,7 +78,8 @@ export function Pie({ telefono, visible }: { telefono: string; visible: string }
           <div className="ft__col">
             <h3>{t('comun.pie.canales')}</h3>
             <a href={CANALES.youtube} target="_blank" rel="noopener">{t('comun.pie.youtube')}</a>
-            <a href={CANALES.spotify} target="_blank" rel="noopener">{t('comun.pie.spotify')}</a>
+            {/* #33: Spotify escondido detrás de su bandera, no borrado. */}
+            {SPOTIFY_EN_LA_WEB && <a href={CANALES.spotify} target="_blank" rel="noopener">{t('comun.pie.spotify')}</a>}
             <a href={CANALES.facebook} target="_blank" rel="noopener">{t('comun.pie.facebook')}</a>
             <a href={CANALES.instagram} target="_blank" rel="noopener">{t('comun.pie.instagram')}</a>
             <a className="entero" href={enlaceWhatsApp(telefono, t('comun.mensajes.general'))} target="_blank" rel="noopener">

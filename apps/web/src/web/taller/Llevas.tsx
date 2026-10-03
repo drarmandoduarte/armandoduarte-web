@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import { MI_ESPACIO_EN_LA_WEB, TELEFONO_TALLER } from '@codice/core';
+import { BotonWhatsApp } from '../comun/BotonWhatsApp';
 import { Foto } from '../comun/Foto';
 import { Seccion } from '../comun/Seccion';
 import { enlaceReservarMiLugar } from '../comun/mi-espacio';
@@ -46,10 +48,21 @@ export function Llevas() {
         ))}
       </div>
       <div className="hero-cta reveal" data-d="3">
-        {/* Auditoría del #41: reservar en la app, solo el botón principal. */}
-        <a href={enlaceReservarMiLugar()} className="btn btn--naranja">
-          {t('taller.llevas.cta')} <span className="btn-arrow">→</span>
-        </a>
+        {/* Auditoría del #41: reservar en la app, solo el botón principal.
+            Sin la app (#33), el WhatsApp con el mensaje del programa, como
+            antes de la #25. */}
+        {MI_ESPACIO_EN_LA_WEB ? (
+          <a href={enlaceReservarMiLugar()} className="btn btn--naranja">
+            {t('taller.llevas.cta')} <span className="btn-arrow">→</span>
+          </a>
+        ) : (
+          <BotonWhatsApp
+            telefono={TELEFONO_TALLER}
+            mensaje={t('comun.mensajes.programa')}
+            texto={t('comun.reservarPorWhatsApp')}
+            clase="btn btn--naranja"
+          />
+        )}
       </div>
     </Seccion>
   );

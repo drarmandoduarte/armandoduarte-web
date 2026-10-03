@@ -282,6 +282,15 @@ entera después, no solo las líneas marcadas.
 
 ## Pendientes abiertos
 
+### 17. Volver a prender `MI_ESPACIO_EN_LA_WEB` y `SPOTIFY_EN_LA_WEB` cuando Armando lo pida · **pendiente: de Armando** (orden #33, 2/10/2026)
+
+Las dos banderas viven en `packages/core/src/web/mi-espacio.ts`. Prenderlas es
+un commit (cada una a `true`), un build y `--update-snapshots` de fidelidad;
+`la-web-no-nombra-vercel.test.ts` ya tiene escrita la rama prendida. Al prender
+`MI_ESPACIO_EN_LA_WEB` hay que revisar con dirección los textos de
+`/privacidad` y `/terminos`, que siguen nombrando Mi espacio (ver el informe de
+la #33).
+
 ### 0. Tres guardianes estuvieron rotos desde la #10 y nadie se enteró · **encontrado y arreglado en la #12**
 
 No es un pendiente: es el caso, escrito donde se lee. La #10 puso la CSP de

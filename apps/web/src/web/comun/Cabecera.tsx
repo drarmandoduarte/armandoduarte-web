@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { enlaceWhatsApp } from '@codice/core';
+import { MI_ESPACIO_EN_LA_WEB, enlaceWhatsApp } from '@codice/core';
 import { IconoWhatsApp } from './IconoWhatsApp';
 import { MenuMovil } from './MenuMovil';
 import { enlaceMiEspacio } from './mi-espacio';
@@ -70,10 +70,12 @@ export function Cabecera({
           <div className="hd__end">
             {/* #25: la puerta a Mi espacio. Texto en el cromo neutro de la
                 cabecera (D25); a 600 px o menos se esconde y entra como primer
-                ítem del menú. */}
-            <a href={enlaceMiEspacio()} className="hd__espacio">
-              {t('comun.cabecera.miEspacio')} <span aria-hidden="true">→</span>
-            </a>
+                ítem del menú. Apagada por la #33 (`MI_ESPACIO_EN_LA_WEB`). */}
+            {MI_ESPACIO_EN_LA_WEB && (
+              <a href={enlaceMiEspacio()} className="hd__espacio">
+                {t('comun.cabecera.miEspacio')} <span aria-hidden="true">→</span>
+              </a>
+            )}
             <a
               href={enlaceWhatsApp(telefono, mensaje)}
               className="hd__wa"

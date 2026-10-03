@@ -34,6 +34,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RECURSOS_I18N } from '@codice/core';
+import { RUTAS } from './rutas';
 
 /* El proyecto vive dos niveles por encima del repo: `04 Codigo/<repo>`. Los
    insumos no son del repo —son lo que mandó el cliente— y por eso están afuera:
@@ -52,8 +53,16 @@ const INSUMOS = join(REPO, '..', '..', '03 Producto', 'web', 'insumos', '2026-09
  * único lugar donde eso se puede autorizar. Un test que no corre no grita; éste
  * al menos dice su nombre.
  */
-const HAY_INSUMO = existsSync(INSUMOS);
+/* ── El pedido del 2/10 (orden #33) ──────────────────────────────────────
+   Tres textos nuevos de Armando —la sede, la modalidad y el receso— llegaron
+   por WhatsApp a Germán y dirección los dejó escritos en la orden #33, entre
+   comillas latinas. Esa orden es el insumo: Rodolfo no produce insumos, y una
+   copia acá sería la segunda verdad que este archivo existe para evitar. */
+const PEDIDO_DEL_2_10 = join(REPO, '..', '..', '03 Producto', 'codice', 'ordenes', 'orden-33-la-web-sin-mi-espacio-por-ahora.md');
+const HAY_INSUMO = existsSync(INSUMOS) && existsSync(PEDIDO_DEL_2_10);
 const LEEME = HAY_INSUMO ? readFileSync(INSUMOS, 'utf8') : '';
+const PEDIDO = HAY_INSUMO ? readFileSync(PEDIDO_DEL_2_10, 'utf8') : '';
+const DIST = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 
 /**
  * Los cinco núcleos tal como están escritos en el `LEEME.md`, en el formato en
@@ -82,6 +91,8 @@ const CLAVES = ['uno', 'dos', 'tres', 'cuatro', 'cinco'] as const;
 const web = RECURSOS_I18N.es.web as Record<string, any>;
 const programa = web.taller.programa;
 const hechos = web.taller.hechos;
+const fichaDeLaPortada = web.inicio.taller;
+const ahora = web.inicio.ahora;
 
 const suite = HAY_INSUMO ? describe : describe.skip;
 
@@ -118,7 +129,7 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
     ).toEqual([]);
   });
 
-  it('la fecha, la sede y el horario salen del insumo y no de otro string', () => {
+  it('la fecha y el horario salen del insumo del 28/9, y la sede del pedido del 2/10', () => {
     /* Los tres viven en el LEEME.md en una frase de prosa, así que se buscan
        dentro de ella en vez de parsearla: lo que importa es que el valor
        publicado ESTÉ ahí, no cómo esté redactada la frase. */
@@ -127,8 +138,8 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
       if (!LEEME.includes(valor)) faltan.push(`${que}: la web publica «${valor}» y el insumo no lo dice`);
     };
     enElInsumo('5 de noviembre de 2026'.slice(0, 15), 'fecha');
-    enElInsumo(hechos.dondeValor, 'sede');
     enElInsumo(hechos.horarioValor, 'horario');
+    if (!PEDIDO.includes(`«${hechos.dondeValor}»`)) faltan.push(`sede: la web publica «${hechos.dondeValor}» y el pedido del 2/10 no lo dice`);
     expect(
       faltan,
       'La fecha, la sede y el horario que publica la web tienen que estar en el insumo del 28/9. '
@@ -140,7 +151,44 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
        que si la web dijera otra cosa el `includes` de arriba ya lo habría
        cazado — pero sólo porque el valor es literal. Esto lo ancla. */
     expect(hechos.horarioValor, 'el horario del insumo es «8:30 a 13:00»').toBe('8:30 a 13:00');
-    expect(hechos.dondeValor, 'la sede del insumo es «Fiesta Inn Mérida»').toBe('Fiesta Inn Mérida');
+    expect(hechos.dondeValor, 'la sede, desde el 2/10, es «Fiesta Inn CORDEMEX»').toBe('Fiesta Inn CORDEMEX');
+  });
+
+  it('los tres textos del 2/10 (sede, modalidad, receso) están en todos lados, y los de antes en ninguno', () => {
+    /* Contra el pedido, entre comillas latinas, como lo escribió dirección.
+       La modalidad la ajustó Armando el mismo 2/10 a las 13:31 (orden #33 bis,
+       llegada por chat a Rodolfo): de «Modalidad Presencial» a «Presencial».
+       Ese ajuste no está escrito en la orden #33, así que se ancla como
+       literal y no se busca en el pedido. */
+    const NUEVOS = {
+      sede: 'Fiesta Inn CORDEMEX',
+      modalidad: 'Presencial',
+      receso: 'Con un receso de 20 minutos',
+    };
+    for (const [que, valor] of Object.entries({ sede: NUEVOS.sede, receso: NUEVOS.receso })) {
+      expect(PEDIDO, `${que}: «${valor}» no está en el pedido del 2/10`).toContain(`«${valor}»`);
+    }
+    /* Cada lugar de i18n donde aparecen. */
+    expect(hechos.dondeValor).toBe(NUEVOS.sede);
+    expect(hechos.dondeAria.startsWith(`${NUEVOS.sede} ·`), 'el aria del mapa nombra la sede').toBe(true);
+    expect(fichaDeLaPortada.fichaLugarValor, 'la ficha del taller de la portada').toBe(NUEVOS.sede);
+    expect(ahora.meta1, 'la banda AHORA').toBe(NUEVOS.sede);
+    expect(web.taller.head.description, 'la descripción de /merida (la de OG)').toContain(NUEVOS.sede);
+    expect(hechos.modalidadValor).toBe(NUEVOS.modalidad);
+    expect(fichaDeLaPortada.fichaModalidadValor, 'la ficha del taller de la portada').toBe(NUEVOS.modalidad);
+    expect(programa.receso).toBe(NUEVOS.receso);
+
+    /* Y lo publicado: ningún texto de antes en ningún HTML de dist (JSON-LD y
+       meta incluidos), y el `Place` del Event con la sede nueva. */
+    const VIEJOS = ['Fiesta Inn Mérida', 'Sesión privada en vivo', 'entre el núcleo 2 y el 3', 'Modalidad Presencial'];
+    const paginas = RUTAS.map(({ archivo }) => ({ archivo, html: existsSync(join(DIST, archivo)) ? readFileSync(join(DIST, archivo), 'utf8') : '' }));
+    for (const { archivo, html } of paginas) {
+      expect(html.length, `${archivo} no está en dist: corre el build antes`).toBeGreaterThan(1000);
+      for (const viejo of VIEJOS) expect(html, `${archivo} todavía dice «${viejo}»`).not.toContain(viejo);
+    }
+    const merida = paginas.find((p) => p.archivo === 'merida.html')!.html;
+    expect(merida, 'el Place del Event').toContain(`"name":"${NUEVOS.sede}"`);
+    expect(merida, 'el receso en /merida').toContain(NUEVOS.receso);
   });
 
   it('y el lector de núcleos distingue una línea de núcleo de la prosa de al lado', () => {

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { CLAVE_MENSAJE_RESERVA, TELEFONO_TALLER } from '@codice/core';
+import { CLAVE_MENSAJE_RESERVA, MI_ESPACIO_EN_LA_WEB, TELEFONO_TALLER } from '@codice/core';
 import { BotonWhatsApp } from '../comun/BotonWhatsApp';
 import { Hero as HeroDeLaCasa } from '../comun/Hero';
 import { Icono } from '../comun/Icono';
@@ -63,7 +63,7 @@ export function Hero() {
         </>
       )}
       bajada={t('taller.hero.sub')}
-      botones={(
+      botones={MI_ESPACIO_EN_LA_WEB ? (
         <>
           {/* #25: «Reservar mi lugar» lleva a la app —entrar y caer en «Me
               anoto» con este taller elegido— y es el único naranja. WhatsApp
@@ -79,6 +79,20 @@ export function Hero() {
             clase="btn"
           />
         </>
+      ) : (
+        <>
+          {/* #33: sin la app, como antes de la #25 — reservar por WhatsApp es
+              el único naranja y «Ver el programa» el secundario. */}
+          <BotonWhatsApp
+            telefono={TELEFONO_TALLER}
+            mensaje={t(CLAVE_MENSAJE_RESERVA)}
+            texto={t('comun.reservarPorWhatsApp')}
+            clase="btn btn--naranja"
+          />
+          <a href="#programa" className="btn">
+            {t('taller.hero.ctaPrograma')} <span className="btn-arrow">→</span>
+          </a>
+        </>
       )}
       /* Tres datos y no cuatro: la fecha **reemplaza** a «Cupo limitado»
          (orden #12, A). Con cuatro, a 375 la línea se parte en tres renglones
@@ -86,8 +100,9 @@ export function Hero() {
       datos={[t('taller.hero.micro1'), t('taller.hero.micro2'), t('taller.hero.micro3')]}
       /* Auditoría del #41: «Ver el programa» vuelve, pero como enlace de texto
          en el cromo neutro, debajo de la línea de datos: dos botones y un
-         naranja siguen siendo el tope del hero. */
-      debajo={(
+         naranja siguen siendo el tope del hero. Sin la app (#33) «Ver el
+         programa» vuelve a ser botón y este enlace se va. */
+      debajo={MI_ESPACIO_EN_LA_WEB && (
         <a href="#programa" className="hero-enlace">
           {t('taller.hero.ctaPrograma')} <span aria-hidden="true">↓</span>
         </a>
