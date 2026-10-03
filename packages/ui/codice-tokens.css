@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   Códice · tokens como variables CSS · v1.2.3
+   Códice · tokens como variables CSS · v1.2.4
    Fuente: packages/ui/codice-tokens.json. Si un valor cambia, cambia allá
    primero — el JSON es el documento y esto es su forma ejecutable.
 
@@ -25,6 +25,12 @@
    No son los candidatos que la orden proponía de memoria (#6F675C, #6B6358):
    ésos llegaban a 5,21 y 5,53 sobre crema, o sea más oscuros de lo necesario.
    El criterio es el mínimo, y el mínimo se mide.
+
+   ── v1.2.4 · error y radio, escritos (orden Códice #35) ──────────────────
+   Dos formas ejecutables de cosas que ya existían: **--error** es
+   `color.semantic.danger` (estaba en el JSON y no acá) y **--radio** es
+   `radius.casa`, los 2 px que la casa dibuja desde la #07. Las pantallas de
+   acceso del guion v1 del Kit 512 los toman por su nombre (`design.json`).
 
    ── v1.2.3 · el ocre de «¿Te suena?», medido otra vez (orden Códice #23) ─
    Un valor cambia y nada más: **--ocre-texto** #795B34 → #755832. La #23 sacó
@@ -145,6 +151,10 @@
   --hair:#EAE4D8;           /* color.border.hairline */
   --hair-hover:#D8CFBE;     /* color.border.hairlineHover */
   --hair-oscura:rgba(250,247,241,.16);  /* la hairline sobre fondo oscuro: crema al 16 % */
+
+  /* ── Error y radio (v1.2.4, #35) ────────────────────────────────────── */
+  --error:#A05A48;          /* color.semantic.danger · 4,85 sobre crema */
+  --radio:2px;              /* radius.casa */
 
   /* ── Mezclas · se recalculan solas sobre los valores nuevos ─────────── */
   --naranja-suave:color-mix(in oklab, var(--naranja) 7%, var(--crema));

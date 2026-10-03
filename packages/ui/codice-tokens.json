@@ -1,7 +1,7 @@
 {
   "$meta": {
     "name": "Códice — Design System (App Dr. Armando)",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "tagline": "Construyendo familias fuertes",
     "generated": "2026-09-17",
     "philosophy": "Quiet luxury con la atmósfera del set de grabación del doctor: luz ámbar de tarde, orden, cercanía sin ruido. Restraint editorial, whitespace generoso, tipografía por encima de imagen, sin sombras, sin degradados, motion invisible.",
@@ -10,6 +10,15 @@
     ],
     "density": "comfortable",
     "changelog": [
+      {
+        "version": "1.2.4",
+        "date": "2026-10-03",
+        "orden": "Códice #35",
+        "cambios": [
+          "`color.semantic.danger` (#A05A48) pasa a tener forma ejecutable: `--error`. Ya estaba en el documento y no en el CSS; las pantallas de acceso del guion v1 del Kit 512 piden un color de error y la #35 lo toma del canon (4,85 sobre crema).",
+          "`radius.casa` = 2px: el radio que la casa dibuja desde la #07 en botones, campos y casillas de la web y de Mi espacio (`border-radius:2px` en los dos `.btn`). No estaba escrito en el canon; `radius.pill` describe la app original del documento, no la que existe. Forma ejecutable: `--radio`."
+        ]
+      },
       {
         "version": "1.2.3",
         "date": "2026-09-30",
@@ -341,7 +350,8 @@
     "md": "8px  · inputs",
     "lg": "12px · cards, burbujas",
     "xl": "16px · superficies",
-    "pill": "999px · botones"
+    "pill": "999px · botones",
+    "casa": "2px · botones, campos y casillas de la web y de Mi espacio (D26/#07). Es el que se usa."
   },
   "border": {
     "philosophy": "Casi no existen; el aire separa.",
