@@ -170,6 +170,9 @@ export class PagosController {
         this.logger.warn('El correo no salió: no se pudieron leer los datos de la inscripción.');
         return 'no_enviado' as const;
       }
+      /* #34 B.3: la persona pidió no recibirlo. No es una falla: el libro ya
+         dice lo que pasó y Mis talleres lo muestra. */
+      if (!datos.avisos) return 'apagado' as const;
       const enviado = await this.correo.enviar(armarCorreo(datos, tipo, motivo));
       return enviado ? ('enviado' as const) : ('no_enviado' as const);
     } catch {

@@ -85,10 +85,13 @@ const PENDIENTES: Record<string, string> = {
   '010_el_libro_en_el_panel.sql':
     'orden #27 C: el último renglón del libro y la firma del equipo para Inscriptos. La corre el CEO '
     + 'cuando se mergee el PR C: sin ella, Inscriptos no lista (la API la llama junto con la 008)',
+  '012_avisos_por_correo.sql':
+    'orden #34 B.3: personas.avisos_por_correo. La corre el CEO ANTES del merge de la #34: sin ella, '
+    + 'GET /api/yo da 42703 y nadie entra a Mi espacio',
 };
 
 describe('las migraciones', () => {
-  it('son once, numeradas de tres dígitos y en orden', async () => {
+  it('son doce, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -101,6 +104,7 @@ describe('las migraciones', () => {
       '009_me_anoto.sql',
       '010_el_libro_en_el_panel.sql',
       '011_el_perfil.sql',
+      '012_avisos_por_correo.sql',
     ]);
   });
 

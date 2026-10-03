@@ -60,7 +60,7 @@ beforeEach(() => {
     return json({});
   }));
   /* #29: «Tus datos» vive en su propia pantalla. */
-  window.history.replaceState(null, '', '/mis-datos');
+  window.history.replaceState(null, '', '/ajustes/perfil');
   window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 });
 afterEach(() => {
@@ -139,7 +139,7 @@ describe('«Completa tu perfil», después de «Me anoto»', () => {
   it('si faltan datos del perfil, la tarjeta suave con el enlace a «Tus datos»; no bloquea nada', async () => {
     await anotarse();
     expect(screen.getByText(t('miEspacio.perfil.completaTitulo'))).toBeTruthy();
-    expect((screen.getByRole('link', { name: t('miEspacio.perfil.completaEnlace') }) as HTMLAnchorElement).getAttribute('href')).toBe('/mis-datos');
+    expect((screen.getByRole('link', { name: t('miEspacio.perfil.completaEnlace') }) as HTMLAnchorElement).getAttribute('href')).toBe('/ajustes/perfil');
   });
 
   it('con el perfil completo, no aparece', async () => {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSesion } from './comun/sesion';
 import { api } from './comun/api';
-import { necesitaEmpezar, slugDeMeAnoto } from '@codice/core';
+import { SECCIONES_DE_AJUSTES, necesitaEmpezar, slugDeMeAnoto, type SeccionDeAjustes } from '@codice/core';
 import { rutaQueCorresponde } from './comun/ruta-que-corresponde';
 import { destinoGuardado, guardarDestinoDeLaUrl, olvidarDestino } from './comun/destino';
 import { Pantalla } from './comun/Piezas';
@@ -10,13 +10,14 @@ import { Entrar } from './entrar/Entrar';
 import { Enrolar } from './entrar/Enrolar';
 import { Reto } from './entrar/Reto';
 import { CodigosDeRespaldo } from './entrar/CodigosDeRespaldo';
-import { PaginaDeMisDatos, PaginaDeMisTalleres, PaginaDeTalleres } from './mi-espacio/MiEspacio';
+import { PaginaDeMisTalleres, PaginaDeTalleres } from './mi-espacio/MiEspacio';
+import { Ajustes } from './mi-espacio/Ajustes';
 import { Inicio } from './mi-espacio/Inicio';
 import { Empezar } from './mi-espacio/Empezar';
 import { Marco } from './comun/Marco';
 import { ProveedorDeNavegacion } from './comun/navegacion';
 import { Panel } from './equipo/Panel';
-import { RUTAS } from './rutas';
+import { RUTAS, RUTA_DE_SECCION } from './rutas';
 import { variablesQueFaltan } from './supabase';
 
 /**
@@ -53,7 +54,7 @@ export function App() {
   const faltanDatos = yo ? necesitaEmpezar(yo.persona) : false;
 
   /* #29: la barra lateral navega sin recargar (ver `comun/navegacion.tsx`).
-     `pushState` y no `replaceState`: entre Talleres y Mis datos el «atrás»
+     `pushState` y no `replaceState`: entre Talleres y Ajustes el «atrás»
      del navegador sí tiene que volver. */
   const navegar = useCallback((destino: string) => {
     window.history.pushState(null, '', destino);
@@ -217,20 +218,35 @@ export function App() {
      `/equipo` se le muestra Inicio y `rutaQueCorresponde()` corrige la URL:
      nunca ve un error. La API y la base lo frenan igual (`SOLO_EQUIPO`, RLS). */
   const enElPanel = ruta === RUTAS.equipo && esEquipo;
+  /* #34 B: la sección de Ajustes que dice la ruta. `/ajustes/seguridad` para
+     un cliente no es suya: Inicio, y la URL la corrige `rutaQueCorresponde()`. */
+  const seccion: SeccionDeAjustes | null = SECCIONES_DE_AJUSTES.find((s) => RUTA_DE_SECCION[s] === ruta) ?? null;
+  const enAjustes = seccion !== null && (seccion !== 'seguridad' || esEquipo);
+  const correo = sesion?.user?.email ?? null;
+  const proveedores = (sesion?.user?.app_metadata?.providers as string[] | undefined) ?? null;
   const pagina = enElPanel ? <Panel yo={yo} />
     : slug !== null || ruta === RUTAS.talleres ? <PaginaDeTalleres key={ruta} yo={yo} slugElegido={slug} recargar={recargar} />
       : ruta === RUTAS.misTalleres ? <PaginaDeMisTalleres yo={yo} />
-        : ruta === RUTAS.misDatos ? <PaginaDeMisDatos yo={yo} recargar={recargar} alRegenerar={setCodigosNuevos} />
+        : enAjustes ? (
+          <Ajustes
+            yo={yo}
+            correo={correo}
+            proveedores={proveedores}
+            seccion={seccion}
+            recargar={recargar}
+            alRegenerar={setCodigosNuevos}
+            alSalirDeTodo={() => salir('deliberada', 'global')}
+          />
+        )
           : <Inicio yo={yo} />;
 
   return (
     <ProveedorDeNavegacion navegar={navegar}>
       <Marco
         ruta={enElPanel ? RUTAS.equipo : ruta}
-        esEquipo={esEquipo}
-        correo={sesion?.user?.email ?? null}
+        usuario={{ yo, correo }}
         alSalir={() => void salir('deliberada')}
-        ancha={enElPanel}
+        ancha={enElPanel || enAjustes}
       >
         {pagina}
       </Marco>

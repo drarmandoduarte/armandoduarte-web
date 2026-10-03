@@ -39,6 +39,13 @@ import type { DecisionDePantalla } from './decision-de-pantalla';
  *   · con los datos completos, `/empezar` no es un lugar: va a Inicio (o al
  *     destino guardado, si hay).
  *
+ * ── Y desde la #34, Ajustes ─────────────────────────────────────────────
+ *   · las secciones de `/ajustes/*` son lugares; `/ajustes` a secas va a
+ *     Perfil, como «Tus preferencias» de Bitácora;
+ *   · `/ajustes/seguridad` es del equipo, como `/equipo`: un cliente va a Inicio;
+ *   · `/mis-datos` ya no existe: va a `/ajustes/perfil` (en Vercel es un 308;
+ *     esto cubre el «atrás» y los enlaces que navegan sin recargar).
+ *
  * Devuelve la ruta a la que hay que ir, o `null` si la actual ya está bien.
  */
 export function rutaQueCorresponde(estado: {
@@ -80,7 +87,9 @@ export function rutaQueCorresponde(estado: {
      `/me-anoto/<slug>` es un lugar para cualquiera con sesión (#24 B). */
   if (enMeAnoto) return null;
   if (LUGARES_CON_SESION.includes(estado.rutaActual)) return null;
-  const sePuedeQuedar = estado.rutaActual === RUTAS.equipo && estado.esEquipo === true;
-  const destino = sePuedeQuedar ? RUTAS.equipo : RUTAS.miEspacio;
+  if (estado.rutaActual === RUTAS.ajustes || estado.rutaActual === RUTAS.misDatos) return RUTAS.ajustesPerfil;
+  const soloEquipo = estado.rutaActual === RUTAS.equipo || estado.rutaActual === RUTAS.ajustesSeguridad;
+  const sePuedeQuedar = soloEquipo && estado.esEquipo === true;
+  const destino = sePuedeQuedar ? estado.rutaActual : RUTAS.miEspacio;
   return destino !== estado.rutaActual ? destino : null;
 }

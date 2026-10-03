@@ -364,7 +364,7 @@ export function ConfirmacionDeLugar({ c, yo, alCerrar }: { c: Confirmacion; yo: 
           <p className="tarjeta-suave__titulo">{t('miEspacio.perfil.completaTitulo')}</p>
           <p className="nota">{t('miEspacio.perfil.completaTexto')}</p>
           {/* #29: «Tus datos» vive en su propia pantalla. */}
-          <EnlaceInterno a={RUTAS.misDatos} className="enlace">{t('miEspacio.perfil.completaEnlace')}</EnlaceInterno>
+          <EnlaceInterno a={RUTAS.ajustesPerfil} className="enlace">{t('miEspacio.perfil.completaEnlace')}</EnlaceInterno>
         </div>
       ) : null}
       <div className="fila fila--suelta">

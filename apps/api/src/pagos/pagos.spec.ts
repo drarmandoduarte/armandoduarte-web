@@ -37,7 +37,7 @@ function armar({ rol = 'cliente', libro = [] as Renglon[], anotarFalla = false, 
     borrarComprobante: vi.fn().mockResolvedValue(false),
     urlFirmada: vi.fn().mockResolvedValue('https://firmada.invalid/x'),
     datosParaElCorreo: vi.fn().mockResolvedValue({
-      email: 'clienta@ejemplo.com', nombre: 'Clienta', referencia: 'AD-0042', curso: 'Taller de prueba',
+      email: 'clienta@ejemplo.com', avisos: true, nombre: 'Clienta', referencia: 'AD-0042', curso: 'Taller de prueba',
       inicio: '2026-11-05T14:30:00Z', fin: '2026-11-05T19:00:00Z', zona: 'America/Merida', sede: 'Sede de prueba', ciudad: 'Mérida',
     }),
   };
@@ -144,6 +144,22 @@ describe('POST /pagos/resolver', () => {
     expect(repo.anotar).toHaveBeenCalledTimes(1);
   });
 
+  it('#34 · EL CASO: si la persona apagó los avisos, el correo no sale y la confirmación queda hecha', async () => {
+    const { controlador, repo, correo } = armar({ rol: 'equipo', libro: enRevision });
+    repo.datosParaElCorreo.mockResolvedValueOnce({ ...(await repo.datosParaElCorreo()), avisos: false });
+    await expect(controlador.resolver(pedido, { inscripcion_id: INSC, tipo: 'confirmado' }))
+      .resolves.toEqual({ ok: true, correo: 'apagado' });
+    expect(correo.enviar).not.toHaveBeenCalled();
+    expect(repo.anotar).toHaveBeenCalledTimes(1);
+  });
+
+  it('…y con los avisos encendidos, sale', async () => {
+    const { controlador, correo } = armar({ rol: 'equipo', libro: enRevision });
+    await expect(controlador.resolver(pedido, { inscripcion_id: INSC, tipo: 'rechazado', nota: 'El monto no coincide' }))
+      .resolves.toEqual({ ok: true, correo: 'enviado' });
+    expect(correo.enviar).toHaveBeenCalledTimes(1);
+  });
+
   it('…y si leer los datos del correo revienta, también', async () => {
     const { controlador, repo } = armar({ rol: 'equipo', libro: enRevision });
     repo.datosParaElCorreo.mockRejectedValueOnce(new Error('se cayó la red'));
@@ -169,7 +185,7 @@ describe('GET /pagos/comprobante/:inscripcion', () => {
 
 describe('el correo', () => {
   const datos = {
-    email: 'clienta@ejemplo.com', nombre: 'Clienta', referencia: 'AD-0042', curso: 'Taller de prueba',
+    email: 'clienta@ejemplo.com', avisos: true, nombre: 'Clienta', referencia: 'AD-0042', curso: 'Taller de prueba',
     inicio: '2026-11-05T14:30:00Z', fin: '2026-11-05T19:00:00Z', zona: 'America/Merida', sede: 'Sede de prueba', ciudad: 'Mérida',
   };
 

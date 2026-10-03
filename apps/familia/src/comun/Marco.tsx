@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  CalendarDays, ChevronLeft, ChevronRight, House, LayoutDashboard, LogOut, Menu, Ticket, UserRound, X,
+  CalendarDays, ChevronLeft, ChevronRight, House, LayoutDashboard, LogOut, Menu, Settings, Ticket, X,
 } from 'lucide-react';
-import { slugDeMeAnoto } from '@codice/core';
-import { RUTAS, WEB } from '../rutas';
+import { claveDelRol, inicialesDe, nombreDelBloque, slugDeMeAnoto } from '@codice/core';
+import { RUTAS } from '../rutas';
+import type { Yo } from './api';
 import { EnlaceInterno } from './navegacion';
 import { usarAncho } from './usar-ancho';
 
@@ -18,6 +19,12 @@ import { usarAncho } from './usar-ancho';
  * ícono Lucide de trazo 1,5 y texto, el ítem activo marcado, y abajo la cuenta
  * y «Salir». El estado plegado se guarda en el navegador. Debajo de un ancho,
  * la barra no se monta y es un cajón que se abre desde la cabecera.
+ *
+ * Desde la #34, también **el pie** de Bitácora: el bloque del usuario (avatar
+ * con iniciales, nombre y, debajo, el rol) y una fila con «Cerrar sesión» y el
+ * engranaje que abre Ajustes. Sin «Volver a la web» (la salida a la web queda
+ * en `/entrar` y `/empezar`) y sin campana, estrellas ni buscador: Mi espacio no
+ * tiene alertas, IA ni búsqueda todavía, y no se ponen íconos vacíos (A.4).
  *
  * Se copió la **estructura y el comportamiento**, no los colores: acá la barra
  * es `--calido` con su borde `--hair`, el activo es `--tinta` sobre `--crema`
@@ -40,8 +47,9 @@ type Icono = ComponentType<{ size?: number; strokeWidth?: number; 'aria-hidden'?
 export interface ItemDeLaBarra { ruta: string; clave: string; Icono: Icono }
 
 /**
- * Los ítems de la barra, en el orden de la orden (A.1). El panel del equipo,
- * solo para el equipo y después de un separador: para un cliente son cuatro.
+ * Los ítems de la barra (#34 A.2): Inicio, Talleres, Mis talleres y, solo para
+ * el equipo y después de un separador, el panel. «Mis datos» salió del nav: es
+ * Ajustes → Perfil, detrás del engranaje.
  */
 export function itemsDeLaBarra(esEquipo: boolean): { principales: ItemDeLaBarra[]; equipo: ItemDeLaBarra[] } {
   return {
@@ -49,7 +57,6 @@ export function itemsDeLaBarra(esEquipo: boolean): { principales: ItemDeLaBarra[
       { ruta: RUTAS.miEspacio, clave: 'marco.inicio', Icono: House },
       { ruta: RUTAS.talleres, clave: 'marco.talleres', Icono: CalendarDays },
       { ruta: RUTAS.misTalleres, clave: 'marco.misTalleres', Icono: Ticket },
-      { ruta: RUTAS.misDatos, clave: 'marco.misDatos', Icono: UserRound },
     ],
     equipo: esEquipo ? [{ ruta: RUTAS.equipo, clave: 'marco.panel', Icono: LayoutDashboard }] : [],
   };
@@ -58,6 +65,18 @@ export function itemsDeLaBarra(esEquipo: boolean): { principales: ItemDeLaBarra[
 /** Qué ítem está activo: `/me-anoto/<slug>` es Talleres con ese taller elegido (A.5). */
 export function rutaDelItemActivo(ruta: string): string {
   return slugDeMeAnoto(ruta) !== null ? RUTAS.talleres : ruta;
+}
+
+/** #34: en `/ajustes/*` el engranaje está activo (ningún ítem del nav lo está). */
+export function enAjustes(ruta: string): boolean {
+  return ruta === RUTAS.ajustes || ruta.startsWith(`${RUTAS.ajustes}/`);
+}
+
+/** Lo que el pie de la barra necesita saber de quien entró (#34 A.3). */
+export interface Usuario {
+  yo: Yo;
+  /** El correo de la sesión: si no hay nombre, es lo que se lee. */
+  correo: string | null;
 }
 
 function leerPlegada(): boolean {
@@ -78,22 +97,20 @@ function guardarPlegada(plegada: boolean): void {
 
 export function Marco({
   ruta,
-  esEquipo,
-  correo,
+  usuario,
   alSalir,
   ancha = false,
   children,
 }: {
   ruta: string;
-  esEquipo: boolean;
-  /** El correo de la sesión, para el pie de la barra. */
-  correo: string | null;
+  usuario: Usuario;
   alSalir: () => void;
   /** El panel del equipo: sus tablas necesitan más que 720 px. */
   ancha?: boolean;
   children: ReactNode;
 }) {
   const conBarra = usarAncho(ANCHO_CON_BARRA);
+  const esEquipo = usuario.yo.tipo === 'equipo';
   const [plegada, setPlegada] = useState(leerPlegada);
   const plegar = () => setPlegada((p) => { guardarPlegada(!p); return !p; });
 
@@ -106,25 +123,25 @@ export function Marco({
   if (conBarra) {
     return (
       <div className={`app${plegada ? ' app--plegada' : ''}`}>
-        <Barra ruta={ruta} esEquipo={esEquipo} correo={correo} alSalir={alSalir} plegada={plegada} alPlegar={plegar} />
+        <Barra ruta={ruta} esEquipo={esEquipo} usuario={usuario} alSalir={alSalir} plegada={plegada} alPlegar={plegar} />
         {contenido}
       </div>
     );
   }
   return (
     <div className="app app--movil">
-      <CabeceraMovil ruta={ruta} esEquipo={esEquipo} correo={correo} alSalir={alSalir} />
+      <CabeceraMovil ruta={ruta} esEquipo={esEquipo} usuario={usuario} alSalir={alSalir} />
       {contenido}
     </div>
   );
 }
 
 function Barra({
-  ruta, esEquipo, correo, alSalir, plegada, alPlegar, alCerrar, alNavegar,
+  ruta, esEquipo, usuario, alSalir, plegada, alPlegar, alCerrar, alNavegar,
 }: {
   ruta: string;
   esEquipo: boolean;
-  correo: string | null;
+  usuario: Usuario;
   alSalir: () => void;
   plegada: boolean;
   /** En escritorio: el chevron. */
@@ -190,21 +207,76 @@ function Barra({
         ) : null}
       </nav>
 
-      <div className="lateral__pie">
-        {plegada || !correo ? null : <p className="lateral__correo" title={correo}>{correo}</p>}
-        <button
-          type="button"
-          className="lateral__item lateral__salir"
-          onClick={alSalir}
-          title={plegada ? t('marco.salir') : undefined}
-          aria-label={plegada ? t('marco.salir') : undefined}
-        >
-          <LogOut size={20} strokeWidth={1.5} aria-hidden />
-          {plegada ? null : <span>{t('marco.salir')}</span>}
-        </button>
-        {plegada ? null : <a className="lateral__web" href={WEB}>← {t('marco.volverALaWeb')}</a>}
-      </div>
+      <BloqueDelUsuario usuario={usuario} ruta={ruta} plegada={plegada} alSalir={alSalir} alNavegar={alNavegar} />
     </aside>
+  );
+}
+
+/**
+ * #34 A.3 · el pie de la barra, como Bitácora: avatar de 40 px con las
+ * iniciales, el nombre y el rol; debajo, «Cerrar sesión» y el engranaje que
+ * abre Ajustes. Plegada: el avatar solo, el engranaje y la salida, en columna y
+ * con su nombre en el `title`. Qué iniciales, qué nombre y qué rol lo decide
+ * `core` (`inicialesDe`, `nombreDelBloque`, `claveDelRol`).
+ */
+function BloqueDelUsuario({ usuario, ruta, plegada, alSalir, alNavegar }: {
+  usuario: Usuario;
+  ruta: string;
+  plegada: boolean;
+  alSalir: () => void;
+  alNavegar?: () => void;
+}) {
+  const { t } = useTranslation();
+  const { yo, correo } = usuario;
+  const iniciales = inicialesDe(yo.persona, correo);
+  const nombre = nombreDelBloque(yo.persona, correo) || t('marco.tuCuenta');
+  const rol = t(claveDelRol(yo.rol, yo.territorio));
+  const activo = enAjustes(ruta);
+
+  const engranaje = (
+    <EnlaceInterno
+      a={RUTAS.ajustes}
+      className={`lateral__engranaje${activo ? ' lateral__engranaje--activo' : ''}`}
+      aria-label={t('marco.ajustes')}
+      aria-current={activo ? 'page' : undefined}
+      title={t('marco.ajustes')}
+      onClick={alNavegar}
+      data-engranaje
+    >
+      <Settings size={16} strokeWidth={1.5} aria-hidden />
+    </EnlaceInterno>
+  );
+  const avatar = <span className="avatar" aria-hidden="true">{iniciales}</span>;
+
+  if (plegada) {
+    return (
+      <div className="lateral__pie lateral__pie--plegado">
+        <span className="lateral__avatar-solo" title={`${nombre} · ${rol}`}>{avatar}</span>
+        {engranaje}
+        <button type="button" className="lateral__salir lateral__salir--icono" onClick={alSalir}
+          title={t('marco.cerrarSesion')} aria-label={t('marco.cerrarSesion')}>
+          <LogOut size={16} strokeWidth={1.5} aria-hidden />
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div className="lateral__pie">
+      <div className="lateral__usuario" data-usuario>
+        {avatar}
+        <div className="lateral__quien">
+          <p className="lateral__nombre" title={nombre}>{nombre}</p>
+          <p className="lateral__rol">{rol}</p>
+        </div>
+      </div>
+      <div className="lateral__acciones">
+        <button type="button" className="lateral__salir" onClick={alSalir}>
+          <LogOut size={16} strokeWidth={1.5} aria-hidden />
+          <span>{t('marco.cerrarSesion')}</span>
+        </button>
+        {engranaje}
+      </div>
+    </div>
   );
 }
 
@@ -214,7 +286,7 @@ function Barra({
  * atrapado adentro mientras está abierto, Esc lo cierra, y al cerrarse el foco
  * vuelve a «Menú». Navegar también lo cierra.
  */
-function CabeceraMovil({ ruta, esEquipo, correo, alSalir }: { ruta: string; esEquipo: boolean; correo: string | null; alSalir: () => void }) {
+function CabeceraMovil({ ruta, esEquipo, usuario, alSalir }: { ruta: string; esEquipo: boolean; usuario: Usuario; alSalir: () => void }) {
   const { t } = useTranslation();
   const [abierto, setAbierto] = useState(false);
   const boton = useRef<HTMLButtonElement>(null);
@@ -272,7 +344,7 @@ function CabeceraMovil({ ruta, esEquipo, correo, alSalir }: { ruta: string; esEq
           <Barra
             ruta={ruta}
             esEquipo={esEquipo}
-            correo={correo}
+            usuario={usuario}
             alSalir={alSalir}
             plegada={false}
             alCerrar={() => setAbierto(false)}

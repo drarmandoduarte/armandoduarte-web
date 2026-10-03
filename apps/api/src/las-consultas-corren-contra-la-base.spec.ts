@@ -417,13 +417,21 @@ describe('SupabaseService, contra el esquema', () => {
     expect(await servicio('aal2').rolDe(s.gabi, s.gabi)).toBe('equipo');
   });
 
-  it('personaDe: devuelve la fila propia con las nueve columnas que la pantalla usa (#27 D suma tres)', async () => {
+  it('territorioDe (#34): el de cada miembro; un cliente, nulo', async () => {
+    expect(await servicio('aal2').territorioDe(s.gabi, s.gabi)).toBe('mexico');
+    expect(await servicio('aal2').territorioDe(s.diana, s.diana)).toBe('internacional');
+    expect(await servicio('aal2').territorioDe(s.armando, s.armando)).toBe('todos');
+    expect(await servicio().territorioDe(s.laura, s.laura)).toBeNull();
+  });
+
+  it('personaDe: devuelve la fila propia con las diez columnas que la pantalla usa (#27 D suma tres, #34 una)', async () => {
     const persona = await servicio().personaDe(s.laura, s.laura);
     expect(persona).toMatchObject({ id: s.laura, nombre: 'Laura', pais: 'MX' });
     /* Que las seis columnas existan es la mitad del punto: un `zona_horaria`
        mal escrito sería otro 42703 en la misma ruta. */
     expect(Object.keys(persona as object).sort()).toEqual(
-      ['anio_nacimiento', 'apellido', 'ciudad', 'id', 'nivel_educativo', 'nombre', 'pais', 'whatsapp', 'zona_horaria']);
+      ['anio_nacimiento', 'apellido', 'avisos_por_correo', 'ciudad', 'id', 'nivel_educativo', 'nombre', 'pais', 'whatsapp', 'zona_horaria']);
+    expect((persona as { avisos_por_correo: boolean }).avisos_por_correo, 'nace encendida (012)').toBe(true);
   });
 });
 
@@ -775,6 +783,20 @@ describe('PagosController (/api/pagos), contra el esquema — orden #27 C', () =
     expect(correos.at(-1)?.asunto).toMatch(/^Tu lugar en El arte de amar a tu hijo adolescente está confirmado · AD-/);
   });
 
+  it('#34 · EL CASO: Mara apagó los avisos → Gabi confirma, el libro lo dice y el correo NO sale', async () => {
+    const [u] = await banco.sql<{ id: string }>(`insert into auth.users (email) values ('mara@ejemplo.mx') returning id`);
+    await banco.sql(`update public.personas set nombre = 'Mara', pais = 'MX' where id = $1`, [u.id]);
+    const [i] = await banco.sql<{ id: string }>(
+      `insert into public.inscripciones (edicion_id, persona_id) values ($1, $2) returning id`, [s.edicionAbierta, u.id]);
+    await new YoController(servicio('aal1')).guardar(pedidoDe(u.id), { avisos_por_correo: false });
+    await pagos('aal1').declarar(pedidoDe(u.id), declaracion(i.id, await subir(u.id, i.id)));
+    const antes = correos.length;
+    await expect(pagos('aal2').resolver(pedidoDe(s.gabi), { inscripcion_id: i.id, tipo: 'confirmado' }))
+      .resolves.toEqual({ ok: true, correo: 'apagado' });
+    expect(await estado(i.id)).toBe('confirmada');
+    expect(correos.length, 'no salió ningún correo').toBe(antes);
+  });
+
   it('anular: Gabi no (403 SOLO_DUENO); Armando sí → anulada', async () => {
     expect(await codigoDe(pagos('aal2').resolver(pedidoDe(s.gabi), { inscripcion_id: deClara, tipo: 'anulado', nota: 'Pidió la devolución' }))).toBe('SOLO_DUENO');
     await pagos('aal2').resolver(pedidoDe(s.armando), { inscripcion_id: deClara, tipo: 'anulado', nota: 'Pidió la devolución' });
@@ -826,6 +848,15 @@ describe('El perfil y las notas (/api/yo, /api/equipo/clientes/:id), contra el e
       .resolves.toEqual({ ok: true });
     const { persona } = await yo.yo(pedidoDe(nora)) as { persona: Record<string, unknown> };
     expect(persona).toMatchObject({ ciudad: 'Mérida', anio_nacimiento: 1984, nivel_educativo: 'posgrado' });
+  });
+
+  it('#34 · POST /api/yo apaga y prende los avisos por correo, y GET /api/yo lo devuelve', async () => {
+    const yo = new YoController(servicio('aal1'));
+    await expect(yo.guardar(pedidoDe(nora), { avisos_por_correo: false })).resolves.toEqual({ ok: true });
+    const leer = async () => ((await yo.yo(pedidoDe(nora))) as { persona: { avisos_por_correo: boolean } }).persona.avisos_por_correo;
+    expect(await leer()).toBe(false);
+    await yo.guardar(pedidoDe(nora), { avisos_por_correo: true });
+    expect(await leer()).toBe(true);
   });
 
   it('null borra un dato; un año de hace menos de 14 o un nivel inventado no entran', async () => {
