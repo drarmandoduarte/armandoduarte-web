@@ -244,7 +244,11 @@ export function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: 
  * tal cual estaban al final de Mis datos. «Cerrar las otras sesiones» se mudó a
  * Ajustes → Sesiones, que ven todos.
  */
-export function SeccionDeSeguridad({ alRegenerar }: { alRegenerar: (codigos: string[]) => void }) {
+export function SeccionDeSeguridad({ alRegenerar, alPedirPasoReciente }: {
+  alRegenerar: (codigos: string[]) => void;
+  /** #35 · P8: la API pidió el código del autenticador; con él, se reintenta. */
+  alPedirPasoReciente: (accion: { reintentar: () => void; cancelar: () => void }) => void;
+}) {
   const { t } = useTranslation();
   const [quedan, setQuedan] = useState<number | null>(null);
   const [regenerando, setRegenerando] = useState(false);
@@ -271,16 +275,15 @@ export function SeccionDeSeguridad({ alRegenerar }: { alRegenerar: (codigos: str
       const r = await api<{ codigos: string[] }>('respaldo/generar', { metodo: 'POST' });
       alRegenerar(r.codigos);
     } catch (fallo) {
-      /* `PASO_RECIENTE_REQUERIDO` es el 403 que manda el kit cuando la
-         verificación del autenticador ya no es reciente. Se traduce a NUESTRO
-         texto —el del kit está en voseo y no se puede tocar— y se muestra el
-         `PasoRecienteGate`, que llega con la orden que lo necesite; hoy el
-         mensaje alcanza para que la persona sepa qué hacer. */
-      setError(
-        fallo instanceof ErrorDeApi && fallo.codigo === 'PASO_RECIENTE_REQUERIDO'
-          ? t('pasoReciente.bajada')
-          : t('comun.errorGenerico'),
-      );
+      /* `PASO_RECIENTE_REQUERIDO` es el 403 del kit cuando la verificación del
+         autenticador ya no es reciente: desde la #35 se pide con P8 (la
+         casilla de 6) y, confirmado, se reintenta. El `message` del kit está en
+         voseo y nunca se pinta (`comun/api.ts`). */
+      if (fallo instanceof ErrorDeApi && fallo.codigo === 'PASO_RECIENTE_REQUERIDO') {
+        alPedirPasoReciente({ reintentar: () => void regenerar(), cancelar: () => {} });
+      } else {
+        setError(t('comun.errorGenerico'));
+      }
     } finally {
       setRegenerando(false);
     }

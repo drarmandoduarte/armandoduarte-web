@@ -6,7 +6,26 @@
  * los siete lugares que lo enlazan.
  */
 export const RUTAS = {
+  /** Hasta la #34, la entrada. Desde la #35 es un 308 a `/login` (`vercel.json`), con su `?ir=`. */
   entrar: '/entrar',
+  /* ── Las pantallas de acceso del guion v1 del Kit 512 (orden #35) ──
+     Las direcciones son las del guion (§4). Siguen siendo ESTADOS de la sesión
+     y no lugares (ver `App.tsx`): la URL acompaña a la decisión del núcleo,
+     nunca al revés — escribir `/auth/2fa` a mano no salta ningún paso. */
+  /** P1 · Entrada. */
+  login: '/login',
+  /** P2 · Código por mail. */
+  loginCodigo: '/login/codigo',
+  /** P3 · Verificación del autenticador. */
+  reto: '/auth/2fa',
+  /** P4 · Activar el autenticador (equipo). */
+  activar: '/auth/2fa/activar',
+  /** P5 · Códigos de respaldo. */
+  respaldo: '/auth/2fa/respaldo',
+  /** P6 · Recuperación con un código de respaldo. */
+  recuperar: '/auth/2fa/recuperar',
+  /** P6b · Reseteo con espera (rescate solo). El guion no le da dirección; ésta es la de la casa. */
+  reseteo: '/auth/2fa/reseteo',
   miEspacio: '/mi-espacio',
   /** El panel del equipo (orden #24 A). Solo `dueno` y `equipo`; a un cliente lo devuelve a Mi espacio. */
   equipo: '/equipo',

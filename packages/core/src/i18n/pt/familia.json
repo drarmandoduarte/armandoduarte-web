@@ -1,0 +1,89 @@
+{
+  "auth": {
+    "back": "← {app}",
+    "login": {
+      "subtitle": "Enviamos um código para o seu e-mail. Sem senhas.",
+      "send": "Enviar código",
+      "title": "Entre no seu *espaço*."
+    },
+    "google": "Continuar com o Google",
+    "email": {
+      "label": "E-mail",
+      "placeholder": "voce@email.com"
+    },
+    "legal": "Ao continuar, você aceita nossos Termos e a Política de Privacidade.",
+    "code": {
+      "eyebrow": "Código",
+      "title": "Confira seu *e-mail*.",
+      "subtitle": "Enviamos um código de 6 dígitos para {email}.",
+      "label": "Código de 6 dígitos",
+      "enter": "Entrar",
+      "resend": "Reenviar código",
+      "resendIn": "Reenviar em {s} s",
+      "otherEmail": "Usar outro e-mail",
+      "wrong": "Código incorreto. Restam {n} tentativas."
+    },
+    "totp": {
+      "eyebrow": "Verificação",
+      "title": "Verifique sua *identidade*.",
+      "subtitle": "Digite o código de 6 dígitos do seu app autenticador.",
+      "verify": "Verificar",
+      "lost": "Estou sem o celular · usar um código de backup"
+    },
+    "signout": "Sair",
+    "enroll": {
+      "eyebrow": "Autenticador",
+      "title": "Ative sua *segunda etapa*.",
+      "subtitle": "Escaneie o código com seu app autenticador ou abra-o neste celular.",
+      "open": "Abrir no meu app autenticador",
+      "copy": "Copiar a chave",
+      "confirmLabel": "Confirme com o código",
+      "confirm": "Confirmar"
+    },
+    "backup": {
+      "eyebrow": "Backup",
+      "title": "Guarde estes *códigos*.",
+      "subtitle": "Se perder o celular, cada um permite entrar uma vez. Não serão mostrados de novo.",
+      "download": "Baixar",
+      "copy": "Copiar",
+      "share": "Compartilhar",
+      "done": "Pronto, salvei"
+    },
+    "recover": {
+      "eyebrow": "Recuperação",
+      "title": "Use um código de *backup*.",
+      "subtitle": "Ao usá-lo, seu autenticador anterior deixa de valer e você vai configurar um novo.",
+      "continue": "Continuar",
+      "back": "Voltar",
+      "noCodes": "Também não tenho os códigos"
+    },
+    "reset": {
+      "eyebrow": "Redefinição",
+      "title": "Peça uma *redefinição*.",
+      "subtitle": "Enviaremos um e-mail para confirmar. Se ninguém cancelar, em 48 horas você poderá configurar um novo autenticador.",
+      "request": "Pedir a redefinição",
+      "waitTitle": "Sua redefinição está *a caminho*.",
+      "waitSubtitle": "Você poderá configurar um novo autenticador em {fecha}."
+    },
+    "session": {
+      "eyebrow": "Sessão",
+      "title": "Encerramos sua *sessão*.",
+      "subtitle": "Passaram 30 minutos sem atividade. É uma medida de segurança.",
+      "again": "Entrar de novo"
+    },
+    "stepup": {
+      "eyebrow": "Confirmação",
+      "title": "Confirme que é *você*.",
+      "subtitle": "Esta ação exige o código do seu app autenticador.",
+      "cancel": "Cancelar"
+    },
+    "evicted": {
+      "title": "Faz um *tempo*.",
+      "subtitle": "Seu celular apagou os dados salvos do app. É só entrar de novo.",
+      "enter": "Entrar"
+    },
+    "lang": {
+      "label": "Idioma"
+    }
+  }
+}

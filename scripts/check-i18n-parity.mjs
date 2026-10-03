@@ -46,6 +46,15 @@ const FUENTE = 'es';
    acordarse de venir. */
 const PISO_DE_CLAVES = 299;
 
+/* ── Idiomas parciales (orden Códice #35) ────────────────────────────────
+   `en` y `pt` entran solo para las pantallas de acceso del guion v1 del Kit
+   512: traen `familia.json` con `auth.*` y nada más. En ellos se compara **ese
+   prefijo**, en las dos direcciones, y se exige ese namespace; lo demás cae a
+   `es`. El piso de abajo es el número de claves `auth.*` del guion (57) más
+   las cuatro que agrega Mi espacio: si una se pierde, rojo. */
+const PARCIALES = { en: { familia: 'auth.' }, pt: { familia: 'auth.' } };
+const PISO_PARCIAL = 61;
+
 const destinos = readdirSync(LOCALES).filter(
   (e) => e !== FUENTE && !e.startsWith('.') && statSync(join(LOCALES, e)).isDirectory(),
 );
@@ -69,6 +78,8 @@ const interpolaciones = (valor) => {
   const out = new Set();
   if (typeof valor !== 'string') return out;
   for (const m of valor.matchAll(/\{\{\s*([a-zA-Z0-9_]+)(?:\s*,[^}]*)?\s*\}\}/g)) out.add(m[1]);
+  /* Las de una llave del guion del Kit 512 (`{app}`, `{email}`, `{n}`): #35. */
+  for (const m of valor.matchAll(/(?<!\{)\{([a-zA-Z0-9_]+)\}(?!\})/g)) out.add(m[1]);
   return out;
 };
 
@@ -100,12 +111,20 @@ if (clavesFuente < PISO_DE_CLAVES) {
 
 for (const destino of destinos) {
   const nsDestino = namespaces(destino);
-  for (const ns of soloEn(new Set(nsFuente), new Set(nsDestino))) problemas.push(`falta ${destino}/${ns}.json (está en ${FUENTE}/)`);
-  for (const ns of soloEn(new Set(nsDestino), new Set(nsFuente))) problemas.push(`sobra ${destino}/${ns}.json (no está en ${FUENTE}/)`);
+  const parcial = PARCIALES[destino];
+  const esperados = parcial ? Object.keys(parcial) : nsFuente;
+  for (const ns of soloEn(new Set(esperados), new Set(nsDestino))) problemas.push(`falta ${destino}/${ns}.json (está en ${FUENTE}/)`);
+  for (const ns of soloEn(new Set(nsDestino), new Set(esperados))) problemas.push(`sobra ${destino}/${ns}.json (no corresponde a ${destino})`);
 
-  for (const ns of nsFuente.filter((n) => nsDestino.includes(n))) {
-    const a = planoFuente[ns];
+  for (const ns of esperados.filter((n) => nsDestino.includes(n))) {
+    const prefijo = parcial?.[ns];
+    const a = planoFuente[ns] && prefijo
+      ? Object.fromEntries(Object.entries(planoFuente[ns]).filter(([k]) => k.startsWith(prefijo)))
+      : planoFuente[ns];
     if (!a) continue;
+    if (prefijo && Object.keys(a).length < PISO_PARCIAL) {
+      problemas.push(`${FUENTE}·${ns} tiene ${Object.keys(a).length} claves «${prefijo}*» y el piso es ${PISO_PARCIAL}`);
+    }
     let b;
     try { b = aplanar(cargar(destino, ns)); } catch (err) {
       problemas.push(`${destino}/${ns}.json no parsea: ${err.message}`);

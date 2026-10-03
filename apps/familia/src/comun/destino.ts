@@ -21,9 +21,9 @@ import { RUTAS } from '../rutas';
  */
 const CLAVE = 'codice.destino-despues-de-entrar';
 
-/** Si la URL actual es `/entrar`, guarda su `?ir=` (válido) o borra el viejo. */
+/** Si la URL actual es la entrada (`/login`, o `/entrar` de antes de la #35), guarda su `?ir=` (válido) o borra el viejo. */
 export function guardarDestinoDeLaUrl(): void {
-  if (window.location.pathname !== RUTAS.entrar) return;
+  if (window.location.pathname !== RUTAS.login && window.location.pathname !== RUTAS.entrar) return;
   const ir = rutaInternaSegura(new URLSearchParams(window.location.search).get('ir'));
   try {
     if (ir) window.sessionStorage.setItem(CLAVE, ir);

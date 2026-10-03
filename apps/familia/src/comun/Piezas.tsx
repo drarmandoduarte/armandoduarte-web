@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TELEFONO_GABY, enlaceWhatsApp } from '@codice/core';
 import { WEB } from '../rutas';
@@ -162,23 +162,6 @@ export function Titulo({ texto }: { texto: string }) {
 }
 
 /**
- * B.9 · el aviso legal, con los dos enlaces a las páginas de la web.
- * Va en `/entrar`, que es donde se acepta.
- */
-export function AvisoLegal() {
-  const { t } = useTranslation();
-  return (
-    <p className="aviso-legal">
-      {t('comun.avisoLegalAntes')}
-      <a href={`${WEB}/privacidad`}>{t('web:comun.pie.privacidad')}</a>
-      {t('comun.avisoLegalMedio')}
-      <a href={`${WEB}/terminos`}>{t('web:comun.pie.terminos')}</a>
-      {t('comun.avisoLegalDespues')}
-    </p>
-  );
-}
-
-/**
  * Un campo de texto con su rótulo, su ayuda y su error.
  *
  * El error se anuncia con `role="alert"` y el campo se marca con
@@ -218,25 +201,6 @@ export function Campo({
   );
 }
 
-/**
- * El campo de los seis dígitos — seis casillas (orden Códice #18, B.8 y F).
- *
- * ── Se ven seis, y es **una** entrada ───────────────────────────────────
- * La #15 dejó escrita la razón para no hacer seis cajitas: seis `<input>`
- * rompen el pegado desde el portapapeles, rompen el autocompletado del código
- * del correo y obligan a manejar el foco a mano, que es donde esos componentes
- * fallan con teclado y con lector de pantalla. La razón sigue siendo cierta, y
- * dirección pidió las seis casillas (B.8). Las dos cosas caben juntas:
- *
- *   · hay **un solo `<input>`**, transparente, encima de la fila. Recibe el
- *     teclado, el pegado entero y el `autoComplete="one-time-code"` de iOS, y
- *     el lector de pantalla lo anuncia como un campo, con su rótulo;
- *   · las seis casillas son **dibujo** (`aria-hidden`): muestran el dígito de
- *     cada posición y resaltan la que sigue, que es el «foco que avanza solo».
- *
- * Pegar «123 456» o «123-456» deja seis dígitos: se limpia todo lo que no es
- * número y se corta en seis. Lo prueba `casillas.test.tsx`.
- */
 /** Un `<select>` con su rótulo y su error, con la misma anatomía que `Campo`. */
 export function Selector({
   id,
@@ -293,58 +257,6 @@ export function AreaDeTexto({
   );
 }
 
-/* Las seis posiciones, escritas. No `Array.from`: `sin-base-desde-el-navegador`
-   busca `.from(` —la lectura directa de Supabase— y tiene razón en no saber
-   distinguirlo. Mejor no darle nada que distinguir. */
-const POSICIONES = [0, 1, 2, 3, 4, 5] as const;
-
-export function CampoDeCodigo(props: {
-  id: string;
-  rotulo: string;
-  valor: string;
-  alCambiar: (valor: string) => void;
-  error?: string | null;
-  autoFocus?: boolean;
-}) {
-  const [enfocado, setEnfocado] = useState(false);
-  const idError = props.error ? `${props.id}-error` : undefined;
-  const siguiente = Math.min(props.valor.length, 5);
-  return (
-    <div className="campo">
-      <label className="campo__rotulo" htmlFor={props.id}>{props.rotulo}</label>
-      <div className="casillas">
-        <input
-          id={props.id}
-          className="casillas__entrada"
-          value={props.valor}
-          onChange={(e) => props.alCambiar(e.target.value.replace(/\D/g, '').slice(0, 6))}
-          onFocus={() => setEnfocado(true)}
-          onBlur={() => setEnfocado(false)}
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          pattern="[0-9]*"
-          maxLength={6}
-          autoFocus={props.autoFocus}
-          aria-invalid={props.error ? 'true' : undefined}
-          aria-describedby={idError}
-        />
-        <div className="casillas__fila" aria-hidden="true">
-          {POSICIONES.map((i) => (
-            <span
-              key={i}
-              data-casilla={i}
-              className={`casilla${props.valor[i] ? ' casilla--llena' : ''}${enfocado && i === siguiente ? ' casilla--sigue' : ''}`}
-            >
-              {props.valor[i] ?? ''}
-            </span>
-          ))}
-        </div>
-      </div>
-      {props.error ? <span className="error" id={idError} role="alert">{props.error}</span> : null}
-    </div>
-  );
-}
-
 /** El botón que hace avanzar: uno por pantalla, y es el único naranja. */
 export function BotonPrincipal({
   children,
@@ -361,9 +273,4 @@ export function BotonPrincipal({
       {cargando && textoCargando ? textoCargando : children}
     </button>
   );
-}
-
-/** Un aviso al entrar: «te cerramos la sesión», «tu sesión ya no estaba». */
-export function Aviso({ children }: { children: ReactNode }) {
-  return <p className="aviso" role="status">{children}</p>;
 }

@@ -85,13 +85,13 @@ afterEach(() => {
 });
 
 const t = (clave: string) => i18n.t(clave);
-/* El título de /entrar lleva su palabra en teal desde la #18: se busca como
-   encabezado, por su nombre accesible, sin los corchetes que la marcan. */
-const sinEspacios = (s: string) => s.replace(/[\s[\]]/g, '');
+/* El título de /login (P1 del guion v1, #35) lleva su palabra entre
+   asteriscos: se busca como encabezado, por su nombre accesible, sin ellos. */
+const sinEspacios = (s: string) => s.replace(/[\s*]/g, '');
 /* jsdom arma el nombre accesible con espacios alrededor del `<span>` de la
    palabra; el navegador no. Se compara sin espacios para medir lo que importa. */
 const tituloDeEntrar = () => screen.findByRole('heading', {
-  name: (nombre) => sinEspacios(nombre) === sinEspacios(t('entrar.titulo')),
+  name: (nombre) => sinEspacios(nombre) === sinEspacios(t('auth.login.title')),
 });
 const pedidosDeYo = () => pedidos.filter((u) => u === '/api/yo').length;
 
