@@ -1,6 +1,6 @@
 {
   "title": "Taller para padres de adolescentes en Mérida · El arte de amar a tu adolescente · Armando Duarte",
-  "description": "Taller presencial de 4 horas y media para padres de adolescentes. Jueves 5 de noviembre de 2026, Fiesta Inn CORDEMEX, 8:30 a 13:00. Con Armando Duarte, cupo limitado.",
+  "description": "Taller presencial de 4 horas y media para padres de adolescentes. Jueves 5 de noviembre de 2026, Fiesta Inn Mérida, 8:30 a 13:00. Con Armando Duarte, cupo limitado.",
   "canonical": "https://armandoduarte.com/merida",
   "ogUrl": "https://armandoduarte.com/merida",
   "ogImage": "https://armandoduarte.com/img/og-merida-1200x630.jpg?v=c72cdd49",
@@ -23,7 +23,7 @@
       "endDate": "2026-11-05T13:00:00-06:00",
       "location": {
         "@type": "Place",
-        "name": "Fiesta Inn CORDEMEX",
+        "name": "Fiesta Inn Mérida",
         "hasMap": "https://maps.app.goo.gl/7CzJ1jubvL8KfNyt8",
         "address": {
           "@type": "PostalAddress",

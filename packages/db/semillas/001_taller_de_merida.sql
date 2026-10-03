@@ -3,7 +3,7 @@
 --
 -- QUÉ TRAE: el primer curso del panel, para que no nazca vacío: «El arte de amar
 -- a tu adolescente» y su edición del jueves 5 de noviembre de 2026, de 8:30 a
--- 13:00 en Mérida, en el Fiesta Inn CORDEMEX, a $1,170 MXN. **En `borrador`**: lo publica
+-- 13:00 en Mérida, en el Fiesta Inn Mérida, a $1,170 MXN. **En `borrador`**: lo publica
 -- Armando desde el panel cuando lo mire. Mientras sea borrador no se ve fuera
 -- del equipo (002) y nadie se puede inscribir (003, `edicion_abierta()`).
 --
@@ -22,6 +22,9 @@
 --   La fila de la base la cambia el CEO por SQL (no es migración) y lo anota
 --   en `infraestructura`; este archivo se corrige para que el repo diga lo
 --   mismo que la base. Volver a correrla no pisa la fila existente.
+--   Y esa misma tarde (orden #33 ter) vuelve a «Fiesta Inn Mérida», pedido de
+--   Diana: «en el lugar del evento sea solamente Fiesta Inn Mérida». Mismo
+--   camino: la fila la corrige el CEO por SQL; este archivo, el repo.
 --
 -- ── Una semilla no es una migración ─────────────────────────────────────────
 -- No cambia el esquema: carga una fila de datos. Por eso vive en `semillas/` y
@@ -57,7 +60,7 @@ insert into public.ediciones
 select c.id,
        timestamp '2026-11-05 08:30' at time zone 'America/Merida',
        timestamp '2026-11-05 13:00' at time zone 'America/Merida',
-       'America/Merida', 'Fiesta Inn CORDEMEX', 'Mérida', 'MX', null,
+       'America/Merida', 'Fiesta Inn Mérida', 'Mérida', 'MX', null,
        1170.00, 'MXN',
        timestamp '2026-11-05 08:30' at time zone 'America/Merida',
        'abierta'
