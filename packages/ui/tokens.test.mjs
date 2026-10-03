@@ -319,8 +319,8 @@ describe('el design.json de Mi espacio (#35)', async () => {
   const { generar, SALIDA_JSON, SALIDA_CSS, MAPA } = await import('./scripts/design-json.mjs');
   const { json, css, documento } = generar();
 
-  it('EL PISO, PRIMERO: generó los siete colores, las dos familias y el radio', () => {
-    expect(Object.keys(documento.colores)).toEqual(['fondo', 'superficie', 'texto', 'secundario', 'acento', 'borde', 'error']);
+  it('EL PISO, PRIMERO: generó los ocho colores, las dos familias y el radio', () => {
+    expect(Object.keys(documento.colores)).toEqual(['fondo', 'superficie', 'texto', 'secundario', 'acento', 'borde', 'error', 'linea']);
     expect(documento.tipografia.sans.familia).toBe('Montserrat');
     expect(documento.radio.valor).toBe('2px');
   });
@@ -336,7 +336,7 @@ describe('el design.json de Mi espacio (#35)', async () => {
   it('cada hex del design.json está en el canon, y es el de su token', () => {
     const canonCss = readFileSync(join(AQUI, 'codice-tokens.css'), 'utf8').toUpperCase();
     const enJson = readFileSync(SALIDA_JSON, 'utf8').match(/#[0-9A-Fa-f]{6}\b/g) ?? [];
-    expect(enJson.length, 'el barrido vio los siete').toBe(7);
+    expect(enJson.length, 'el barrido vio los ocho').toBe(8);
     expect(enJson.filter((h) => !canonCss.includes(h.toUpperCase()))).toEqual([]);
     for (const [rol, ruta] of Object.entries(MAPA.colores)) {
       const nodo = ruta.split('.').reduce((o, k) => o?.[k], tokens);
@@ -344,8 +344,11 @@ describe('el design.json de Mi espacio (#35)', async () => {
     }
   });
 
-  it('el mapa es el de la orden: acento teal CFF, sin serif, español neutro', () => {
+  it('el mapa es el de la orden: acento teal CFF, borde ink.muted (auditoría #56), sin serif, español neutro', () => {
     expect(MAPA.colores.acento).toBe('color.cff.tealDark');
+    /* WCAG 1.4.11: el borde de un control a 3:1 sobre el fondo, como mínimo. */
+    expect(MAPA.colores.borde).toBe('color.ink.muted');
+    expect(contraste(documento.colores.borde.hex, documento.colores.fondo.hex)).toBeGreaterThanOrEqual(3);
     expect(documento.tipografia.serif).toBeNull();
     expect(documento.tipografia.acentuada).toEqual({ familia: 'sans', estilo: 'italic', color: 'acento' });
     expect(documento.espanol).toBe('neutro');

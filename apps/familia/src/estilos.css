@@ -128,9 +128,8 @@ img,svg{display:block;max-width:100%}
      Vibes sale 2 px por encima de la caja (`line-height: 1.1`). Y es el mismo
      a 42 px y a 33 px, así que va en px y no en `em`.
 
-   Lo vigilaba `e2e/entrar-como-quien.spec.ts`, que medía `/entrar` y se fue
-   con la #35 (la entrada ahora es la del guion v1 del Kit 512, sin fotos).
-   Queda para `/empezar`, sin guardián de píxeles: pendiente en el informe #35. */
+   Lo vigila `e2e/entrar-como-quien.spec.ts`, que desde la #35 mide `/empezar`
+   (la entrada es la del guion v1 del Kit 512, sin fotos; auditoría del #56). */
 @media (min-width:1100px){
   .marco--con-armando{
     --contenedor:min(90%,1400px,calc(100% - 40px));

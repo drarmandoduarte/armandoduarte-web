@@ -36,14 +36,19 @@
       "css": "--teal"
     },
     "borde": {
-      "token": "color.border.hairline",
-      "hex": "#EAE4D8",
-      "css": "--hair"
+      "token": "color.ink.muted",
+      "hex": "#716A60",
+      "css": "--gris"
     },
     "error": {
       "token": "color.semantic.danger",
       "hex": "#A05A48",
       "css": "--error"
+    },
+    "linea": {
+      "token": "color.border.hairline",
+      "hex": "#EAE4D8",
+      "css": "--hair"
     }
   },
   "tipografia": {

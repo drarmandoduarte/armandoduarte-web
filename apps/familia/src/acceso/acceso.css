@@ -42,7 +42,7 @@
 .acceso__google:hover{background:color-mix(in oklab, var(--acceso-texto) 4%, transparent)}
 /* La línea con el círculo en el medio. */
 .acceso__separador{display:flex;align-items:center;gap:32px;margin:40px 0}
-.acceso__separador::before,.acceso__separador::after{content:'';flex:1;height:1px;background:var(--acceso-borde)}
+.acceso__separador::before,.acceso__separador::after{content:'';flex:1;height:1px;background:var(--acceso-linea)}
 .acceso__separador span{width:10px;height:10px;border-radius:50%;border:1px solid var(--acceso-secundario);flex:none}
 
 .acceso__etiqueta{display:block;margin-bottom:14px;font-family:var(--acceso-sans);font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--acceso-acento)}
@@ -102,4 +102,4 @@
 .acceso__chico:hover{background:color-mix(in oklab, var(--acceso-texto) 4%, transparent)}
 
 /* P5 · los diez códigos, en dos columnas, monoespaciados. */
-.acceso__codigos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 32px;margin-top:40px;padding:24px 28px;list-style:none;background:var(--acceso-superficie);border:1px solid var(--acceso-borde);border-radius:var(--acceso-radio);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:17px;letter-spacing:.08em;color:var(--acceso-texto)}
+.acceso__codigos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 32px;margin-top:40px;padding:24px 28px;list-style:none;background:var(--acceso-superficie);border:1px solid var(--acceso-linea);border-radius:var(--acceso-radio);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:17px;letter-spacing:.08em;color:var(--acceso-texto)}

@@ -41,9 +41,15 @@ export const MAPA = {
     secundario: 'color.ink.muted',
     /* Mi espacio usa la paleta CFF de Armando (decisión del 29/9). */
     acento: 'color.cff.tealDark',
-    /* El hairline que ya usa la app en sus campos (`.campo__entrada`). */
-    borde: 'color.border.hairline',
+    /* El borde de campos y casillas. Era el hairline (1,18:1 sobre crema, no
+       llega al 3:1 de WCAG 1.4.11 y en P3 casi no se veía); auditoría del CEO
+       del PR #56: ink.muted, 4,99:1. */
+    borde: 'color.ink.muted',
     error: 'color.semantic.danger',
+    /* Las líneas que NO son borde de un control: la del separador de P1 y el
+       recuadro de los códigos de P5. Siguen en el hairline (auditoría #56:
+       el cambio es «en campos y casillas»). */
+    linea: 'color.border.hairline',
   },
   tipografia: {
     sans: 'typography.families.structure',

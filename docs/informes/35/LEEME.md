@@ -83,7 +83,19 @@ No tengo un teléfono. Lo que sí hay es `pegar-en-telefono-emulado-390.png`: un
 9. **P6 no tiene etiqueta visible** (el guion no la pone): el campo tiene `aria-label`.
 10. **P3 lleva «← Armando Duarte» y el selector de idioma arriba, aunque la captura `03` no los muestra.** El texto del guion (§2) los pide en todas las pantallas.
 
-## Decisiones para dirección
+## Ajustes de la auditoría del CEO (PR #56, 3/10)
 
-- **El borde de las casillas y los campos es el hairline (1,18:1 sobre crema), como dice la orden.** Se ve muy tenue (ver P3) y no llega al 3:1 que pide WCAG 1.4.11 para el borde de un control. Opciones: `hairlineHover` (1,45:1) o `ink.muted` (4,99:1). Hace falta cambiar el mapa en una orden.
-- **Se borró `e2e/entrar-como-quien.spec.ts`**, que medía la foto de Armando en `/entrar`. `/empezar` conserva esa composición, pero ya no tiene un guardián de píxeles.
+1. **El borde de campos y casillas pasa a `color.ink.muted`** (4,99:1 sobre crema), 1 px; la casilla activa sigue en el acento.
+   - Se cambió el **mapa** del script y el `design.json` se regeneró. Al cambiar el mapa, el guardián quedó en rojo hasta regenerar.
+   - `tokens.test.mjs` ahora afirma el mapa y que el borde llegue a 3:1 sobre el fondo. Si se vuelve al hairline, cae.
+   - El separador de P1 y el recuadro de los códigos de P5 no son borde de un control. Para que sigan en hairline agregué el rol `linea` (`color.border.hairline`), porque la decisión dice «en campos y casillas».
+   - Recapturé todas las pantallas, no solo P1–P3, porque el borde cambia también P4, P6 y P8.
+2. **`e2e/entrar-como-quien.spec.ts` volvió y ahora mide `/empezar`**, con una sesión simulada de una clienta nueva.
+   - A 1440 y 1920: pelo 166 = letras 166 y corte 1085,4 = línea del pie 1085,4.
+   - Mutación, cada mitad por separado:
+     - `--aire-rotulo` a 8 px: «el pelo está 10 px por debajo de las letras» (2 rojos).
+     - El corte 12 px arriba: «el corte no apoya en la línea del pie (1073,4 contra 1085,4)» (2 rojos).
+
+     Con el CSS devuelto, 2/2 en verde.
+
+**Prueba en teléfono real:** la hace Germán en el smoke, pegando el código del correo en el iPhone. Modelo: _(lo anota Germán)_.
