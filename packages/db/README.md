@@ -91,6 +91,7 @@ CEO con autorización de Germán.
 | 009 | `009_me_anoto.sql` | el cupo cumplido por la base y las tres consultas de «me anoto» (orden #24 B) | **30/9/2026 23:35** |
 | 010 | `010_el_libro_en_el_panel.sql` | `libro_de_edicion()` y `firma_del_libro()`: el último renglón del libro para Inscriptos (orden #27 C), sin tablas ni policies nuevas | pendiente (la corre el CEO después del merge del PR C) |
 | 011 | `011_el_perfil.sql` | ciudad, año de nacimiento y nivel educativo en `personas`; `notas_de_persona` (solo se agrega, equipo por territorio con aal2, el cliente no la lee); `panel_clientes()` reemplazada con esas columnas (orden #27 D) | **1/10/2026 16:20** |
+| 012 | `012_avisos_por_correo.sql` | `personas.avisos_por_correo boolean not null default true`: la preferencia de Ajustes → Notificaciones (orden #34) | pendiente (la corre el CEO **antes** del merge de la #34; snippet `012_avisos_por_correo`) |
 
 Las siete quedaron guardadas en el editor SQL de Supabase con el nombre de su
 archivo (`001_personas_y_miembros` … `007_permisos`).
