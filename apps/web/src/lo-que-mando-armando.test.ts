@@ -151,7 +151,12 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
        que si la web dijera otra cosa el `includes` de arriba ya lo habría
        cazado — pero sólo porque el valor es literal. Esto lo ancla. */
     expect(hechos.horarioValor, 'el horario del insumo es «8:30 a 13:00»').toBe('8:30 a 13:00');
-    expect(hechos.dondeValor, 'la sede, desde el 2/10, es «Fiesta Inn CORDEMEX»').toBe('Fiesta Inn CORDEMEX');
+    /* La sede pasó a «Fiesta Inn CORDEMEX» en la #33 y volvió a «Fiesta Inn
+       Mérida» la misma tarde (#33 ter, pedido de Diana). Es la del insumo del
+       28/9, así que se ancla también contra él. */
+    expect(hechos.dondeValor, 'la sede, desde la #33 ter, es «Fiesta Inn Mérida»').toBe('Fiesta Inn Mérida');
+    enElInsumo(hechos.dondeValor, 'sede');
+    expect(faltan, 'la sede tiene que estar en el insumo del 28/9').toEqual([]);
   });
 
   it('los tres textos del 2/10 (sede, modalidad, receso) están en todos lados, y los de antes en ninguno', () => {
@@ -161,7 +166,7 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
        Ese ajuste no está escrito en la orden #33, así que se ancla como
        literal y no se busca en el pedido. */
     const NUEVOS = {
-      sede: 'Fiesta Inn CORDEMEX',
+      sede: 'Fiesta Inn Mérida',
       modalidad: 'Presencial',
       receso: 'Con un receso de 20 minutos',
     };
@@ -180,7 +185,9 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
 
     /* Y lo publicado: ningún texto de antes en ningún HTML de dist (JSON-LD y
        meta incluidos), y el `Place` del Event con la sede nueva. */
-    const VIEJOS = ['Fiesta Inn Mérida', 'Sesión privada en vivo', 'entre el núcleo 2 y el 3', 'Modalidad Presencial'];
+    /* «CORDEMEX» suelto y no «Fiesta Inn CORDEMEX»: que no quede la palabra en
+       ninguna forma (#33 ter). */
+    const VIEJOS = ['CORDEMEX', 'Sesión privada en vivo', 'entre el núcleo 2 y el 3', 'Modalidad Presencial'];
     const paginas = RUTAS.map(({ archivo }) => ({ archivo, html: existsSync(join(DIST, archivo)) ? readFileSync(join(DIST, archivo), 'utf8') : '' }));
     for (const { archivo, html } of paginas) {
       expect(html.length, `${archivo} no está en dist: corre el build antes`).toBeGreaterThan(1000);

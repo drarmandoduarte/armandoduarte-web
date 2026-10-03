@@ -110,7 +110,7 @@ const EVENTO_MERIDA = {
   endDate: '2026-11-05T13:00:00-06:00',
   location: {
     '@type': 'Place',
-    name: 'Fiesta Inn CORDEMEX',
+    name: 'Fiesta Inn Mérida',
     /* El mismo enlace que la franja de hechos (orden #20, E), de `CANALES`:
        una dirección escrita dos veces es una dirección que un día apunta a dos
        lugares. Google lo usa para el mapa del resultado enriquecido. */
