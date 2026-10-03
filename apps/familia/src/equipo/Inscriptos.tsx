@@ -122,7 +122,9 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
       });
       const id = resolviendo.id;
       setResolviendo(null);
-      setAviso({ id, texto: t(r.correo === 'no_enviado' ? 'equipo.inscriptos.pago.correoNoSalio' : 'equipo.inscriptos.pago.hecho') });
+      /* #34 B.3: `apagado` es la persona que pidió no recibir correos; igual hay que avisarle. */
+      const clave = r.correo === 'no_enviado' ? 'correoNoSalio' : r.correo === 'apagado' ? 'correoApagado' : 'hecho';
+      setAviso({ id, texto: t(`equipo.inscriptos.pago.${clave}`) });
       await cargar(elegida, false);
     } catch (e) {
       const codigo = e instanceof ErrorDeApi ? e.codigoDelServidor : undefined;

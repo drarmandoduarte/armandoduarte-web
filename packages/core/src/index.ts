@@ -91,3 +91,9 @@ export {
   whatsappE164,
   whatsappValido,
 } from './mi-espacio/whatsapp';
+
+// ── La barra y los ajustes (orden #34) ───────────────────────────────────────
+export {
+  FORMAS_DE_ENTRAR, SECCIONES_DE_AJUSTES, claveDelRol, formasDeEntrar, inicialesDe, nombreDelBloque, seccionesDeAjustes,
+} from './mi-espacio/ajustes';
+export type { FormaDeEntrar, SeccionDeAjustes } from './mi-espacio/ajustes';

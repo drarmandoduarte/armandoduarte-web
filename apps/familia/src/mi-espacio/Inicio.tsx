@@ -107,7 +107,7 @@ function TarjetaDatos({ yo }: { yo: Yo }) {
         <p className="nota">{t('inicio.datosFaltan', { lista: faltan.map((c) => t(`inicio.campos.${c}`)).join(', ') })}</p>
       )}
       <p className="tarjeta__accion">
-        <EnlaceInterno a={RUTAS.misDatos} className="enlace">
+        <EnlaceInterno a={RUTAS.ajustesPerfil} className="enlace">
           {faltan.length === 0 ? t('inicio.datosVer') : t('inicio.datosCompletar')} →
         </EnlaceInterno>
       </p>

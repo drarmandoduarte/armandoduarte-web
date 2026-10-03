@@ -24,6 +24,7 @@ const APP = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG = JSON.parse(readFileSync(join(APP, 'vercel.json'), 'utf8')) as {
   headers: { source: string; headers: { key: string; value: string }[] }[];
   rewrites: { source: string; destination: string }[];
+  redirects?: { source: string; destination: string; permanent?: boolean }[];
 };
 
 /** Las cabeceras que aplican a TODA respuesta, por nombre. */
@@ -162,5 +163,12 @@ describe('las cabeceras de Mi espacio', () => {
     const robots = readFileSync(join(APP, 'public', 'robots.txt'), 'utf8');
     expect(robots).toMatch(/^User-agent: \*$/m);
     expect(robots).toMatch(/^Disallow: \/$/m);
+  });
+
+  it('(9) #34: /mis-datos es un 308 a /ajustes/perfil — y es la única redirección', () => {
+    /* «Mis datos» pasó a Ajustes → Perfil. Un enlace guardado o un correo viejo
+       a `/mis-datos` no cae en un lugar que ya no existe. 308 y no 301: el
+       navegador no cambia el método. */
+    expect(CONFIG.redirects).toEqual([{ source: RUTAS.misDatos, destination: RUTAS.ajustesPerfil, permanent: true }]);
   });
 });

@@ -174,11 +174,30 @@ export class SupabaseService {
   async personaDe(token: string, personaId: string) {
     const { data, error } = await this.comoElUsuario(token)
       .from('personas')
-      .select('id, nombre, apellido, whatsapp, pais, zona_horaria, ciudad, anio_nacimiento, nivel_educativo')
+      .select('id, nombre, apellido, whatsapp, pais, zona_horaria, ciudad, anio_nacimiento, nivel_educativo, avisos_por_correo')
       .eq('id', personaId)
       .maybeSingle();
     if (error) throw new UnauthorizedException('No pudimos leer tus datos.');
     return data;
+  }
+
+  /**
+   * El territorio del miembro activo (#34 A.3: «Equipo · México»), o nulo para
+   * un cliente. Solo para pintar el rol: lo que cada quien ve lo decide la RLS.
+   */
+  async territorioDe(token: string, personaId: string): Promise<'mexico' | 'internacional' | 'todos' | null> {
+    const { data, error } = await this.comoElUsuario(token)
+      .from('miembros')
+      .select('territorio')
+      .eq('user_id', personaId)
+      .eq('activo', true)
+      .maybeSingle();
+    if (error) {
+      this.logger.warn(`No se pudo leer el territorio: ${error.code ?? 'sin código'}`);
+      return null;
+    }
+    const t = data?.territorio;
+    return t === 'mexico' || t === 'internacional' || t === 'todos' ? t : null;
   }
 
   /** Cierra todas las otras sesiones de esta persona. Único uso de service_role. */

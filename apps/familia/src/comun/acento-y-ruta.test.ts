@@ -91,17 +91,33 @@ describe('rutaQueCorresponde', () => {
     expect(rutaQueCorresponde({ ...base, decision: 'reto', destinoGuardado: '/me-anoto/el-arte' })).toBeNull();
   });
 
-  it('#29: /talleres, /mis-talleres y /mis-datos son lugares; una ruta inventada va a Inicio', () => {
-    for (const lugar of ['/talleres', '/mis-talleres', '/mis-datos', '/mi-espacio']) {
+  it('#29: /talleres y /mis-talleres son lugares; una ruta inventada va a Inicio', () => {
+    for (const lugar of ['/talleres', '/mis-talleres', '/mi-espacio']) {
       expect(rutaQueCorresponde({ ...base, rutaActual: lugar }), lugar).toBeNull();
     }
-    expect(rutaQueCorresponde({ ...base, rutaActual: '/ajustes' })).toBe('/mi-espacio');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/preferencias' })).toBe('/mi-espacio');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/ajustes/apariencia' })).toBe('/mi-espacio');
     /* Sin sesión, cualquiera de ellas manda a la entrada. */
     expect(rutaQueCorresponde({ ...base, haySesion: false, hayYo: false, decision: null, rutaActual: '/mis-datos' })).toBe('/entrar');
   });
 
+  it('#34: las secciones de /ajustes son lugares; /ajustes a secas y /mis-datos van a Perfil', () => {
+    for (const lugar of ['/ajustes/perfil', '/ajustes/cuenta', '/ajustes/notificaciones', '/ajustes/sesiones', '/ajustes/privacidad']) {
+      expect(rutaQueCorresponde({ ...base, rutaActual: lugar }), lugar).toBeNull();
+    }
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/ajustes' })).toBe('/ajustes/perfil');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/mis-datos' })).toBe('/ajustes/perfil');
+    expect(rutaQueCorresponde({ ...base, haySesion: false, hayYo: false, decision: null, rutaActual: '/ajustes/perfil' })).toBe('/entrar');
+  });
+
+  it('#34 · EL CASO: /ajustes/seguridad es del equipo; un cliente va a Inicio', () => {
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/ajustes/seguridad', esEquipo: true })).toBeNull();
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/ajustes/seguridad', esEquipo: false })).toBe('/mi-espacio');
+    expect(rutaQueCorresponde({ ...base, rutaActual: '/ajustes/seguridad' })).toBe('/mi-espacio');
+  });
+
   it('#29 C · EL CASO: sin nombre, apellido o WhatsApp, primero /empezar — desde cualquier ruta, también el equipo', () => {
-    for (const desde of ['/entrar', '/', '/mi-espacio', '/talleres', '/mis-datos', '/me-anoto/el-arte']) {
+    for (const desde of ['/entrar', '/', '/mi-espacio', '/talleres', '/ajustes/perfil', '/me-anoto/el-arte']) {
       expect(rutaQueCorresponde({ ...base, rutaActual: desde, faltanDatos: true }), desde).toBe('/empezar');
     }
     expect(rutaQueCorresponde({ ...base, rutaActual: '/equipo', esEquipo: true, faltanDatos: true })).toBe('/empezar');

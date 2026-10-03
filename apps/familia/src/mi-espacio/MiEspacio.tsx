@@ -24,7 +24,8 @@ import type { Cobro } from './Comprobante';
  *
  *   · `/talleres` — «Talleres abiertos» de la #24 B, con «Me anoto»;
  *   · `/mis-talleres` — «Mis talleres» de la #24 B + #27 C (estado, comprobante);
- *   · `/mis-datos` — «Tus datos» de la #18 + #27 D y, para el equipo, Seguridad;
+ *   · `/mis-datos` — «Tus datos» de la #18 + #27 D y, para el equipo, Seguridad
+ *     (desde la #34, Ajustes → Perfil y Ajustes → Seguridad, en `Ajustes.tsx`);
  *   · Inicio (`/mi-espacio`) es nuevo y vive en `Inicio.tsx`.
  *
  * «Cerrar sesión» pasó a la barra («Salir»). El marco lo pone `App.tsx`.
@@ -139,24 +140,9 @@ export function PaginaDeMisTalleres({ yo }: { yo: Yo }) {
   );
 }
 
-/** `/mis-datos`: «Tus datos» (#18 + #27 D) y, para el equipo, Seguridad. */
-export function PaginaDeMisDatos({ yo, recargar, alRegenerar }: {
-  yo: Yo;
-  recargar: () => Promise<void>;
-  /** Sube los códigos nuevos a `App`, que es quien muestra la pantalla 4. */
-  alRegenerar: (codigos: string[]) => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <>
-      <CabeceraDeContenido titulo={<Titulo texto={t('paginas.misDatos')} />} bajada={t('paginas.misDatosBajada')} />
-      <SeccionDeDatos yo={yo} recargar={recargar} principal />
-      {yo.tipo === 'equipo' ? <SeccionDeSeguridad alRegenerar={alRegenerar} /> : null}
-    </>
-  );
-}
-
 /**
+ * Ajustes → Perfil (#34 B.1; hasta la #33, `/mis-datos`).
+ *
  * «Tus datos» — y, desde la #27 D, el perfil: país, ciudad, año de nacimiento
  * y nivel educativo. **Todo opcional**; «Guardar» es uno y guarda todo junto
  * (`POST /api/yo`). La edad se calcula al lado del año y nunca se pide la
@@ -166,7 +152,7 @@ export function PaginaDeMisDatos({ yo, recargar, alRegenerar }: {
  * Qué es válido lo dice `@codice/core` (`validarPerfil`); la base lo vuelve a
  * mirar con los `check` de la 001 y la 011.
  */
-function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: () => Promise<void>; principal: boolean }) {
+export function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: () => Promise<void>; principal: boolean }) {
   const { t, i18n } = useTranslation();
   const p = yo.persona;
   const faltan = !p?.nombre || !p?.apellido || !p?.whatsapp || !p?.pais;
@@ -253,13 +239,15 @@ function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: () => P
   );
 }
 
-/** Seguridad: solo para el equipo. */
-function SeccionDeSeguridad({ alRegenerar }: { alRegenerar: (codigos: string[]) => void }) {
+/**
+ * Ajustes → Seguridad (#34 B.4): solo para el equipo. Los códigos de respaldo,
+ * tal cual estaban al final de Mis datos. «Cerrar las otras sesiones» se mudó a
+ * Ajustes → Sesiones, que ven todos.
+ */
+export function SeccionDeSeguridad({ alRegenerar }: { alRegenerar: (codigos: string[]) => void }) {
   const { t } = useTranslation();
   const [quedan, setQuedan] = useState<number | null>(null);
   const [regenerando, setRegenerando] = useState(false);
-  const [cerrando, setCerrando] = useState(false);
-  const [cerradas, setCerradas] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -298,26 +286,11 @@ function SeccionDeSeguridad({ alRegenerar }: { alRegenerar: (codigos: string[]) 
     }
   }
 
-  async function cerrarOtras() {
-    setError(null);
-    setCerrando(true);
-    try {
-      await api('sesiones/cerrar-las-otras', { metodo: 'POST' });
-      setCerradas(true);
-    } catch {
-      setError(t('comun.errorGenerico'));
-    } finally {
-      setCerrando(false);
-    }
-  }
-
   const pocos = quedan !== null && quedan <= 3;
 
   return (
-    <section className="seccion">
-      <h2 className="subtitulo">{t('miEspacio.seguridadTitulo')}</h2>
-
-      <h3 className="nota u-mt-4">{t('respaldo.regenerarTitulo')}</h3>
+    <div>
+      <h3 className="subtitulo">{t('respaldo.regenerarTitulo')}</h3>
       {quedan === null ? null : (
         <p className="nota">
           {pocos ? t('respaldo.quedanPocos', { cuantos: quedan }) : t('respaldo.quedan', { cuantos: quedan })}
@@ -330,15 +303,7 @@ function SeccionDeSeguridad({ alRegenerar }: { alRegenerar: (codigos: string[]) 
         </button>
       </div>
 
-      <h3 className="nota u-mt-6">{t('miEspacio.cerrarOtrasSesiones')}</h3>
-      <p className="nota">{t('miEspacio.cerrarOtrasAyuda')}</p>
-      <div className="fila">
-        <button type="button" className="btn btn--ancho" onClick={cerrarOtras} disabled={cerrando}>
-          {cerrando ? t('miEspacio.cerrandoOtrasSesiones') : t('miEspacio.cerrarOtrasSesiones')}
-        </button>
-      </div>
-      {cerradas ? <p className="exito" role="status">{t('miEspacio.otrasSesionesCerradas')}</p> : null}
       {error ? <p className="error" role="alert">{error}</p> : null}
-    </section>
+    </div>
   );
 }

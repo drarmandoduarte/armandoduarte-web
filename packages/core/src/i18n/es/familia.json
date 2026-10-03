@@ -239,14 +239,21 @@
     "inicio": "Inicio",
     "talleres": "Talleres",
     "misTalleres": "Mis talleres",
-    "misDatos": "Mis datos",
     "panel": "Panel del equipo",
-    "salir": "Salir",
-    "volverALaWeb": "Volver a la web",
     "plegar": "Plegar la barra",
     "desplegar": "Desplegar la barra",
     "menu": "Menú",
-    "cerrarMenu": "Cerrar el menú"
+    "cerrarMenu": "Cerrar el menú",
+    "cerrarSesion": "Cerrar sesión",
+    "ajustes": "Ajustes",
+    "tuCuenta": "Tu cuenta",
+    "rol": {
+      "cliente": "Cliente",
+      "equipo": "Equipo",
+      "equipoMexico": "Equipo · México",
+      "equipoInternacional": "Equipo · Internacional",
+      "dueno": "Dueño"
+    }
   },
   "paginas": {
     "talleres": "Talleres [abiertos]",
@@ -254,9 +261,7 @@
     "misTalleres": "Mis [talleres]",
     "misTalleresBajada": "Tus inscripciones, su estado y tu comprobante.",
     "misTalleresVacio": "Todavía no te anotaste a ningún taller.",
-    "verTalleres": "Ver los talleres abiertos",
-    "misDatos": "Mis [datos]",
-    "misDatosBajada": "Con estos datos te avisamos todo lo de tus talleres."
+    "verTalleres": "Ver los talleres abiertos"
   },
   "inicio": {
     "proximoTitulo": "Tu próximo taller",
@@ -440,6 +445,7 @@
         "anularAviso": "La inscripción queda anulada. No se borra nada: queda en el libro.",
         "hecho": "Listo.",
         "correoNoSalio": "Quedó hecho, pero el correo no salió: avísale por WhatsApp.",
+        "correoApagado": "Quedó hecho. Esta persona pidió no recibir correos: avísale por WhatsApp.",
         "errores": {
           "motivo": "Escribe el motivo: es lo que va a leer la persona.",
           "largo": "El motivo es demasiado largo (hasta 500 caracteres).",
@@ -541,6 +547,64 @@
     "rechazado": {
       "asunto": "Revisamos tu comprobante de {{curso}} · {{referencia}}",
       "cuerpo": "Revisamos el comprobante que subiste para «{{curso}}» (referencia {{referencia}}) y no pudimos confirmarlo:\n\n{{motivo}}\n\nPuedes subir otro desde Mi espacio: {{enlace}}\n\nSi tienes dudas, escríbenos por WhatsApp."
+    }
+  },
+  "ajustes": {
+    "rotulo": "§ · Configuración",
+    "titulo": "Tus preferencias.",
+    "secciones": "Secciones de ajustes",
+    "nav": {
+      "perfil": "Perfil",
+      "cuenta": "Cuenta",
+      "notificaciones": "Notificaciones",
+      "seguridad": "Seguridad",
+      "sesiones": "Sesiones",
+      "privacidad": "Privacidad"
+    },
+    "perfil": {
+      "titulo": "Perfil",
+      "bajada": "Lo que editas aquí lo usa el equipo para avisarte sobre tus talleres."
+    },
+    "cuenta": {
+      "titulo": "Cuenta",
+      "bajada": "Con qué entras a Mi espacio.",
+      "correo": "Tu correo",
+      "correoAyuda": "Es tu llave: no se cambia desde aquí; escríbenos por WhatsApp si necesitas cambiarlo.",
+      "entrasCon": "Entras con",
+      "google": "Google",
+      "codigo": "Código por correo",
+      "y": " y ",
+      "cerrarTodo": "Cerrar sesión en todos los dispositivos",
+      "cerrarTodoAyuda": "Sales de Mi espacio aquí y en cualquier otro teléfono o computadora donde hayas entrado.",
+      "cerrandoTodo": "Cerrando…"
+    },
+    "notificaciones": {
+      "titulo": "Notificaciones",
+      "bajada": "Qué te avisamos por correo.",
+      "avisos": "Avisarme por correo cuando mi lugar quede confirmado o cuando el equipo revise mi comprobante",
+      "guardado": "Guardado.",
+      "error": "No pudimos guardar tu preferencia. Inténtalo de nuevo."
+    },
+    "seguridad": {
+      "titulo": "Seguridad",
+      "bajada": "El autenticador y los códigos de respaldo de tu cuenta de equipo."
+    },
+    "sesiones": {
+      "titulo": "Sesiones",
+      "bajada": "Dónde está abierta tu cuenta.",
+      "esteDispositivo": "Este dispositivo",
+      "ahora": "Activa ahora",
+      "otras": "Otros dispositivos",
+      "otrasAyuda": "Si entraste desde una computadora que no es tuya, cierra las otras sesiones: este dispositivo queda adentro."
+    },
+    "privacidad": {
+      "titulo": "Privacidad",
+      "bajada": "Qué hacemos con tus datos y cómo pedir que los cambiemos.",
+      "texto": "Tus datos se usan solo para tus talleres: avisarte, confirmar tu lugar y atenderte. No se venden ni se comparten para publicidad.",
+      "aviso": "Aviso de privacidad",
+      "terminos": "Términos de uso",
+      "arco": "Pedir, corregir o borrar mis datos (derechos ARCO)",
+      "arcoMensaje": "Hola, quiero ejercer mis derechos ARCO sobre mis datos de Mi espacio (acceso, rectificación, cancelación u oposición)."
     }
   }
 }

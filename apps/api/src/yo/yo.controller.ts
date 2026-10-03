@@ -38,6 +38,8 @@ export class YoController {
     const usuario = await usuarioDelPedido(pedido, token, this.supabase);
     const rol = await this.supabase.rolDe(token, usuario.id);
     const persona = await this.supabase.personaDe(token, usuario.id);
+    /* #34 A.3: el rol de la barra dice el territorio («Equipo · México»). */
+    const territorio = esEquipo(rol) ? await this.supabase.territorioDe(token, usuario.id) : null;
 
     return {
       persona: persona
@@ -54,9 +56,12 @@ export class YoController {
             ciudad: persona.ciudad,
             anio_nacimiento: persona.anio_nacimiento,
             nivel_educativo: persona.nivel_educativo,
+            /* #34 B.3: Ajustes → Notificaciones. */
+            avisos_por_correo: persona.avisos_por_correo,
           }
         : null,
       rol,
+      territorio,
       tipo: esEquipo(rol) ? ('equipo' as const) : ('cliente' as const),
     };
   }
@@ -76,12 +81,14 @@ export class YoController {
     if (typeof cuerpo.anio_nacimiento === 'number' && cuerpo.anio_nacimiento > new Date().getFullYear() - 14) {
       throw new BadRequestException({ message: 'El año no es válido.', code: 'NO_VALIDO' });
     }
-    const cambios: Record<string, string | number | null> = {};
+    const cambios: Record<string, string | number | boolean | null> = {};
     for (const campo of ['nombre', 'apellido', 'whatsapp', 'pais', 'ciudad', 'anio_nacimiento', 'nivel_educativo'] as const) {
       const valor = cuerpo[campo];
       if (valor === undefined) continue;
       cambios[campo] = typeof valor === 'string' ? (valor.trim() === '' ? null : valor.trim()) : valor;
     }
+    /* #34 B.3: sí o no, nunca nulo (la 012 es `not null`). */
+    if (typeof cuerpo.avisos_por_correo === 'boolean') cambios.avisos_por_correo = cuerpo.avisos_por_correo;
     if (Object.keys(cambios).length > 0) {
       const { data, error } = await this.supabase.comoElUsuario(token)
         .from('personas').update(cambios).eq('id', usuario.id).select('id');

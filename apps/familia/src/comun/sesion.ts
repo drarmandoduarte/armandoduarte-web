@@ -37,7 +37,8 @@ export interface EstadoDeSesion {
   decision: DecisionDePantalla | null;
   /** Vuelve a preguntar `/api/yo` y a recalcular. */
   recargar: () => Promise<void>;
-  salir: (motivo?: 'inactividad' | 'deliberada') => Promise<void>;
+  /** `alcance: 'global'` (#34 B.2): cierra también en todos los otros dispositivos. */
+  salir: (motivo?: 'inactividad' | 'deliberada', alcance?: 'local' | 'global') => Promise<void>;
   /** Marca que el segundo paso se verificó recién (reinicia los 30 min). */
   marcarVerificado: () => void;
 }
@@ -180,14 +181,16 @@ export function useSesion(): EstadoDeSesion {
   }, [recargar]);
 
   const salir = useCallback(
-    async (motivo: 'inactividad' | 'deliberada' = 'deliberada') => {
+    async (motivo: 'inactividad' | 'deliberada' = 'deliberada', alcance: 'local' | 'global' = 'local') => {
       /* El aviso se marca ANTES de cerrar: `signOut` dispara el cambio de
          estado que desmonta esta pantalla, y lo que se escriba después puede no
          llegar a ejecutarse. */
       if (motivo === 'inactividad') markInactivityLogout();
       else marcarSalidaDeliberada();
       clearWindow();
-      await supabase.auth.signOut();
+      /* `local` es lo de siempre; `global` revoca todas las sesiones de la
+         cuenta (lo que pide el kit para «en todos los dispositivos»). */
+      await supabase.auth.signOut(alcance === 'global' ? { scope: 'global' } : undefined);
       setYo(null);
       setRespuestaDeYo('sin-sesion');
     },

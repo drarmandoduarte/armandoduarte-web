@@ -21,6 +21,8 @@ export interface Renglon {
 /** Lo que el correo necesita saber de una inscripción. */
 export interface DatosDelCorreo {
   email: string;
+  /** #34 B.3: la persona quiere el correo. Si es `false`, no se manda. */
+  avisos: boolean;
   nombre: string | null;
   referencia: string;
   curso: string;
@@ -133,16 +135,17 @@ export class PagosRepositorio {
     const cliente = this.supabase.comoElUsuario(token);
     const insc = await this.inscripcion(token, inscripcionId);
     if (!insc) return null;
-    const { data: persona } = await cliente.from('personas').select('email, nombre').eq('id', insc.persona_id).maybeSingle();
+    const { data: persona } = await cliente.from('personas').select('email, nombre, avisos_por_correo').eq('id', insc.persona_id).maybeSingle();
     const { data: edicion } = await cliente.from('ediciones')
       .select('curso_id, inicio, fin, zona, sede, ciudad').eq('id', insc.edicion_id).maybeSingle();
     const e = edicion as { curso_id: string; inicio: string; fin: string; zona: string; sede: string | null; ciudad: string | null } | null;
     if (!persona || !e) return null;
     const { data: curso } = await cliente.from('cursos').select('titulo').eq('id', e.curso_id).maybeSingle();
     if (!curso) return null;
-    const p = persona as { email: string; nombre: string | null };
+    const p = persona as { email: string; nombre: string | null; avisos_por_correo?: boolean | null };
     return {
-      email: p.email, nombre: p.nombre, referencia: insc.referencia, curso: (curso as { titulo: string }).titulo,
+      /* Solo un `false` explícito apaga: la 012 es `not null default true`. */
+      email: p.email, avisos: p.avisos_por_correo !== false, nombre: p.nombre, referencia: insc.referencia, curso: (curso as { titulo: string }).titulo,
       inicio: e.inicio, fin: e.fin, zona: e.zona, sede: e.sede, ciudad: e.ciudad,
     };
   }

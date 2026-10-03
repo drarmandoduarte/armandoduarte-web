@@ -1,4 +1,4 @@
-import { IsIn, IsInt, IsOptional, IsString, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 
 /**
  * Lo que guarda «Tus datos» — orden #27 D.2.
@@ -37,4 +37,8 @@ export class PerfilDto {
 
   @IsOptional() @ValidateIf(NULO_O) @IsIn(NIVELES)
   nivel_educativo?: string | null;
+
+  /** #34 B.3: Ajustes → Notificaciones. Sí o no; `null` no (la columna es `not null`). */
+  @IsOptional() @IsBoolean()
+  avisos_por_correo?: boolean;
 }

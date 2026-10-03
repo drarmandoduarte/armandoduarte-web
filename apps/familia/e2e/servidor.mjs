@@ -112,12 +112,25 @@ const REGLAS = (CONFIG.headers ?? [])
  */
 const REWRITES = (CONFIG.rewrites ?? []).map((r) => ({ re: traducir(r.source), destination: r.destination }));
 
+/**
+ * Las redirecciones del `vercel.json` (#34: `/mis-datos` → `/ajustes/perfil`),
+ * leídas igual que los rewrites. Vercel las aplica **antes** que el sistema de
+ * archivos y que los rewrites; `permanent: true` es un 308.
+ */
+const REDIRECTS = (CONFIG.redirects ?? []).map((r) => ({ re: traducir(r.source), destination: r.destination, estado: r.permanent ? 308 : 307 }));
+
 const cabecerasDe = (ruta) => Object.fromEntries(
   REGLAS.filter((r) => r.re.test(ruta)).flatMap((r) => r.headers.map((h) => [h.key, h.value])),
 );
 
 createServer((req, res) => {
   const pedido = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+  const redireccion = REDIRECTS.find((r) => r.re.test(pedido));
+  if (redireccion) {
+    res.writeHead(redireccion.estado, { Location: redireccion.destination, ...cabecerasDe(pedido) });
+    res.end();
+    return;
+  }
   /* `normalize` y el corte de `..`: sin eso, `/../../etc/passwd` sale de la
      carpeta. Es un servidor de pruebas y aun así no se deja abierto. */
   const limpio = normalize(pedido).replace(/^(\.\.[/\\])+/, '');

@@ -1,5 +1,6 @@
 /**
- * El marco con barra lateral — orden #29, A y D.
+ * El marco con barra lateral — orden #29, A y D; y desde la #34, A: sin
+ * «Volver a la web», sin «Mis datos» en el nav, y el bloque del usuario abajo.
  *
  * `App` entera, con Supabase y la API simulados (como `me-anoto.test.tsx`). Lo
  * que se afirma es lo que ve la persona: los ítems de la barra para un cliente
@@ -15,7 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
-const falso = vi.hoisted(() => ({ sesion: null as Session | null }));
+const falso = vi.hoisted(() => ({ sesion: null as Session | null, salidas: [] as unknown[] }));
 
 vi.mock('../supabase', () => ({
   variablesQueFaltan: () => [],
@@ -24,7 +25,7 @@ vi.mock('../supabase', () => ({
       getSession: async () => ({ data: { session: falso.sesion }, error: null }),
       onAuthStateChange: (_cb: (e: AuthChangeEvent, s: Session | null) => void) =>
         ({ data: { subscription: { unsubscribe: () => {} } } }),
-      signOut: async () => ({ error: null }),
+      signOut: async (opciones?: unknown) => { falso.salidas.push(opciones ?? 'local'); return { error: null }; },
       mfa: { getAuthenticatorAssuranceLevel: async () => ({ data: { currentLevel: 'aal2', nextLevel: 'aal2' }, error: null }) },
     },
   },
@@ -37,11 +38,11 @@ import { itemsDeLaBarra, rutaDelItemActivo } from './Marco';
 const t = (clave: string, o?: Record<string, unknown>) => i18n.t(clave, o);
 const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 const token = (aal: string) => `${b64({ alg: 'HS256' })}.${b64({ aal })}.c2lnbmF0dXJh`;
-const sesionDe = (aal: string) => ({ access_token: token(aal), user: { id: 'u', email: 'ana@ejemplo.mx' } }) as unknown as Session;
+const sesionDe = (aal: string) => ({ access_token: token(aal), user: { id: 'u', email: 'ana@ejemplo.mx', app_metadata: { providers: ['email'] } } }) as unknown as Session;
 
 /** El equipo pasa por el segundo paso: sin una verificación reciente, la decisión no es «pasar». */
-function comoEquipo(persona: object = ficha) {
-  yo = { rol: 'equipo', tipo: 'equipo', persona };
+function comoEquipo(persona: object = ficha, rol = 'equipo', territorio = 'mexico') {
+  yo = { rol, tipo: 'equipo', territorio, persona };
   falso.sesion = sesionDe('aal2');
   window.localStorage.setItem('armando-duarte.aal2_verified_at', new Date().toISOString());
   window.localStorage.setItem('armando-duarte.last_activity_at', String(Date.now()));
@@ -89,23 +90,23 @@ const barra = async () => within(await screen.findByRole('navigation', { name: t
 const nombres = (nav: ReturnType<typeof within>) => nav.getAllByRole('link').map((a: HTMLElement) => a.textContent);
 
 describe('la barra: qué ítems y cuál está activo', () => {
-  it('EL CASO: un cliente ve cuatro — Inicio, Talleres, Mis talleres, Mis datos — y no el panel', async () => {
+  it('EL CASO: un cliente ve tres — Inicio, Talleres, Mis talleres — sin «Mis datos» ni el panel', async () => {
     render(<App />);
     const nav = await barra();
-    expect(nombres(nav)).toEqual([t('marco.inicio'), t('marco.talleres'), t('marco.misTalleres'), t('marco.misDatos')]);
+    expect(nombres(nav)).toEqual([t('marco.inicio'), t('marco.talleres'), t('marco.misTalleres')]);
     expect(nav.queryByRole('link', { name: t('marco.panel') })).toBeNull();
   });
 
-  it('el equipo ve cinco: el panel, después de un separador', async () => {
+  it('el equipo ve cuatro: el panel, después de un separador', async () => {
     comoEquipo();
     render(<App />);
     const nav = await barra();
-    expect(nombres(nav)).toEqual([t('marco.inicio'), t('marco.talleres'), t('marco.misTalleres'), t('marco.misDatos'), t('marco.panel')]);
+    expect(nombres(nav)).toEqual([t('marco.inicio'), t('marco.talleres'), t('marco.misTalleres'), t('marco.panel')]);
     expect(document.querySelector('.lateral__separador')).not.toBeNull();
   });
 
   it('el activo sigue a la ruta; /me-anoto/<slug> es Talleres', async () => {
-    for (const [ruta, activo] of [['/mi-espacio', 'marco.inicio'], ['/talleres', 'marco.talleres'], ['/mis-talleres', 'marco.misTalleres'], ['/mis-datos', 'marco.misDatos'], ['/me-anoto/el-arte', 'marco.talleres']]) {
+    for (const [ruta, activo] of [['/mi-espacio', 'marco.inicio'], ['/talleres', 'marco.talleres'], ['/mis-talleres', 'marco.misTalleres'], ['/me-anoto/el-arte', 'marco.talleres']]) {
       window.history.replaceState(null, '', ruta);
       render(<App />);
       const nav = await barra();
@@ -117,23 +118,70 @@ describe('la barra: qué ítems y cuál está activo', () => {
     expect(itemsDeLaBarra(false).equipo).toEqual([]);
   });
 
-  it('abajo: el correo de la sesión, «Salir» y «Volver a la web»', async () => {
+  it('#34 · EL CASO: sin «Volver a la web» — ni en la barra ni en el cajón', async () => {
     render(<App />);
     await barra();
-    expect(screen.getByText('ana@ejemplo.mx')).toBeTruthy();
-    expect(screen.getByRole('button', { name: t('marco.salir') })).toBeTruthy();
-    expect((screen.getByRole('link', { name: new RegExp(t('marco.volverALaWeb')) }) as HTMLAnchorElement).href).toBe('https://armandoduarte.com/');
+    expect(screen.queryByText(/Volver a la web/i)).toBeNull();
+    expect([...document.querySelectorAll('a')].filter((a) => a.getAttribute('href')?.startsWith('https://armandoduarte.com'))).toEqual([]);
+    cleanup();
+    ancho(false);
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: t('marco.menu') }));
+    expect(within(screen.getByRole('dialog')).queryByText(/Volver a la web/i)).toBeNull();
+  });
+});
+
+describe('#34 · el bloque del usuario', () => {
+  const bloque = () => document.querySelector('[data-usuario]') as HTMLElement;
+
+  it('cliente: avatar «AP», «Ana Pérez» y «Cliente»; abajo «Cerrar sesión» y el engranaje', async () => {
+    render(<App />);
+    await barra();
+    expect(bloque().querySelector('.avatar')?.textContent).toBe('AP');
+    expect(within(bloque()).getByText('Ana Pérez')).toBeTruthy();
+    expect(within(bloque()).getByText(t('marco.rol.cliente'))).toBeTruthy();
+    expect(screen.getByRole('button', { name: t('marco.cerrarSesion') })).toBeTruthy();
+    expect(screen.getByRole('link', { name: t('marco.ajustes') }).getAttribute('href')).toBe('/ajustes');
+  });
+
+  it('el rol del equipo dice su territorio; el del dueño, «Dueño»', async () => {
+    for (const [rol, territorio, clave] of [['equipo', 'mexico', 'marco.rol.equipoMexico'], ['equipo', 'internacional', 'marco.rol.equipoInternacional'], ['dueno', 'todos', 'marco.rol.dueno']]) {
+      comoEquipo({ ...ficha, ciudad: 'Mérida' }, rol, territorio);
+      render(<App />);
+      await barra();
+      expect(within(bloque()).getByText(t(clave)), clave).toBeTruthy();
+      cleanup();
+    }
+  });
+
+  it('el engranaje abre /ajustes (→ Perfil), sin recargar, y queda activo', async () => {
+    render(<App />);
+    await barra();
+    const antes = pedidos.filter((p) => p === '/api/yo').length;
+    fireEvent.click(screen.getByRole('link', { name: t('marco.ajustes') }));
+    expect(await screen.findByRole('heading', { name: t('ajustes.titulo') })).toBeTruthy();
+    expect(window.location.pathname).toBe('/ajustes/perfil');
+    expect(screen.getByRole('link', { name: t('marco.ajustes') }).getAttribute('aria-current')).toBe('page');
+    expect(pedidos.filter((p) => p === '/api/yo').length, 'no se recargó la sesión').toBe(antes);
+  });
+
+  it('«Cerrar sesión» cierra la sesión de este dispositivo', async () => {
+    falso.salidas = [];
+    render(<App />);
+    await barra();
+    fireEvent.click(screen.getByRole('button', { name: t('marco.cerrarSesion') }));
+    await waitFor(() => expect(falso.salidas).toEqual(['local']));
   });
 });
 
 describe('navegar sin recargar', () => {
-  it('un clic en «Mis datos» cambia la URL y la pantalla, sin volver a preguntar quién es', async () => {
+  it('un clic en «Mis talleres» cambia la URL y la pantalla, sin volver a preguntar quién es', async () => {
     render(<App />);
     const nav = await barra();
     const antes = pedidos.filter((p) => p === '/api/yo').length;
-    fireEvent.click(nav.getByRole('link', { name: t('marco.misDatos') }));
-    expect(window.location.pathname).toBe('/mis-datos');
-    expect(await screen.findByLabelText(t('miEspacio.nivelEducativo'))).toBeTruthy();
+    fireEvent.click(nav.getByRole('link', { name: t('marco.misTalleres') }));
+    expect(window.location.pathname).toBe('/mis-talleres');
+    expect(await screen.findByText(t('paginas.misTalleresVacio'))).toBeTruthy();
     expect(pedidos.filter((p) => p === '/api/yo').length, 'no se recargó la sesión').toBe(antes);
   });
 
@@ -155,6 +203,10 @@ describe('plegar la barra', () => {
     expect(document.querySelector('.lateral--plegada')).not.toBeNull();
     /* Plegada: los ítems siguen nombrados (para el lector), pero sin texto a la vista. */
     expect(document.querySelectorAll('.lateral__item span')).toHaveLength(0);
+    /* #34: plegada, el avatar solo (sin nombre) y el engranaje debajo, con su nombre en el title. */
+    expect(document.querySelector('.lateral__avatar-solo .avatar')?.textContent).toBe('AP');
+    expect(document.querySelector('[data-usuario]')).toBeNull();
+    expect(screen.getByRole('link', { name: t('marco.ajustes') }).getAttribute('title')).toBe(t('marco.ajustes'));
     expect(window.localStorage.getItem('codice.barra-plegada')).toBe('1');
     cleanup();
     render(<App />);

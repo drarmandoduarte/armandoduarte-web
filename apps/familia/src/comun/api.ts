@@ -147,7 +147,11 @@ export interface Yo {
     ciudad?: string | null;
     anio_nacimiento?: number | null;
     nivel_educativo?: string | null;
+    /** #34 B.3: Ajustes → Notificaciones. */
+    avisos_por_correo?: boolean;
   } | null;
   rol: 'dueno' | 'equipo' | 'cliente';
+  /** #34 A.3: el territorio del miembro, para «Equipo · México». Nulo para un cliente. */
+  territorio?: 'mexico' | 'internacional' | 'todos' | null;
   tipo: 'equipo' | 'cliente';
 }
