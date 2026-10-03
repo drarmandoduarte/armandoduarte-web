@@ -127,7 +127,10 @@ createServer((req, res) => {
   const pedido = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   const redireccion = REDIRECTS.find((r) => r.re.test(pedido));
   if (redireccion) {
-    res.writeHead(redireccion.estado, { Location: redireccion.destination, ...cabecerasDe(pedido) });
+    /* Vercel pasa el query del pedido al destino de la redirección: `/entrar?ir=…`
+       llega a `/login?ir=…` (#35). Acá, lo mismo. */
+    const query = new URL(req.url, 'http://x').search;
+    res.writeHead(redireccion.estado, { Location: `${redireccion.destination}${query}`, ...cabecerasDe(pedido) });
     res.end();
     return;
   }

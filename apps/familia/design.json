@@ -1,0 +1,86 @@
+{
+  "$nota": "GENERADO por packages/ui/scripts/design-json.mjs desde packages/ui/codice-tokens.json (orden Códice #35). No se edita a mano: tokens.test.mjs lo regenera y lo compara byte a byte.",
+  "kit": "Kit de Seguridad 512 · guion de pantallas de acceso v1",
+  "canon": {
+    "archivo": "packages/ui/codice-tokens.json",
+    "version": "1.2.4"
+  },
+  "nombre": "Armando Duarte",
+  "web": "https://armandoduarte.com",
+  "frase": "Entra a tu *espacio*.",
+  "espanol": "neutro",
+  "colores": {
+    "fondo": {
+      "token": "color.background.cream",
+      "hex": "#FAF7F1",
+      "css": "--crema"
+    },
+    "superficie": {
+      "token": "color.background.surfaceWarm",
+      "hex": "#F3EBDD",
+      "css": "--calido"
+    },
+    "texto": {
+      "token": "color.ink.primary",
+      "hex": "#2E2B25",
+      "css": "--tinta"
+    },
+    "secundario": {
+      "token": "color.ink.muted",
+      "hex": "#716A60",
+      "css": "--gris"
+    },
+    "acento": {
+      "token": "color.cff.tealDark",
+      "hex": "#005761",
+      "css": "--teal"
+    },
+    "borde": {
+      "token": "color.ink.muted",
+      "hex": "#716A60",
+      "css": "--gris"
+    },
+    "error": {
+      "token": "color.semantic.danger",
+      "hex": "#A05A48",
+      "css": "--error"
+    },
+    "linea": {
+      "token": "color.border.hairline",
+      "hex": "#EAE4D8",
+      "css": "--hair"
+    }
+  },
+  "tipografia": {
+    "sans": {
+      "token": "typography.families.structure",
+      "familia": "Montserrat",
+      "pesos": [
+        400,
+        500,
+        600
+      ],
+      "css": "--display"
+    },
+    "lectura": {
+      "token": "typography.families.reading",
+      "familia": "Open Sans",
+      "pesos": [
+        400,
+        600
+      ],
+      "css": "--lectura"
+    },
+    "serif": null,
+    "acentuada": {
+      "familia": "sans",
+      "estilo": "italic",
+      "color": "acento"
+    }
+  },
+  "radio": {
+    "token": "radius.casa",
+    "valor": "2px",
+    "css": "--radio"
+  }
+}

@@ -97,3 +97,8 @@ export {
   FORMAS_DE_ENTRAR, SECCIONES_DE_AJUSTES, claveDelRol, formasDeEntrar, inicialesDe, nombreDelBloque, seccionesDeAjustes,
 } from './mi-espacio/ajustes';
 export type { FormaDeEntrar, SeccionDeAjustes } from './mi-espacio/ajustes';
+
+// ── Las pantallas de acceso del guion v1 del Kit 512 (orden #35) ─────────────
+export {
+  INTENTOS_POR_CODIGO, SEGUNDOS_PARA_REENVIAR, intentosQueQuedan, partirTituloDeAcceso, rellenar,
+} from './mi-espacio/acceso';

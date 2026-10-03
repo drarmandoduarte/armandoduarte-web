@@ -165,10 +165,14 @@ describe('las cabeceras de Mi espacio', () => {
     expect(robots).toMatch(/^Disallow: \/$/m);
   });
 
-  it('(9) #34: /mis-datos es un 308 a /ajustes/perfil — y es la única redirección', () => {
+  it('(9) #34 y #35: /mis-datos es un 308 a /ajustes/perfil y /entrar uno a /login — y no hay otras', () => {
     /* «Mis datos» pasó a Ajustes → Perfil. Un enlace guardado o un correo viejo
        a `/mis-datos` no cae en un lugar que ya no existe. 308 y no 301: el
        navegador no cambia el método. */
-    expect(CONFIG.redirects).toEqual([{ source: RUTAS.misDatos, destination: RUTAS.ajustesPerfil, permanent: true }]);
+    /* /entrar es la dirección que la web y los correos viejos tienen escrita; Vercel le pasa el ?ir= a /login. */
+    expect(CONFIG.redirects).toEqual([
+      { source: RUTAS.misDatos, destination: RUTAS.ajustesPerfil, permanent: true },
+      { source: RUTAS.entrar, destination: RUTAS.login, permanent: true },
+    ]);
   });
 });

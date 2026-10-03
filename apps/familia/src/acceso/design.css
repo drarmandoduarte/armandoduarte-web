@@ -1,0 +1,17 @@
+/* GENERADO por packages/ui/scripts/design-json.mjs desde el canon (orden Códice #35).
+   No se edita a mano: tokens.test.mjs lo regenera y lo compara byte a byte.
+   Es el design.json de Mi espacio en forma ejecutable, por referencia a las
+   variables del canon (ningún hex vive acá). */
+.acceso{
+  --acceso-fondo:var(--crema);         /* color.background.cream */
+  --acceso-superficie:var(--calido);    /* color.background.surfaceWarm */
+  --acceso-texto:var(--tinta);         /* color.ink.primary */
+  --acceso-secundario:var(--gris);    /* color.ink.muted */
+  --acceso-acento:var(--teal);        /* color.cff.tealDark */
+  --acceso-borde:var(--gris);         /* color.ink.muted */
+  --acceso-error:var(--error);         /* color.semantic.danger */
+  --acceso-linea:var(--hair);         /* color.border.hairline */
+  --acceso-sans:var(--display);
+  --acceso-lectura:var(--lectura);
+  --acceso-radio:var(--radio);         /* radius.casa · 2px */
+}

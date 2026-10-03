@@ -75,8 +75,8 @@ function contraste(hexA, hexB) {
 
 describe('los tokens de Códice', () => {
   it('la versión del documento es la que esta orden dejó', () => {
-    expect(tokens.$meta.version).toBe('1.2.3');
-    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.3');
+    expect(tokens.$meta.version).toBe('1.2.4');
+    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.4');
   });
 
   /*
@@ -303,5 +303,55 @@ describe('los tokens de Códice', () => {
         .map(([ruta, v]) => `web.${ruta} → ${v}`);
       expect(rotas, 'una referencia que no resuelve es un hex disfrazado de disciplina').toEqual([]);
     });
+  });
+});
+
+/*
+ * ── El design.json de Mi espacio sale del canon (orden Códice #35) ───────
+ *
+ * El guion v1 del Kit 512 viste las pantallas de acceso con el `design.json`
+ * de cada app. El de Mi espacio lo genera `scripts/design-json.mjs`; acá se lo
+ * regenera y se lo compara **byte a byte** con lo que está en el repo (D27: un
+ * guardián que mira una copia escrita a mano no vigila nada). Si alguien lo
+ * edita a mano, o cambia el canon sin regenerarlo, esto se pone rojo.
+ */
+describe('el design.json de Mi espacio (#35)', async () => {
+  const { generar, SALIDA_JSON, SALIDA_CSS, MAPA } = await import('./scripts/design-json.mjs');
+  const { json, css, documento } = generar();
+
+  it('EL PISO, PRIMERO: generó los ocho colores, las dos familias y el radio', () => {
+    expect(Object.keys(documento.colores)).toEqual(['fondo', 'superficie', 'texto', 'secundario', 'acento', 'borde', 'error', 'linea']);
+    expect(documento.tipografia.sans.familia).toBe('Montserrat');
+    expect(documento.radio.valor).toBe('2px');
+  });
+
+  it('EL CASO: el design.json del repo es exactamente el que sale del canon', () => {
+    expect(readFileSync(SALIDA_JSON, 'utf8'), 'corre `node packages/ui/scripts/design-json.mjs`').toBe(json);
+  });
+
+  it('y su forma ejecutable (las variables --acceso-*), también', () => {
+    expect(readFileSync(SALIDA_CSS, 'utf8'), 'corre `node packages/ui/scripts/design-json.mjs`').toBe(css);
+  });
+
+  it('cada hex del design.json está en el canon, y es el de su token', () => {
+    const canonCss = readFileSync(join(AQUI, 'codice-tokens.css'), 'utf8').toUpperCase();
+    const enJson = readFileSync(SALIDA_JSON, 'utf8').match(/#[0-9A-Fa-f]{6}\b/g) ?? [];
+    expect(enJson.length, 'el barrido vio los ocho').toBe(8);
+    expect(enJson.filter((h) => !canonCss.includes(h.toUpperCase()))).toEqual([]);
+    for (const [rol, ruta] of Object.entries(MAPA.colores)) {
+      const nodo = ruta.split('.').reduce((o, k) => o?.[k], tokens);
+      expect(documento.colores[rol].hex, rol).toBe(String(nodo?.value ?? nodo).toUpperCase());
+    }
+  });
+
+  it('el mapa es el de la orden: acento teal CFF, borde ink.muted (auditoría #56), sin serif, español neutro', () => {
+    expect(MAPA.colores.acento).toBe('color.cff.tealDark');
+    /* WCAG 1.4.11: el borde de un control a 3:1 sobre el fondo, como mínimo. */
+    expect(MAPA.colores.borde).toBe('color.ink.muted');
+    expect(contraste(documento.colores.borde.hex, documento.colores.fondo.hex)).toBeGreaterThanOrEqual(3);
+    expect(documento.tipografia.serif).toBeNull();
+    expect(documento.tipografia.acentuada).toEqual({ familia: 'sans', estilo: 'italic', color: 'acento' });
+    expect(documento.espanol).toBe('neutro');
+    expect(documento.frase).toBe('Entra a tu *espacio*.');
   });
 });

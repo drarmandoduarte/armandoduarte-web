@@ -6,10 +6,13 @@ import { SECCIONES_DE_AJUSTES, necesitaEmpezar, slugDeMeAnoto, type SeccionDeAju
 import { rutaQueCorresponde } from './comun/ruta-que-corresponde';
 import { destinoGuardado, guardarDestinoDeLaUrl, olvidarDestino } from './comun/destino';
 import { Pantalla } from './comun/Piezas';
-import { Entrar } from './entrar/Entrar';
-import { Enrolar } from './entrar/Enrolar';
-import { Reto } from './entrar/Reto';
-import { CodigosDeRespaldo } from './entrar/CodigosDeRespaldo';
+import { Login } from './acceso/Login';
+import { Activar } from './acceso/Activar';
+import { Verificacion } from './acceso/Verificacion';
+import { Recuperar } from './acceso/Recuperar';
+import { Reseteo } from './acceso/Reseteo';
+import { Respaldo } from './acceso/Respaldo';
+import { Confirmacion } from './acceso/Confirmacion';
 import { PaginaDeMisTalleres, PaginaDeTalleres } from './mi-espacio/MiEspacio';
 import { Ajustes } from './mi-espacio/Ajustes';
 import { Inicio } from './mi-espacio/Inicio';
@@ -31,10 +34,17 @@ import { variablesQueFaltan } from './supabase';
  * escrita otra vez y con más superficie—. Con estados, la única forma de llegar
  * a una pantalla es que la sesión esté en la condición que la produce.
  *
- * Las rutas que sí existen (`/entrar`, `/mi-espacio` y, desde la #29, los
- * lugares de la barra lateral y `/empezar`) viven en `rutas.ts`
- * y las usa el `vercel.json` para servir el `index.html` en cualquiera: es una
- * SPA y el servidor no sabe de estados.
+ * Las rutas que sí existen (`/mi-espacio` y, desde la #29, los lugares de la
+ * barra lateral y `/empezar`) viven en `rutas.ts` y las usa el `vercel.json`
+ * para servir el `index.html` en cualquiera: es una SPA y el servidor no sabe de
+ * estados.
+ *
+ * ── Desde la #35, los estados tienen dirección ──────────────────────────
+ * El guion v1 del Kit 512 le da una URL a cada pantalla de acceso (`/login`,
+ * `/auth/2fa`…). Siguen siendo estados: la URL **acompaña** a la decisión
+ * (`rutaQueCorresponde()`), y escribir una a mano no salta ningún paso. Lo que
+ * sí cambia es que dentro de un estado la ruta elige la pantalla: en `reto`,
+ * `/auth/2fa` es P3, `/auth/2fa/recuperar` es P6 y `/auth/2fa/reseteo` es P6b.
  *
  * ── Quién decide ────────────────────────────────────────────────────────
  * `decidirReto()`, del núcleo del kit. Este componente solo traduce su
@@ -44,8 +54,10 @@ import { variablesQueFaltan } from './supabase';
 export function App() {
   const { t } = useTranslation();
   const { cargando, sesion, yo, decision, recargar, salir, marcarVerificado } = useSesion();
-  /** Los diez códigos recién generados, mientras la pantalla 4 los muestra. */
+  /** Los diez códigos recién generados, mientras P5 los muestra. */
   const [codigosNuevos, setCodigosNuevos] = useState<string[] | null>(null);
+  /** P8: la acción que espera el código del autenticador (`PASO_RECIENTE_REQUERIDO`). */
+  const [pasoReciente, setPasoReciente] = useState<{ reintentar: () => void; cancelar: () => void } | null>(null);
   /** La ruta que la pantalla pinta. Es estado (#24 B) porque `replaceState` no
    *  vuelve a pintar: sin esto, al llegar a `/me-anoto/<slug>` después de
    *  entrar, la pantalla seguía mostrando lo de la ruta anterior. */
@@ -86,6 +98,8 @@ export function App() {
       esEquipo: yo?.tipo === 'equipo',
       destinoGuardado: guardado,
       faltanDatos,
+      mostrandoCodigos: codigosNuevos !== null,
+      busqueda: window.location.search,
     });
     /* El destino se olvida cuando se usa, y no mientras falten los datos:
        ahí espera a que `/empezar` termine (#29 C). */
@@ -95,7 +109,7 @@ export function App() {
       guardarDestinoDeLaUrl();
     }
     setRuta(window.location.pathname);
-  }, [cargando, sesion, yo, decision, faltanDatos, ruta]);
+  }, [cargando, sesion, yo, decision, faltanDatos, ruta, codigosNuevos]);
 
   /* Lo primero, antes que cualquier pantalla: si falta una variable, se dice
      SU NOMBRE. Quien va a leer esto es dirección cargando el proyecto en
@@ -123,15 +137,27 @@ export function App() {
 
   /* Sin sesión, a la entrada — salvo que no se haya podido saber si la hay
      (#22): eso va a la pantalla de error de abajo, no a pedir el correo. */
-  if (!sesion && decision !== 'error') return <Entrar />;
+  if (!sesion && decision !== 'error') {
+    return <ProveedorDeNavegacion navegar={navegar}><Login ruta={ruta} /></ProveedorDeNavegacion>;
+  }
 
   /* Los códigos nuevos tapan todo lo demás mientras estén en pantalla: se ven
      una sola vez y no se pueden volver a pedir. */
   if (codigosNuevos) {
     return (
-      <CodigosDeRespaldo
+      <Respaldo
         codigos={codigosNuevos}
         alTerminar={() => { setCodigosNuevos(null); void recargar(); }}
+      />
+    );
+  }
+
+  /* P8, encima de la pantalla en la que se pidió la acción. */
+  if (pasoReciente) {
+    return (
+      <Confirmacion
+        alConfirmar={() => { marcarVerificado(); const { reintentar } = pasoReciente; setPasoReciente(null); reintentar(); }}
+        alCancelar={() => { const { cancelar } = pasoReciente; setPasoReciente(null); cancelar(); }}
       />
     );
   }
@@ -164,7 +190,8 @@ export function App() {
 
   if (decision === 'enrolar') {
     return (
-      <Enrolar
+      <Activar
+        alSalir={() => void salir('deliberada')}
         alTerminar={async () => {
           marcarVerificado();
           /* Recién enrolado, la cuenta todavía no tiene códigos de respaldo.
@@ -185,7 +212,14 @@ export function App() {
   }
 
   if (decision === 'reto') {
-    return <Reto alVerificar={() => { marcarVerificado(); void recargar(); }} />;
+    const alVerificar = () => { marcarVerificado(); void recargar(); };
+    return (
+      <ProveedorDeNavegacion navegar={navegar}>
+        {ruta === RUTAS.recuperar ? <Recuperar alRecuperar={alVerificar} />
+          : ruta === RUTAS.reseteo ? <Reseteo />
+            : <Verificacion alVerificar={alVerificar} alSalir={() => void salir('deliberada')} />}
+      </ProveedorDeNavegacion>
+    );
   }
 
   if (decision === 'cerrar-sesion') {
@@ -235,6 +269,7 @@ export function App() {
             seccion={seccion}
             recargar={recargar}
             alRegenerar={setCodigosNuevos}
+            alPedirPasoReciente={setPasoReciente}
             alSalirDeTodo={() => salir('deliberada', 'global')}
           />
         )

@@ -7,6 +7,9 @@ import './i18n';
    antes de que las variables existan. */
 import '@codice/ui/styles.css';
 import './estilos.css';
+/* #35: las pantallas de acceso del guion v1 del Kit 512, vestidas con el design.json. */
+import './acceso/design.css';
+import './acceso/acceso.css';
 import { App } from './App';
 
 const raiz = document.getElementById('raiz');

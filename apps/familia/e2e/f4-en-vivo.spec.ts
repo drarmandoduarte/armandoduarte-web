@@ -31,7 +31,8 @@ test.skip(!URL_PREVIEW, 'F.4 necesita URL_PREVIEW: el preview lo crea dirección
 
 test.describe('F.4 · contra el preview de verdad', () => {
   test('las cabeceras llegan enteras, y la CSP deja hablar solo con Supabase', async ({ request }) => {
-    const respuesta = await request.get(`${URL_PREVIEW}/entrar`);
+    /* Desde la #35 la entrada es /login (guion v1 del Kit 512); /entrar es un 308 hacia ella. */
+    const respuesta = await request.get(`${URL_PREVIEW}/login`);
     expect(respuesta.status(), 'la pantalla de entrada tiene que responder').toBe(200);
 
     const h = respuesta.headers();
@@ -75,9 +76,9 @@ test.describe('F.4 · contra el preview de verdad', () => {
       if (m.type() === 'error' && /Content Security Policy/i.test(m.text())) violaciones.push(m.text());
     });
 
-    await page.goto(`${URL_PREVIEW}/entrar`);
+    await page.goto(`${URL_PREVIEW}/login`);
     await page.fill('#correo', CORREO_CLIENTE!);
-    await page.getByRole('button', { name: /enviarme el código/i }).click();
+    await page.getByRole('button', { name: /enviar código/i }).click();
 
     /* Acá entra la persona: escribe el código que le llegó al correo. El test
        espera hasta dos minutos a que la pantalla cambie. */

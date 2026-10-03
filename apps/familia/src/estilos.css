@@ -128,7 +128,8 @@ img,svg{display:block;max-width:100%}
      Vibes sale 2 px por encima de la caja (`line-height: 1.1`). Y es el mismo
      a 42 px y a 33 px, así que va en px y no en `em`.
 
-   Lo vigila `e2e/entrar-como-quien.spec.ts`. */
+   Lo vigila `e2e/entrar-como-quien.spec.ts`, que desde la #35 mide `/empezar`
+   (la entrada es la del guion v1 del Kit 512, sin fotos; auditoría del #56). */
 @media (min-width:1100px){
   .marco--con-armando{
     --contenedor:min(90%,1400px,calc(100% - 40px));
@@ -170,31 +171,7 @@ img,svg{display:block;max-width:100%}
 .campo__entrada[aria-invalid='true']{border-color:var(--naranja-texto)}
 .campo__ayuda{margin-top:6px;font-size:13px;line-height:1.5;color:var(--gris)}
 
-/* El campo del código · seis casillas (B.8, F). Se ven seis y es UNA entrada:
-   el `<input>` va encima, transparente, y recibe teclado, pegado y el
-   autocompletado de iOS; las casillas solo dibujan. Ver `CampoDeCodigo`. */
-.casillas{position:relative}
-.casillas__entrada{
-  position:absolute;inset:0;width:100%;height:100%;z-index:1;
-  opacity:0;border:0;padding:0;font-size:16px;cursor:text;
-}
-.casillas__fila{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.casilla{
-  display:flex;align-items:center;justify-content:center;height:56px;
-  font-family:var(--display);font-size:24px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--tinta);
-  background:color-mix(in oklab, var(--calido) 60%, var(--crema));
-  border:1px solid var(--hair);border-radius:2px;
-  transition:border-color .2s var(--ease),box-shadow .2s var(--ease);
-}
-.casilla--llena{border-color:var(--hair-hover)}
-.casilla--sigue{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
-.casillas__entrada[aria-invalid='true'] + .casillas__fila .casilla{border-color:var(--naranja-texto)}
-
 .error{margin-top:12px;font-size:14px;line-height:1.5;color:var(--naranja-texto)}
-.aviso{
-  margin-bottom:24px;padding:14px 16px;font-size:14px;line-height:1.55;
-  color:var(--tinta);background:var(--calido);border-left:2px solid var(--hair-hover);border-radius:2px;
-}
 .exito{margin-top:12px;font-size:14px;line-height:1.5;color:var(--teal)}
 
 /* ── Botones · la anatomía de 512 ────────────────────────────────────────
@@ -228,9 +205,6 @@ img,svg{display:block;max-width:100%}
 /* El separador del «o», antes de Google. */
 .separador{display:flex;align-items:center;gap:16px;margin:24px 0}
 .separador::before,.separador::after{content:'';flex:1;height:1px;background:var(--hair)}
-.aviso-legal{margin-top:28px;font-size:13px;line-height:1.6;color:var(--gris)}
-.aviso-legal a{color:var(--gris);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
-.aviso-legal a:hover{color:var(--tinta)}
 .btn img{width:18px;height:18px;flex:none}
 .separador span{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gris)}
 

@@ -1,5 +1,10 @@
 /**
- * La entrada a la altura de la web — orden Códice #18.
+ * El marco de las pantallas de Mi espacio fuera del acceso — orden Códice #18.
+ *
+ * Desde la #35 la entrada (`/login` y el resto del acceso) es la del guion v1
+ * del Kit 512 y se prueba en `acceso/el-acceso-del-guion.test.tsx`. Acá queda
+ * lo que sigue vivo de la #18: el marco con cabecera y pie, y Armando de pie
+ * en `/empezar`, que no es pantalla de acceso (orden #35).
  *
  * Lo que se prueba acá es **estructura**, no estética: que las piezas que la
  * orden pide estén, en su orden y con sus enlaces. El aspecto se mide en el
@@ -7,7 +12,6 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { useState } from 'react';
 import { TELEFONO_GABY, TELEFONO_TALLER } from '@codice/core';
 
 vi.mock('../supabase', () => ({
@@ -16,8 +20,7 @@ vi.mock('../supabase', () => ({
 }));
 
 import '../i18n';
-import { CampoDeCodigo, Pantalla } from './Piezas';
-import { Entrar } from '../entrar/Entrar';
+import { Pantalla } from './Piezas';
 
 /** El `matchMedia` de jsdom siempre dice «no»: acá se elige el ancho. */
 function anchoDeEscritorio(es: boolean) {
@@ -27,47 +30,6 @@ function anchoDeEscritorio(es: boolean) {
     addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false,
   })) as unknown as typeof window.matchMedia;
 }
-
-function ConCodigo() {
-  const [valor, setValor] = useState('');
-  return <CampoDeCodigo id="c" rotulo="Código" valor={valor} alCambiar={setValor} />;
-}
-const casillas = () => [...document.querySelectorAll<HTMLElement>('[data-casilla]')];
-
-describe('B.8 · el código en seis casillas', () => {
-  it('se ven seis casillas, y hay UNA sola entrada para el teclado', () => {
-    render(<ConCodigo />);
-    expect(casillas()).toHaveLength(6);
-    expect(document.querySelectorAll('input')).toHaveLength(1);
-    /* Lo que hace que el celular muestre números y que iOS ofrezca el código. */
-    const entrada = screen.getByLabelText('Código');
-    expect(entrada.getAttribute('autocomplete')).toBe('one-time-code');
-    expect(entrada.getAttribute('inputmode')).toBe('numeric');
-  });
-
-  it('EL CASO: pegar el código entero lo reparte en las seis, aunque venga con espacios o guion', () => {
-    render(<ConCodigo />);
-    fireEvent.change(screen.getByLabelText('Código'), { target: { value: '123 456' } });
-    expect(casillas().map((c) => c.textContent)).toEqual(['1', '2', '3', '4', '5', '6']);
-    fireEvent.change(screen.getByLabelText('Código'), { target: { value: '65-43-21-99' } });
-    expect(casillas().map((c) => c.textContent)).toEqual(['6', '5', '4', '3', '2', '1']);
-  });
-
-  it('el foco avanza solo: la casilla marcada es la siguiente vacía', () => {
-    render(<ConCodigo />);
-    const entrada = screen.getByLabelText('Código');
-    fireEvent.focus(entrada);
-    expect(casillas()[0].className).toContain('casilla--sigue');
-    fireEvent.change(entrada, { target: { value: '12' } });
-    expect(casillas()[2].className).toContain('casilla--sigue');
-    expect(casillas().filter((c) => c.className.includes('casilla--sigue'))).toHaveLength(1);
-  });
-
-  it('las casillas son dibujo: el lector de pantalla oye un campo, no seis', () => {
-    render(<ConCodigo />);
-    expect(document.querySelector('.casillas__fila')?.getAttribute('aria-hidden')).toBe('true');
-  });
-});
 
 describe('B y C · el marco', () => {
   it('la cabecera lleva a la web: el wordmark y «Volver a la web»', () => {
@@ -88,13 +50,13 @@ describe('B y C · el marco', () => {
     expect(wa[0]).not.toContain(TELEFONO_TALLER);
   });
 
-  it('Armando y la firma van SOLO en /entrar (y /empezar); en las demás pantallas, la columna sola', () => {
+  it('Armando y la firma van SOLO en /empezar (`conArmando`); en las demás pantallas, la columna sola', () => {
     anchoDeEscritorio(true);
     const { unmount } = render(<Pantalla><p>x</p></Pantalla>);
     expect(document.querySelector('.de-pie')).toBeNull();
     expect(document.querySelector('.firma')).toBeNull();
     unmount();
-    render(<Entrar />);
+    render(<Pantalla conArmando><p>x</p></Pantalla>);
     expect(document.querySelector('.de-pie .de-pie__img')).not.toBeNull();
     /* #31: la firma encabeza el formulario, en el lugar del rótulo. */
     expect(document.querySelector('.columna > .firma')?.textContent).toBe('Construyendo familias fuertes');
@@ -105,45 +67,14 @@ describe('B y C · el marco', () => {
        del formulario. Con dos montadas el teléfono bajaba 42 KB que no
        mostraba, y performance caía de 76 a 71. */
     anchoDeEscritorio(true);
-    const { unmount } = render(<Entrar />);
+    const { unmount } = render(<Pantalla conArmando><p>x</p></Pantalla>);
     expect(document.querySelectorAll('img[src*="/img/armando/"]')).toHaveLength(1);
     expect(document.querySelectorAll('.firma')).toHaveLength(1);
     unmount();
     anchoDeEscritorio(false);
-    render(<Entrar />);
+    render(<Pantalla conArmando><p>x</p></Pantalla>);
     expect(document.querySelectorAll('img[src*="/img/armando/"]')).toHaveLength(0);
     expect(document.querySelector('.de-pie')).toBeNull();
     expect(document.querySelector('.firma')?.textContent).toBe('Construyendo familias fuertes');
-  });
-});
-
-describe('B · /entrar, de arriba abajo', () => {
-  it('Google PRIMERO y con su logo, después el separador, después el correo', () => {
-    render(<Entrar />);
-    const columna = document.querySelector('.columna')!;
-    const google = screen.getByRole('button', { name: /continuar con google/i });
-    const correo = screen.getByLabelText(/tu correo/i);
-    /* DOCUMENT_POSITION_FOLLOWING = 4: el correo viene DESPUÉS de Google. */
-    expect(google.compareDocumentPosition(correo) & 4).toBe(4);
-    expect(google.querySelector('img')?.getAttribute('src')).toBe('/img/google.svg');
-    expect(columna.querySelector('.separador')).not.toBeNull();
-  });
-
-  it('el título lleva «espacio» en teal, y el naranja queda solo en el botón', () => {
-    render(<Entrar />);
-    expect(document.querySelector('h1 .titulo__palabra')?.textContent).toBe('espacio');
-    const naranjas = document.querySelectorAll('.btn--naranja');
-    expect(naranjas).toHaveLength(1);
-    expect(naranjas[0].textContent).toMatch(/enviarme el código/i);
-  });
-
-  it('el aviso legal enlaza las dos páginas de la web', () => {
-    render(<Entrar />);
-    const aviso = document.querySelector('.aviso-legal')!;
-    expect(aviso.textContent).toMatch(/^Al continuar aceptas el Aviso de privacidad y los Términos\.$/);
-    expect([...aviso.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual([
-      'https://armandoduarte.com/privacidad',
-      'https://armandoduarte.com/terminos',
-    ]);
   });
 });

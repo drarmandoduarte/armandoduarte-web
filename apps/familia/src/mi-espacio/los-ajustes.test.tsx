@@ -24,7 +24,12 @@ vi.mock('../supabase', () => ({
       onAuthStateChange: (_cb: (e: AuthChangeEvent, s: Session | null) => void) =>
         ({ data: { subscription: { unsubscribe: () => {} } } }),
       signOut: async (opciones?: unknown) => { falso.salidas.push(opciones ?? 'local'); return { error: null }; },
-      mfa: { getAuthenticatorAssuranceLevel: async () => ({ data: { currentLevel: 'aal2', nextLevel: 'aal2' }, error: null }) },
+      mfa: {
+        getAuthenticatorAssuranceLevel: async () => ({ data: { currentLevel: 'aal2', nextLevel: 'aal2' }, error: null }),
+        listFactors: async () => ({ data: { totp: [{ id: 'f-1' }] }, error: null }),
+        challenge: async () => ({ data: { id: 'ch-1' }, error: null }),
+        verify: async (o: { code: string }) => { falso.salidas.push(`verify:${o.code}`); return { error: null }; },
+      },
     },
   },
 }));
@@ -42,6 +47,8 @@ const ficha = { id: 'u', nombre: 'Ana', apellido: 'Pérez', whatsapp: '+52999123
 let yo: Record<string, unknown>;
 let pedidos: { ruta: string; cuerpo: unknown }[];
 let yoFalla: boolean;
+/** #35: cuántas veces más contesta `respaldo/generar` con PASO_RECIENTE_REQUERIDO. */
+let pasoRecienteFaltan: number;
 
 function comoEquipo() {
   yo = { rol: 'equipo', tipo: 'equipo', territorio: 'mexico', persona: ficha };
@@ -58,6 +65,7 @@ beforeEach(() => {
   yo = { rol: 'cliente', tipo: 'cliente', territorio: null, persona: ficha };
   pedidos = [];
   yoFalla = false;
+  pasoRecienteFaltan = 0;
   window.matchMedia = ((q: string) => ({
     matches: /min-width: (900|1100)px/.test(q), media: q, onchange: null,
     addEventListener: () => {}, removeEventListener: () => {},
@@ -72,6 +80,10 @@ beforeEach(() => {
     if (ruta === '/api/talleres') return json({ abiertos: [], mios: [], cobro: null });
     if (ruta === '/api/equipo/cursos') return json({ cursos: [] });
     if (ruta === '/api/respaldo/cuantos') return json({ quedan: 10 });
+    if (ruta === '/api/respaldo/generar') {
+      if (pasoRecienteFaltan > 0) { pasoRecienteFaltan -= 1; return json({ code: 'PASO_RECIENTE_REQUERIDO' }, 403); }
+      return json({ codigos: ['AAAA-11111', 'BBBB-22222', 'CCCC-33333', 'DDDD-44444', 'EEEE-55555', 'FFFF-66666', 'GGGG-77777', 'HHHH-88888', 'IIII-99999', 'JJJJ-00000'] });
+    }
     return json({ ok: true });
   }));
   window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
@@ -213,6 +225,39 @@ describe('las secciones', () => {
     const arco = screen.getByRole('link', { name: new RegExp(t('ajustes.privacidad.arco').replace(/[()]/g, '\\$&')) }).getAttribute('href')!;
     expect(arco).toMatch(/^https:\/\/wa\.me\/\d+\?text=/);
     expect(decodeURIComponent(arco.split('text=')[1])).toBe(t('ajustes.privacidad.arcoMensaje'));
+  });
+});
+
+describe('#35 · regenerar los códigos: P8 si la verificación no es reciente, y después P5', () => {
+  it('EL CASO: PASO_RECIENTE_REQUERIDO → P8 con la casilla de 6 → verifica sola → reintenta → P5', async () => {
+    comoEquipo();
+    pasoRecienteFaltan = 1;
+    ir('/ajustes/seguridad');
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: t('respaldo.regenerar') }));
+    const mismo = (esperado: string) => (nombre: string) => nombre.replace(/\s+/g, '') === esperado.replace(/[\s*]/g, '');
+    expect(await screen.findByRole('heading', { level: 1, name: mismo(t('auth.stepup.title')) })).toBeTruthy();
+    expect(document.querySelectorAll('[data-casilla]')).toHaveLength(6);
+    fireEvent.change(screen.getByLabelText(t('auth.code.label')), { target: { value: '123456' } });
+    await waitFor(() => expect(falso.salidas).toContain('verify:123456'));
+    /* Reintentó y llegaron los diez: P5, con «Listo» apagado hasta guardarlos. */
+    expect(await screen.findByRole('heading', { level: 1, name: mismo(t('auth.backup.title')) })).toBeTruthy();
+    expect(screen.getAllByRole('listitem')).toHaveLength(10);
+    const listo = screen.getByRole('button', { name: new RegExp(t('auth.backup.done')) }) as HTMLButtonElement;
+    expect(listo.disabled).toBe(true);
+    Object.assign(navigator, { clipboard: { writeText: vi.fn(async () => {}) } });
+    fireEvent.click(screen.getByRole('button', { name: t('auth.backup.copy') }));
+    await waitFor(() => expect(listo.disabled).toBe(false));
+  });
+
+  it('«Cancelar» en P8 vuelve a Seguridad sin códigos nuevos', async () => {
+    comoEquipo();
+    pasoRecienteFaltan = 1;
+    ir('/ajustes/seguridad');
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: t('respaldo.regenerar') }));
+    fireEvent.click(await screen.findByRole('button', { name: t('auth.stepup.cancel') }));
+    expect(await screen.findByText(t('respaldo.regenerarTitulo'))).toBeTruthy();
   });
 });
 

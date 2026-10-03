@@ -15,76 +15,9 @@
     "inicioDeLaWeb": "Armando Duarte · ir a la web",
     "ayuda": "¿Necesitas ayuda?",
     "ayudaWhatsapp": "WhatsApp",
-    "ayudaMensaje": "Hola, necesito ayuda para entrar a Mi espacio.",
-    "avisoLegalAntes": "Al continuar aceptas el ",
-    "avisoLegalMedio": " y los ",
-    "avisoLegalDespues": "."
-  },
-  "entrar": {
-    "titulo": "Entra a tu [espacio].",
-    "bajada": "Tus talleres, tus inscripciones y tus datos, en un solo lugar. Sin contraseñas.",
-    "correoEtiqueta": "Tu correo",
-    "correoAyuda": "El mismo que usas siempre.",
-    "correoInvalido": "Ese correo no parece completo. Revísalo.",
-    "enviarCodigo": "Enviarme el código",
-    "enviando": "Enviando…",
-    "codigoBajada": "Te enviamos un código a {{correo}}.",
-    "codigoEtiqueta": "Código de 6 dígitos",
-    "codigoInvalido": "Ese código no es correcto o ya venció. Pide uno nuevo.",
-    "verificar": "Entrar",
-    "verificando": "Verificando…",
-    "reenviar": "Enviar otro código",
-    "reenviarEn": "Puedes pedir otro código en {{segundos}} s",
-    "cambiarCorreo": "Cambiar",
-    "oBien": "o con tu correo",
-    "conGoogle": "Continuar con Google",
-    "conCodigoDeRespaldo": "Usar un código de respaldo",
-    "avisoInactividad": "Cerramos tu sesión porque pasaron 30 minutos sin actividad. Vuelve a entrar.",
-    "avisoSesionPerdida": "Tu sesión ya no estaba activa. Vuelve a entrar.",
-    "retratoAlt": "Armando Duarte"
-  },
-  "enrolar": {
-    "titulo": "Protege tu [cuenta]",
-    "bajada": "Tu cuenta ve datos de otras personas, así que necesita un segundo paso. Toma dos minutos y se hace una sola vez.",
-    "paso1": "Abre tu app de autenticación",
-    "paso1Ayuda": "Google Authenticator, 1Password, Authy o la que ya uses.",
-    "paso2": "Escanea este código",
-    "paso2Ayuda": "Si estás en el celular, toca el botón de abajo y se abre sola.",
-    "abrirEnElCelular": "Abrir mi app de autenticación",
-    "aMano": "¿No puedes escanear? Escribe esta clave a mano:",
-    "copiarClave": "Copiar la clave",
-    "copiada": "Copiada",
-    "paso3": "Escribe el código que te muestra",
-    "confirmar": "Confirmar",
-    "confirmando": "Confirmando…",
-    "codigoInvalido": "Ese código no coincide. Revisa que la hora de tu celular esté en automático y vuelve a intentarlo.",
-    "sinSalida": "Para entrar necesitas terminar este paso."
-  },
-  "reto": {
-    "titulo": "Confirma que eres [tú]",
-    "bajada": "Escribe el código de 6 dígitos que te muestra tu app de autenticación.",
-    "codigoEtiqueta": "Código de tu autenticador",
-    "verificar": "Confirmar",
-    "verificando": "Confirmando…",
-    "codigoInvalido": "Ese código no coincide. Prueba con el siguiente que te muestre la app.",
-    "usarRespaldo": "No tengo mi autenticador",
-    "respaldoTitulo": "Usa un código de respaldo",
-    "respaldoBajada": "Escribe uno de los diez códigos que guardaste. Cada uno sirve una sola vez.",
-    "respaldoEtiqueta": "Código de respaldo",
-    "respaldoInvalido": "Ese código no es válido o ya se usó.",
-    "volverAlAutenticador": "Volver al autenticador"
+    "ayudaMensaje": "Hola, necesito ayuda para entrar a Mi espacio."
   },
   "respaldo": {
-    "titulo": "Guarda tus [códigos] de respaldo",
-    "bajada": "Son diez y sirven una sola vez cada uno. Te dejan entrar si pierdes el celular. No los volveremos a mostrar.",
-    "descargar": "Descargar",
-    "copiar": "Copiar",
-    "compartir": "Compartir",
-    "copiados": "Copiados",
-    "descargados": "Descargados",
-    "compartidos": "Compartidos",
-    "obligatorio": "Guárdalos antes de continuar: descárgalos, cópialos o compártelos.",
-    "listo": "Ya los guardé",
     "regenerarTitulo": "Códigos de respaldo",
     "quedan": "Te quedan {{cuantos}} de 10 códigos sin usar.",
     "quedanPocos": "Te quedan {{cuantos}} códigos. Conviene generar unos nuevos.",
@@ -299,11 +232,6 @@
     "guardar": "Guardar y entrar",
     "guardando": "Guardando…",
     "error": "No pudimos guardar tus datos. Vuelve a intentarlo."
-  },
-  "pasoReciente": {
-    "titulo": "Confirma otra vez",
-    "bajada": "Para esto necesitamos que escribas el código de tu autenticador ahora mismo.",
-    "confirmar": "Confirmar"
   },
   "equipo": {
     "titulo": "Panel del [equipo]",
@@ -606,5 +534,96 @@
       "arco": "Pedir, corregir o borrar mis datos (derechos ARCO)",
       "arcoMensaje": "Hola, quiero ejercer mis derechos ARCO sobre mis datos de Mi espacio (acceso, rectificación, cancelación u oposición)."
     }
+  },
+  "auth": {
+    "back": "← {app}",
+    "login": {
+      "subtitle": "Te enviamos un código al correo. Sin contraseñas.",
+      "send": "Enviar código",
+      "title": "Entra a tu *espacio*."
+    },
+    "google": "Continuar con Google",
+    "email": {
+      "label": "Correo electrónico",
+      "placeholder": "tu@correo.com"
+    },
+    "legal": "Al continuar aceptas nuestros Términos y la Política de Privacidad.",
+    "code": {
+      "eyebrow": "Código",
+      "title": "Revisa tu *correo*.",
+      "subtitle": "Te enviamos un código de 6 dígitos a {email}.",
+      "label": "Código de 6 dígitos",
+      "enter": "Entrar",
+      "resend": "Reenviar código",
+      "resendIn": "Reenviar en {s} s",
+      "otherEmail": "Usar otro correo",
+      "wrong": "Código incorrecto. Te quedan {n} intentos."
+    },
+    "totp": {
+      "eyebrow": "Verificación",
+      "title": "Verifica tu *identidad*.",
+      "subtitle": "Ingresa el código de 6 dígitos de tu app de autenticación.",
+      "verify": "Verificar",
+      "lost": "No tengo el teléfono · usar un código de respaldo"
+    },
+    "signout": "Cerrar sesión",
+    "enroll": {
+      "eyebrow": "Autenticador",
+      "title": "Activa tu *segundo paso*.",
+      "subtitle": "Escanea el código con tu app de autenticación, o ábrela desde este teléfono.",
+      "open": "Abrir en mi app de autenticación",
+      "copy": "Copiar la clave",
+      "confirmLabel": "Confirma con el código",
+      "confirm": "Confirmar"
+    },
+    "backup": {
+      "eyebrow": "Respaldo",
+      "title": "Guarda estos *códigos*.",
+      "subtitle": "Si pierdes el teléfono, cada uno te deja entrar una vez. No se vuelven a mostrar.",
+      "download": "Descargar",
+      "copy": "Copiar",
+      "share": "Compartir",
+      "done": "Listo, los guardé"
+    },
+    "recover": {
+      "eyebrow": "Recuperación",
+      "title": "Usa un código de *respaldo*.",
+      "subtitle": "Al usarlo, tu autenticador anterior deja de valer y vas a configurar uno nuevo.",
+      "continue": "Continuar",
+      "back": "Volver",
+      "noCodes": "Tampoco tengo los códigos"
+    },
+    "reset": {
+      "eyebrow": "Reseteo",
+      "title": "Pide un *reseteo*.",
+      "subtitle": "Te mandamos un correo para confirmarlo. Si nadie lo cancela, en 48 horas vas a poder configurar un autenticador nuevo.",
+      "request": "Pedir el reseteo",
+      "waitTitle": "Tu reseteo está *en camino*.",
+      "waitSubtitle": "Vas a poder configurar un autenticador nuevo el {fecha}."
+    },
+    "session": {
+      "eyebrow": "Sesión",
+      "title": "Cerramos tu *sesión*.",
+      "subtitle": "Pasaron 30 minutos sin actividad. Es una medida de seguridad.",
+      "again": "Volver a entrar"
+    },
+    "stepup": {
+      "eyebrow": "Confirmación",
+      "title": "Confirma que eres *tú*.",
+      "subtitle": "Esta acción pide el código de tu app de autenticación.",
+      "cancel": "Cancelar"
+    },
+    "evicted": {
+      "title": "Pasó un *tiempo*.",
+      "subtitle": "Tu teléfono borró los datos guardados de la app. Entra de nuevo y listo.",
+      "enter": "Entrar"
+    },
+    "lang": {
+      "label": "Idioma"
+    }
+  },
+  "acceso": {
+    "respaldoInvalido": "Ese código no es válido o ya se usó.",
+    "sesionPerdida": "Tu sesión ya no estaba activa. Vuelve a entrar."
   }
 }

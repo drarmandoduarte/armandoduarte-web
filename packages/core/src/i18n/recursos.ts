@@ -17,10 +17,19 @@
    `en/` y `pt/`. */
 import esWeb from './es/web.json';
 import esFamilia from './es/familia.json';
+import enFamilia from './en/familia.json';
+import ptFamilia from './pt/familia.json';
 
-export const IDIOMAS = ['es'] as const;
+/* ── en y pt, desde la #35, solo para el acceso ────────────────────────────
+   El guion v1 del Kit 512 pide las pantallas de acceso en tres idiomas (§5).
+   `en/familia.json` y `pt/familia.json` traen **solo `auth.*`**; el resto de
+   Mi espacio y la web siguen en español y caen a `es` por `fallbackLng`.
+   `check-i18n-parity` lo sabe: en esos dos compara solo `auth.*`. */
+export const IDIOMAS = ['es', 'en', 'pt'] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 
 export const RECURSOS_I18N = {
   es: { web: esWeb, familia: esFamilia },
+  en: { familia: enFamilia },
+  pt: { familia: ptFamilia },
 } as const;

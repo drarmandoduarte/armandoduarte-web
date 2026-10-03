@@ -1,34 +1,54 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { PUERTO } from '../playwright.config';
 
 /**
- * `/entrar` como «Quién soy» — orden #31 (reemplaza al panel de la #30).
+ * `/empezar` como «Quién soy» — orden #31, restituido en la #35 (auditoría
+ * del CEO del PR #56).
  *
- * A 1440×900 y 1920×1080 afirma:
- *
+ * Hasta la #35 este test medía `/entrar`. La entrada pasó a ser la del guion
+ * v1 del Kit 512 (sin fotos), pero `/empezar` —que NO es pantalla de acceso:
+ * ocurre después de entrar— conserva la composición de la #31, y sin esto se
+ * quedaba sin guardián de píxeles. Mismas afirmaciones, sobre `/empezar`, a
+ * 1440×900 y 1920×1080:
  *   · **ningún fondo cálido**: ningún elemento pinta `--calido` puro, y ninguno
- *     con un fondo que no sea crema cubre más del 15 % de la pantalla (eso
- *     deja pasar los campos —cálido al 60 %, chicos— y caza un panel);
+ *     con un fondo que no sea crema cubre más del 15 % de la pantalla;
  *   · la rejilla al ancho de la cabecera: Armando arranca en su borde
  *     izquierdo y el formulario termina en su borde derecho;
  *   · el formulario (la firma) a 96 px de la línea de la cabecera;
  *   · **por píxeles**: la primera fila que no es fondo del pelo = la primera
- *     fila que no es fondo de las letras de la firma, ±1 (como
- *     `apps/web/e2e/pelo-a-la-altura-del-rotulo.spec.ts`);
+ *     fila que no es fondo de las letras de la firma, ±1;
  *   · el corte del archivo apoyado en la línea del pie, ±1.
+ *
+ * `/empezar` necesita sesión: se simula como en `check/capturas-35.mjs`
+ * (una clienta nueva, sin apellido ni WhatsApp → `necesitaEmpezar()`), con
+ * Supabase y la API interceptados. Nada real.
  *
  * La captura se decodifica en un `<canvas>` de una pestaña en blanco: la CSP
  * de la app no deja cargar `data:` como imagen. Sin dependencias nuevas.
- *
- * Qué NO mira: `/empezar` (mismo molde, necesita sesión simulada: lo muestra
- * `check/capturas-29.mjs`) y debajo de 1100 px, donde no hay foto (lo prueba
+ * Qué NO mira: debajo de 1100 px, donde no hay foto (lo prueba
  * `la-entrada-a-la-altura.test.tsx`).
  *
  * No corre en la gate (pendiente 16 de `docs/tareas.md`). A mano, contra el build:
- *
- *   VITE_SUPABASE_URL=https://x.supabase.co VITE_SUPABASE_ANON_KEY=x pnpm --filter @codice/familia build
+ *   VITE_SUPABASE_URL=https://jrscpjdscgycetyvenco.supabase.co VITE_SUPABASE_ANON_KEY=x pnpm --filter @codice/familia build
  *   pnpm --filter @codice/familia test:e2e e2e/entrar-como-quien.spec.ts
  */
+
+/* ── La sesión simulada: una clienta nueva (la forma de capturas-35.mjs) ── */
+const REF = 'jrscpjdscgycetyvenco';
+const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
+const SESION = {
+  access_token: `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub: 'u-nueva', aal: 'aal1', exp: 4102444800, role: 'authenticated' })}.c2lnbmF0dXJh`,
+  refresh_token: 'r', token_type: 'bearer', expires_in: 3600, expires_at: 4102444800,
+  user: { id: 'u-nueva', aud: 'authenticated', role: 'authenticated', email: 'nueva@ejemplo.com', app_metadata: {}, user_metadata: {}, created_at: '2026-09-29T00:00:00Z', factors: [] },
+};
+const YO = { rol: 'cliente', tipo: 'cliente', persona: { id: 'u-nueva', nombre: 'Laura', apellido: null, whatsapp: null, pais: 'MX' } };
+
+async function conSesion(contexto: BrowserContext) {
+  await contexto.addInitScript(({ clave, valor }) => window.localStorage.setItem(clave, valor), { clave: `sb-${REF}-auth-token`, valor: JSON.stringify(SESION) });
+  await contexto.route(`https://${REF}.supabase.co/**`, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SESION.user) }));
+  await contexto.route('**/api/**', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(new URL(r.request().url()).pathname === '/api/yo' ? YO : {}) }));
+}
+
 const VIEWPORTS = [
   { width: 1440, height: 900 },
   { width: 1920, height: 1080 },
@@ -63,9 +83,12 @@ async function primeraFila(lienzo: Page, png: Buffer, caja: Caja, fondo: { x: nu
 }
 
 for (const vp of VIEWPORTS) {
-  test(`/entrar a ${vp.width}×${vp.height}: como «Quién soy», sin fondo, el pelo a la altura de la firma`, async ({ page }) => {
+  test(`/empezar a ${vp.width}×${vp.height}: como «Quién soy», sin fondo, el pelo a la altura de la firma`, async ({ page }) => {
+    await conSesion(page.context());
     await page.setViewportSize(vp);
-    await page.goto(`http://127.0.0.1:${PUERTO}/entrar`, { waitUntil: 'networkidle' });
+    await page.goto(`http://127.0.0.1:${PUERTO}/empezar`, { waitUntil: 'networkidle' });
+    await page.locator('.de-pie img').waitFor();
+    expect(new URL(page.url()).pathname, 'la sesión simulada no llegó a /empezar').toBe('/empezar');
     await page.evaluate(() => document.fonts.ready);
     await page.waitForFunction(() => {
       const img = document.querySelector('.de-pie img') as HTMLImageElement | null;

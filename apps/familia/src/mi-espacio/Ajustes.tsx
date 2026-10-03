@@ -30,7 +30,7 @@ import { SeccionDeDatos, SeccionDeSeguridad } from './MiEspacio';
  * Pacientes, que Bitácora tiene y a Armando hoy no le aplican. No se dejan
  * secciones vacías.
  */
-export function Ajustes({ yo, correo, proveedores, seccion, recargar, alRegenerar, alSalirDeTodo }: {
+export function Ajustes({ yo, correo, proveedores, seccion, recargar, alRegenerar, alPedirPasoReciente, alSalirDeTodo }: {
   yo: Yo;
   correo: string | null;
   /** `app_metadata.providers` de la sesión: con qué entra (B.2). */
@@ -38,6 +38,8 @@ export function Ajustes({ yo, correo, proveedores, seccion, recargar, alRegenera
   seccion: SeccionDeAjustes;
   recargar: () => Promise<void>;
   alRegenerar: (codigos: string[]) => void;
+  /** #35 · P8, ver `SeccionDeSeguridad`. */
+  alPedirPasoReciente: (accion: { reintentar: () => void; cancelar: () => void }) => void;
   alSalirDeTodo: () => Promise<void>;
 }) {
   const { t } = useTranslation();
@@ -50,7 +52,7 @@ export function Ajustes({ yo, correo, proveedores, seccion, recargar, alRegenera
   if (actual === 'perfil') cuerpo = <SeccionDePerfil yo={yo} recargar={recargar} />;
   else if (actual === 'cuenta') cuerpo = <SeccionDeCuenta correo={correo} proveedores={proveedores} alSalirDeTodo={alSalirDeTodo} />;
   else if (actual === 'notificaciones') cuerpo = <SeccionDeNotificaciones yo={yo} recargar={recargar} />;
-  else if (actual === 'seguridad') cuerpo = <Seccion clave="seguridad"><SeccionDeSeguridad alRegenerar={alRegenerar} /></Seccion>;
+  else if (actual === 'seguridad') cuerpo = <Seccion clave="seguridad"><SeccionDeSeguridad alRegenerar={alRegenerar} alPedirPasoReciente={alPedirPasoReciente} /></Seccion>;
   else if (actual === 'sesiones') cuerpo = <SeccionDeSesiones />;
   else cuerpo = <SeccionDePrivacidad />;
 

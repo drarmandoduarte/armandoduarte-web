@@ -73,6 +73,16 @@ const DONDE_VIVEN = 'packages/ui/codice-tokens.css';
 
 const HEX = /#[0-9a-fA-F]{3,8}\b/g;
 
+/* ── Los generados desde el canon (orden Códice #35) ───────────────────────
+   El `design.json` de Mi espacio lleva hex porque es lo que lee el molde del
+   Kit 512, y **no se escribe a mano**: lo genera
+   `packages/ui/scripts/design-json.mjs` y `packages/ui/tokens.test.mjs` lo
+   regenera y lo compara byte a byte. Acá se le pide además que cada hex que
+   traiga **esté en el canon**: un hex que no está en `codice-tokens.css` cae
+   igual que en cualquier otro archivo. */
+const GENERADOS_DEL_CANON = ['apps/familia/design.json'];
+const HEX_DEL_CANON = new Set((readFileSync(join(RAIZ, DONDE_VIVEN), 'utf8').match(HEX) ?? []).map((h) => h.toUpperCase()));
+
 function recorrer(dir) {
   const out = [];
   let entradas;
@@ -93,8 +103,10 @@ for (const carpeta of CARPETAS) {
     const rel = relative(RAIZ, archivo);
     if (rel === DONDE_VIVEN || IGNORAR_ARCHIVO.some((n) => rel.endsWith(n))) continue;
     archivos += 1;
+    const generado = GENERADOS_DEL_CANON.includes(rel);
     readFileSync(archivo, 'utf8').split('\n').forEach((linea, i) => {
       for (const m of linea.match(HEX) ?? []) {
+        if (generado && HEX_DEL_CANON.has(m.toUpperCase())) continue;
         hallazgos.push(`${rel}:${i + 1}  ${m}  ->  ${linea.trim().slice(0, 100)}`);
       }
     });

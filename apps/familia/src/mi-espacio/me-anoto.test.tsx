@@ -161,10 +161,10 @@ describe('sin slug: Talleres con la lista (#29: su propia pantalla)', () => {
 });
 
 describe('?ir= (orden #24 B, a)', () => {
-  it('sin sesión en /me-anoto/<slug>: a /entrar?ir= y el destino queda guardado', async () => {
+  it('sin sesión en /me-anoto/<slug>: a /login?ir= (#35) y el destino queda guardado', async () => {
     falso.sesion = null;
     render(<App />);
-    await waitFor(() => expect(window.location.pathname).toBe('/entrar'));
+    await waitFor(() => expect(window.location.pathname).toBe('/login'));
     expect(new URLSearchParams(window.location.search).get('ir')).toBe(`/me-anoto/${SLUG}`);
     expect(window.sessionStorage.getItem('codice.destino-despues-de-entrar')).toBe(`/me-anoto/${SLUG}`);
   });

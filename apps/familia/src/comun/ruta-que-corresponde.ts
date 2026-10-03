@@ -46,6 +46,20 @@ import type { DecisionDePantalla } from './decision-de-pantalla';
  *   · `/mis-datos` ya no existe: va a `/ajustes/perfil` (en Vercel es un 308;
  *     esto cubre el «atrás» y los enlaces que navegan sin recargar).
  *
+ * ── Y desde la #35, las direcciones del guion v1 del Kit 512 ─────────────
+ * Las pantallas de acceso siguen siendo **estados** de la sesión, pero el guion
+ * les da dirección (§4), así que la URL ahora **acompaña** a la decisión del
+ * núcleo —nunca al revés—:
+ *   · sin sesión → `/login` (P1); `/login/codigo` (P2) es suya también;
+ *     `/entrar` de antes va a `/login` con su `?ir=`;
+ *   · `reto` → `/auth/2fa` (P3), y desde ahí `/auth/2fa/recuperar` (P6) y
+ *     `/auth/2fa/reseteo` (P6b) son suyas; cualquier otra → P3;
+ *   · `enrolar` → `/auth/2fa/activar` (P4);
+ *   · los diez códigos en pantalla → `/auth/2fa/respaldo` (P5), antes que todo;
+ *   · con `pasar`, ninguna de ésas es un lugar: a Mi espacio (o al destino).
+ * Escribir `/auth/2fa` a mano con la sesión en `pasar` no muestra nada: va a
+ * Inicio. Y escribirlo sin sesión va a `/login`.
+ *
  * Devuelve la ruta a la que hay que ir, o `null` si la actual ya está bien.
  */
 export function rutaQueCorresponde(estado: {
@@ -60,14 +74,27 @@ export function rutaQueCorresponde(estado: {
   destinoGuardado?: string | null;
   /** #29 C: a la ficha le falta nombre, apellido o WhatsApp (`necesitaEmpezar()`). */
   faltanDatos?: boolean;
+  /** #35: los diez códigos de respaldo están en pantalla (P5). */
+  mostrandoCodigos?: boolean;
+  /** #35: el `?…` de la URL actual, para llevar el `?ir=` de `/entrar` a `/login`. */
+  busqueda?: string;
 }): string | null {
   if (estado.cargando) return null;
   const enMeAnoto = slugDeMeAnoto(estado.rutaActual) !== null;
+  const ir = (destino: string) => (destino === estado.rutaActual ? null : destino);
 
   if (!estado.haySesion) {
-    if (enMeAnoto) return `${RUTAS.entrar}?ir=${encodeURIComponent(estado.rutaActual)}`;
-    return estado.rutaActual === RUTAS.entrar ? null : RUTAS.entrar;
+    if (enMeAnoto) return `${RUTAS.login}?ir=${encodeURIComponent(estado.rutaActual)}`;
+    if (estado.rutaActual === RUTAS.entrar) return `${RUTAS.login}${estado.busqueda ?? ''}`;
+    if (estado.rutaActual === RUTAS.login || estado.rutaActual === RUTAS.loginCodigo) return null;
+    return RUTAS.login;
   }
+  /* P5 antes que nada: se ven una sola vez. */
+  if (estado.mostrandoCodigos) return ir(RUTAS.respaldo);
+  if (estado.decision === 'reto') {
+    return ([RUTAS.reto, RUTAS.recuperar, RUTAS.reseteo] as string[]).includes(estado.rutaActual) ? null : RUTAS.reto;
+  }
+  if (estado.decision === 'enrolar') return ir(RUTAS.activar);
   if (!estado.hayYo || estado.decision !== 'pasar') return null;
 
   /* #29 C: antes que nada, completar los datos. El destino guardado se queda
@@ -78,7 +105,7 @@ export function rutaQueCorresponde(estado: {
 
   const guardado = rutaInternaSegura(estado.destinoGuardado);
   const caminoGuardado = guardado?.split(/[?#]/)[0] ?? null;
-  if (guardado && caminoGuardado !== RUTAS.entrar) {
+  if (guardado && caminoGuardado !== RUTAS.entrar && caminoGuardado !== RUTAS.login) {
     return caminoGuardado === estado.rutaActual ? null : guardado;
   }
 
