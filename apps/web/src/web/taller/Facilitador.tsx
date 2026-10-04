@@ -6,7 +6,7 @@ import { Seccion } from '../comun/Seccion';
  * Sobre el facilitador.
  *
  * ── El `style=` que había acá, y por qué ya no está (orden #03) ───────────
- * Las claves de la ficha —«Familia», «Práctica», «Formación», «Obra»— llevaban
+ * Las claves de la ficha —«Familia», «Práctica», «Formación», «Obra» (hoy «Libros publicados», #36)— llevaban
  * el color escrito a mano en línea, crema al 60 %, copiado del sitio estático.
  * La #01 lo portó igual y lo dejó anotado como redundante: la regla
  * `.oscuro .ficha li span:first-child` decía exactamente lo mismo.
@@ -37,7 +37,7 @@ export function Facilitador() {
             <li><span>{t('taller.facilitador.familiaClave')}</span><span>{t('taller.facilitador.familiaValor')}</span></li>
             <li><span>{t('taller.facilitador.practicaClave')}</span><span>{t('taller.facilitador.practicaValor')}</span></li>
             <li><span>{t('taller.facilitador.formacionClave')}</span><span>{t('taller.facilitador.formacionValor')}</span></li>
-            <li><span>{t('taller.facilitador.obraClave')}</span><span>{t('taller.facilitador.obraValor')}</span></li>
+            <li><span>{t('taller.facilitador.librosClave')}</span><span>{t('taller.facilitador.librosValor')}</span></li>
           </ul>
           <blockquote className="cita u-mt-5 reveal" data-d="3">
             {t('taller.facilitador.cita')}<small>{t('taller.facilitador.citaFirma')}</small>
