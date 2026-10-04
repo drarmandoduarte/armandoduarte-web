@@ -72,7 +72,7 @@
       "ctaWhatsapp": "Escribir por WhatsApp",
       "micro1": "Padre de 7",
       "micro2": "Doctor en Liderazgo",
-      "micro3": "2 libros",
+      "micro3": "3 libros",
       "fotoAlt": "Armando Duarte, sentado, sonriendo"
     },
     "ahora": {
@@ -92,11 +92,11 @@
       "fichaFormacionValor": "Licenciatura en Ciencias de la Familia · Maestría en Educación · Doctorado en Liderazgo",
       "fichaPracticaClave": "Práctica",
       "fichaPracticaValor": "1.000 horas al año en sesiones de consultoría familiar",
-      "fichaObraClave": "Obra",
-      "fichaObraAntes": "Autor de ",
-      "fichaObraLibro1": "Construyendo Familias Fuertes",
-      "fichaObraEntre": " y ",
-      "fichaObraLibro2": "Padres digitalmente responsables",
+      "fichaLibrosClave": "Libros publicados",
+      "fichaLibrosLibro1": "Construyendo Familias Fuertes",
+      "fichaLibrosLibro2": "Padres digitalmente responsables",
+      "fichaLibrosLibro3": "Inteligencias Múltiples en la Familia",
+      "fichaLibrosEntre": " · ",
       "fichaBaseClave": "Base",
       "fichaBaseValor": "Mérida, Yucatán · México",
       "cita": "Mi propósito es guiar a padres comprometidos a trascender la reactividad y el miedo, y convertirse en el refugio seguro y la guía que sus hijos necesitan para crecer libres, seguros y responsables.",
@@ -175,7 +175,7 @@
     "head": {
       "title": "Taller para padres de adolescentes en Mérida · El arte de amar a tu adolescente · Armando Duarte",
       "description": "Taller presencial de 4 horas y media para padres de adolescentes. Jueves 5 de noviembre de 2026, Fiesta Inn Mérida, 8:30 a 13:00. Con Armando Duarte, cupo limitado.",
-      "ogImageAlt": "El arte de amar a tu hijo adolescente · taller en Mérida"
+      "ogImageAlt": "Taller · El arte de amar a tu hijo adolescente"
     },
     "hero": {
       "eyebrow": "Taller presencial · Mérida",
@@ -278,8 +278,8 @@
       "practicaValor": "1.000 horas al año de consultoría familiar",
       "formacionClave": "Formación",
       "formacionValor": "Licenciatura en Ciencias de la Familia · Maestría en Educación · Doctorado en Liderazgo",
-      "obraClave": "Obra",
-      "obraValor": "Construyendo Familias Fuertes · Padres digitalmente responsables",
+      "librosClave": "Libros publicados",
+      "librosValor": "Construyendo Familias Fuertes · Padres digitalmente responsables · Inteligencias Múltiples en la Familia",
       "cita": "Mi propósito es guiar a padres comprometidos a trascender la reactividad y el miedo, y convertirse en el refugio seguro y la guía que sus hijos necesitan.",
       "citaFirma": "Armando Duarte",
       "fotoAlt": "Armando Duarte"

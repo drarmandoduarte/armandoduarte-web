@@ -59,9 +59,15 @@ const INSUMOS = join(REPO, '..', '..', '03 Producto', 'web', 'insumos', '2026-09
    comillas latinas. Esa orden es el insumo: Rodolfo no produce insumos, y una
    copia acá sería la segunda verdad que este archivo existe para evitar. */
 const PEDIDO_DEL_2_10 = join(REPO, '..', '..', '03 Producto', 'codice', 'ordenes', 'orden-33-la-web-sin-mi-espacio-por-ahora.md');
-const HAY_INSUMO = existsSync(INSUMOS) && existsSync(PEDIDO_DEL_2_10);
+/* ── El pedido del 3/10 (orden #36) ──────────────────────────────────────
+   «Libros publicados» con el tercer libro y la miniatura del taller. Llegó por
+   WhatsApp a Germán y dirección lo dejó escrito en la orden #36, entre comillas
+   latinas: esa orden es el insumo, por la misma razón que la #33. */
+const PEDIDO_DEL_3_10 = join(REPO, '..', '..', '03 Producto', 'codice', 'ordenes', 'orden-36-libros-publicados-y-miniatura.md');
+const HAY_INSUMO = existsSync(INSUMOS) && existsSync(PEDIDO_DEL_2_10) && existsSync(PEDIDO_DEL_3_10);
 const LEEME = HAY_INSUMO ? readFileSync(INSUMOS, 'utf8') : '';
 const PEDIDO = HAY_INSUMO ? readFileSync(PEDIDO_DEL_2_10, 'utf8') : '';
+const PEDIDO_36 = HAY_INSUMO ? readFileSync(PEDIDO_DEL_3_10, 'utf8') : '';
 const DIST = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 
 /**
@@ -210,6 +216,41 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
     expect(html.length, 'terminos.html no está en dist: corre el build antes').toBeGreaterThan(1000);
     expect(html, 'lo publicado').toContain(RESERVAS);
     expect(html, 'el texto de antes').not.toContain('se reservan en Mi espacio');
+  });
+
+  it('#36: «Libros publicados» con los tres, «3 libros» en el hero y el alt de la miniatura', () => {
+    const LIBROS = 'Construyendo Familias Fuertes · Padres digitalmente responsables · Inteligencias Múltiples en la Familia';
+    const CLAVE = 'Libros publicados';
+    const ALT = 'Taller · El arte de amar a tu hijo adolescente';
+    for (const valor of [LIBROS, CLAVE, ALT, '3 LIBROS']) {
+      expect(PEDIDO_36, `«${valor}» no está en el pedido del 3/10`).toContain(`«${valor}»`);
+    }
+    /* Las dos fichas. La de #quien arma el valor con tres <em>, así que se
+       compara la suma de sus partes: el texto que lee la persona. */
+    const quien = web.inicio.quien;
+    expect(quien.fichaLibrosClave).toBe(CLAVE);
+    expect([quien.fichaLibrosLibro1, quien.fichaLibrosLibro2, quien.fichaLibrosLibro3].join(quien.fichaLibrosEntre)).toBe(LIBROS);
+    expect(web.taller.facilitador.librosClave).toBe(CLAVE);
+    expect(web.taller.facilitador.librosValor).toBe(LIBROS);
+    /* El hero lo pone en mayúsculas por CSS; el texto es «3 libros». */
+    expect(web.inicio.hero.micro3.toUpperCase()).toBe('3 LIBROS');
+    expect(web.taller.head.ogImageAlt).toBe(ALT);
+
+    /* Lo publicado: «Obra» no queda como rótulo en ninguna página, ni «2 libros». */
+    for (const { archivo } of RUTAS) {
+      const ruta = join(DIST, archivo);
+      const html = existsSync(ruta) ? readFileSync(ruta, 'utf8') : '';
+      expect(html.length, `${archivo} no está en dist: corre el build antes`).toBeGreaterThan(1000);
+      expect(html, `${archivo} todavía tiene el rótulo «Obra»`).not.toMatch(/>\s*Obra\s*</);
+      expect(html, `${archivo} todavía dice «2 libros»`).not.toMatch(/>\s*2 libros\s*</i);
+    }
+    const inicio = readFileSync(join(DIST, 'index.html'), 'utf8');
+    expect(inicio, 'la ficha de #quien, con los tres en cursiva').toContain(
+      `<em>${quien.fichaLibrosLibro1}</em> · <em>${quien.fichaLibrosLibro2}</em> · <em>${quien.fichaLibrosLibro3}</em>`,
+    );
+    const merida = readFileSync(join(DIST, 'merida.html'), 'utf8');
+    expect(merida, 'la ficha de #facilitador').toContain(LIBROS);
+    expect(merida, 'el og:image:alt de /merida').toContain(`property="og:image:alt" content="${ALT}"`);
   });
 
   it('y el lector de núcleos distingue una línea de núcleo de la prosa de al lado', () => {

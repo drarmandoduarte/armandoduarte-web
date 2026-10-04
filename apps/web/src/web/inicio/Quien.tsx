@@ -40,12 +40,13 @@ export function Quien() {
               <span>{t('inicio.quien.fichaPracticaValor')}</span>
             </li>
             <li>
-              <span><Icono nombre="obra" ancho={24} alto={24} />{t('inicio.quien.fichaObraClave')}</span>
+              <span><Icono nombre="obra" ancho={24} alto={24} />{t('inicio.quien.fichaLibrosClave')}</span>
               <span>
-                {t('inicio.quien.fichaObraAntes')}
-                <em>{t('inicio.quien.fichaObraLibro1')}</em>
-                {t('inicio.quien.fichaObraEntre')}
-                <em>{t('inicio.quien.fichaObraLibro2')}</em>
+                <em>{t('inicio.quien.fichaLibrosLibro1')}</em>
+                {t('inicio.quien.fichaLibrosEntre')}
+                <em>{t('inicio.quien.fichaLibrosLibro2')}</em>
+                {t('inicio.quien.fichaLibrosEntre')}
+                <em>{t('inicio.quien.fichaLibrosLibro3')}</em>
               </span>
             </li>
             <li>
