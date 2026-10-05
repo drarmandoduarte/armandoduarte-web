@@ -28,7 +28,7 @@ export {
 } from './web/contacto';
 // La puerta desde la web a Mi espacio (orden #25), y sus banderas (orden #33).
 export {
-  APP_FAMILIA, MI_ESPACIO_EN_LA_WEB, SPOTIFY_EN_LA_WEB, SLUG_DEL_TALLER_DE_MERIDA, RUTA_RESERVAR_MERIDA, baseDeLaApp, enlaceAMiEspacio,
+  APP_FAMILIA, WEB_PUBLICA, MI_ESPACIO_EN_LA_WEB, SPOTIFY_EN_LA_WEB, SLUG_DEL_TALLER_DE_MERIDA, RUTA_RESERVAR_MERIDA, baseDeLaApp, enlaceAMiEspacio,
 } from './web/mi-espacio';
 
 // ── El panel del equipo (orden #24 A) ────────────────────────────────────────

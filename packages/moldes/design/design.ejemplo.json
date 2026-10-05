@@ -1,0 +1,44 @@
+{
+  "$comment": "Molde · design.json · esquema v1 (3/10/2026). NO reemplaza el documento de marca de cada app (crm-design-tokens.json, sperantia-design-tokens.json, migue-tokens.json): es el extracto chico, legible por código, que los moldes leen. Se deriva del documento de marca y vive al lado. Toda app tiene este archivo en la raíz de su frontend con exactamente estas claves. Los colores en hexadecimal de seis cifras. Las tipografías son nombres de Google Fonts (o 'system' para la del sistema). Los radios en píxeles (999 = píldora). 'espanol' es 'voseo' o 'neutro'. La frase de marca marca la palabra acentuada con asteriscos y va en los tres idiomas ({ es, en, pt }); un texto solo se toma como español y en los otros dos se muestra el título genérico del molde.",
+  "app": {
+    "nombre": "NombreDeLaApp",
+    "frase": {
+      "es": "Tu frase de *marca*.",
+      "en": "Your brand *line*.",
+      "pt": "Sua frase de *marca*."
+    },
+    "espanol": "neutro"
+  },
+  "color": {
+    "fondo": "#F6F1E8",
+    "papel": "#FBF8F2",
+    "texto": "#1E1E1E",
+    "texto2": "#6B6760",
+    "linea": "#D9D2C5",
+    "acento": "#9C4A2F",
+    "error": "#B4432F",
+    "ok": "#3D7A4F",
+    "aviso": "#B8791C"
+  },
+  "colorOscuro": {
+    "fondo": "#1A1816",
+    "papel": "#221F1C",
+    "texto": "#EFE9DF",
+    "texto2": "#A69F94",
+    "linea": "#3A352F",
+    "acento": "#D98562",
+    "error": "#F08A76",
+    "ok": "#7CC08F",
+    "aviso": "#E0A94A"
+  },
+  "tipografia": {
+    "sans": "Outfit",
+    "serif": "Instrument Serif",
+    "mono": "IBM Plex Mono"
+  },
+  "radio": {
+    "boton": 999,
+    "campo": 12,
+    "tarjeta": 14
+  }
+}

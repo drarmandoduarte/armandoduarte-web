@@ -17,16 +17,28 @@ alguien lo va a leer en el PR. Ése es el punto.
 
 | paquete | piso |
 |---|---|
-| `@codice/ui` | 38 |
+| `@codice/ui` | 42 |
 | `@codice/core` | 123 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 107 |
 | `@codice/web` | 83 |
-| `@codice/familia` | 169 |
+| `@codice/familia` | 222 |
 | `@codice/api` | 70 |
 | `@codice/navegador` | 65 |
 
 
+
+## Lo que trae la orden #37, PR 1 — `ui` 38 → 42, `familia` 169 → 222
+
+- **`@codice/ui` (+4)**: el bloque del `design.json` pasa al esquema del molde.
+  Ahora comprueba `validar() []` y `avisos()` sin nada, que `public/design.css`
+  sea el de `generar-css.mjs`, las fuentes propias, cada hex con su token
+  siguiendo las `ref`, y el modo oscuro a AA.
+- **`@codice/familia` (+11)**: `el-molde-esta-instalado.test.ts` (§1, §2 y §4).
+  El resto de la diferencia son tests de las #34/#35 que entraron sin subir el
+  piso. Mutación de §2: un `<Dialog>` del molde sin `closeLabel` → rojo.
+- Los tests propios del molde (`packages/moldes/*`) **no** cuentan acá: corren
+  en `moldes-apps`, y la copia la cuida el guardián de los moldes.
 
 ## Lo que trae la orden #38 — `ui` 31 → 38, `core` 102 → 123, `web` 71 → 83, `navegador` 40 → 65
 

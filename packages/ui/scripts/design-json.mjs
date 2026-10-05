@@ -14,11 +14,18 @@
  * que mira una copia no vigila nada (D27).
  *
  * Escribe dos archivos, los dos generados:
- *   · `apps/familia/design.json` — el documento que lee el molde del kit:
- *     cada rol con su token, su hex y su variable CSS;
+ *   · `apps/familia/design.json` — desde la orden #37, **en el esquema del
+ *     molde** (`packages/moldes/design/design.schema.json`): `app`, `color`,
+ *     `colorOscuro`, `tipografia` y `radio`, y nada más (el esquema no admite
+ *     otras claves; de dónde sale cada valor queda en `$comment` y en `MAPA`);
  *   · `apps/familia/src/acceso/design.css` — las variables `--acceso-*` que
- *     usan las pantallas de acceso, **por referencia** a las del canon
- *     (`var(--teal)`), nunca con el hex.
+ *     usan las pantallas de acceso de la #35, **por referencia** a las del
+ *     canon (`var(--teal)`), nunca con el hex. Se va en el PR 2 de la #37,
+ *     cuando esas pantallas pasan a ser las del molde.
+ *
+ * De `design.json` salen, con las herramientas del molde y sin tocarlas,
+ * `apps/familia/public/design.css` (`generar-css.mjs`) y
+ * `apps/familia/public/fuentes/` (`bajar-fuentes.mjs`).
  *
  * `packages/ui/tokens.test.mjs` los regenera y los compara byte a byte, y
  * afirma que cada hex del `design.json` está en el canon.
@@ -32,7 +39,40 @@ const RAIZ = join(UI, '..', '..');
 export const SALIDA_JSON = join(RAIZ, 'apps', 'familia', 'design.json');
 export const SALIDA_CSS = join(RAIZ, 'apps', 'familia', 'src', 'acceso', 'design.css');
 
-/** El mapa de la orden #35, rol → ruta del token en el canon. */
+/**
+ * El mapa de la orden #37: rol del molde → ruta del token en el canon.
+ *
+ * Claro, con la paleta CFF de Mi espacio (#29): fondo crema, papel —campos y
+ * tarjetas— cálido, tinta, gris, acento teal oscuro. `linea` es el hairline,
+ * como en la #35. Oscuro, `color.oscuro.*` (canon v1.3.0).
+ */
+export const MAPA_MOLDE = {
+  color: {
+    fondo: 'color.background.cream',
+    papel: 'color.background.surfaceWarm',
+    texto: 'color.ink.primary',
+    texto2: 'color.ink.muted',
+    linea: 'color.border.hairline',
+    acento: 'color.cff.tealDark',
+    error: 'color.semantic.danger',
+    ok: 'color.semantic.success',
+    aviso: 'color.semantic.warning',
+  },
+  colorOscuro: Object.fromEntries(
+    ['fondo', 'papel', 'texto', 'texto2', 'linea', 'acento', 'error', 'ok', 'aviso'].map((k) => [k, `color.oscuro.${k}`]),
+  ),
+  /* La marca no tiene serif (#35, §1.2 del guion): los títulos y la palabra
+     acentuada van en Montserrat, la misma de la estructura. Sin mono propia. */
+  tipografia: { sans: 'typography.families.structure', serif: 'typography.families.structure', mono: 'system' },
+  /* `radius.casa` (2 px) en botones y campos, como dibuja la casa desde la
+     #07; `radius.lg` (12 px) en tarjetas. */
+  radio: { boton: 'radius.casa', campo: 'radius.casa', tarjeta: 'radius.lg' },
+};
+
+/** La frase de marca en los tres idiomas (orden #37). */
+export const FRASE = { es: 'Entra a tu *espacio*.', en: 'Enter your *space*.', pt: 'Entre no seu *espaço*.' };
+
+/** El mapa de la orden #35 para las pantallas de acceso de entonces (`--acceso-*`). */
 export const MAPA = {
   colores: {
     fondo: 'color.background.cream',
@@ -90,33 +130,41 @@ export function generar() {
   const radioCrudo = String(leer(canon, MAPA.radio)).match(/^\d+px/)?.[0];
   if (!radioCrudo) throw new Error(`design-json: ${MAPA.radio} no es un radio`);
 
+  const documentoDeAcceso = {
+    tipografia: { sans: familia(MAPA.tipografia.sans), lectura: familia(MAPA.tipografia.lectura) },
+    radio: { css: variable(MAPA.radio) },
+  };
+
+  /* ── El design.json del molde ─────────────────────────────────────────── */
+  /** El hex de un token, siguiendo una `ref` del canon (una sola vuelta). */
+  const hexDe = (ruta) => {
+    let nodo = leer(canon, ruta);
+    if (nodo && typeof nodo === 'object' && nodo.ref) nodo = leer(canon, nodo.ref);
+    const hex = typeof nodo === 'string' ? nodo : nodo?.value;
+    if (!/^#[0-9A-F]{6}$/i.test(hex ?? '')) throw new Error(`design-json: ${ruta} no es un color del canon`);
+    return hex.toUpperCase();
+  };
+  const paleta = (mapa) => Object.fromEntries(Object.entries(mapa).map(([rol, ruta]) => [rol, hexDe(ruta)]));
+  const px = (ruta) => {
+    const n = Number(String(leer(canon, ruta)).match(/^(\d+)px/)?.[1]);
+    if (!Number.isInteger(n)) throw new Error(`design-json: ${ruta} no es un radio en px`);
+    return n;
+  };
   const documento = {
-    $nota: 'GENERADO por packages/ui/scripts/design-json.mjs desde packages/ui/codice-tokens.json (orden Códice #35). No se edita a mano: tokens.test.mjs lo regenera y lo compara byte a byte.',
-    kit: 'Kit de Seguridad 512 · guion de pantallas de acceso v1',
-    canon: { archivo: 'packages/ui/codice-tokens.json', version: canon.$meta.version },
-    nombre: 'Armando Duarte',
-    web: 'https://armandoduarte.com',
-    /* La palabra entre asteriscos es la acentuada (guion §2). */
-    frase: 'Entra a tu *espacio*.',
-    /* Tuteo mexicano (D6): «pierdes», «entra». Es el único cambio de texto que el guion permite (§5). */
-    espanol: 'neutro',
-    colores,
-    tipografia: {
-      sans: familia(MAPA.tipografia.sans),
-      lectura: familia(MAPA.tipografia.lectura),
-      /* §1.2: la marca no tiene serif → la palabra acentuada va en la misma sans, cursiva y en el acento. */
-      serif: null,
-      acentuada: { familia: 'sans', estilo: 'italic', color: 'acento' },
-    },
-    radio: { token: MAPA.radio, valor: radioCrudo, css: variable(MAPA.radio) },
+    $comment: `GENERADO por packages/ui/scripts/design-json.mjs desde packages/ui/codice-tokens.json v${canon.$meta.version} (órdenes Códice #35 y #37), en el esquema v1 del molde. No se edita a mano: tokens.test.mjs lo regenera y lo compara byte a byte. De dónde sale cada valor: MAPA_MOLDE en ese script.`,
+    app: { nombre: 'Armando Duarte', frase: FRASE, espanol: 'neutro' },
+    color: paleta(MAPA_MOLDE.color),
+    colorOscuro: paleta(MAPA_MOLDE.colorOscuro),
+    tipografia: Object.fromEntries(Object.entries(MAPA_MOLDE.tipografia).map(([rol, ruta]) => [rol, ruta === 'system' ? 'system' : leer(canon, ruta).family])),
+    radio: Object.fromEntries(Object.entries(MAPA_MOLDE.radio).map(([rol, ruta]) => [rol, px(ruta)])),
   };
 
   const json = `${JSON.stringify(documento, null, 2)}\n`;
   const lineas = [
     ...Object.entries(colores).map(([rol, c]) => `  --acceso-${rol}:var(${c.css});${' '.repeat(Math.max(1, 14 - rol.length))}/* ${c.token} */`),
-    `  --acceso-sans:var(${documento.tipografia.sans.css});`,
-    `  --acceso-lectura:var(${documento.tipografia.lectura.css});`,
-    `  --acceso-radio:var(${documento.radio.css});         /* ${MAPA.radio} · ${radioCrudo} */`,
+    `  --acceso-sans:var(${documentoDeAcceso.tipografia.sans.css});`,
+    `  --acceso-lectura:var(${documentoDeAcceso.tipografia.lectura.css});`,
+    `  --acceso-radio:var(${documentoDeAcceso.radio.css});         /* ${MAPA.radio} · ${radioCrudo} */`,
   ];
   const css = `/* GENERADO por packages/ui/scripts/design-json.mjs desde el canon (orden Códice #35).
    No se edita a mano: tokens.test.mjs lo regenera y lo compara byte a byte.

@@ -1,0 +1,169 @@
+/* Kit UI · alias semánticos. Los componentes usan SOLO estos, nunca un `--c-*`
+   ni un hex.
+
+   ── De dónde salen los colores ─────────────────────────────────────────────
+   De ningún lado de este archivo. Los escribe `@moldes/design` a partir del
+   `design.json` de la app (`--c-fondo`, `--c-acento`, … y sus escalones de letra
+   ya medidos). Esta hoja solo dice QUÉ ROL cumple cada uno, y es igual en todas
+   las apps:
+
+     acento actúa · papel sostiene · aviso avisa · error urge · gris informa · ok confirma
+
+   ── Los nombres, y el que se cambió ───────────────────────────────────────
+   Los alias vienen del kit del que se extrajo el molde, porque los componentes
+   ya los usan y están probados. Uno se renombró: el color que AVISA se llamaba
+   «accent», y al lado del `acento` del `design.json` (que es el que ACTÚA, acá
+   `--primary`) eran dos palabras iguales para dos colores distintos. Ahora es
+   `--warning`, como el `tone="warning"` de `Toast`. `tokens/sin-accent.test.js`
+   impide que el nombre viejo vuelva.
+
+   ── Los dos temas ──────────────────────────────────────────────────────────
+   Casi nada tiene bloque oscuro: el resolver escribe los `--c-*` dos veces —en
+   `:root` y en `[data-theme="dark"]`—, así que un alias que apunta a
+   `var(--c-acento)` se traduce solo. Lo que sí tiene bloque oscuro es lo que el
+   tema no cambia de pigmento sino de decisión, cada caso con su razón.
+
+   ── Los «suaves» se calculan, no se eligen ─────────────────────────────────
+   Todo `*-soft` es el color mezclado con la superficie que tiene debajo, así que
+   también se traduce solo: de día contra el papel, de noche contra el oscuro.
+   Las proporciones viven en `--mezcla-suave` y `--mezcla-suave-2` y bajan de
+   noche: sobre lo oscuro, el mismo porcentaje rinde más de lo que hace falta y
+   el chip empieza a competir con su letra. */
+:root{
+--mezcla-suave:11%;
+--mezcla-suave-2:22%;
+/* El borde de una pieza de familia: su pigmento a medio camino de la
+   transparencia. Va contra `transparent` y no contra la superficie a propósito:
+   así la misma línea sirve sobre la tarjeta y sobre la página. */
+--mezcla-linea:50%;
+
+/* ── Las superficies ─────────────────────────────────────────────────────────
+   La página es el fondo; la tarjeta, el riel y lo que flota, el papel. El riel
+   y el contenido se separan por TONO, no por línea. */
+--bg:var(--c-fondo);
+--surface:var(--c-papel);
+--sidebar-bg:var(--surface);
+--shell-bg:var(--bg);
+--surface-2:var(--c-hundido);
+--surface-sunken:var(--c-hundido);
+/* Las dos líneas. La fuerte es la del `design.json`; la suave, la misma a medio
+   camino de la transparencia, para que pertenezca al papel que tiene debajo. */
+--border-strong:var(--c-linea);
+--border:color-mix(in srgb, var(--c-linea) 60%, transparent);
+--card-border:var(--border);
+
+/* ── La tinta y sus dos escalones ────────────────────────────────────────────
+   El segundo se calcula mezclando tinta con papel; el tercero es el texto
+   secundario del `design.json`. `@moldes/design` rechaza un `design.json` cuyo
+   texto secundario no pase AA, así que los tres se leen. */
+--text:var(--c-texto);
+--text-2:color-mix(in srgb, var(--c-texto) 80%, var(--c-fondo));
+--text-3:var(--c-texto2);
+/* Se da vuelta solo: de día el papel, de noche el oscuro. */
+--text-inverse:var(--c-papel);
+
+/* ── El color que ACTÚA (el acento del design.json) ──────────────────────────
+   Los dos estados apretados se mezclan con la TINTA, y esa mezcla también se da
+   vuelta sola: de día se hunde, de noche se enciende. */
+--primary:var(--c-acento);
+--primary-hover:color-mix(in srgb, var(--c-acento) 86%, var(--c-texto));
+--primary-active:color-mix(in srgb, var(--c-acento) 74%, var(--c-texto));
+--primary-soft:color-mix(in srgb, var(--c-acento) var(--mezcla-suave), var(--surface));
+--primary-soft-2:color-mix(in srgb, var(--c-acento) var(--mezcla-suave-2), var(--surface));
+/* La letra del acento: su escalón medido contra el fondo, el papel y su chip. */
+--primary-text:var(--c-acento-texto);
+--primary-soft-fg:var(--c-acento-texto);
+--primary-linea:color-mix(in srgb, var(--c-acento) var(--mezcla-linea), transparent);
+/* De las dos tintas de la app, la que mejor se lee encima del acento (medido). */
+--on-primary:var(--c-sobre-acento);
+
+/* ── El color que AVISA ──────────────────────────────────────────────────────
+   Lo de hoy, lo que pide un ojo sin urgir. No es el acento de la marca: ese
+   es `--primary`. */
+--warning:var(--c-aviso);
+--warning-hover:color-mix(in srgb, var(--c-aviso) 86%, var(--c-texto));
+--warning-soft:color-mix(in srgb, var(--c-aviso) var(--mezcla-suave), var(--surface));
+--warning-soft-2:color-mix(in srgb, var(--c-aviso) var(--mezcla-suave-2), var(--surface));
+--warning-text:var(--c-aviso-texto);
+--warning-soft-fg:var(--c-aviso-texto);
+--warning-linea:color-mix(in srgb, var(--c-aviso) var(--mezcla-linea), transparent);
+--on-warning:var(--c-sobre-aviso);
+
+/* ── El color que URGE ───────────────────────────────────────────────────────
+   El relleno usa el escalón de letra y no el pleno: es el único relleno sólido
+   que lleva texto encima, y el pleno de un rojo medio no siempre lo sostiene. */
+--danger:var(--c-error-texto);
+--danger-hover:color-mix(in srgb, var(--c-error-texto) 86%, var(--c-texto));
+--danger-soft:color-mix(in srgb, var(--c-error) var(--mezcla-suave), var(--surface));
+--danger-text:var(--c-error-texto);
+--danger-linea:color-mix(in srgb, var(--c-error) var(--mezcla-linea), transparent);
+--on-danger:var(--c-sobre-error);
+
+/* ── El color que INFORMA ────────────────────────────────────────────────────
+   El gris de la app: informa sin competir con la marca. */
+--info:var(--c-info);
+--info-soft:color-mix(in srgb, var(--c-info) var(--mezcla-suave), var(--surface));
+--info-soft-2:color-mix(in srgb, var(--c-info) var(--mezcla-suave-2), var(--surface));
+--info-text:var(--c-info-texto);
+--info-linea:color-mix(in srgb, var(--c-info) var(--mezcla-linea), transparent);
+
+/* ── El color que CONFIRMA ───────────────────────────────────────────────────
+   El éxito no rellena nada que lleve texto adentro: un punto sí —un punto es
+   puntuación, no un bloque—. Por eso `--success` existe y `--on-success` no: la
+   regla se sostiene por lo que falta. */
+--success:var(--c-ok);
+--success-text:var(--c-ok-texto);
+--success-linea:color-mix(in srgb, var(--c-ok) var(--mezcla-linea), transparent);
+
+/* ── Las cuatro columnas del Centro de alertas ───────────────────────────────
+   Crítico urge, hoy avisa, próximamente informa, oportunidades confirma: un
+   pigmento por columna, sin repetir. Van por separado y no `var(--danger-text)`
+   suelto en la pantalla porque lo que se declara acá es la INTENCIÓN. */
+--alerta-critico:var(--danger-text);
+--alerta-hoy:var(--warning-text);
+--alerta-proximamente:var(--info-text);
+--alerta-oportunidades:var(--success-text);
+
+/* ── El color de la cuenta (white-label) ─────────────────────────────────────
+   Algunas apps dejan que cada cuenta (un consultorio, una agencia) elija su color.
+   Es el único slot que la cuenta puede ocupar, y por defecto es el acento de la
+   app. Los funcionales no se mueven: el error es error aunque la cuenta sea
+   violeta. Lo carga la app en tiempo de ejecución, no el `design.json`. */
+--cuenta-acento:var(--primary);
+--cuenta-sobre-acento:var(--on-primary);
+--cuenta-acento-mezcla:11%;
+--cuenta-acento-suave:color-mix(in srgb, var(--cuenta-acento) var(--cuenta-acento-mezcla), var(--surface));
+
+/* El foco es del color de la cuenta: el que la persona reconoce como «suyo». */
+--focus-ring:var(--cuenta-acento);
+--focus-ring-width:2px;
+--focus-ring-offset:2px;
+--overlay:color-mix(in srgb, var(--c-texto) 44%, transparent);
+--overlay-blur:8px; /* único gesto glass del sistema: el velo del diálogo */
+/* Regla única de elevación: de día lo que flota lleva sombra sobre la superficie
+   normal; de noche no hay sombra y la elevación se cuenta con superficie y borde. */
+--floating-surface:var(--surface);
+--floating-border:var(--border);
+}
+
+/* ── Lo que el tema NO traduce solo ──────────────────────────────────────────
+   Corto a propósito; cada línea con su razón. */
+[data-theme="dark"]{
+/* Sobre lo oscuro, la misma proporción rinde más de lo que hace falta. */
+--mezcla-suave:14%;
+--mezcla-suave-2:18%;
+/* De noche la tarjeta no se distingue de la página por relleno, así que el
+   borde sube un escalón. */
+--card-border:var(--border-strong);
+/* Sin sombra: la elevación de noche se cuenta con superficie y borde. */
+--floating-surface:var(--surface-2);
+--floating-border:var(--border-strong);
+--float-border-tone:var(--border-strong);
+--tooltip-bg:var(--surface-2);
+--tooltip-fg:var(--text);
+/* El velo de noche es negro y más denso: la tinta de noche es clara, y un velo
+   claro sobre la pantalla la aclararía en vez de apagarla. */
+--overlay:rgb(0 0 0 / .62);
+/* De noche el color de la cuenta no tiñe superficies: vive solo en chip y avatar. */
+--cuenta-acento-mezcla:0%;
+}

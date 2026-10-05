@@ -1,7 +1,7 @@
 {
   "$meta": {
     "name": "Códice — Design System (App Dr. Armando)",
-    "version": "1.2.5",
+    "version": "1.3.0",
     "tagline": "Construyendo familias fuertes",
     "generated": "2026-09-17",
     "philosophy": "Quiet luxury con la atmósfera del set de grabación del doctor: luz ámbar de tarde, orden, cercanía sin ruido. Restraint editorial, whitespace generoso, tipografía por encima de imagen, sin sombras, sin degradados, motion invisible.",
@@ -10,6 +10,14 @@
     ],
     "density": "comfortable",
     "changelog": [
+      {
+        "version": "1.3.0",
+        "date": "2026-10-05",
+        "orden": "Códice #37",
+        "cambios": [
+          "`color.oscuro.*`: la paleta del modo oscuro de Mi espacio, que el molde 1.1.2 exige (`colorOscuro` del `design.json`) y el canon no tenía. Propuesta de Rodolfo aprobada por dirección (5/10) para vetar en las capturas del PR 3. Sale del canon: el grafito del telón de fondo, crema de texto, el teal claro del manual CFF de acento y el ámbar de la casa de aviso, por referencia; papel, texto2, línea, error y ok son mezclas medidas (crema sobre grafito, y los semánticos aclarados hacia crema lo mínimo, en pasos de 2 %, hasta 4,5:1 sobre fondo y papel). `validar()` del molde da []."
+        ]
+      },
       {
         "version": "1.2.5",
         "date": "2026-10-05",
@@ -180,6 +188,56 @@
         "value": "#B34528",
         "role": "/matrimonios (orden #38): fondo de las secciones oscuras —«Sobre el facilitador» y el cierre— y el acento donde /merida usa el teal oscuro. Muestreada de la pared del póster del taller.",
         "contrast": "crema encima: 5,17:1 (AA para texto chico, sin oscurecer). Sobre crema, la terracota como texto o borde: 5,17."
+      }
+    },
+    "oscuro": {
+      "$description": "El modo oscuro de Mi espacio (orden #37): el `colorOscuro` del design.json del molde. Donde el color ya está en el canon va como referencia (`ref`); donde no, el valor con cómo se derivó. Los contrastes son contra `fondo` y `papel`, medidos con `razonDeContraste` del molde.",
+      "fondo": {
+        "ref": "color.chrome.graphite",
+        "role": "Fondo de la app en oscuro: el grafito del telón (D25)."
+      },
+      "papel": {
+        "value": "#212327",
+        "role": "Tarjetas y paneles en oscuro.",
+        "deriva": "crema al 5 % sobre el grafito."
+      },
+      "texto": {
+        "ref": "color.background.cream",
+        "role": "Texto en oscuro.",
+        "contrast": "16,62 sobre fondo · 14,72 sobre papel."
+      },
+      "texto2": {
+        "value": "#B6B4B1",
+        "role": "Texto secundario en oscuro.",
+        "deriva": "crema al 70 % sobre el grafito, el mismo 70 % del texto secundario sobre las secciones oscuras de la web.",
+        "contrast": "8,59 sobre fondo · 7,61 sobre papel."
+      },
+      "linea": {
+        "value": "#3A3C3E",
+        "role": "Bordes y separadores en oscuro.",
+        "deriva": "crema al 16 % sobre el grafito, como `--hair-oscura`."
+      },
+      "acento": {
+        "ref": "color.cff.tealLight",
+        "role": "Acento en oscuro: el teal claro del manual CFF.",
+        "contrast": "5,49 sobre fondo · 4,86 sobre papel."
+      },
+      "error": {
+        "value": "#B47D6D",
+        "role": "Error en oscuro.",
+        "deriva": "`color.semantic.danger` aclarado hacia crema un 22 %, el mínimo que llega a 4,5 sobre papel.",
+        "contrast": "5,16 sobre fondo · 4,57 sobre papel."
+      },
+      "ok": {
+        "value": "#74936F",
+        "role": "Éxito en oscuro.",
+        "deriva": "`color.semantic.success` aclarado hacia crema un 4 %.",
+        "contrast": "5,20 sobre fondo · 4,61 sobre papel."
+      },
+      "aviso": {
+        "ref": "color.semantic.warning",
+        "role": "Aviso en oscuro: el ámbar de la casa, que ya pasa.",
+        "contrast": "5,59 sobre fondo · 4,95 sobre papel."
       }
     },
     "chrome": {

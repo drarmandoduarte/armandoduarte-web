@@ -7,7 +7,7 @@
     "dev": "pnpm --filter @codice/web dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "node scripts/guardian-de-guardianes.mjs",
+    "test": "grep -E '  guardian/(check|huellas|revisar)\\.mjs$' HUELLAS.txt | sha256sum -c - && node guardian/check.mjs && node scripts/guardian-de-guardianes.mjs",
     "lint": "eslint .",
     "check:tuteo": "node scripts/check-tuteo.mjs",
     "check:i18n": "node scripts/check-i18n-parity.mjs",
@@ -18,7 +18,8 @@
     "check:acento": "node apps/web/check/acento.mjs",
     "check:renglones": "node apps/web/check/renglones.mjs",
     "check:altura": "node apps/web/check/altura.mjs",
-    "qa:instalar": "playwright install chromium"
+    "qa:instalar": "playwright install chromium",
+    "check:moldes": "node guardian/check.mjs"
   },
   "packageManager": "pnpm@10.4.0",
   "pnpm": {

@@ -1,7 +1,7 @@
 import { useCallback, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
-import { IDIOMAS, partirTituloDeAcceso, rellenar, type Idioma } from '@codice/core';
+import { IDIOMAS, WEB_PUBLICA, partirTituloDeAcceso, rellenar, type Idioma } from '@codice/core';
 import { guardarIdioma } from '../comun/idioma';
 import design from '../../design.json';
 
@@ -14,8 +14,9 @@ import design from '../../design.json';
  * pantalla traiga. **Sin fotos ni paneles**: el guion lo prohíbe y es regla de
  * dirección para todas las apps; la foto de Armando de la #31 se fue con esto.
  *
- * Lo que es de Armando sale del `design.json` (generado del canon): el nombre,
- * la web y, en las variables `--acceso-*` de `acceso/design.css`, los colores,
+ * Lo que es de Armando sale del `design.json` (generado del canon): el nombre
+ * (y desde la #37, en el esquema del molde, `design.app.nombre`; la web pasó a
+ * `WEB_PUBLICA` de `@codice/core`) y, en las variables `--acceso-*` de `acceso/design.css`, los colores,
  * la tipografía y el radio. Nada de eso se escribe acá.
  */
 
@@ -24,7 +25,7 @@ export function useTextos() {
   const { t, i18n } = useTranslation();
   const ta = useCallback(
     (clave: string, variables: Record<string, string | number> = {}) =>
-      rellenar(t(`auth.${clave}`), { app: design.nombre, ...variables }),
+      rellenar(t(`auth.${clave}`), { app: design.app.nombre, ...variables }),
     [t],
   );
   return { ta, idioma: (i18n.resolvedLanguage ?? 'es') as Idioma, i18n };
@@ -83,7 +84,7 @@ export function MarcoDeAcceso({
     <div className="acceso" lang={idioma}>
       <div className="acceso__columna">
         <header className="acceso__cabeza">
-          <a className="acceso__volver" href={design.web}>{ta('back')}</a>
+          <a className="acceso__volver" href={WEB_PUBLICA}>{ta('back')}</a>
           <SelectorDeIdioma />
         </header>
         <main className={`acceso__cuerpo${centrada ? ' acceso__cuerpo--centrada' : ''}`} id="contenido">

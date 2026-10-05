@@ -1,0 +1,4 @@
+guardian/check.mjs: OK
+guardian/huellas.mjs: OK
+guardian/revisar.mjs: OK
+Guardián de los moldes · v1.1.2 · 358 archivos idénticos a sus huellas.

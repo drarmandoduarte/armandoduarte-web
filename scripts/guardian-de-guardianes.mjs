@@ -302,7 +302,16 @@ function main() {
 
   let salidaDeLasSuites = 0;
   try {
-    execFileSync('pnpm', ['-r', '--if-present', 'test'], { cwd: RAIZ, stdio: 'inherit' });
+    /* ── Sin los tests propios del molde (orden #37) ──────────────────────
+       `packages/moldes/*` es una copia de `moldes-apps` que no se edita acá:
+       su integridad la cuida el guardián de los moldes, que corre ANTES que
+       este archivo en `pnpm test` (`guardian/check.mjs`, archivo por archivo
+       contra `HUELLAS.txt`). Sus tests son del molde y corren en su repo y en
+       su CI. Correrlos acá además los rompía por algo que no es nuestro:
+       `design/generar-css.test.js` arma rutas con `URL.pathname` sin
+       decodificar, y esta carpeta tiene espacios («App Dr. Armando»). Va como
+       propuesta al molde (fase-2 §12), no como arreglo en la copia. */
+    execFileSync('pnpm', ['-r', '--if-present', '--filter', '!./packages/moldes/*', 'test'], { cwd: RAIZ, stdio: 'inherit' });
   } catch (e) {
     salidaDeLasSuites = typeof e.status === 'number' ? e.status : 1;
   }

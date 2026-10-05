@@ -1,0 +1,28 @@
+/* Kit UI · lo que los componentes no pueden escribir en línea.
+   Un `style={{}}` no sabe de `@media` ni de `@keyframes`: lo poco que lo
+   necesita vive acá, con clases `molde-*`, y nada más. Sin colores, fuentes ni
+   radios propios: solo variables, igual que los componentes. */
+
+/* ── La casilla de 6 huecos (guion de pantallas §3) ──────────────────────────
+   Escritorio: 80 × 72 con 12 entre casillas. Celular (hasta 600 px): 48 × 56
+   con 8, para que las seis entren en 390. */
+.molde-otp{display:flex;justify-content:center;gap:8px;width:100%}
+.molde-otp-casilla{flex:0 1 48px;height:56px}
+@media (min-width:600px){
+.molde-otp{gap:12px}
+.molde-otp-casilla{flex-basis:80px;height:72px}
+}
+/* El cursor de la casilla activa: una barra de 1 px que parpadea. */
+@keyframes molde-cursor{0%,49%{opacity:1}50%,100%{opacity:0}}
+.molde-cursor{animation:molde-cursor 1s steps(2) infinite}
+@media (prefers-reduced-motion:reduce){.molde-cursor{animation:none}}
+
+/* ── La columna de las pantallas de acceso (guion §2) ────────────────────────
+   560 px como máximo; en celular, 24 px de margen. */
+.molde-columna{width:100%;max-width:560px;margin-inline:auto;padding-inline:24px}
+
+/* ── Las dos columnas del Uso de IA: una sola en celular ─────────────────────*/
+.molde-dos{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media (max-width:560px){.molde-dos{grid-template-columns:1fr}}
+.molde-limite{display:grid;grid-template-columns:1fr 2fr auto;gap:14px;align-items:center}
+@media (max-width:560px){.molde-limite{grid-template-columns:1fr auto}.molde-limite>.molde-limite-barra{grid-column:1/-1}}

@@ -1,0 +1,43 @@
+/* Kit UI · radios, bordes y elevación.
+
+   ── Los tres radios de la app ──────────────────────────────────────────────
+   Vienen del `design.json` (`--r-boton`, `--r-campo`, `--r-tarjeta`) y son lo
+   único de la forma que cambia por app. Doctrina: lo que se TOCA usa el radio
+   del botón (botón, chip de filtro, segmentado); lo que se ESCRIBE, el del
+   campo; lo que CONTIENE (tarjeta, diálogo, hoja), el de la tarjeta.
+
+   ── Lo que no cambia por app ───────────────────────────────────────────────
+   La escala chica (menús, insignias, globos) y la píldora de lo que es redondo
+   por naturaleza —un avatar, el riel de un interruptor, una barra de progreso—,
+   que sigue siendo redondo aunque la app tenga botones cuadrados.
+
+   Sin sombras en controles: la jerarquía la dan el relleno y el borde. La sombra
+   existe solo para lo que flota de verdad (menú, diálogo, aviso) y solo de día. */
+:root{
+--radius-boton:var(--r-boton);
+--radius-campo:var(--r-campo);
+--radius-tarjeta:var(--r-tarjeta);
+
+--radius-xs:5px;
+--radius-sm:6px;
+--radius-md:8px;
+--radius-lg:10px;
+--radius-xl:12px;
+--radius-2xl:14px;
+--radius-3xl:16px;
+--radius-pill:999px;
+
+--border-w:1px;
+--border-w-strong:1.5px;
+
+--shadow-none:none;
+--shadow-pop:0 6px 20px -6px rgb(0 0 0 / .18), 0 2px 6px -2px rgb(0 0 0 / .10);
+--shadow-dialog:0 24px 60px -12px rgb(0 0 0 / .28), 0 4px 12px -4px rgb(0 0 0 / .14);
+/* La sombra de lo que se arrastra: la única que no se apaga de noche, porque
+   viste un clon colgado del `body` que no tiene vecino contra el cual contarse. */
+--shadow-arrastre:0 24px 50px rgb(0 0 0 / .45);
+}
+[data-theme="dark"]{
+--shadow-pop:none;
+--shadow-dialog:none;
+}

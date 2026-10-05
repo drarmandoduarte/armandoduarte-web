@@ -1,0 +1,14 @@
+{
+  "$comment": "design.json de muestra: un consultorio. Papel crema, verde profundo, serif con cuerpo, botones en píldora. Sirve para el storybook y los tests; no es de ninguna app real.",
+  "app": { "nombre": "Consultorio Sur", "frase": { "es": "Cada consulta, en su *lugar*.", "en": "Every visit, in its *place*.", "pt": "Cada consulta, no seu *lugar*." }, "espanol": "neutro" },
+  "color": {
+    "fondo": "#F7F1E5", "papel": "#FCFBF7", "texto": "#1A1A1A", "texto2": "#5C695C", "linea": "#D8D2C4",
+    "acento": "#3D5A40", "error": "#C05F5F", "ok": "#6B8C73", "aviso": "#B8916C"
+  },
+  "colorOscuro": {
+    "fondo": "#242424", "papel": "#1A1A1A", "texto": "#EDE8DC", "texto2": "#9BA096", "linea": "#3B3A37",
+    "acento": "#82A886", "error": "#E07A7A", "ok": "#9CBFA2", "aviso": "#E0B47C"
+  },
+  "tipografia": { "sans": "Outfit", "serif": "Fraunces", "mono": "IBM Plex Mono" },
+  "radio": { "boton": 999, "campo": 8, "tarjeta": 16 }
+}

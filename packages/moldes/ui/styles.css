@@ -1,0 +1,9 @@
+/* Kit UI — importar UNA vez en la app, después de aplicar el design.json
+   (`aplicarDesign` de @moldes/design escribe las --c-*, --f-* y --r-*). */
+@import "tokens/semantic.css";
+@import "tokens/typography.css";
+@import "tokens/spacing.css";
+@import "tokens/shape.css";
+@import "tokens/motion.css";
+@import "tokens/base.css";
+@import "tokens/piezas.css";

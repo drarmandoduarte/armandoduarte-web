@@ -1,0 +1,68 @@
+/* Kit UI · tipografía.
+   Las tres familias salen del `design.json` (`--f-sans`, `--f-serif`, `--f-mono`,
+   con sus pilas de respaldo ya puestas por el resolver). Esta hoja dice para qué
+   se usa cada una, y la escala, que es del molde y no cambia por app.
+
+   ── Para qué es cada familia (guion de pantallas §1) ────────────────────────
+   La sans para todo, **títulos incluidos**. La serif, en cursiva y en el color
+   del acento, solo para la palabra acentuada de un título («Verifica tu
+   *identidad*.»). Por eso `--font-display` es la sans: un título del molde es
+   sans con una palabra en serif, no un título en serif. */
+:root{
+--font-ui:var(--f-sans);
+--font-display:var(--f-sans);
+--font-acento:var(--f-serif);
+--font-mono:var(--f-mono);
+
+/* Escala — pensada para densidad: 11.5/12.5/13 son tamaños de trabajo reales.
+   EN REM, y no es un detalle de estilo: de la raíz cuelga el tamaño de letra que
+   elige la persona (Ajustes → Apariencia), y en px no colgaría nada. */
+--text-2xs:0.65625rem;  /* 10.5px */
+--text-xs:0.71875rem;   /* 11.5px */
+--text-sm:0.78125rem;   /* 12.5px */
+--text-base:0.8125rem;  /* 13px   */
+--text-md:0.875rem;     /* 14px   */
+--text-lg:0.9375rem;    /* 15px   */
+--text-xl:1.0625rem;    /* 17px   */
+--text-2xl:1.25rem;     /* 20px   */
+--text-3xl:1.5rem;      /* 24px   */
+--text-4xl:1.75rem;     /* 28px   */
+--text-5xl:2.125rem;    /* 34px   */
+--text-6xl:2.75rem;     /* 44px   */
+/* El título de la pantalla de entrada (guion P1): el único que crece con la
+   ventana. Piso en rem para que un teléfono siga leyendo; techo para que un
+   monitor grande no lo vuelva un cartel. */
+--text-portada:clamp(2.5rem, 6vw, 4.5rem);
+
+--leading-tight:1.15;
+--leading-snug:1.35;
+--leading-normal:1.55;
+--leading-relaxed:1.65;
+--leading-display:1.05;
+
+--weight-regular:400;
+--weight-medium:500;
+--weight-semibold:600;
+--weight-bold:700;
+/* El peso del título en la sans. */
+--weight-display:500;
+/* El de la palabra acentuada: la cursiva de la serif en su peso normal, que es
+   el único que todas las serif de Google Fonts tienen en cursiva. */
+--weight-acento:400;
+
+--tracking-tight:-.02em;
+--tracking-display:-.015em;
+--tracking-normal:0;
+--tracking-wide:.08em;
+/* Los rótulos en versalitas: la etiqueta de un campo, el título de un bloque. */
+--tracking-rotulo:.16em;
+--tracking-eyebrow:.22em;
+--tracking-brand:.32em;
+}
+
+/* ── El tamaño de letra de la persona ────────────────────────────────────────
+   Tres escalones y no un deslizador: tres estados se verifican uno por uno.
+   `100%` es el tamaño que la persona ya tenga en su navegador — no 16px fijos. */
+:root{font-size:100%}
+:root[data-letra="grande"]{font-size:112.5%}
+:root[data-letra="muy-grande"]{font-size:125%}
