@@ -1,0 +1,6 @@
+$ pnpm test   (con process.exit(1) → process.exit(0) en guardian/check.mjs)
+sha256sum: WARNING: 1 computed checksum did NOT match
+guardian/check.mjs: FAILED
+guardian/huellas.mjs: OK
+guardian/revisar.mjs: OK
+salida: 1

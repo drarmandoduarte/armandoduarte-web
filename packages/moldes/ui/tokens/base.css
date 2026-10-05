@@ -1,0 +1,55 @@
+/* Kit UI · reset mínimo y defaults de documento. */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:var(--text-md);line-height:var(--leading-normal);-webkit-font-smoothing:antialiased;transition:var(--transition-theme)}
+h1,h2,h3,h4,h5,h6,p,figure,blockquote{margin:0}
+h1,h2,h3,h4{letter-spacing:var(--tracking-tight);line-height:var(--leading-tight);font-weight:var(--weight-bold)}
+ul,ol{margin:0;padding:0}
+img,svg,video{display:block;max-width:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--primary-text);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;transition:color var(--dur-fast) var(--ease-standard)}
+/* El hover del enlace se calcula mezclando con la tinta: se hunde de día y se
+   enciende de noche, con una sola línea para los dos temas. */
+a:hover{color:color-mix(in srgb, var(--primary-text) 78%, var(--c-texto))}
+:where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:var(--focus-ring-width) solid var(--focus-ring);outline-offset:var(--focus-ring-offset);border-radius:var(--radius-sm)}
+::selection{background:var(--primary-soft-2);color:var(--text)}
+.molde-tabular{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"lnum" 1}
+/* Cifras tabulares en todo lo que se compara en columna. */
+table,.molde-dense,[data-density]{font-variant-numeric:tabular-nums}
+.molde-display{font-family:var(--font-display);font-weight:var(--weight-display);font-style:normal;letter-spacing:var(--tracking-display);line-height:var(--leading-display)}
+/* ── La palabra acentuada (guion de pantallas §2) ────────────────────────────
+   En todo título del molde la palabra que se quiere decir despacio va en la
+   serif de la app, en cursiva y en el color del acento. Si la app no tiene serif
+   (`"serif": "system"`), cae en Georgia: sigue siendo serif, sigue siendo la
+   palabra. `em` e `i` dentro de un `.molde-display` son los únicos que la piden. */
+.molde-display em,.molde-display i{font-family:var(--font-acento);font-style:italic;font-weight:var(--weight-acento);color:var(--primary-text);letter-spacing:0}
+/* Lo que no grita hasta que se lo mira. Las acciones de una tarjeta —editar,
+   archivar— viven apagadas y suben al 100 % cuando el cursor entra en su caja o
+   algo de adentro toma el foco (sin eso, quien navega con teclado no las
+   encontraría). En un aparato SIN cursor se quedan al 60 %: esconder lo que no
+   se puede revelar es esconderlo y ya. Va en CSS y no en clases utilitarias
+   porque un `@media` compuesto con `group-hover` no sobrevive a los
+   compiladores. */
+.molde-al-pasar{opacity:.6;transition:opacity var(--dur-fast) var(--ease-standard)}
+/* Y el caso en que la capa además TAPA lo que hay debajo: donde no hay
+   cursor no hay gesto que la revele, así que no puede tapar — ocupa su lugar
+   en el renglón, entera. `-encima` va ANTES del `@media` a propósito: escritas
+   al revés, el `opacity:1` de afuera le ganaría al `opacity:0` de adentro. */
+.molde-al-pasar-encima{position:static;opacity:1}
+@media (hover:hover){
+.molde-al-pasar{opacity:0}
+.molde-al-pasar-encima{position:absolute;inset-block:0;inset-inline-end:0;opacity:0}
+.molde-al-pasar-caja:hover .molde-al-pasar,.molde-al-pasar-caja:focus-within .molde-al-pasar{opacity:1}
+}
+/* Las flechitas de `type="number"` no se dibujan.
+
+   Son el par de triangulitos que el navegador pega a la derecha de un campo
+   numérico, con su gris y su borde, que no son de la marca. Una regla y no una
+   pieza: quitarlas deja el campo siendo un `Input` del kit. El `type` sigue
+   siendo `number` (teclado numérico, `min`/`max`/`step`, flechas del teclado);
+   se va el dibujo, no la conducta. Van las dos declaraciones: los
+   pseudo-elementos `-webkit-` para Chrome, Edge y Safari, `appearance` para
+   Firefox. La clase la pone `Input` solo cuando el `type` es `number`. */
+.molde-sin-flechas::-webkit-outer-spin-button,
+.molde-sin-flechas::-webkit-inner-spin-button{-webkit-appearance:none;appearance:none;margin:0}
+.molde-sin-flechas{-moz-appearance:textfield;appearance:textfield}

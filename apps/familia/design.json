@@ -1,86 +1,44 @@
 {
-  "$nota": "GENERADO por packages/ui/scripts/design-json.mjs desde packages/ui/codice-tokens.json (orden Códice #35). No se edita a mano: tokens.test.mjs lo regenera y lo compara byte a byte.",
-  "kit": "Kit de Seguridad 512 · guion de pantallas de acceso v1",
-  "canon": {
-    "archivo": "packages/ui/codice-tokens.json",
-    "version": "1.2.5"
+  "$comment": "GENERADO por packages/ui/scripts/design-json.mjs desde packages/ui/codice-tokens.json v1.3.0 (órdenes Códice #35 y #37), en el esquema v1 del molde. No se edita a mano: tokens.test.mjs lo regenera y lo compara byte a byte. De dónde sale cada valor: MAPA_MOLDE en ese script.",
+  "app": {
+    "nombre": "Armando Duarte",
+    "frase": {
+      "es": "Entra a tu *espacio*.",
+      "en": "Enter your *space*.",
+      "pt": "Entre no seu *espaço*."
+    },
+    "espanol": "neutro"
   },
-  "nombre": "Armando Duarte",
-  "web": "https://armandoduarte.com",
-  "frase": "Entra a tu *espacio*.",
-  "espanol": "neutro",
-  "colores": {
-    "fondo": {
-      "token": "color.background.cream",
-      "hex": "#FAF7F1",
-      "css": "--crema"
-    },
-    "superficie": {
-      "token": "color.background.surfaceWarm",
-      "hex": "#F3EBDD",
-      "css": "--calido"
-    },
-    "texto": {
-      "token": "color.ink.primary",
-      "hex": "#2E2B25",
-      "css": "--tinta"
-    },
-    "secundario": {
-      "token": "color.ink.muted",
-      "hex": "#716A60",
-      "css": "--gris"
-    },
-    "acento": {
-      "token": "color.cff.tealDark",
-      "hex": "#005761",
-      "css": "--teal"
-    },
-    "borde": {
-      "token": "color.ink.muted",
-      "hex": "#716A60",
-      "css": "--gris"
-    },
-    "error": {
-      "token": "color.semantic.danger",
-      "hex": "#A05A48",
-      "css": "--error"
-    },
-    "linea": {
-      "token": "color.border.hairline",
-      "hex": "#EAE4D8",
-      "css": "--hair"
-    }
+  "color": {
+    "fondo": "#FAF7F1",
+    "papel": "#F3EBDD",
+    "texto": "#2E2B25",
+    "texto2": "#716A60",
+    "linea": "#EAE4D8",
+    "acento": "#005761",
+    "error": "#A05A48",
+    "ok": "#6E8F6A",
+    "aviso": "#B08A52"
+  },
+  "colorOscuro": {
+    "fondo": "#16181C",
+    "papel": "#212327",
+    "texto": "#FAF7F1",
+    "texto2": "#B6B4B1",
+    "linea": "#3A3C3E",
+    "acento": "#3D9CA4",
+    "error": "#B47D6D",
+    "ok": "#74936F",
+    "aviso": "#B08A52"
   },
   "tipografia": {
-    "sans": {
-      "token": "typography.families.structure",
-      "familia": "Montserrat",
-      "pesos": [
-        400,
-        500,
-        600
-      ],
-      "css": "--display"
-    },
-    "lectura": {
-      "token": "typography.families.reading",
-      "familia": "Open Sans",
-      "pesos": [
-        400,
-        600
-      ],
-      "css": "--lectura"
-    },
-    "serif": null,
-    "acentuada": {
-      "familia": "sans",
-      "estilo": "italic",
-      "color": "acento"
-    }
+    "sans": "Montserrat",
+    "serif": "Montserrat",
+    "mono": "system"
   },
   "radio": {
-    "token": "radius.casa",
-    "valor": "2px",
-    "css": "--radio"
+    "boton": 2,
+    "campo": 2,
+    "tarjeta": 12
   }
 }

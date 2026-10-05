@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    // A propósito lo contrario de la base: acá el objetivo SON los .d.ts. Con
+    // skipLibCheck en true, un `extends` roto dentro de un .d.ts no da error y
+    // la interfaz se degrada a sus miembros propios sin que nadie se entere.
+    "skipLibCheck": false,
+    "allowJs": false,
+    "noEmit": true
+  },
+  "include": ["index.d.ts", "components/**/*.d.ts"]
+}

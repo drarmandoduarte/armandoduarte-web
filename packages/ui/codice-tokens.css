@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   Códice · tokens como variables CSS · v1.2.5
+   Códice · tokens como variables CSS · v1.3.0
    Fuente: packages/ui/codice-tokens.json. Si un valor cambia, cambia allá
    primero — el JSON es el documento y esto es su forma ejecutable.
 
@@ -25,6 +25,15 @@
    No son los candidatos que la orden proponía de memoria (#6F675C, #6B6358):
    ésos llegaban a 5,21 y 5,53 sobre crema, o sea más oscuros de lo necesario.
    El criterio es el mínimo, y el mínimo se mide.
+
+   ── v1.3.0 · el modo oscuro de Mi espacio (orden Códice #37) ──────────
+   El molde 1.1.2 exige una paleta oscura (`colorOscuro` del design.json) y el
+   canon no tenía. Va en `color.oscuro.*`: referencias donde el color existe
+   (grafito, crema, teal claro, ámbar de aviso) y cinco mezclas medidas donde
+   no. Acá están SOLO esas cinco, para que el hex tenga forma ejecutable; quien
+   las pinta es el `design.css` del molde, generado desde el design.json. Y
+   **--ok** = `color.semantic.success`, que el `ok` del molde usa y no tenía
+   forma ejecutable (como `--error` en la #35).
 
    ── v1.2.5 · la terracota del taller de matrimonios (orden Códice #38) ──
    Un token nuevo y nada más: **--terracota**, la pared del póster de «Cómo
@@ -154,6 +163,13 @@
                                oscuras y el acento donde /merida usa el teal · crema encima 5,17 */
   --navy:#001B4A;           /* color.cff.navy · la tapa del segundo libro */
 
+  /* ── Modo oscuro de Mi espacio (v1.3.0, #37) · las mezclas medidas ───── */
+  --oscuro-papel:#212327;   /* color.oscuro.papel · crema al 5 % sobre el grafito */
+  --oscuro-texto2:#B6B4B1;  /* color.oscuro.texto2 · crema al 70 % · 8,59 sobre fondo */
+  --oscuro-linea:#3A3C3E;   /* color.oscuro.linea · crema al 16 % */
+  --oscuro-error:#B47D6D;   /* color.oscuro.error · danger +22 % crema · 4,57 sobre papel */
+  --oscuro-ok:#74936F;      /* color.oscuro.ok · success +4 % crema · 4,61 sobre papel */
+
   /* ── Hairlines · casi no existen; el aire separa ─────────────────────── */
   --hair:#EAE4D8;           /* color.border.hairline */
   --hair-hover:#D8CFBE;     /* color.border.hairlineHover */
@@ -161,6 +177,7 @@
 
   /* ── Error y radio (v1.2.4, #35) ────────────────────────────────────── */
   --error:#A05A48;          /* color.semantic.danger · 4,85 sobre crema */
+  --ok:#6E8F6A;             /* color.semantic.success · el `ok` del design.json del molde (#37) */
   --radio:2px;              /* radius.casa */
 
   /* ── Mezclas · se recalculan solas sobre los valores nuevos ─────────── */

@@ -14,6 +14,13 @@
  */
 export const APP_FAMILIA = 'https://familia.armandoduarte.com';
 
+/**
+ * La web pública, a donde vuelve el «Volver» del acceso. Vivía en el
+ * `design.json` de la #35; el del molde (#37) no admite claves fuera de su
+ * esquema, y una dirección es un dato del negocio, no de la marca.
+ */
+export const WEB_PUBLICA = 'https://armandoduarte.com';
+
 /* ── Las banderas de la web (orden #33) ───────────────────────────────────
    Pedido de Armando, 2/10/2026 (vía Germán): «por ahora esconder lo de Spotify
    en su web y dejar solo las reservas vía WhatsApp; esconder Mi espacio».

@@ -1,0 +1,77 @@
+/* Kit UI · espaciado y densidad. Del molde: no cambia por app.
+   Las superficies de trabajo se diseñan primero en COMPACTA (el caso real); cómoda es la relajación. */
+:root{
+--space-0:0px;--space-1:2px;--space-2:4px;--space-3:6px;--space-4:8px;--space-5:10px;
+--space-6:12px;--space-7:14px;--space-8:16px;--space-9:18px;--space-10:20px;
+--space-12:24px;--space-14:28px;--space-16:32px;--space-20:40px;--space-24:48px;
+--space-28:56px;--space-32:64px;--space-40:80px;--space-48:96px;
+
+/* Densidad COMPACTA (default en superficies operativas) */
+--row-h:36px;
+--control-h:32px;
+--control-px:var(--space-6);
+--cell-py:var(--space-4);
+--cell-px:var(--space-5);
+--card-p:var(--space-12);
+--stack:var(--space-6);
+
+--container-max:1060px;
+/* ── EL RIEL: EL ANCHO QUE HAY, MENOS LA CANALETA ───────────────────────────
+
+   Antes esto era un número: `--app-max: 1600px`. Un número no es una
+   regla, y se ve en cuanto aparece un monitor que quien lo escribió no tenía
+   delante: en 2056 el riel medía 1600 y sobraban **224 px repartidos a los
+   costados**, sin usar. En 2560 sobrarían 728, y el riel seguiría midiendo
+   1600. El contenido no crece con la pantalla; el desperdicio sí.
+
+   La regla es: **el riel crece con la ventana, la canaleta no.**
+
+     riel = ancho disponible − canaleta a cada lado, hasta el techo
+
+   · El **ancho disponible** lo da el propio shell: el `main` es un `flex: 1` al
+     lado del sidebar, así que ya mide lo que hay. No hace falta calcularlo, y
+     por eso no hay ningún `calc(100vw - …)` acá: una cuenta con el ancho del
+     sidebar adentro se rompe sola el día que el sidebar se colapsa.
+
+   · La **canaleta** son estos 24 px, iguales a los dos lados y a cualquier
+     ancho — es lo único fijo de la regla. La dibuja el shell de la app, que la
+     lee de aquí; `tokens/riel.test.js` custodia el valor.
+
+   · El **techo** existe para que un ultrawide no se vuelva una sábana, y es
+     alto a propósito: en 1920 y en 2560 no llega a tocar —el riel usa todo lo
+     que hay— y recién muerde en un 3440, donde el sobrante pasa a ser margen.
+     No está en `rem` como las medidas de lectura: el riel es un asunto del
+     monitor, no del tamaño de letra. Lo que sí cuelga de la letra son las
+     medidas de texto (`--measure-cabecera`), y esa diferencia es la que hace
+     que ensanchar el riel no estire ningún párrafo.
+
+   Y lo que NO es: **no es `--container-max`.** Ese mide 1060 px, es un ancho de
+   LECTURA —una columna de texto— y no lo usa el shell. Aplicárselo dejaría el
+   tablero de cuatro columnas igual de apretado en 1440 que en 2560. Los
+   párrafos siguen teniendo su propia medida; lo que crece es el riel. */
+--app-canaleta:24px;
+--app-techo:2400px;
+
+/* En rem, y por la misma razón que la escala de texto: el sidebar es una lista
+   de etiquetas. Con el ancho clavado en píxeles, «Configuración» en muy grande se
+   leería «Configur…» — y quien eligió muy grande es justamente quien no puede
+   leer eso. El colapsado sigue en píxeles: ahí no hay texto, hay iconos. */
+--sidebar-w:14.5rem;
+
+/* Hasta dónde crece el bloque de texto de una cabecera de pantalla.
+   Es una medida de LECTURA, no de layout: 48 rem son las ~120 letras que un ojo
+   recorre sin perder el renglón, y es el mismo valor que las once pantallas ya
+   tenían escrito a mano. En rem porque cuelga del tamaño de letra de la
+   persona: quien eligió muy grande necesita la misma cantidad de letras por
+   línea, no la misma cantidad de píxeles. */
+--measure-cabecera:48rem;
+}
+[data-density="comoda"]{
+--row-h:48px;
+--control-h:40px;
+--control-px:var(--space-9);
+--cell-py:var(--space-6);
+--cell-px:var(--space-7);
+--card-p:var(--space-14);
+--stack:var(--space-8);
+}

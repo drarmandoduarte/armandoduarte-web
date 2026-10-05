@@ -1,3 +1,5 @@
 packages:
   - "apps/*"
   - "packages/*"
+  # El molde 1.1.2 (orden #37): copiado de moldes-apps, no se edita acá.
+  - "packages/moldes/*"

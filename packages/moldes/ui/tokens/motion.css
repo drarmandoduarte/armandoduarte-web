@@ -1,0 +1,36 @@
+/* Kit UI · movimiento: late, no gira. Nada rebota, nada crece, nada rota.
+   El pulso (--pulse) queda reservado a lo que está VIVO: una urgencia activa, una grabación en curso, alguien conectado.
+   La carga son tres puntos que laten en secuencia — no hay spinners en el molde. */
+:root{
+--dur-instant:80ms /* @kind other */;
+--dur-fast:200ms /* @kind other */;
+--dur-base:180ms /* @kind other */;
+--dur-slow:250ms /* @kind other */;
+--ease-standard:cubic-bezier(.2,0,0,1); /* @kind other */
+--ease-out:cubic-bezier(0,0,.2,1); /* @kind other */
+--ease-in:cubic-bezier(.4,0,1,1); /* @kind other */
+--transition-theme:background var(--dur-slow), color var(--dur-slow), border-color var(--dur-slow);
+--dur-latido:1600ms /* @kind other */; /* ciclo del pulso, nunca menor a 1,5s */
+}
+/* El temblor de un código incorrecto (guion de pantallas §3): una vez, corto,
+   de lado. Es el único movimiento lateral del molde y existe porque es lo que
+   dice «no» sin una palabra. */
+@keyframes molde-temblor{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.molde-tiembla{animation:molde-temblor 360ms var(--ease-standard) 1}
+@keyframes molde-latido{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes molde-carga{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.molde-vivo{animation:molde-latido var(--dur-latido) var(--ease-standard) infinite}
+.molde-carga span{animation:molde-carga 1400ms var(--ease-standard) infinite}
+.molde-carga span:nth-child(2){animation-delay:200ms}
+.molde-carga span:nth-child(3){animation-delay:400ms}
+@media (prefers-reduced-motion:reduce){
+.molde-vivo,.molde-carga span,.molde-tiembla{animation:none}
+}
+@media (prefers-reduced-motion:reduce){
+:root{
+--dur-instant:0ms /* @kind other */;
+--dur-fast:0ms /* @kind other */;
+--dur-base:0ms /* @kind other */;
+--dur-slow:0ms /* @kind other */;
+}
+}

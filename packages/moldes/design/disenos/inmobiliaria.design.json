@@ -1,0 +1,14 @@
+{
+  "$comment": "design.json de muestra: una inmobiliaria. Blanco frío, azul petróleo, serif de titular, esquinas casi rectas. Sirve para el storybook y los tests; no es de ninguna app real.",
+  "app": { "nombre": "Rivera Propiedades", "frase": "Tu próxima *casa*.", "espanol": "voseo" },
+  "color": {
+    "fondo": "#F2F3F0", "papel": "#FFFFFF", "texto": "#14202B", "texto2": "#55616C", "linea": "#D3D8DA",
+    "acento": "#1F4E6B", "error": "#B23A3A", "ok": "#2F7A55", "aviso": "#A8741A"
+  },
+  "colorOscuro": {
+    "fondo": "#10171D", "papel": "#172129", "texto": "#E8ECEE", "texto2": "#9AA6AF", "linea": "#2C3943",
+    "acento": "#7FB3D5", "error": "#F08A80", "ok": "#7CC4A0", "aviso": "#E2B25C"
+  },
+  "tipografia": { "sans": "DM Sans", "serif": "DM Serif Display", "mono": "JetBrains Mono" },
+  "radio": { "boton": 6, "campo": 6, "tarjeta": 8 }
+}

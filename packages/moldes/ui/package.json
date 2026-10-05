@@ -1,0 +1,37 @@
+{
+  "name": "@moldes/ui",
+  "version": "1.1.2",
+  "private": true,
+  "type": "module",
+  "description": "Kit UI — tokens y componentes escritos contra design.json. No trae colores, fuentes ni radios propios.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./styles.css": "./styles.css"
+  },
+  "peerDependencies": {
+    "lucide-react": ">=0.454.0",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@moldes/design": "workspace:*"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "jsdom": "^30.1.1",
+    "lucide-react": "^0.508.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.6.3",
+    "vitest": "^4.1.10"
+  }
+}

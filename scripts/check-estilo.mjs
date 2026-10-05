@@ -31,7 +31,7 @@ const IGNORAR = ['node_modules', 'dist', '.git', 'e2e', 'public', 'fuentes'];
 const EXTENSIONES = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'];
 
 /**
- * Los tres archivos que el barrido saltea, cada uno con su motivo escrito. Una
+ * Los archivos que el barrido saltea, cada uno con su motivo escrito. Una
  * excepción sin motivo al lado es una excepción que dentro de un mes nadie sabe
  * si todavía vale.
  */
@@ -39,6 +39,11 @@ const EXCEPCIONES = new Map([
   ['scripts/check-tuteo.mjs', 'lleva adentro la lista de ~180 formas que caza: un guardián tiene que poder nombrar lo que persigue'],
   ['scripts/check-estilo.mjs', 'ídem — este mismo archivo escribe el patrón'],
   ['packages/ui/codice-tokens.json', 'es el documento de D6 que DEFINE la regla de dos registros: su `estilo.assistant.example` es el ejemplo canónico del registro del doctor. No se dibuja en ninguna pantalla; describir la regla no es romperla'],
+  /* #37: la capa de voseo del molde. `crearT` la suma SOLO con
+     `espanol: 'voseo'`, y el `design.json` de Mi espacio dice `neutro` (lo
+     afirma `apps/familia/src/el-molde-esta-instalado.test.ts`). El molde no se
+     edita dentro de una app: el archivo tiene que estar, idéntico a su huella. */
+  ['packages/moldes/idiomas/es-UY.json', 'la capa de voseo (es-UY) del molde 1.1.2: no se usa —Mi espacio es `neutro`— y no se puede quitar ni editar, porque el guardián de los moldes la exige idéntica'],
 ]);
 
 /**

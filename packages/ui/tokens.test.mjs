@@ -30,7 +30,7 @@
  * abajo, donde estaba el bloque.
  */
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -75,8 +75,8 @@ function contraste(hexA, hexB) {
 
 describe('los tokens de Códice', () => {
   it('la versión del documento es la que esta orden dejó', () => {
-    expect(tokens.$meta.version).toBe('1.2.5');
-    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.5');
+    expect(tokens.$meta.version).toBe('1.3.0');
+    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.3.0');
   });
 
   /*
@@ -320,43 +320,79 @@ describe('los tokens de Códice', () => {
  * guardián que mira una copia escrita a mano no vigila nada). Si alguien lo
  * edita a mano, o cambia el canon sin regenerarlo, esto se pone rojo.
  */
-describe('el design.json de Mi espacio (#35)', async () => {
-  const { generar, SALIDA_JSON, SALIDA_CSS, MAPA } = await import('./scripts/design-json.mjs');
+describe('el design.json de Mi espacio, en el esquema del molde (#35 · #37)', async () => {
+  const { generar, SALIDA_JSON, SALIDA_CSS, MAPA, MAPA_MOLDE, FRASE } = await import('./scripts/design-json.mjs');
+  const { validar, avisos, hojaDeDesign, COLORES } = await import('../moldes/design/index.js');
   const { json, css, documento } = generar();
+  const DESIGN_CSS = join(AQUI, '..', '..', 'apps', 'familia', 'public', 'design.css');
+  const FUENTES = join(AQUI, '..', '..', 'apps', 'familia', 'public', 'fuentes');
 
-  it('EL PISO, PRIMERO: generó los ocho colores, las dos familias y el radio', () => {
-    expect(Object.keys(documento.colores)).toEqual(['fondo', 'superficie', 'texto', 'secundario', 'acento', 'borde', 'error', 'linea']);
-    expect(documento.tipografia.sans.familia).toBe('Montserrat');
-    expect(documento.radio.valor).toBe('2px');
+  it('EL PISO, PRIMERO: nueve colores dos veces, tres tipografías, tres radios', () => {
+    expect(Object.keys(documento.color)).toEqual(COLORES);
+    expect(Object.keys(documento.colorOscuro)).toEqual(COLORES);
+    expect(Object.keys(documento.tipografia)).toEqual(['sans', 'serif', 'mono']);
+    expect(Object.keys(documento.radio)).toEqual(['boton', 'campo', 'tarjeta']);
   });
 
   it('EL CASO: el design.json del repo es exactamente el que sale del canon', () => {
     expect(readFileSync(SALIDA_JSON, 'utf8'), 'corre `node packages/ui/scripts/design-json.mjs`').toBe(json);
   });
 
-  it('y su forma ejecutable (las variables --acceso-*), también', () => {
+  it('validar() del molde da [] y avisos() nada', () => {
+    const delRepo = JSON.parse(readFileSync(SALIDA_JSON, 'utf8'));
+    expect(validar(delRepo)).toEqual([]);
+    expect(avisos(delRepo)).toEqual([]);
+  });
+
+  it('public/design.css es el que sale de generar-css.mjs ahora (el molde, sin tocar)', () => {
+    expect(readFileSync(DESIGN_CSS, 'utf8'), 'corre `node packages/moldes/design/generar-css.mjs apps/familia/design.json apps/familia/public`')
+      .toBe(hojaDeDesign(JSON.parse(json)));
+  });
+
+  it('las fuentes propias están: la hoja y un woff2 por cada url que nombra', () => {
+    const hoja = readFileSync(join(FUENTES, 'fuentes.css'), 'utf8');
+    const urls = [...hoja.matchAll(/url\('\/fuentes\/([^']+)'\)/g)].map((m) => m[1]);
+    expect(urls.length, 'la hoja no nombra ningún archivo').toBeGreaterThanOrEqual(2);
+    for (const u of urls) expect(existsSync(join(FUENTES, u)), u).toBe(true);
+    expect(hoja, 'nada se le pide a Google').not.toMatch(/googleapis|gstatic/);
+  });
+
+  it('y la forma ejecutable de las pantallas de la #35 (las variables --acceso-*), también', () => {
     expect(readFileSync(SALIDA_CSS, 'utf8'), 'corre `node packages/ui/scripts/design-json.mjs`').toBe(css);
   });
 
-  it('cada hex del design.json está en el canon, y es el de su token', () => {
+  it('cada hex del design.json está en el canon, y es el de su token (siguiendo las ref)', () => {
     const canonCss = readFileSync(join(AQUI, 'codice-tokens.css'), 'utf8').toUpperCase();
     const enJson = readFileSync(SALIDA_JSON, 'utf8').match(/#[0-9A-Fa-f]{6}\b/g) ?? [];
-    expect(enJson.length, 'el barrido vio los ocho').toBe(8);
+    expect(enJson.length, 'el barrido vio los dieciocho').toBe(18);
     expect(enJson.filter((h) => !canonCss.includes(h.toUpperCase()))).toEqual([]);
-    for (const [rol, ruta] of Object.entries(MAPA.colores)) {
-      const nodo = ruta.split('.').reduce((o, k) => o?.[k], tokens);
-      expect(documento.colores[rol].hex, rol).toBe(String(nodo?.value ?? nodo).toUpperCase());
+    const resolver = (ruta) => {
+      let nodo = ruta.split('.').reduce((o, k) => o?.[k], tokens);
+      if (nodo?.ref) nodo = nodo.ref.split('.').reduce((o, k) => o?.[k], tokens);
+      return String(nodo?.value ?? nodo).toUpperCase();
+    };
+    for (const bloque of ['color', 'colorOscuro']) {
+      for (const [rol, ruta] of Object.entries(MAPA_MOLDE[bloque])) expect(documento[bloque][rol], `${bloque}.${rol}`).toBe(resolver(ruta));
     }
   });
 
-  it('el mapa es el de la orden: acento teal CFF, borde ink.muted (auditoría #56), sin serif, español neutro', () => {
-    expect(MAPA.colores.acento).toBe('color.cff.tealDark');
-    /* WCAG 1.4.11: el borde de un control a 3:1 sobre el fondo, como mínimo. */
+  it('el mapa es el de la orden: paleta CFF, frase en tres idiomas, neutro, radios de la casa', () => {
+    expect(MAPA_MOLDE.color.acento).toBe('color.cff.tealDark');
+    expect(MAPA_MOLDE.color.fondo).toBe('color.background.cream');
+    expect(MAPA_MOLDE.color.papel).toBe('color.background.surfaceWarm');
+    expect(documento.app).toEqual({ nombre: 'Armando Duarte', frase: FRASE, espanol: 'neutro' });
+    expect(FRASE).toEqual({ es: 'Entra a tu *espacio*.', en: 'Enter your *space*.', pt: 'Entre no seu *espaço*.' });
+    expect(documento.radio).toEqual({ boton: 2, campo: 2, tarjeta: 12 });
+    /* La #35 sigue: el borde de los campos de sus pantallas, ink.muted (auditoría #56). */
     expect(MAPA.colores.borde).toBe('color.ink.muted');
-    expect(contraste(documento.colores.borde.hex, documento.colores.fondo.hex)).toBeGreaterThanOrEqual(3);
-    expect(documento.tipografia.serif).toBeNull();
-    expect(documento.tipografia.acentuada).toEqual({ familia: 'sans', estilo: 'italic', color: 'acento' });
-    expect(documento.espanol).toBe('neutro');
-    expect(documento.frase).toBe('Entra a tu *espacio*.');
+  });
+
+  it('el modo oscuro (v1.3.0): texto y texto2 a AA sobre fondo y papel, y acento, error, ok y aviso también', () => {
+    const o = documento.colorOscuro;
+    for (const tinta of ['texto', 'texto2', 'acento', 'error', 'ok', 'aviso']) {
+      for (const papel of ['fondo', 'papel']) {
+        expect(contraste(o[tinta], o[papel]), `${tinta} sobre ${papel}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
   });
 });

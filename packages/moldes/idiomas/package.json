@@ -1,0 +1,24 @@
+{
+  "name": "@moldes/idiomas",
+  "version": "1.1.2",
+  "private": true,
+  "type": "module",
+  "description": "Molde · t(clave, variables), los textos del molde en es/en/pt y la capa es-UY de voseo.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./es.json": "./es.json",
+    "./en.json": "./en.json",
+    "./pt.json": "./pt.json",
+    "./es-UY.json": "./es-UY.json"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10",
+    "typescript": "^5.6.3"
+  }
+}

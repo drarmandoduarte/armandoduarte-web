@@ -1,0 +1,9 @@
+$ pnpm test   (con una coma de más en packages/moldes/ui/components/acceso/Antetitulo.jsx)
+guardian/check.mjs: OK
+guardian/huellas.mjs: OK
+guardian/revisar.mjs: OK
+
+GUARDIÁN DE LOS MOLDES · rojo (1):
+  Cambió: ui/components/acceso/Antetitulo.jsx. El molde no se edita dentro de una app: se revierte, o se propone al molde.
+
+salida: 1

@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/german-falcioni/moldes-apps/blob/main/packages/design/design.schema.json",
+  "title": "design.json · esquema v1 (molde)",
+  "description": "El extracto chico, legible por código, de la marca de una app. Lo leen todos los moldes.",
+  "type": "object",
+  "required": [
+    "app",
+    "color",
+    "colorOscuro",
+    "tipografia",
+    "radio"
+  ],
+  "properties": {
+    "$comment": {
+      "type": "string"
+    },
+    "app": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nombre",
+        "frase",
+        "espanol"
+      ],
+      "properties": {
+        "nombre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frase": {
+          "description": "La frase de marca, con la palabra acentuada entre asteriscos. Un texto (español) o la frase en cada idioma; el idioma que falte usa el título genérico del molde.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "\\*[^*]+\\*"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "properties": {
+                "es": {
+                  "type": "string",
+                  "pattern": "\\*[^*]+\\*"
+                },
+                "en": {
+                  "type": "string",
+                  "pattern": "\\*[^*]+\\*"
+                },
+                "pt": {
+                  "type": "string",
+                  "pattern": "\\*[^*]+\\*"
+                }
+              }
+            }
+          ]
+        },
+        "espanol": {
+          "enum": [
+            "voseo",
+            "neutro"
+          ]
+        }
+      }
+    },
+    "color": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fondo",
+        "papel",
+        "texto",
+        "texto2",
+        "linea",
+        "acento",
+        "error",
+        "ok",
+        "aviso"
+      ],
+      "properties": {
+        "fondo": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "papel": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "texto": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "texto2": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "linea": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "acento": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "error": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "ok": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "aviso": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "colorOscuro": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fondo",
+        "papel",
+        "texto",
+        "texto2",
+        "linea",
+        "acento",
+        "error",
+        "ok",
+        "aviso"
+      ],
+      "properties": {
+        "fondo": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "papel": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "texto": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "texto2": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "linea": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "acento": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "error": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "ok": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "aviso": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "tipografia": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sans",
+        "serif",
+        "mono"
+      ],
+      "properties": {
+        "sans": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nombre de Google Fonts, o 'system'"
+        },
+        "serif": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nombre de Google Fonts, o 'system'"
+        },
+        "mono": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nombre de Google Fonts, o 'system'"
+        }
+      }
+    },
+    "radio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "boton",
+        "campo",
+        "tarjeta"
+      ],
+      "properties": {
+        "boton": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999,
+          "description": "Píxeles; 999 = píldora"
+        },
+        "campo": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999,
+          "description": "Píxeles; 999 = píldora"
+        },
+        "tarjeta": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999,
+          "description": "Píxeles; 999 = píldora"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

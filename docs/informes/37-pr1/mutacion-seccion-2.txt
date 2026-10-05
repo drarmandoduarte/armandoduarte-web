@@ -1,0 +1,5 @@
+$ cd apps/familia && npx vitest run src/el-molde-esta-instalado.test.ts   (con un <Dialog> del molde sin closeLabel en src/mutacion-tmp.tsx)
+     × ningún uso sin su texto (hoy: 1 usos de piezas del molde) 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
++   "mutacion-tmp.tsx: <Dialog> sin closeLabel",
+      Tests  1 failed | 10 passed (11)

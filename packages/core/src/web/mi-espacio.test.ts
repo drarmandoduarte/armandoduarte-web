@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { APP_FAMILIA, RUTA_RESERVAR_MERIDA, baseDeLaApp, enlaceAMiEspacio } from './mi-espacio';
+import { APP_FAMILIA, RUTA_RESERVAR_MERIDA, baseDeLaApp, enlaceAMiEspacio, WEB_PUBLICA } from './mi-espacio';
 
 describe('la puerta a Mi espacio (orden #25, A)', () => {
   it('la dirección de la app es el subdominio de Armando', () => {
     expect(APP_FAMILIA).toBe('https://familia.armandoduarte.com');
+    expect(WEB_PUBLICA, '#37: el «Volver» del acceso').toBe('https://armandoduarte.com');
   });
 
   it('sin destino, a /entrar; con destino, /entrar?ir= con la ruta codificada', () => {
