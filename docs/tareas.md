@@ -282,7 +282,7 @@ entera después, no solo las líneas marcadas.
 
 ## Pendientes abiertos
 
-### 18. Los renglones de una palabra de `/matrimonios` · **pendiente: de dirección** (orden #38, 5/10/2026)
+### 18. Los renglones de una palabra de `/matrimonios` · **cerrado: aprobados por dirección** en la auditoría del PR #58 (5/10/2026); pasaron de `PENDIENTES` a `APROBADAS` en la #38-bis
 
 Seis filas nuevas en `PENDIENTES` de `apps/web/check/renglones.mjs`, de dos
 clases que ya estaban:

@@ -1,0 +1,3 @@
+# Orden Códice #38-bis: el rótulo de matrimonios en el pie y el menú
+
+«Matrimonios» → «Cómo sanar un matrimonio herido · En línea» en el pie y en el menú, con las mismas claves (`comun.pie.tallerMatrimonios` y `comun.nav.matrimonios`). Capturas actualizadas por la orden #38-bis: el texto y las imágenes de las cinco páginas a 1440/900/390, más `overlay-1440/390`. El único cambio de texto es ese rótulo, y los enlaces quedan iguales. Además, los seis renglones aprobados en la auditoría del PR #58 pasan de `PENDIENTES` a `APROBADAS` en `check/renglones.mjs` y se cierra el punto 18 de `docs/tareas.md`. Gate verde.

@@ -149,6 +149,16 @@ export const APROBADAS = [
      letras; a 24 px y cinco columnas es la mejor lectura. */
   ['#programa h3', 'adolescencia', 'cola del Núcleo 1, «Estudiar la adolescencia»: una palabra larga, aprobada en la auditoría del PR #35. A 1440, 390 y 375', 1],
   ['#programa h3', 'cambios', 'cola del Núcleo 5, «Realizar los cambios»: una palabra larga, aprobada en la auditoría del PR #35. A 1440', 1],
+  /* ── `/matrimonios`, aprobados en la auditoría del PR #58 (CEO, 5/10) ──────
+     «MATRIMONIO / HERIDO» es el diseño, como «ADOLESCENTE»: la forma de la
+     orden y del póster. Los títulos de las fortalezas en la columna de 227 px,
+     como los núcleos de la #35. No se achica nada. */
+  ['#inicio h1', 'MATRIMONIO', '/matrimonios: el titular del hero, una palabra por renglón como el póster. Aprobado en la auditoría del PR #58. A los cuatro anchos', 1],
+  ['#inicio h1', 'HERIDO', '/matrimonios: el mismo titular, segunda palabra. Aprobado en la auditoría del PR #58', 1],
+  ['#programa h3', 'Desarmar', '/matrimonios: «Desarmar la energía destructiva» en tres renglones a 1440. Aprobado en la auditoría del PR #58', 1],
+  ['#programa h3', 'destructiva', '/matrimonios: la misma fortaleza, cola, a 1440. Aprobado en la auditoría del PR #58', 1],
+  ['#programa h3', 'profundas', '/matrimonios: cola de «Sanar heridas profundas» a 1440, 390 y 375. Aprobado en la auditoría del PR #58', 1],
+  ['#programa h3', 'Reactivar', '/matrimonios: «Reactivar lo positivo», primer renglón, a 1440. Aprobado en la auditoría del PR #58', 1],
 ];
 
 /**
@@ -184,20 +194,6 @@ export const PENDIENTES = [
   ['#programa h3', 'Comprender', 'renglón del medio del Núcleo 3, «Comprender nuestra familia», a 1440 y 900', 1],
   ['#reservar h2', 'padres', 'el cierre («El amor incondicional no es la ausencia de límites…») mide siete renglones a 375, y `text-wrap: balance` de Chromium sólo trabaja hasta seis', 1],
   ['#reservar h2', 'conscientes.', 'el mismo cierre, último renglón, a 375', 1],
-  /* ── `/matrimonios` (orden #38) ───────────────────────────────────────── */
-  /* El hero: la orden pide «MATRIMONIO HERIDO» en su renglón y en naranja,
-     «como ADOLESCENTE», y a 80 px las dos palabras no entran juntas en la
-     columna del hero (que no se toca, #23). Quedan una por renglón, que es
-     además la forma del póster. Se arregla aprobándolo como «ADOLESCENTE» o
-     cambiando el tamaño del titular; las dos son de dirección. */
-  ['#inicio h1', 'MATRIMONIO', '/matrimonios: «MATRIMONIO HERIDO» no entra en un renglón a 80 px; la forma de la orden y del póster. A los cuatro anchos', 1],
-  ['#inicio h1', 'HERIDO', '/matrimonios: el mismo titular, segunda palabra. A los cuatro anchos', 1],
-  /* Las fortalezas: la misma columna de 227 px a 24 px de los núcleos de
-     `/merida` (que tienen dos aprobados y uno pendiente por lo mismo). */
-  ['#programa h3', 'Desarmar', '/matrimonios: «Desarmar la energía destructiva» en tres renglones a 1440', 1],
-  ['#programa h3', 'destructiva', '/matrimonios: la misma fortaleza, cola, a 1440', 1],
-  ['#programa h3', 'profundas', '/matrimonios: cola de «Sanar heridas profundas» a 1440, 390 y 375', 1],
-  ['#programa h3', 'Reactivar', '/matrimonios: «Reactivar lo positivo», primer renglón, a 1440', 1],
 ];
 
 /** Las dos listas juntas es lo que el barrido aplica. */
