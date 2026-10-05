@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   Códice · tokens como variables CSS · v1.2.4
+   Códice · tokens como variables CSS · v1.2.5
    Fuente: packages/ui/codice-tokens.json. Si un valor cambia, cambia allá
    primero — el JSON es el documento y esto es su forma ejecutable.
 
@@ -25,6 +25,11 @@
    No son los candidatos que la orden proponía de memoria (#6F675C, #6B6358):
    ésos llegaban a 5,21 y 5,53 sobre crema, o sea más oscuros de lo necesario.
    El criterio es el mínimo, y el mínimo se mide.
+
+   ── v1.2.5 · la terracota del taller de matrimonios (orden Códice #38) ──
+   Un token nuevo y nada más: **--terracota**, la pared del póster de «Cómo
+   sanar un matrimonio herido». Solo en `/matrimonios`, donde `/merida` usa el
+   teal oscuro. Crema encima da 5,17:1: AA para texto chico sin oscurecerla.
 
    ── v1.2.4 · error y radio, escritos (orden Códice #35) ──────────────────
    Dos formas ejecutables de cosas que ya existían: **--error** es
@@ -145,6 +150,8 @@
   --teal-medio:#3D9CA4;     /* color.cff.tealLight · SOLO ≥ 24 px o íconos, y SOLO sobre crema (3,03)
                                o blanco (3,24). Sobre cálido da 2,73 y sobre el teal oscuro 2,56:
                                ahí no sirve ni para un ícono. Lo afirma `tokens.test.mjs`. */
+  --terracota:#B34528;      /* color.matrimonio.terracota · #38, SOLO /matrimonios: las secciones
+                               oscuras y el acento donde /merida usa el teal · crema encima 5,17 */
   --navy:#001B4A;           /* color.cff.navy · la tapa del segundo libro */
 
   /* ── Hairlines · casi no existen; el aire separa ─────────────────────── */

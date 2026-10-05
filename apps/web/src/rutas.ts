@@ -1,5 +1,5 @@
 /**
- * Las cuatro rutas de la web pública, en un solo lugar.
+ * Las rutas de la web pública, en un solo lugar (cinco desde la #38).
  *
  * Están acá y no sueltas dentro del `<Routes>` porque **tres cosas distintas
  * tienen que estar de acuerdo sobre esta lista**: el router del cliente, el
@@ -30,12 +30,15 @@ export interface Ruta {
   /** El archivo que el prerender escribe en `dist/`. */
   archivo: string;
   /** La clave de i18n con el `<head>` de esa página. */
-  pagina: 'inicio' | 'taller' | 'privacidad' | 'terminos';
+  pagina: 'inicio' | 'taller' | 'matrimonios' | 'privacidad' | 'terminos';
 }
 
 export const RUTAS: readonly Ruta[] = [
   { ruta: '/', archivo: 'index.html', pagina: 'inicio' },
   { ruta: '/merida', archivo: 'merida.html', pagina: 'taller' },
+  /* #38: el segundo taller, en línea. La ruta la eligió Armando; no es una
+     ciudad porque el taller no tiene una. */
+  { ruta: '/matrimonios', archivo: 'matrimonios.html', pagina: 'matrimonios' },
   { ruta: '/privacidad', archivo: 'privacidad.html', pagina: 'privacidad' },
   { ruta: '/terminos', archivo: 'terminos.html', pagina: 'terminos' },
 ] as const;

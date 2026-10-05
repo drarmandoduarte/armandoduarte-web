@@ -42,6 +42,7 @@ import { PUERTO_PORT } from '../playwright.config';
 const PAGINAS = [
   { nombre: 'inicio', ruta: '/' },
   { nombre: 'taller', ruta: '/merida' },
+  { nombre: 'matrimonios', ruta: '/matrimonios' },
   { nombre: 'privacidad', ruta: '/privacidad' },
   { nombre: 'terminos', ruta: '/terminos' },
 ] as const;

@@ -14,7 +14,8 @@
       "libros": "Libros",
       "programa": "Construyendo Familias Fuertes",
       "contacto": "Contacto",
-      "miEspacio": "Mi espacio"
+      "miEspacio": "Mi espacio",
+      "matrimonios": "Matrimonios"
     },
     "cabecera": {
       "abrirMenu": "Abrir menú",
@@ -46,7 +47,8 @@
       "copyright": "© 2026 · Armando Duarte",
       "contacto": "Contacto",
       "privacidadCorta": "Privacidad",
-      "aria": "Armando Duarte"
+      "aria": "Armando Duarte",
+      "tallerMatrimonios": "Matrimonios"
     },
     "mensajes": {
       "general": "Hola, Armando. Te escribo desde tu página web.",
@@ -81,7 +83,14 @@
       "meta1": "Fiesta Inn Mérida",
       "meta2": "Jueves 5 de noviembre",
       "meta3": "8:30 a 13:00",
-      "cta": "Reservar mi lugar"
+      "cta": "Reservar mi lugar",
+      "matrimonios": {
+        "titulo": "Cómo sanar un matrimonio herido · taller en línea",
+        "meta1": "100% en línea (vía Zoom)",
+        "meta2": "Jueves 29 de octubre",
+        "meta3": "7:00 a 9:00 pm (hora de CDMX)",
+        "cta": "Asegurar mi lugar"
+      }
     },
     "quien": {
       "eyebrow": "Quién soy",
@@ -330,6 +339,128 @@
       "ctaReservar": "Reservar mi lugar",
       "ctaWhatsapp": "Prefiero escribir por WhatsApp",
       "ctaConocer": "Conocer a Armando"
+    }
+  },
+  "matrimonios": {
+    "head": {
+      "title": "Cómo sanar un matrimonio herido · Taller en línea con Armando Duarte",
+      "description": "Taller en línea vía Zoom con Armando Duarte para sanar tu matrimonio: 6 meses de acompañamiento. Inicia el jueves 29 de octubre de 2026, 7:00 a 9:00 pm (CDMX).",
+      "ogImageAlt": "Taller · Cómo sanar un matrimonio herido"
+    },
+    "mensaje": "Hola, quiero asegurar mi lugar en el taller Cómo sanar un matrimonio herido.",
+    "reservar": "Asegurar mi lugar en el taller",
+    "otroPais": "Desde otro país",
+    "hero": {
+      "eyebrow": "Taller en línea · Vía Zoom",
+      "titulo1": "Cómo sanar un",
+      "titulo2Palabra": "MATRIMONIO HERIDO",
+      "sub": "Todo lo que necesitas para fortalecer tu relación",
+      "ctaPrograma": "Ver el programa",
+      "micro1": "6 meses",
+      "micro2": "Jueves 29 de octubre",
+      "micro3": "7:00 a 9:00 pm CDMX",
+      "fotoAlt": "Armando Duarte"
+    },
+    "hechos": {
+      "iniciaClave": "Inicia",
+      "iniciaValor": "Jueves 29 de octubre de 2026",
+      "horarioClave": "Horario",
+      "horarioValor": "7:00 a 9:00 pm (hora de CDMX)",
+      "modalidadClave": "Modalidad",
+      "modalidadValor": "100% en línea (vía Zoom)",
+      "duracionClave": "Duración",
+      "duracionValor": "6 meses"
+    },
+    "mirarse": {
+      "titulo": "¿Hace cuánto tiempo dejaron de mirarse con ilusión?",
+      "bajada": "Tómate un momento para reflexionar con honestidad sobre el estado actual de tu relación:",
+      "uno": "¿Sientes que van por diferentes caminos, aunque viven bajo el mismo techo?",
+      "dos": "¿Las conversaciones terminan en discusiones, sarcasmos o silencios hirientes?",
+      "tres": "¿Te da miedo admitir que la rutina y la apatía apagaron por completo la pasión entre ustedes?",
+      "cuatro": "¿Sientes que toca tu cuerpo, pero los corazones ya no conectan?",
+      "cinco": "¿Te parte el corazón ver cómo tus hijos absorben la tensión, las miradas frías y la distancia de sus padres?",
+      "cita": "«El amor no muere por falta de espacio; muere por acumulación de indiferencia.»"
+    },
+    "dolor": {
+      "titulo": "El dolor de un matrimonio herido no tiene por qué ser el final",
+      "cuerpo1": "Cuando la apatía emocional se instala en la pareja, el desprecio verbal se vuelve lo cotidiano y las miradas están vacías, aparece el temor al divorcio. Al sentir el peso del rencor por errores pasados y la amarga sensación del mutuo desinterés, sentimos que se desmorona el proyecto más importante de nuestra vida.",
+      "hijos": "Sin embargo, las Ciencias de la Familia nos demuestran una verdad profunda: ",
+      "hijosFuerte": "tus hijos no necesitan padres perfectos, necesitan ver que el amor verdadero sabe luchar, reparar y sanar.",
+      "rival": "Tu pareja no es el rival a vencer, nuestro verdadero enemigo es la ignorancia. Lo que sabemos hoy, ya demostró ser insuficiente. Nuestra tarea es aprender herramientas para sanar la relación. Acabemos con la ignorancia, no con la relación.",
+      "cita": "«No están solos ni son malas personas. Lo que están sufriendo no es falta de amor, es que han repetido patrones disfuncionales aprendidos en casa».",
+      "llantoAlt": "Una mujer llora con la cara entre las manos mientras su pareja mira el teléfono",
+      "hijoAlt": "Un hijo sentado entre sus padres, que discuten de espaldas"
+    },
+    "giro": {
+      "titulo1": "La certeza que transformará tu vida:",
+      "titulo2": "¡TODO PROBLEMA TIENE SOLUCIÓN!",
+      "cuerpo": "Un matrimonio herido no está condenado a muerte. La vida de todo ser humano pasa por periodos de salud y enfermedad, eso es lo natural. En la vida si nos caemos, nos levantamos. Los matrimonios venimos de la debilidad y caminamos hacia la fortaleza. Al final del túnel hay una luz de esperanza: la formación lleva a la transformación.",
+      "cita": "«No esperes a estar motivado para actuar; actúa para recuperar la vitalidad.»",
+      "fotoAlt": "Dos manos que se buscan, en blanco y negro"
+    },
+    "fortalezas": {
+      "titulo": "Las fortalezas que desarrollarás en este viaje de 6 meses",
+      "bajada": "A lo largo de este acompañamiento cercano y práctico vía Zoom, trabajarán paso a paso para:",
+      "uno": {
+        "titulo": "Desarmar la energía destructiva",
+        "texto": "Detener las faltas de respeto, el sarcasmo y los ataques, aprendiendo a comunicarse con empatía y asertividad."
+      },
+      "dos": {
+        "titulo": "Sanar heridas profundas",
+        "texto": "Superar el rencor, la desconfianza y los errores del pasado con herramientas efectivas de perdón."
+      },
+      "tres": {
+        "titulo": "Reactivar lo positivo",
+        "texto": "Recuperar la conexión emocional, aprender para que la intimidad sea satisfactoria para ambos, consolidar el reconocimiento diario."
+      },
+      "cuatro": {
+        "titulo": "Proteger la salud emocional de sus hijos",
+        "texto": "Brindarles la seguridad insustituible de crecer en un hogar unido, seguro y lleno de paz."
+      },
+      "cinco": {
+        "titulo": "Reconstruir su proyecto de vida",
+        "texto": "Soñar juntos otra vez, tener metas de futuro y mantener la ilusión de llegar a viejitos juntos."
+      }
+    },
+    "frases": {
+      "titulo": "Frases poderosas para recordar en el camino",
+      "uno": "«El progreso diario vence al espejismo de hacer solo una gran cosa.»",
+      "dos": "«Sanar tu matrimonio es el mayor regalo de amor para tus hijos.»",
+      "tres": "«La distancia en la pareja no la miden los metros, sino la falta de cariño.»",
+      "cuatro": "«No están solos: el amor se aprende, se cuida y se restaura.»",
+      "unoAlt": "Las manos de una pareja mayor, con el anillo de bodas",
+      "dosAlt": "Una familia abrazada al aire libre",
+      "tresAlt": "Una pareja mayor abrazada y riendo, en blanco y negro",
+      "cuatroAlt": "Una pareja mayor, frente con frente, sonriendo"
+    },
+    "facilitador": {
+      "eyebrow": "Sobre el facilitador",
+      "titulo1": "Armando Duarte.",
+      "titulo2": "Experto en familia.",
+      "bioNombre": "Armando Duarte",
+      "bio": " es un experto en familia. Casado y padre de 7 hijos. Dedica 1000 horas al año para atender en sesiones de consultoría familiar a parejas que pasan por dificultades. Cuenta con estudios de Licenciatura en Ciencias de la Familia, Maestría en Educación y Doctorado en Liderazgo.",
+      "cita": "«Mi propósito es acompañar a los matrimonios a encontrar la raíz de sus problemas y descubrir soluciones positivas a favor del matrimonio y la familia».",
+      "citaFirma": "Armando Duarte",
+      "fotoAlt": "Armando Duarte"
+    },
+    "cierre": {
+      "titulo": "¿Están listos para luchar?",
+      "cuerpo": "No permitan que la inercia, el miedo o la moda del «divorcio civilizado» decidan el destino de su familia. Sostener la esperanza y tomar acción hoy es la decisión más valiosa que pueden tomar por su futuro y por sus hijos.",
+      "modalidadClave": "Modalidad",
+      "modalidadValor": "100% En línea (vía Zoom)",
+      "duracionClave": "Duración",
+      "duracionValor": "6 meses de formación, acompañamiento y guía",
+      "iniciaClave": "Inicia",
+      "iniciaValor": "Jueves 29 de octubre 2026",
+      "inversionClave": "Inversión por pareja",
+      "inversionValor": "$1,170 MXN (6 mensualidades)",
+      "incluyeClave": "Incluye:",
+      "incluye1": "Acceso a las sesiones en vivo",
+      "incluye2": "Acceso a las grabaciones",
+      "incluye3": "Apuntes para cada una de las sesiones",
+      "incluye4": "Tarea a través de whatsapp (películas, libros, audiolibros, cuestionarios, videos)",
+      "llamado": "¡Inscríbanse hoy mismo y comiencen a sanar su matrimonio!",
+      "telefonos": "México (+52) 462 199 3143 · Otros países (+52) 462 251 1017"
     }
   },
   "privacidad": {

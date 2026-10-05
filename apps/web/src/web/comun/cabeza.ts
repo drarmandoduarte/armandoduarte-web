@@ -27,7 +27,7 @@ import { enlaceReservarMiLugar } from './mi-espacio';
  * `check:tokens` no deja ningún hex en `apps/`.
  */
 
-export type Pagina = 'inicio' | 'taller' | 'privacidad' | 'terminos';
+export type Pagina = 'inicio' | 'taller' | 'matrimonios' | 'privacidad' | 'terminos';
 
 const SITIO = 'https://armandoduarte.com';
 const CREMA = tokens.color.background.cream.value;
@@ -53,6 +53,7 @@ const ICONOS: Etiqueta[] = [
 const CANONICA: Record<Pagina, string> = {
   inicio: `${SITIO}/`,
   taller: `${SITIO}/merida`,
+  matrimonios: `${SITIO}/matrimonios`,
   privacidad: `${SITIO}/privacidad`,
   terminos: `${SITIO}/terminos`,
 };
@@ -73,11 +74,18 @@ const CANONICA: Record<Pagina, string> = {
  * `img/og.jpg` —la que `check/og-taller.html` genera— deja de estar enlazada
  * desde ninguna página; queda en el repo y está anotado en `docs/creditos.md`.
  */
-const OG_IMAGENES: Record<'inicio' | 'taller', { archivo: string; ancho: number; alto: number }[]> = {
+const OG_IMAGENES: Record<'inicio' | 'taller' | 'matrimonios', { archivo: string; ancho: number; alto: number }[]> = {
   inicio: [{ archivo: 'og-home.jpg', ancho: 1200, alto: 630 }],
   taller: [
     { archivo: 'og-merida-1200x630.jpg', ancho: 1200, alto: 630 },
     { archivo: 'og-merida-1200x1200.jpg', ancho: 1200, alto: 1200 },
+  ],
+  /* #38: el póster 1×1 que Armando pidió «como imagen del botón», y su
+     apaisada (el cuadrado entero sobre el mismo póster desenfocado). Mismo
+     orden que `/merida`: primero la de 630, después la cuadrada de WhatsApp. */
+  matrimonios: [
+    { archivo: 'og-matrimonios-1200x630.jpg', ancho: 1200, alto: 630 },
+    { archivo: 'og-matrimonios-1200x1200.jpg', ancho: 1200, alto: 1200 },
   ],
 };
 
@@ -135,6 +143,47 @@ const EVENTO_MERIDA = {
   },
 } as const;
 
+/**
+ * El `Event` de `/matrimonios` (orden #38).
+ *
+ * En línea: `OnlineEventAttendanceMode` y un `VirtualLocation` con la URL de la
+ * página, que es lo que schema.org pide cuando no hay lugar físico. La fecha es
+ * la de la **primera sesión** —jueves 29/10/2026, 19:00 a 21:00 de CDMX—, que
+ * es lo que la orden fija; los seis meses van en la descripción. CDMX está en
+ * −6 todo el año desde que México dejó el horario de verano (2022).
+ *
+ * El precio va con su `description` literal de la orden («Por pareja, 6
+ * mensualidades»): $1,170 MXN es lo que Armando escribió, y si quiso decir
+ * otra cosa lo dice él (decisión 4 del CEO).
+ */
+const EVENTO_MATRIMONIOS = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: 'Cómo sanar un matrimonio herido · taller en línea',
+  description: 'Taller en línea vía Zoom con Armando Duarte: 6 meses de formación, acompañamiento y guía para matrimonios.',
+  eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+  eventStatus: 'https://schema.org/EventScheduled',
+  image: [`${SITIO}/img/og-matrimonios-1200x630.jpg`, `${SITIO}/img/og-matrimonios-1200x1200.jpg`],
+  startDate: '2026-10-29T19:00:00-06:00',
+  endDate: '2026-10-29T21:00:00-06:00',
+  location: { '@type': 'VirtualLocation', url: `${SITIO}/matrimonios` },
+  organizer: { '@type': 'Person', name: 'Armando Duarte', url: `${SITIO}/` },
+  performer: { '@type': 'Person', name: 'Armando Duarte' },
+  offers: {
+    '@type': 'Offer',
+    price: 1170,
+    priceCurrency: 'MXN',
+    description: 'Por pareja, 6 mensualidades',
+    availability: 'https://schema.org/InStock',
+  },
+} as const;
+
+/** El `Event` de cada página que tiene uno. */
+const EVENTOS: Partial<Record<Pagina, unknown>> = {
+  taller: EVENTO_MERIDA,
+  matrimonios: EVENTO_MATRIMONIOS,
+};
+
 export function etiquetasDe(pagina: Pagina): Etiqueta[] {
   const textos = RECURSOS_I18N.es.web[pagina].head as {
     title: string;
@@ -186,8 +235,8 @@ export function etiquetasDe(pagina: Pagina): Etiqueta[] {
     { tipo: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
     { tipo: 'link', attrs: { rel: 'canonical', href: CANONICA[pagina] } },
     ...ICONOS,
-    ...(pagina === 'taller'
-      ? [{ tipo: 'script' as const, mime: 'application/ld+json', datos: EVENTO_MERIDA }]
+    ...(EVENTOS[pagina]
+      ? [{ tipo: 'script' as const, mime: 'application/ld+json', datos: EVENTOS[pagina] }]
       : []),
   ];
 }

@@ -1,7 +1,7 @@
 {
   "$meta": {
     "name": "Códice — Design System (App Dr. Armando)",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "tagline": "Construyendo familias fuertes",
     "generated": "2026-09-17",
     "philosophy": "Quiet luxury con la atmósfera del set de grabación del doctor: luz ámbar de tarde, orden, cercanía sin ruido. Restraint editorial, whitespace generoso, tipografía por encima de imagen, sin sombras, sin degradados, motion invisible.",
@@ -10,6 +10,14 @@
     ],
     "density": "comfortable",
     "changelog": [
+      {
+        "version": "1.2.5",
+        "date": "2026-10-05",
+        "orden": "Códice #38",
+        "cambios": [
+          "`color.matrimonio.terracota` (#B34528): la terracota de la pared del póster del taller «Cómo sanar un matrimonio herido», muestreada por el CEO. Va SOLO en `/matrimonios`, donde `/merida` usa el teal oscuro (las secciones oscuras). Crema encima: 5,17:1. Forma ejecutable: `--terracota`."
+        ]
+      },
       {
         "version": "1.2.4",
         "date": "2026-10-03",
@@ -164,6 +172,14 @@
         "value": "#DA8100",
         "role": "Acento sobre fondos oscuros: rótulos y enlaces sobre teal y sobre tinta.",
         "contrast": "sobre tinta 4,78:1 (pasa). Sobre teal 2,81:1 (NO pasa) — es el pendiente 4c, decisión de dirección."
+      }
+    },
+    "matrimonio": {
+      "$description": "Colores de una sola página. No son marca de la casa: salen del material de un taller y viven solo en su landing.",
+      "terracota": {
+        "value": "#B34528",
+        "role": "/matrimonios (orden #38): fondo de las secciones oscuras —«Sobre el facilitador» y el cierre— y el acento donde /merida usa el teal oscuro. Muestreada de la pared del póster del taller.",
+        "contrast": "crema encima: 5,17:1 (AA para texto chico, sin oscurecer). Sobre crema, la terracota como texto o borde: 5,17."
       }
     },
     "chrome": {

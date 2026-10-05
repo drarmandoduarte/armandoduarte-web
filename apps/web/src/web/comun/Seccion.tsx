@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-/** Los cinco tonos de fondo del ritmo de la página (`web.surfaces` en tokens). */
-export type Tono = 'crema' | 'calido' | 'blanco' | 'oscuro' | 'tinta';
+/** Los tonos de fondo del ritmo de la página (`web.surfaces` en tokens). */
+export type Tono = 'crema' | 'calido' | 'blanco' | 'oscuro' | 'tinta' | 'terracota';
 
 const CLASE: Record<Tono, string> = {
   crema: '',
@@ -9,6 +9,10 @@ const CLASE: Record<Tono, string> = {
   blanco: 'blanco',
   oscuro: 'oscuro',
   tinta: 'tinta',
+  /* #38 · `/matrimonios`: la sección oscura con la terracota del póster. Lleva
+     también `oscuro` para heredar todo lo que el teal ya resolvió —texto crema,
+     ficha, cita, botones— y `.terracota` solo cambia el color (`index.css`). */
+  terracota: 'oscuro terracota',
 };
 
 /**

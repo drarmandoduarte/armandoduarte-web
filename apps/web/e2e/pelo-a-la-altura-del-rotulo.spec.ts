@@ -36,6 +36,8 @@ const VIEWPORTS = [
 const LUGARES = [
   ['portada', '/', '#quien'],
   ['taller', '/merida', '#facilitador'],
+  /* #38: «Sobre el facilitador» de /matrimonios, con las mismas reglas. */
+  ['matrimonios', '/matrimonios', '#facilitador'],
 ] as const;
 
 const UMBRAL = 40;

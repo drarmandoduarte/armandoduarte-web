@@ -1,0 +1,46 @@
+{
+  "title": "Cómo sanar un matrimonio herido · Taller en línea con Armando Duarte",
+  "description": "Taller en línea vía Zoom con Armando Duarte para sanar tu matrimonio: 6 meses de acompañamiento. Inicia el jueves 29 de octubre de 2026, 7:00 a 9:00 pm (CDMX).",
+  "canonical": "https://armandoduarte.com/matrimonios",
+  "ogUrl": "https://armandoduarte.com/matrimonios",
+  "ogImage": "https://armandoduarte.com/img/og-matrimonios-1200x630.jpg?v=f5c2791f",
+  "hojas": [
+    "/assets/style-<hash>.css"
+  ],
+  "datos": [
+    {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      "name": "Cómo sanar un matrimonio herido · taller en línea",
+      "description": "Taller en línea vía Zoom con Armando Duarte: 6 meses de formación, acompañamiento y guía para matrimonios.",
+      "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "image": [
+        "https://armandoduarte.com/img/og-matrimonios-1200x630.jpg?v=f5c2791f",
+        "https://armandoduarte.com/img/og-matrimonios-1200x1200.jpg?v=1f613b29"
+      ],
+      "startDate": "2026-10-29T19:00:00-06:00",
+      "endDate": "2026-10-29T21:00:00-06:00",
+      "location": {
+        "@type": "VirtualLocation",
+        "url": "https://armandoduarte.com/matrimonios"
+      },
+      "organizer": {
+        "@type": "Person",
+        "name": "Armando Duarte",
+        "url": "https://armandoduarte.com/"
+      },
+      "performer": {
+        "@type": "Person",
+        "name": "Armando Duarte"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": 1170,
+        "priceCurrency": "MXN",
+        "description": "Por pareja, 6 mensualidades",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+  ]
+}

@@ -93,7 +93,7 @@ import { writeFileSync } from 'node:fs';
 
 const BASE = process.argv[2] || 'http://127.0.0.1:4180';
 const SALIDA = process.argv[3] || '/tmp/pares.json';
-const PAGINAS = [['inicio','/'],['taller','/merida'],['privacidad','/privacidad'],['terminos','/terminos']];
+const PAGINAS = [['inicio','/'],['taller','/merida'],['matrimonios','/matrimonios'],['privacidad','/privacidad'],['terminos','/terminos']];
 /* La orden #19 (E) pide las tres de su sección A —1440, 900 y 375— y la casa
    venía midiendo a 390. Se suman, no se cambian: 390 es el ancho con el que se
    midieron todas las órdenes anteriores y quitarlo dejaría sin vigilar lo que
@@ -313,6 +313,19 @@ async function porConsola() {
         document.adoptedStyleSheets = [...document.adoptedStyleSheets, hoja];
       }, '*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1!important}');
       await p.evaluate(() => document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in')));
+      /* ── Las fotos `lazy`, cargadas antes de medir (orden #38) ────────────
+         La captura de página completa NO las hace bajar: una foto de fondo al
+         final de una página larga —el cierre de `/matrimonios`, a 7.500 px—
+         quedaba sin cargar y el barrido medía el texto contra el color liso
+         de la sección. Verde, y falso: el píxel que ve la persona tiene la
+         foto. Se las pasa a `eager` y se espera a que estén decodificadas. */
+      const fotos = await p.evaluate(async () => {
+        const imgs = [...document.querySelectorAll('img')];
+        imgs.forEach((i) => { i.loading = 'eager'; });
+        await Promise.all(imgs.map((i) => (i.complete ? i.decode().catch(() => {}) : new Promise((r) => { i.onload = i.onerror = r; }))));
+        return { total: imgs.length, sinCargar: imgs.filter((i) => !i.complete || i.naturalWidth === 0).length };
+      });
+      if (fotos.sinCargar) throw new Error(`${ruta} @${ancho}: ${fotos.sinCargar} de ${fotos.total} imágenes sin cargar antes de medir`);
       for (const conMenu of [false, true]) {
         if (conMenu) await p.evaluate(() => {
           document.getElementById('ov')?.classList.add('open');

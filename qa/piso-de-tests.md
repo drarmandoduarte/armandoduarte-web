@@ -17,16 +17,36 @@ alguien lo va a leer en el PR. Ése es el punto.
 
 | paquete | piso |
 |---|---|
-| `@codice/ui` | 31 |
-| `@codice/core` | 102 |
+| `@codice/ui` | 38 |
+| `@codice/core` | 123 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 107 |
-| `@codice/web` | 71 |
+| `@codice/web` | 83 |
 | `@codice/familia` | 169 |
 | `@codice/api` | 70 |
-| `@codice/navegador` | 40 |
+| `@codice/navegador` | 65 |
 
 
+
+## Lo que trae la orden #38 — `ui` 31 → 38, `core` 102 → 123, `web` 71 → 83, `navegador` 40 → 65
+
+La landing `/matrimonios`. Los pisos se suben a lo que hoy se declara, para que
+un archivo que desaparezca se note.
+
+- **`@codice/ui` (+2 de la #38)**: los dos pares de la terracota en
+  `tokens.test.mjs` (crema sobre terracota y terracota sobre crema, ≥ 4,5).
+- **`@codice/core` (+4 de la #38)**: `contacto.test.ts` +3 (los dos números del
+  taller de matrimonios, que ninguno sea el de Mérida, y el mensaje codificado
+  entero) +1 (la quinta página en el mapa); `i18n.test.ts` cuenta `matrimonios`.
+- **`@codice/web` (+10 de la #38)**: `lo-que-mando-armando.test.ts` +6 contra
+  el `.docx` de Armando (piso, cada texto es un párrafo, ningún párrafo sin
+  publicar, lo que sale de la orden, lo publicado, el autoexamen del lector);
+  `el-evento-de-matrimonios-dice-la-verdad.test.ts` (+4, nuevo); `rutas`,
+  `la-imagen-al-compartir-existe` y `las-imagenes-llevan-su-huella` cuentan la
+  quinta página. Mutaciones en el informe de la #38.
+- **`navegador` (+12 de la #38, 53 → 65 declarados)**: cada spec que recorre páginas suma `/matrimonios`
+  (fidelidad a 1440/900/390, CSP, renglones, acento, altura, los tres de
+  Armando en `#facilitador`, héroes iguales, hero opaco).
 
 ## Lo que trae la orden #33 — `web` 63 → 71
 

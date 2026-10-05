@@ -8,8 +8,8 @@ import { RUTAS } from './rutas';
 import { RECURSOS_I18N } from '@codice/core';
 
 describe('las rutas de la web pública', () => {
-  it('son las cuatro del sitio estático', () => {
-    expect(RUTAS.map((r) => r.ruta)).toEqual(['/', '/merida', '/privacidad', '/terminos']);
+  it('son las cuatro del sitio estático, más /matrimonios (#38)', () => {
+    expect(RUTAS.map((r) => r.ruta)).toEqual(['/', '/merida', '/matrimonios', '/privacidad', '/terminos']);
   });
 
   it('cada una escribe un archivo distinto', () => {

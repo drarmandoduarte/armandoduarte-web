@@ -72,6 +72,7 @@ const BASE = process.argv[2] || 'http://127.0.0.1:4180';
 export const RUTAS = [
   ['inicio', '/'],
   ['merida', '/merida'],
+  ['matrimonios', '/matrimonios'],
   ['privacidad', '/privacidad'],
   ['terminos', '/terminos'],
 ];
@@ -95,7 +96,7 @@ export const ANCHOS = [1440, 900, 390, 375];
  * es el mínimo de los cuatro anchos, con margen para que el contenido crezca; lo
  * que caza es que la página no haya cargado o que el selector se haya roto.
  */
-export const PISO = { inicio: 14, merida: 18, privacidad: 8, terminos: 8 };
+export const PISO = { inicio: 14, merida: 18, matrimonios: 14, privacidad: 8, terminos: 8 }; // matrimonios: 17 medidos (#38)
 
 /**
  * ── Las excepciones, en dos listas que NO significan lo mismo ─────────────
@@ -183,6 +184,20 @@ export const PENDIENTES = [
   ['#programa h3', 'Comprender', 'renglón del medio del Núcleo 3, «Comprender nuestra familia», a 1440 y 900', 1],
   ['#reservar h2', 'padres', 'el cierre («El amor incondicional no es la ausencia de límites…») mide siete renglones a 375, y `text-wrap: balance` de Chromium sólo trabaja hasta seis', 1],
   ['#reservar h2', 'conscientes.', 'el mismo cierre, último renglón, a 375', 1],
+  /* ── `/matrimonios` (orden #38) ───────────────────────────────────────── */
+  /* El hero: la orden pide «MATRIMONIO HERIDO» en su renglón y en naranja,
+     «como ADOLESCENTE», y a 80 px las dos palabras no entran juntas en la
+     columna del hero (que no se toca, #23). Quedan una por renglón, que es
+     además la forma del póster. Se arregla aprobándolo como «ADOLESCENTE» o
+     cambiando el tamaño del titular; las dos son de dirección. */
+  ['#inicio h1', 'MATRIMONIO', '/matrimonios: «MATRIMONIO HERIDO» no entra en un renglón a 80 px; la forma de la orden y del póster. A los cuatro anchos', 1],
+  ['#inicio h1', 'HERIDO', '/matrimonios: el mismo titular, segunda palabra. A los cuatro anchos', 1],
+  /* Las fortalezas: la misma columna de 227 px a 24 px de los núcleos de
+     `/merida` (que tienen dos aprobados y uno pendiente por lo mismo). */
+  ['#programa h3', 'Desarmar', '/matrimonios: «Desarmar la energía destructiva» en tres renglones a 1440', 1],
+  ['#programa h3', 'destructiva', '/matrimonios: la misma fortaleza, cola, a 1440', 1],
+  ['#programa h3', 'profundas', '/matrimonios: cola de «Sanar heridas profundas» a 1440, 390 y 375', 1],
+  ['#programa h3', 'Reactivar', '/matrimonios: «Reactivar lo positivo», primer renglón, a 1440', 1],
 ];
 
 /** Las dos listas juntas es lo que el barrido aplica. */

@@ -51,10 +51,11 @@ import { QUIETAR } from './renglones.mjs';
 const BASE = process.argv[2] || 'http://127.0.0.1:4180';
 const SOLO_TABLA = process.argv.includes('--tabla');
 
-/** Las dos páginas que tienen secciones. Las legales son texto corrido. */
+/** Las páginas que tienen secciones (`/matrimonios` desde la #38). Las legales son texto corrido. */
 export const RUTAS = [
   ['inicio', '/'],
   ['merida', '/merida'],
+  ['matrimonios', '/matrimonios'],
 ];
 
 /**
@@ -72,12 +73,13 @@ export const VIEWPORTS = [
  * El piso de secciones por ruta, **medido** el 29/9 y no estimado. `/merida`
  * pasó de 9 a 10 en la #20-bis, cuando «Lo que te llevas» salió de `#programa`
  * a su propia sección `#llevas`, y a 11 en la #23 con la banda `#hechos`.
+ * `/matrimonios` nace con 9 (#38): hero, hechos y sus siete secciones.
  *
  * «Ninguna sección sobra» sobre un barrido que no encontró ninguna sección se
  * escribe igual que sobre una página en orden. Es la regla de la casa sobre las
  * aserciones de cero: al lado del cero va cuántas secciones se miraron.
  */
-export const PISO = { inicio: 8, merida: 11 };
+export const PISO = { inicio: 8, merida: 11, matrimonios: 9 };
 
 /** El tope de una sección que no es hero, en pantallas (#23). */
 export const TOPE_PANTALLAS = 1.6;

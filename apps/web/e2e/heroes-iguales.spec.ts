@@ -73,6 +73,8 @@ for (const vp of VIEWPORTS) {
     await page.setViewportSize(vp);
     const portada = await medir(page, '/');
     const taller = await medir(page, '/merida');
+    /* #38: el tercer hero, el de `/matrimonios`, contra el mismo de la portada. */
+    const matrimonios = await medir(page, '/matrimonios');
 
     /* EL PISO, PRIMERO: que haya arco en las dos. Dos `null` son iguales. */
     expect(portada.arco, 'la portada no tiene `.hero .foto--arco`').not.toBeNull();
@@ -82,8 +84,11 @@ for (const vp of VIEWPORTS) {
     expect(taller.arco, 'el arco del taller no tiene la misma caja que el de la portada').toEqual(portada.arco);
     expect(taller.rotulo!.y, 'el rótulo del taller no arranca a la misma altura que el de la portada').toBe(portada.rotulo!.y);
     expect(taller.titulo, 'el título del taller no tiene el mismo tamaño que el de la portada').toBe(portada.titulo);
+    expect(matrimonios.arco, 'el arco de /matrimonios no tiene la misma caja que el de la portada').toEqual(portada.arco);
+    expect(matrimonios.rotulo!.y, 'el rótulo de /matrimonios no arranca a la misma altura').toBe(portada.rotulo!.y);
+    expect(matrimonios.titulo, 'el título de /matrimonios no tiene el mismo tamaño').toBe(portada.titulo);
 
-    for (const [nombre, m] of [['portada', portada], ['taller', taller]] as const) {
+    for (const [nombre, m] of [['portada', portada], ['taller', taller], ['matrimonios', matrimonios]] as const) {
       /* Lo que fija la orden: el hero mide la pantalla; el arco deja 48 px
          arriba (desde la cabecera) y 48 abajo (hasta el filo del hero), con el
          busto apoyado en su borde de abajo; el rótulo a 72. */

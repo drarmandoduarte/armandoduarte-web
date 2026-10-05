@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router';
 import { Inicio } from './web/inicio/Inicio';
 import { Taller } from './web/taller/Taller';
+import { Matrimonios } from './web/matrimonios/Matrimonios';
 import { Privacidad } from './web/legal/Privacidad';
 import { Terminos } from './web/legal/Terminos';
 
@@ -13,6 +14,7 @@ export function App() {
     <Routes>
       <Route path="/" element={<Inicio />} />
       <Route path="/merida" element={<Taller />} />
+      <Route path="/matrimonios" element={<Matrimonios />} />
       <Route path="/privacidad" element={<Privacidad />} />
       <Route path="/terminos" element={<Terminos />} />
     </Routes>

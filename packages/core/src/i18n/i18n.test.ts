@@ -55,14 +55,14 @@ describe('los textos de la web pública', () => {
     expect(vacias, 'una clave vacía se dibuja como nada y no se queja').toEqual([]);
   });
 
-  it('las cuatro páginas y lo común están', () => {
+  it('las cinco páginas y lo común están (/matrimonios desde la #38)', () => {
     expect(Object.keys(RECURSOS_I18N.es.web).sort()).toEqual(
-      ['comun', 'inicio', 'privacidad', 'taller', 'terminos'],
+      ['comun', 'inicio', 'matrimonios', 'privacidad', 'taller', 'terminos'],
     );
   });
 
   it('cada página declara su `<title>` y su descripción', () => {
-    for (const pagina of ['inicio', 'taller', 'privacidad', 'terminos'] as const) {
+    for (const pagina of ['inicio', 'taller', 'matrimonios', 'privacidad', 'terminos'] as const) {
       const head = (RECURSOS_I18N.es.web as Record<string, { head: { title: string; description: string } }>)[pagina].head;
       expect(head.title.length, `${pagina}: title`).toBeGreaterThan(10);
       expect(head.description.length, `${pagina}: description`).toBeGreaterThan(30);

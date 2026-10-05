@@ -75,8 +75,8 @@ function contraste(hexA, hexB) {
 
 describe('los tokens de Códice', () => {
   it('la versión del documento es la que esta orden dejó', () => {
-    expect(tokens.$meta.version).toBe('1.2.4');
-    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.4');
+    expect(tokens.$meta.version).toBe('1.2.5');
+    expect(tokens.$meta.changelog?.[0]?.version).toBe('1.2.5');
   });
 
   /*
@@ -136,6 +136,11 @@ describe('los tokens de Códice', () => {
       ['background.cream sobre cff.tealDark',         C.background.cream.value, C.cff.tealDark.value],
       ['cff.amber sobre ink.primary',                 C.cff.amber.value, C.ink.primary.value],
       ['ink.primary sobre cff.amber',                 C.ink.primary.value, C.cff.amber.value],
+      /* #38 · la terracota de /matrimonios: crema encima (las secciones
+         oscuras) y ella sobre crema (el texto del botón principal, el número
+         de las fortalezas). El LEEME del insumo dice 5,17. */
+      ['background.cream sobre matrimonio.terracota', C.background.cream.value, C.matrimonio.terracota.value],
+      ['matrimonio.terracota sobre background.cream', C.matrimonio.terracota.value, C.background.cream.value],
     ];
 
     /*
