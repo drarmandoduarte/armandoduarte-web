@@ -46,17 +46,24 @@ export function MenuMovil({
   /*
    * El ítem de la página en la que uno está, en ámbar (orden #06, B).
    *
-   * Solo puede haber uno y solo puede ser `/merida`: los otros cinco destinos
-   * son anclas de la portada, no páginas. Marcar «Quién soy» como activo estando
+   * Solo puede haber uno y solo puede ser una página de taller —`/merida` o,
+   * desde la #38, `/matrimonios`—: los otros destinos son anclas de la
+   * portada, no páginas. Marcar «Quién soy» como activo estando
    * en la portada sería mentir —no es donde uno está, es a dónde va a saltar— y
    * las dos legales no están en el menú.
    */
-  const activo = (href: string) => (pagina === 'taller' && href === '/merida' ? 'activo' : undefined);
+  const activo = (href: string) => (
+    (pagina === 'taller' && href === '/merida') || (pagina === 'matrimonios' && href === '/matrimonios')
+      ? 'activo'
+      : undefined
+  );
 
   const destinos = [
     ['/#quien', t('comun.nav.quien')],
     ['/#hago', t('comun.nav.hago')],
     ['/merida', t('comun.nav.taller')],
+    /* #38: debajo del de Mérida, que es donde están los talleres. */
+    ['/matrimonios', t('comun.nav.matrimonios')],
     ['/#libros', t('comun.nav.libros')],
     ['/#programa', t('comun.nav.programa')],
     ['/#contacto', t('comun.nav.contacto')],

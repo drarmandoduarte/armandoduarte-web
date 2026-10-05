@@ -31,6 +31,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
+import { inflateRawSync } from 'node:zlib';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RECURSOS_I18N } from '@codice/core';
@@ -260,5 +261,196 @@ suite('la web dice lo que mandó Armando, carácter por carácter', () => {
     expect(nucleosDelLeeme('- Título — Texto'), 'una viñeta no es un núcleo numerado').toEqual([]);
     expect(nucleosDelLeeme('1. Título - Texto'), 'con guion corto no es la forma del insumo').toEqual([]);
     expect(nucleosDelLeeme('**Los datos del taller** (Armando, 28/9): jueves')).toEqual([]);
+  });
+});
+
+/* ═══ /matrimonios · contra el `.docx` de Armando (orden #38) ═════════════
+   Acá el insumo **es el archivo que mandó Armando**, no una transcripción:
+   `landing SANAR MATRIMONIO HERIDO.docx`, en la carpeta de insumos del 5/10.
+   Se lee el `.docx` de verdad —un zip con `word/document.xml` adentro— con
+   `node:zlib`, sin dependencias: un párrafo por `<w:p>`, el texto de sus
+   `<w:t>` pegado.
+
+   Las únicas diferencias permitidas, declaradas en la orden #38 y aplicadas
+   por `aLaCasa()` antes de comparar —nada más se normaliza—:
+     · sin el emoji 👉 (D6: sin emojis);
+     · las comillas tipográficas de la casa: "…" y “…” pasan a «…»;
+     · «(Foto)» delante de la biografía es una indicación de Armando para el
+       diseño, no texto: se quita.
+   Y dos que no son del texto sino de la forma, también declaradas:
+     · los dos títulos que en el `.docx` terminan en «:» porque presentan una
+       lista («Las fortalezas…», «Frases poderosas…») se publican sin los dos
+       puntos, como los escribe la orden;
+     · en la ficha del cierre y en las fortalezas, «Clave: valor» se parte en
+       dos piezas de la pantalla; se compara la suma. */
+const INSUMOS_38 = join(REPO, '..', '..', '03 Producto', 'web', 'insumos', '2026-10-05-matrimonios');
+const DOCX = join(INSUMOS_38, 'landing SANAR MATRIMONIO HERIDO.docx');
+const ORDEN_38 = join(REPO, '..', '..', '03 Producto', 'codice', 'ordenes', 'orden-38-landing-matrimonios.md');
+const HAY_DOCX = existsSync(DOCX) && existsSync(ORDEN_38);
+
+/** `word/document.xml` de un `.docx`, leído del zip a mano (directorio central). */
+export function documentoDe(docx: Buffer): string {
+  let fin = docx.length - 22;
+  while (fin >= 0 && docx.readUInt32LE(fin) !== 0x06054b50) fin -= 1;
+  if (fin < 0) throw new Error('no es un zip: no encontré el fin del directorio central');
+  const entradas = docx.readUInt16LE(fin + 10);
+  let p = docx.readUInt32LE(fin + 16);
+  for (let i = 0; i < entradas; i += 1) {
+    const metodo = docx.readUInt16LE(p + 10);
+    const comprimido = docx.readUInt32LE(p + 20);
+    const largoNombre = docx.readUInt16LE(p + 28);
+    const largoExtra = docx.readUInt16LE(p + 30);
+    const largoComentario = docx.readUInt16LE(p + 32);
+    const local = docx.readUInt32LE(p + 42);
+    const nombre = docx.toString('utf8', p + 46, p + 46 + largoNombre);
+    if (nombre === 'word/document.xml') {
+      const desde = local + 30 + docx.readUInt16LE(local + 26) + docx.readUInt16LE(local + 28);
+      const datos = docx.subarray(desde, desde + comprimido);
+      return (metodo === 8 ? inflateRawSync(datos) : datos).toString('utf8');
+    }
+    p += 46 + largoNombre + largoExtra + largoComentario;
+  }
+  throw new Error('el .docx no tiene word/document.xml');
+}
+
+const desescapar = (x: string) => x
+  .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+
+/** Los párrafos del documento, con su texto tal cual (sin normalizar). */
+export function parrafosDe(xml: string): string[] {
+  return [...xml.matchAll(/<w:p[ >][\s\S]*?<\/w:p>/g)]
+    .map(([p]) => [...p.matchAll(/<w:t(?: [^>]*)?>([\s\S]*?)<\/w:t>/g)].map((m) => desescapar(m[1])).join(''));
+}
+
+/** Las diferencias declaradas arriba, y ninguna otra. */
+export const aLaCasa = (x: string) => x
+  .replace(/👉\s*/gu, '')
+  .replace(/^\(Foto\)\s*/, '')
+  .replace(/"([^"]*)"/g, '«$1»')
+  .replace(/“([^”]*)”/g, '«$1»')
+  .trim();
+
+const PARRAFOS_38 = HAY_DOCX ? parrafosDe(documentoDe(readFileSync(DOCX))).map(aLaCasa).filter(Boolean) : [];
+const ORDEN = HAY_DOCX ? readFileSync(ORDEN_38, 'utf8') : '';
+const suite38 = HAY_DOCX ? describe : describe.skip;
+
+suite38('/matrimonios dice lo que mandó Armando en el .docx (#38)', () => {
+  const m = (web as Record<string, any>).matrimonios;
+  const f = m.fortalezas;
+  const c = m.cierre;
+  const conDosPuntos = (clave: string, valor: string) => `${clave}: ${valor}`;
+
+  /** Lo que se publica y tiene que ser, ENTERO, un párrafo del `.docx`. */
+  const publicados: [string, string][] = [
+    ['hero.sub', m.hero.sub],
+    ['mirarse.titulo', m.mirarse.titulo],
+    ['mirarse.bajada', m.mirarse.bajada],
+    ...(['uno', 'dos', 'tres', 'cuatro', 'cinco'] as const).map((k): [string, string] => [`mirarse.${k}`, m.mirarse[k]]),
+    ['mirarse.cita', m.mirarse.cita],
+    ['dolor.titulo', m.dolor.titulo],
+    ['dolor.cuerpo1', m.dolor.cuerpo1],
+    ['dolor.hijos + hijosFuerte', m.dolor.hijos + m.dolor.hijosFuerte],
+    ['dolor.rival', m.dolor.rival],
+    ['dolor.cita', m.dolor.cita],
+    ['giro.titulo1 + titulo2', `${m.giro.titulo1} ${m.giro.titulo2}`],
+    ['giro.cuerpo', m.giro.cuerpo],
+    ['giro.cita', m.giro.cita],
+    ['fortalezas.titulo (+ «:»)', `${f.titulo}:`],
+    ['fortalezas.bajada', f.bajada],
+    ...(['uno', 'dos', 'tres', 'cuatro', 'cinco'] as const).map((k): [string, string] => [`fortalezas.${k}`, conDosPuntos(f[k].titulo, f[k].texto)]),
+    ['frases.titulo (+ «:»)', `${m.frases.titulo}:`],
+    ...(['uno', 'dos', 'tres', 'cuatro'] as const).map((k): [string, string] => [`frases.${k}`, m.frases[k]]),
+    ['facilitador.bioNombre + bio', m.facilitador.bioNombre + m.facilitador.bio],
+    ['facilitador.cita', m.facilitador.cita],
+    ['cierre.titulo', c.titulo],
+    ['cierre.cuerpo', c.cuerpo],
+    ...(['modalidad', 'duracion', 'inicia', 'inversion'] as const).map((k): [string, string] => [`cierre.${k}`, conDosPuntos(c[`${k}Clave`], c[`${k}Valor`])]),
+    ['cierre.incluyeClave', c.incluyeClave],
+    ...([1, 2, 3, 4] as const).map((i): [string, string] => [`cierre.incluye${i}`, c[`incluye${i}`]]),
+    ['cierre.llamado', c.llamado],
+  ];
+
+  it('EL PISO, PRIMERO: el .docx se leyó y trae lo que tiene que traer', () => {
+    expect(PARRAFOS_38.length, `no se pudo leer ${DOCX}`).toBeGreaterThanOrEqual(40);
+    expect(PARRAFOS_38).toContain('¿Están listos para luchar?');
+    expect(publicados.length, 'la lista de lo publicado').toBe(43);
+  });
+
+  it('cada texto publicado es, carácter por carácter, un párrafo del .docx', () => {
+    const faltan = publicados
+      .filter(([, valor]) => !PARRAFOS_38.includes(valor))
+      .map(([clave, valor]) => `${clave}: «${valor}» no es ningún párrafo del .docx`);
+    expect(
+      faltan,
+      'Lo que Armando escribió no se edita en la web: se le pide a él. Las únicas diferencias son las '
+      + 'declaradas arriba (emoji, comillas, «(Foto)», los «:» de dos títulos).',
+    ).toEqual([]);
+  });
+
+  it('y al revés: ningún párrafo del .docx quedó sin publicar', () => {
+    const publicado = new Set(publicados.map(([, v]) => v));
+    /* Lo que el `.docx` trae y no es texto de la página, cada uno con su
+       motivo: el título del documento (el titular sale de la orden, abajo),
+       las dos indicaciones de botón y el encabezado del facilitador, que es el
+       rótulo de la sección. */
+    const NO_SON_TEXTO = new Map([
+      ['CÓMO SANAR A UN MATRIMONIO HERIDO', 'el título del documento; el hero dice lo que fija la orden'],
+      ['BOTON [ ASEGURAR MI LUGAR EN EL TALLER ]', 'una indicación de botón: es «Asegurar mi lugar en el taller»'],
+      ['Sobre el Facilitador', 'el rótulo de la sección, «Sobre el facilitador»'],
+      ['Todo lo que necesitas para fortalecer tu relación', 'la bajada del hero (ya está en la lista)'],
+    ]);
+    const sueltos = PARRAFOS_38.filter((p) => !publicado.has(p) && !NO_SON_TEXTO.has(p));
+    expect(sueltos, 'un párrafo de Armando que la página no dice').toEqual([]);
+    expect(m.reservar.toUpperCase(), 'el botón').toBe('ASEGURAR MI LUGAR EN EL TALLER');
+    expect(PARRAFOS_38, 'la indicación del botón sigue en el .docx').toContain('BOTON [ ASEGURAR MI LUGAR EN EL TALLER ]');
+    expect(m.facilitador.eyebrow.toLowerCase()).toBe('sobre el facilitador');
+  });
+
+  it('lo que no está en el .docx sale de la orden #38, entre sus comillas', () => {
+    /* El titular, los datos del hero y de la banda de hechos, el mensaje de
+       WhatsApp y la línea de los dos números: los fija la orden, no el `.docx`
+       (el horario no está en el `.docx`: está en el póster y en la orden). */
+    expect(ORDEN).toContain(`«${m.hero.titulo1} / ${m.hero.titulo2Palabra}»`);
+    expect(ORDEN).toContain(`«${m.hero.eyebrow.toUpperCase()}»`);
+    expect(ORDEN).toContain(`«${[m.hero.micro1, m.hero.micro2, m.hero.micro3].join(' · ').toUpperCase()}»`);
+    const h = m.hechos;
+    for (const [clave, valor] of [[h.iniciaClave, h.iniciaValor], [h.horarioClave, h.horarioValor], [h.modalidadClave, h.modalidadValor], [h.duracionClave, h.duracionValor]]) {
+      expect(ORDEN, `la banda de hechos: ${clave}`).toContain(`${clave} · ${valor}`);
+    }
+    expect(ORDEN).toContain(`«${m.mensaje}»`);
+    expect(ORDEN).toContain(`«${c.telefonos}»`);
+    expect(ORDEN).toContain(`**«${m.reservar}»**`);
+    expect(ORDEN).toContain(`**«${m.otroPais}»**`);
+    expect(ORDEN).toContain(`«${m.head.title}»`);
+    expect(ORDEN).toContain(`«${m.head.ogImageAlt}»`);
+  });
+
+  it('lo publicado: sin el emoji, con los textos, y el precio literal', () => {
+    const archivo = join(DIST, 'matrimonios.html');
+    const html = existsSync(archivo) ? readFileSync(archivo, 'utf8') : '';
+    expect(html.length, 'matrimonios.html no está en dist: corre el build antes').toBeGreaterThan(1000);
+    expect(html, 'D6: sin emojis').not.toContain('👉');
+    for (const [clave, valor] of publicados) {
+      /* Los «Clave: valor» se publican en dos piezas: se busca el valor. */
+      const pieza = valor.includes(': ') && /^(cierre\.|fortalezas\.(uno|dos|tres|cuatro|cinco))/.test(clave)
+        ? valor.slice(valor.indexOf(': ') + 2)
+        : valor;
+      const visible = clave.endsWith('(+ «:»)') ? valor.slice(0, -1) : pieza;
+      const enHtml = clave === 'dolor.hijos + hijosFuerte' || clave === 'facilitador.bioNombre + bio' || clave.startsWith('giro.titulo')
+        ? null
+        : visible;
+      if (enHtml) expect(html, `${clave} no está en la página`).toContain(enHtml);
+    }
+    expect(html).toContain('$1,170 MXN (6 mensualidades)');
+  });
+
+  it('y el lector del .docx distingue lo que tiene que distinguir', () => {
+    /* El autoexamen: las tres normalizaciones hacen solo lo suyo. */
+    expect(aLaCasa('👉 ¡Hola!')).toBe('¡Hola!');
+    expect(aLaCasa('"Uno." y “dos”')).toBe('«Uno.» y «dos»');
+    expect(aLaCasa('(Foto) Armando')).toBe('Armando');
+    expect(aLaCasa('Una foto (Foto) adentro')).toBe('Una foto (Foto) adentro');
+    expect(parrafosDe('<w:p><w:r><w:t>Uno</w:t></w:r><w:r><w:t xml:space="preserve"> dos</w:t></w:r></w:p><w:p><w:r><w:t>&amp;</w:t></w:r></w:p>'))
+      .toEqual(['Uno dos', '&']);
   });
 });

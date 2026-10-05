@@ -41,9 +41,12 @@ describe('las imágenes llevan su huella', () => {
   it('EL PISO, primero: el barrido vio las cuatro páginas y las imágenes de las dos que tienen', () => {
     /* Medido el 30/9: 20 URLs en `/` y 31 en `/merida`. Un «cero sin huella»
        sobre un `dist/` vacío o una expresión rota sería igual de verde. */
-    expect(paginas.sort()).toEqual(['index.html', 'merida.html', 'privacidad.html', 'terminos.html']);
+    expect(paginas.sort()).toEqual(['index.html', 'matrimonios.html', 'merida.html', 'privacidad.html', 'terminos.html']);
     expect(encontradas.filter((x) => x.pagina === 'index.html').length).toBeGreaterThanOrEqual(15);
     expect(encontradas.filter((x) => x.pagina === 'merida.html').length).toBeGreaterThanOrEqual(25);
+    /* #38: 42 medidas el 5/10 (las fotos de la página, los íconos, los
+       retratos y las dos og). */
+    expect(encontradas.filter((x) => x.pagina === 'matrimonios.html').length).toBeGreaterThanOrEqual(35);
     const css = readdirSync(join(DIST, 'assets')).filter((n) => n.endsWith('.css'));
     for (const c of css) expect(readFileSync(join(DIST, 'assets', c), 'utf8'), c).not.toMatch(/img\//);
   });
@@ -65,14 +68,14 @@ describe('las imágenes llevan su huella', () => {
     /* Hoy no hay `twitter:image`: X cae a `og:image`. Si un día se agrega,
        entra en esta misma comprobación sin tocarla. */
     const vistas: string[] = [];
-    for (const pagina of ['index.html', 'merida.html']) {
+    for (const pagina of ['index.html', 'merida.html', 'matrimonios.html']) {
       const html = readFileSync(join(DIST, pagina), 'utf8');
       for (const m of html.matchAll(/(?:property|name)="(?:og:image|twitter:image)" content="([^"]+)"/g)) {
         vistas.push(m[1]);
         expect(m[1], pagina).toMatch(/^https:\/\/armandoduarte\.com\/img\/.+\?v=[0-9a-f]{8}$/);
       }
     }
-    /* Piso: una en `/` y dos en `/merida` (la apaisada y la cuadrada). */
-    expect(vistas.length).toBeGreaterThanOrEqual(3);
+    /* Piso: una en `/`, dos en `/merida` y dos en `/matrimonios`. */
+    expect(vistas.length).toBeGreaterThanOrEqual(5);
   });
 });

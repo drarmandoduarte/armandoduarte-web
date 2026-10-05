@@ -28,6 +28,8 @@ import { PUERTO_PORT } from '../playwright.config';
 const LUGARES = [
   ['taller', '/merida', '#facilitador'],
   ['portada', '/', '#quien'],
+  /* #38: el mismo recorte, sobre terracota. */
+  ['matrimonios', '/matrimonios', '#facilitador'],
 ] as const;
 
 /* 1440 y 375, que son los de la orden. A 900 la maqueta apila y la figura pasa

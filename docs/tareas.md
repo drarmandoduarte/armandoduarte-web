@@ -282,6 +282,20 @@ entera después, no solo las líneas marcadas.
 
 ## Pendientes abiertos
 
+### 18. Los renglones de una palabra de `/matrimonios` · **pendiente: de dirección** (orden #38, 5/10/2026)
+
+Seis filas nuevas en `PENDIENTES` de `apps/web/check/renglones.mjs`, de dos
+clases que ya estaban:
+
+- **El titular del hero**: «MATRIMONIO» / «HERIDO», una palabra por renglón. La
+  orden lo pide «como ADOLESCENTE» y a 80 px las dos no entran juntas en la
+  columna del hero (que la #23 fija). Es la forma del póster. Se cierra
+  aprobándolo como «ADOLESCENTE» o achicando el titular.
+- **Cuatro títulos de fortaleza** a 24 px en la columna de 227 px de los núcleos
+  (los de `/merida` tienen el mismo problema): «Desarmar / la energía /
+  destructiva», «Sanar heridas / profundas», «Reactivar / lo positivo». Se cierra
+  aprobándolos como los dos de la auditoría del PR #35, o con títulos a 22 px.
+
 ### 17. Volver a prender `MI_ESPACIO_EN_LA_WEB` y `SPOTIFY_EN_LA_WEB` cuando Armando lo pida · **pendiente: de Armando** (orden #33, 2/10/2026)
 
 Las dos banderas viven en `packages/core/src/web/mi-espacio.ts`. Prenderlas es

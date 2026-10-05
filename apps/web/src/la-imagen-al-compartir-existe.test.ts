@@ -36,7 +36,7 @@ import { etiquetasDe, type Pagina } from './web/comun/cabeza';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const PUBLICO = join(AQUI, '..', 'public');
 const SITIO = 'https://armandoduarte.com';
-const PAGINAS: Pagina[] = ['inicio', 'taller', 'privacidad', 'terminos'];
+const PAGINAS: Pagina[] = ['inicio', 'taller', 'matrimonios', 'privacidad', 'terminos'];
 
 /** Las `og:image` de una página con el `width`/`height` que le sigue a cada una. */
 function imagenesDe(pagina: Pagina) {
@@ -79,13 +79,16 @@ describe('las imágenes al compartir el enlace', () => {
   /* EL PISO, PRIMERO: que haya imágenes que mirar. Sin esto, un `etiquetasDe`
      que devolviera la lista vacía dejaría todas las afirmaciones de abajo
      cumplidas sobre cero elementos, que es la forma más limpia de un verde
-     falso. Son tres: una en la portada y dos en `/merida`. */
-  it('piso · hay tres og:image declaradas entre las cuatro páginas', () => {
+     falso. Son cinco: una en la portada, dos en `/merida` y dos en
+     `/matrimonios` (#38). */
+  it('piso · hay cinco og:image declaradas entre las cinco páginas', () => {
     const total = PAGINAS.reduce((n, p) => n + imagenesDe(p).length, 0);
     expect(total, 'el barrido no encontró ninguna og:image: o las páginas no declaran, o esto no lee')
-      .toBe(3);
+      .toBe(5);
     expect(imagenesDe('taller'), '/merida declara dos: la apaisada y la cuadrada de WhatsApp')
       .toHaveLength(2);
+    expect(imagenesDe('matrimonios').map((i) => i.url), '/matrimonios: los dos og-matrimonios-* del insumo, la apaisada primero')
+      .toEqual([`${SITIO}/img/og-matrimonios-1200x630.jpg`, `${SITIO}/img/og-matrimonios-1200x1200.jpg`]);
     /* Las legales no se comparten y no declaran ninguna: es una decisión de la
        #01 y si alguien le pone una, esto lo dice. */
     for (const pagina of ['privacidad', 'terminos'] as Pagina[]) {

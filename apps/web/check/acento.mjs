@@ -70,6 +70,7 @@ export const PAGINAS = [
   // nombre        ruta            piso   (medido el 17/9)
   ['inicio', '/', 220],           //  268
   ['merida', '/merida', 270],     //  328
+  ['matrimonios', '/matrimonios', 270], //  320 (medido el 5/10, #38)
   ['privacidad', '/privacidad', 80], //  98
   ['terminos', '/terminos', 75],  //   91
 ];

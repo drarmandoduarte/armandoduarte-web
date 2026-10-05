@@ -1082,3 +1082,146 @@ a,button{-webkit-tap-highlight-color:transparent}
    aviso de privacidad no acentúa nada, y el barrido de la #07 lo cazaría. Sigue
    el color del texto. */
 .legal a{border-bottom:1px solid currentColor}
+
+/* ═══ /matrimonios · «Cómo sanar un matrimonio herido» (orden #38) ═══════
+   Misma casa que /merida. Lo que cambia, y solo en esta página: la terracota
+   del póster (`--terracota`, #38) donde /merida usa el teal oscuro. Todo lo
+   que sigue cuelga de clases que solo existen en `web/matrimonios/`, salvo la
+   banda AHORA de la portada, que está marcada. */
+
+/* ── La sección terracota ─────────────────────────────────────────────────
+   `Seccion tono="terracota"` dibuja `oscuro terracota`: hereda del teal el
+   texto crema, la ficha, la cita y los botones, y acá cambia el fondo.
+
+   ── Y el texto secundario va en crema PLENO, medido ────────────────────
+   Sobre el teal el rótulo, las claves de la ficha y la firma van en crema al
+   70 % (4,52 · `.oscuro`). Sobre la terracota ese 70 % da **3,33** —el teal
+   es mucho más oscuro: 7,74 contra 5,17 de crema pleno— y el cuerpo al 88 %
+   da 4,37. Para llegar a 4,5 hace falta crema al ~90 %, y a ese punto la
+   diferencia con el pleno no se ve: va pleno, y la jerarquía la dan el
+   tamaño y las versalitas, como ya la daban. El «suave» del título es texto
+   grande (≥ 24 px, pide 3:1) y queda al 75 %: 3,60. */
+.terracota{background:var(--terracota);--velo:var(--terracota)}
+.terracota .eyebrow,.terracota .body,.terracota .lead,.terracota .small,
+.terracota .ficha li span:first-child,.terracota .cita small{color:var(--crema)}
+.terracota .suave{color:color-mix(in oklab, var(--crema) 75%, transparent)}
+/* El primario sobre terracota es crema con texto terracota (como sobre teal,
+   con el texto teal): 5,17. */
+.terracota .btn--naranja{color:var(--terracota)}
+/* El contorno del secundario: el 50 % de crema que sirve sobre el teal (3,14)
+   sobre la terracota da 2,2 y el borde de un control pide 3 (WCAG 1.4.11).
+   Al 75 %, 3,6. */
+.terracota .btn{border-color:color-mix(in oklab, var(--crema) 75%, transparent)}
+.terracota .btn--naranja{border-color:var(--crema)}
+
+/* ── «¿Hace cuánto tiempo…?» · el molde de «¿Te suena?» ──────────────────
+   Lleva `suena-fondo`, así que hereda el texto en tinta sobre la foto y los
+   números en `--ocre-texto` (el contraste lo vuelve a medir el barrido sobre
+   esta foto, no se da por heredado). Las preguntas tienen el cuerpo de los
+   títulos de la lista de /merida, porque acá son lo único que hay en cada fila.
+
+   ── El velo, medido con `check/contraste.mjs` sobre el píxel pintado ──
+   Se empezó en el 86 % de «¿Te suena?» y se bajó buscando que la pareja se
+   vea: la foto es clara (sábanas blancas) y a escritorio pasa con 0 pares
+   desde el 76 %. Queda en **80 %**: el «01» da 4,76 a 900 y el peor de 1440,
+   5,61. En el teléfono la foto se ve chica y arriba (abajo, ≤ 600 px) y el
+   80 % NO alcanza —el «01» cae a 4,44 a 375—: ahí va el 86 % de /merida. */
+.fondo-foto--cama img{object-position:30% 50%}
+.fondo-foto--cama::after{background:color-mix(in oklab, var(--crema) 80%, transparent)}
+.lista .pregunta{font-family:var(--display);font-weight:400;font-size:clamp(19px,1.6vw,23px);line-height:1.3;color:var(--tinta);max-width:none}
+.lista--preguntas{margin-top:0}
+
+/* ── «El dolor de un matrimonio herido…» · dos filas alternadas ──────── */
+.dolor__fila+.dolor__fila{margin-top:var(--s7)}
+/* La de arriba es apaisada (`dolor-llanto`, 3:2) y la de abajo vertical
+   (`dolor-hijo`), recortada al 4:5 de las tarjetas de la casa. */
+.dolor__foto img{aspect-ratio:3/2}
+.dolor__foto--vertical{max-width:340px;justify-self:end}
+.dolor__foto--vertical img{aspect-ratio:4/5}
+#dolor .cita{max-width:52ch}
+/* El título es largo para su columna, y `balance` (el de la casa, #16 B) lo
+   reparte en cuatro renglones parejos dejando «matrimonio» solo en el segundo,
+   a 1440 y en el teléfono. `pretty` llena cada renglón y solo cuida el final:
+   «El dolor de un / matrimonio herido no / tiene por qué ser / el final», sin
+   huérfanos. Medido con `check/renglones.mjs` a los cuatro anchos. */
+#dolor h2{text-wrap:pretty}
+
+/* ── El giro ──────────────────────────────────────────────────────────── */
+/* La certeza en su propio renglón, en tinta y un peso más: es la frase que
+   gira la página. Sin color: el naranja de esta pantalla es el botón (D26). */
+.giro__certeza{display:block;font-weight:400}
+.giro__foto img{aspect-ratio:4/3}
+
+/* ── «Sobre el facilitador» · el pelo a la altura de las letras (#28, 3) ──
+   Acá la columna de texto es más alta que en /merida (la biografía nueva), la
+   figura también, y a 1920 el pelo quedaba **2 px por encima** del rótulo con
+   el 2,5 de la casa (`e2e/pelo-a-la-altura-del-rotulo.spec.ts`). Con 3,5 las
+   dos quedan a ±1 a 1440 y a 1920; se probó 4,5 y también pasa: va el menor. */
+@media (min-width:901px){#facilitador.terracota{--aire-rotulo:3.5px}}
+
+/* ── Las fortalezas · los núcleos, con el número en el círculo ───────────
+   El círculo en terracota donde /merida lo tiene teal. El número es TEXTO, no
+   un glifo: al pintarse (hover/foco) el relleno es `--naranja-texto` y no el
+   `--naranja` de /merida, porque crema sobre `--naranja` da 3,86 y un número
+   de 16 px pide 4,5; sobre `--naranja-texto`, 5,00. */
+.fortalezas .lead{max-width:none}
+.nucleo__circulo--numero{font-family:var(--display);font-size:16px;font-weight:500;line-height:1}
+.fortalezas .nucleo__circulo{border-color:var(--terracota);color:var(--terracota)}
+@media (hover:hover){
+  .fortalezas .nucleo:hover .nucleo__circulo{background:var(--naranja-texto);border-color:var(--naranja-texto);color:var(--crema)}
+  .fortalezas .nucleo:hover .nucleo__linea{background:var(--naranja-texto)}
+}
+.fortalezas .nucleo:focus-within .nucleo__circulo{background:var(--naranja-texto);border-color:var(--naranja-texto);color:var(--crema)}
+.fortalezas .nucleo:focus-within .nucleo__linea{background:var(--naranja-texto)}
+
+/* ── Las frases · las tarjetas de «Lo que te llevas», de a cuatro ──────── */
+.tres--cuatro{grid-template-columns:repeat(4,1fr)}
+#frases .tres figure img.encuadre--arriba{object-position:center top}
+.frase{font-family:var(--display);font-weight:400;font-size:clamp(19px,1.5vw,22px);line-height:1.35;color:var(--tinta)}
+
+/* ── El cierre · terracota sobre la foto de los abuelos entre flores ─────
+   ── El velo, medido: el primero que da 0 pares a los cuatro anchos ─────
+   Crema sobre terracota pura da 5,17, así que cualquier píxel claro de la
+   foto lo baja. «Desde otro país» a 900 px es el que manda:
+     88 % → 4,31 · 90 % → 4,44 · **92 % → 4,51**  ← éste
+   El costo, dicho: a 92 % la foto se adivina —la luz de las flores y el
+   abrazo—, no se mira. Es lo que cuesta texto chico crema encima.
+
+   (Para medir esto `check/contraste.mjs` tuvo que aprender a esperar las
+   fotos `lazy`: antes el cierre se medía sobre la terracota lisa y daba 5,17
+   en verde. Ver la nota allá.) */
+.fondo-foto--flores img{object-position:50% 35%}
+.fondo-foto--flores::after{background:color-mix(in oklab, var(--terracota) 92%, transparent)}
+.cierre-matrimonios .ficha{margin-top:0}
+.incluye__clave{margin-top:var(--s5);font-family:var(--display);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta)}
+.terracota .incluye__clave{color:var(--crema)}
+.terracota .incluye{margin-top:var(--s3);border-color:var(--hair-oscura)}
+.terracota .incluye li{border-color:var(--hair-oscura);color:var(--crema)}
+.cierre-matrimonios__accion{margin-top:var(--s7);text-align:center}
+.llamado{font-family:var(--display);font-weight:400;font-size:clamp(22px,2.2vw,30px);line-height:1.3;color:var(--crema)}
+.cierre-matrimonios .cta-row{margin-top:var(--s5)}
+.telefonos{margin-top:var(--s4);font-family:var(--display);font-size:14px;font-weight:500;letter-spacing:.06em;color:var(--crema);font-variant-numeric:tabular-nums}
+
+/* ── La portada · la banda AHORA en dos filas (#38) ───────────────────────
+   Una rejilla de tres columnas y dos filas: la píldora arriba a la izquierda,
+   la segunda fila arranca en la columna de los títulos. */
+.ahora__row{row-gap:var(--s4)}
+.ahora__segunda{grid-column:2}
+.ahora__segunda-accion{grid-column:3}
+
+@media (max-width:1100px){
+  .tres--cuatro{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:900px){
+  .tres--cuatro{grid-template-columns:1fr}
+  .dolor__foto--vertical{justify-self:auto;max-width:none}
+  .ahora__segunda,.ahora__segunda-accion{grid-column:auto}
+  .ahora__segunda{margin-top:var(--s3)}
+}
+@media (max-width:600px){
+  /* Como «¿Te suena?» en el teléfono (#33): la foto ocupa la primera pantalla
+     y se funde en crema; el resto de la sección va sobre crema. */
+  .fondo-foto--cama{bottom:auto;height:100svh}
+  .fondo-foto--cama img{object-position:22% 50%}
+  .fondo-foto--cama::after{background:linear-gradient(to bottom,color-mix(in oklab, var(--crema) 86%, transparent) 80%,var(--crema))}
+}

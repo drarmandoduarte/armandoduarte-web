@@ -3,7 +3,7 @@
   "kit": "Kit de Seguridad 512 · guion de pantallas de acceso v1",
   "canon": {
     "archivo": "packages/ui/codice-tokens.json",
-    "version": "1.2.4"
+    "version": "1.2.5"
   },
   "nombre": "Armando Duarte",
   "web": "https://armandoduarte.com",

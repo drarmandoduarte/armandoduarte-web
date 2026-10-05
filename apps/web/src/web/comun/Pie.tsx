@@ -69,6 +69,8 @@ export function Pie({ telefono, visible }: { telefono: string; visible: string }
                 todo». Se fueron la fecha y «Reservar por WhatsApp», y con ellos
                 sus dos claves de `web.json` — una clave sin uso es deuda. */}
             <a href="/merida">{t('comun.pie.tallerMerida')}</a>
+            {/* #38: el segundo taller, en línea. */}
+            <a href="/matrimonios">{t('comun.pie.tallerMatrimonios')}</a>
           </div>
           <div className="ft__col">
             <h3>{t('comun.pie.legal')}</h3>

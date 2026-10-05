@@ -24,6 +24,11 @@ import {
   TELEFONO_GABY_VISIBLE,
   TELEFONO_TALLER,
   TELEFONO_TALLER_VISIBLE,
+  TELEFONO_MATRIMONIOS_MEXICO,
+  TELEFONO_MATRIMONIOS_MEXICO_VISIBLE,
+  TELEFONO_MATRIMONIOS_OTROS_PAISES,
+  TELEFONO_MATRIMONIOS_OTROS_PAISES_VISIBLE,
+  CLAVE_MENSAJE_MATRIMONIOS,
   enlaceWhatsApp,
 } from './contacto';
 
@@ -62,9 +67,9 @@ describe('el enlace de WhatsApp', () => {
 });
 
 describe('a qué teléfono llama cada página (orden #05, E)', () => {
-  const PAGINAS = ['inicio', 'taller', 'privacidad', 'terminos'] as const;
+  const PAGINAS = ['inicio', 'taller', 'matrimonios', 'privacidad', 'terminos'] as const;
 
-  it('piso · el mapa cubre las cuatro páginas y ninguna más', () => {
+  it('piso · el mapa cubre las cinco páginas y ninguna más', () => {
     expect(Object.keys(CONTACTO_DE_PAGINA).sort()).toEqual([...PAGINAS].sort());
   });
 
@@ -103,5 +108,31 @@ describe('a qué teléfono llama cada página (orden #05, E)', () => {
       expect(enlace, `«${mensaje.slice(0, 40)}…» salió con el número de Gaby`).not.toContain(TELEFONO_GABY);
       expect(enlace).toContain(`wa.me/${TELEFONO_TALLER}?`);
     }
+  });
+});
+
+describe('el taller de matrimonios: dos números (orden #38)', () => {
+  /* Los dos los dio Armando el 5/10, y la orden #38 los escribe así. */
+  it('México es +52 462 199 3143 y otros países +52 462 251 1017', () => {
+    expect(TELEFONO_MATRIMONIOS_MEXICO).toBe('524621993143');
+    expect(TELEFONO_MATRIMONIOS_OTROS_PAISES).toBe('524622511017');
+    expect(TELEFONO_MATRIMONIOS_MEXICO_VISIBLE.replace(/\D/g, '')).toBe(TELEFONO_MATRIMONIOS_MEXICO);
+    expect(TELEFONO_MATRIMONIOS_OTROS_PAISES_VISIBLE.replace(/\D/g, '')).toBe(TELEFONO_MATRIMONIOS_OTROS_PAISES);
+  });
+
+  it('la página llama al de México, y ninguno de los dos es el de Mérida', () => {
+    expect(CONTACTO_DE_PAGINA.matrimonios.numero).toBe(TELEFONO_MATRIMONIOS_MEXICO);
+    expect(TELEFONO_MATRIMONIOS_MEXICO).not.toBe(TELEFONO_TALLER);
+    expect(TELEFONO_MATRIMONIOS_OTROS_PAISES).not.toBe(TELEFONO_TALLER);
+    expect(TELEFONO_MATRIMONIOS_OTROS_PAISES).not.toBe(TELEFONO_MATRIMONIOS_MEXICO);
+  });
+
+  it('el mensaje es el de la orden, y se codifica entero', () => {
+    const web = RECURSOS_I18N.es.web as unknown as Record<string, Record<string, string>>;
+    const mensaje = web.matrimonios[CLAVE_MENSAJE_MATRIMONIOS.split('.')[1]];
+    expect(mensaje).toBe('Hola, quiero asegurar mi lugar en el taller Cómo sanar un matrimonio herido.');
+    expect(enlaceWhatsApp(TELEFONO_MATRIMONIOS_OTROS_PAISES, mensaje)).toBe(
+      'https://wa.me/524622511017?text=Hola%2C%20quiero%20asegurar%20mi%20lugar%20en%20el%20taller%20C%C3%B3mo%20sanar%20un%20matrimonio%20herido.',
+    );
   });
 });

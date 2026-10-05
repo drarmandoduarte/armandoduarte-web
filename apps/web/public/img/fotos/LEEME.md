@@ -101,3 +101,23 @@ dejaba fuera a dos niños, y proponía pedirle otra foto a Lucía. **La #12 la
 reemplazó**, así que el caso se cerró solo. Queda escrito porque la lección
 sirve: cuando un recorte pelea con su foto, lo que hay que cambiar suele ser la
 foto.
+
+## `matrimonios/` · la landing «Cómo sanar un matrimonio herido» (orden #38)
+
+Las mandó **Armando** por WhatsApp el 5/10/2026 (17 archivos). El CEO eligió
+cada una por su papel en la página —dolor arriba, esperanza abajo— y las redujo
+a WebP (q72/70); los originales y la tabla completa viven en
+`03 Producto/web/insumos/2026-10-05-matrimonios/LEEME.md`. Acá van solo las que
+la página usa, sin JPG de respaldo: WebP lo entiende todo navegador desde 2020.
+
+| archivo | dónde se ve | origen |
+|---|---|---|
+| `dolor-cama-{2400,1600,900}` | fondo de «¿Hace cuánto tiempo dejaron de mirarse con ilusión?» | `5.jpg`, de Armando (con su autorización) |
+| `dolor-llanto-{1600,900}` | «El dolor de un matrimonio herido…», primer bloque | `2.jpg`, de Armando |
+| `dolor-hijo-{1600,900}` | «El dolor…», el párrafo de los hijos | `4.jpg`, de Armando |
+| `giro-manos-{1600,900}` | «¡Todo problema tiene solución!» (B/N) | Pexels · joyboy |
+| `esperanza-manos-anillo-{1600,900}` | «Frases poderosas…», 1 | Pexels · monika |
+| `esperanza-familia-{1600,900}` | «Frases poderosas…», 2 | Pexels · danikprihodko 19510859 |
+| `esperanza-abrazo-bn-{1600,900}` | «Frases poderosas…», 3 | Pexels · rodry |
+| `esperanza-frente-{1600,900}` | «Frases poderosas…», 4 | Pexels · itsmeseher |
+| `esperanza-abrazo-flores-{2400,1600,900}` | fondo del cierre «¿Están listos para luchar?» | Pexels · luisbecerra 5906158 |

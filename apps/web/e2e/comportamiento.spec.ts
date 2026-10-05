@@ -241,7 +241,8 @@ test.describe('los tres comportamientos siguen vivos sin React', () => {
        Se lee del menú y no de `@codice/core` (Playwright no carga sus JSON):
        que la bandera y el HTML coincidan lo afirma `la-web-no-nombra-vercel`. */
     const conMiEspacio = (await page.locator('#ov a[data-nav]', { hasText: 'Mi espacio' }).count()) > 0;
-    const PARADAS = conMiEspacio ? 9 : 8;
+    /* #38: un ítem más, «Matrimonios», debajo del taller de Mérida. */
+    const PARADAS = conMiEspacio ? 10 : 9;
     const recorrido: string[] = [];
     for (let i = 0; i < PARADAS; i++) {
       await page.keyboard.press('Tab');
@@ -402,7 +403,7 @@ test.describe('los tres comportamientos siguen vivos sin React', () => {
    * sin JavaScript todo vale 1 y la comprobación pasaría sola. Se espera a que
    * `comportamiento.ts` ponga la clase `js` y recién ahí se mide.
    */
-  for (const [pagina, ruta] of [['portada', '/'], ['/merida', '/merida']] as const) {
+  for (const [pagina, ruta] of [['portada', '/'], ['/merida', '/merida'], ['/matrimonios', '/matrimonios']] as const) {
     test(`1440px · el hero de ${pagina} está opaco apenas carga`, async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(`http://127.0.0.1:${PUERTO_PORT}${ruta}`, { waitUntil: 'domcontentloaded' });
