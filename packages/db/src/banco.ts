@@ -131,11 +131,11 @@ export async function levantarBanco(): Promise<Banco> {
      mueve, un renombre— `readdirSync` devuelve `[]`, las migraciones «corren»
      sin error y los tests fallan después hablando de tablas que no existen. Con
      esto, el rojo dice la causa. */
-  if (archivos.length < 13) {
+  if (archivos.length < 14) {
     throw new Error(
-      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 13 `
+      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 14 `
       + '(seis de la #13, la 007 de permisos, la 008 del panel, la 009 de «me anoto», la 010 del libro en el panel, la 011 del perfil, '
-      + 'la 012 de los avisos y la 013 de los rescates). '
+      + 'la 012 de los avisos, la 013 de los rescates y la 014 de ajustes y papelera). '
       + 'O el glob no las ve, o alguien las movió: no se corrió nada.',
     );
   }
