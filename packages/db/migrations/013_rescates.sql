@@ -17,10 +17,11 @@
 -- APLICADA: —
 --
 -- ── IMPORTANTE: se corre ANTES del merge del PR 2 de la #37 ────────────────
--- `GET /api/yo` lee `rescates` para decir si hay un reseteo pendiente, y las
--- cuatro rutas de `/api/rescate/*` escriben acá. Desplegado sin esta migración,
--- `/api/yo` da `42P01` y **nadie entra a Mi espacio**. Es el caso de la 009, la
--- 011 y la 012: migración corrida, mergeá.
+-- Las cuatro rutas de `/api/rescate/*` leen y escriben acá: desplegado sin esta
+-- migración, pedir, confirmar, cancelar y aplicar un reseteo dan `42P01`.
+-- `GET /api/yo` también la lee («Reseteo pendiente»), pero a propósito no se
+-- cae si falta: sin la tabla no hay reseteo que mostrar y la entrada sigue.
+-- Migración corrida, mergeá.
 --
 -- ── Lo que se guarda, y lo que NO ──────────────────────────────────────────
 --   · `token_hash`: el SHA-256 (hex) del token de los enlaces del correo. El
