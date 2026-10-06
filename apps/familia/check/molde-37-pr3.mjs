@@ -228,7 +228,7 @@ async function comparar(archivo, delMolde) {
   const pagina = await navegador.newPage({ viewport: { width: 1800, height: 1000 } });
   const a = `data:image/png;base64,${readFileSync(join(SALIDA, archivo)).toString('base64')}`;
   const b = `data:image/png;base64,${readFileSync(origen).toString('base64')}`;
-  await pagina.setContent(`<!doctype html><body style="margin:0;background:#888;font:600 15px system-ui;color:#111">
+  await pagina.setContent(`<!doctype html><body style="margin:0;background:gray;font:600 15px system-ui;color:black">
     <div style="display:flex;gap:16px;padding:16px;align-items:flex-start">
       <figure style="margin:0;flex:1"><figcaption style="padding:0 0 8px">Mi espacio · ${archivo}</figcaption><img src="${a}" style="width:100%;display:block"></figure>
       <figure style="margin:0;flex:1"><figcaption style="padding:0 0 8px">Molde 1.1.2 · ${delMolde}</figcaption><img src="${b}" style="width:100%;display:block"></figure>

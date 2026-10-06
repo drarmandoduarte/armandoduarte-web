@@ -263,7 +263,8 @@ function FilaDeLista({ t, nombre, explicacion, valor, opciones, accion }: {
   return (
     <FilaAjuste nombre={nombre} explicacion={explicacion} guardadoEn={guardadoEn} textoGuardado={t('settings.saved')}>
       <Selector
-        label={nombre} value={actual} options={opciones} buscable={opciones.length > 12}
+        /* Sin `label` visible: el nombre ya lo dice la fila. Queda para el lector de pantalla. */
+        aria-label={nombre} value={actual} options={opciones} buscable={opciones.length > 12}
         onChange={(v) => { setActual(v); guardar(v).catch(() => setActual(valor)); }}
         containerStyle={{ minWidth: '14rem', maxWidth: '20rem' }}
       />

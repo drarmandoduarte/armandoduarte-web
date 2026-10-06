@@ -1,0 +1,153 @@
+entrada-1440-claro.png                           CSP 0 · <style> 0 · 16 pares, 4 bajo AA · «Entra a tu espacio.»
+entrada-1440-claro-en.png                        CSP 0 · <style> 0 · 16 pares, 4 bajo AA · «Enter your space.»
+entrada-1440-claro-pt.png                        CSP 0 · <style> 0 · 16 pares, 4 bajo AA · «Entre no seu espaço.»
+entrada-1440-oscuro.png                          CSP 0 · <style> 0 · 16 pares, 2 bajo AA · «Entra a tu espacio.»
+entrada-390-claro.png                            CSP 0 · <style> 0 · 16 pares, 4 bajo AA · «Entra a tu espacio.»
+entrada-390-claro-en.png                         CSP 0 · <style> 0 · 16 pares, 4 bajo AA · «Enter your space.»
+entrada-390-claro-pt.png                         CSP 0 · <style> 0 · 16 pares, 4 bajo AA · «Entre no seu espaço.»
+entrada-390-oscuro.png                           CSP 0 · <style> 0 · 16 pares, 2 bajo AA · «Entra a tu espacio.»
+verificacion-1440-claro.png                      CSP 0 · <style> 0 · 14 pares, 4 bajo AA · «Verifica tu identidad.»
+verificacion-1440-claro-en.png                   CSP 0 · <style> 0 · 14 pares, 4 bajo AA · «Verify your identity.»
+verificacion-1440-claro-pt.png                   CSP 0 · <style> 0 · 14 pares, 4 bajo AA · «Verifique sua identidade.»
+verificacion-1440-oscuro.png                     CSP 0 · <style> 0 · 14 pares, 2 bajo AA · «Verifica tu identidad.»
+verificacion-390-claro.png                       CSP 0 · <style> 0 · 14 pares, 4 bajo AA · «Verifica tu identidad.»
+verificacion-390-claro-en.png                    CSP 0 · <style> 0 · 14 pares, 4 bajo AA · «Verify your identity.»
+verificacion-390-claro-pt.png                    CSP 0 · <style> 0 · 14 pares, 4 bajo AA · «Verifique sua identidade.»
+verificacion-390-oscuro.png                      CSP 0 · <style> 0 · 14 pares, 2 bajo AA · «Verifica tu identidad.»
+inicio-cliente-1440-claro.png                    CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «Hola, Laura.»
+inicio-cliente-1440-oscuro.png                   CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «Hola, Laura.»
+inicio-cliente-390-claro.png                     CSP 0 · <style> 0 · 22 pares, 0 bajo AA · «Hola, Laura.»
+inicio-cliente-390-oscuro.png                    CSP 0 · <style> 0 · 22 pares, 0 bajo AA · «Hola, Laura.»
+alertas-cliente-1440-claro.png                   CSP 0 · <style> 0 · 32 pares, 0 bajo AA · «Lo que hay que mirar.»
+alertas-cliente-1440-oscuro.png                  CSP 0 · <style> 0 · 32 pares, 0 bajo AA · «Lo que hay que mirar.»
+alertas-cliente-390-claro.png                    CSP 0 · <style> 0 · 25 pares, 0 bajo AA · «Lo que hay que mirar.»
+alertas-cliente-390-oscuro.png                   CSP 0 · <style> 0 · 25 pares, 0 bajo AA · «Lo que hay que mirar.»
+papelera-cliente-1440-claro.png                  CSP 0 · <style> 0 · 17 pares, 0 bajo AA · «Lo que borraste.»
+papelera-cliente-1440-oscuro.png                 CSP 0 · <style> 0 · 17 pares, 0 bajo AA · «Lo que borraste.»
+papelera-cliente-390-claro.png                   CSP 0 · <style> 0 · 10 pares, 0 bajo AA · «Lo que borraste.»
+papelera-cliente-390-oscuro.png                  CSP 0 · <style> 0 · 10 pares, 0 bajo AA · «Lo que borraste.»
+ajustes-lista-cliente-390-claro.png              CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-lista-cliente-390-oscuro.png             CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-perfil-cliente-1440-claro.png            CSP 0 · <style> 0 · 34 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-perfil-cliente-1440-oscuro.png           CSP 0 · <style> 0 · 34 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-perfil-cliente-390-claro.png             CSP 0 · <style> 0 · 15 pares, 0 bajo AA · «»
+ajustes-perfil-cliente-390-oscuro.png            CSP 0 · <style> 0 · 15 pares, 0 bajo AA · «»
+ajustes-cuenta-cliente-1440-claro.png            CSP 0 · <style> 0 · 41 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-cuenta-cliente-1440-oscuro.png           CSP 0 · <style> 0 · 41 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-cuenta-cliente-390-claro.png             CSP 0 · <style> 0 · 22 pares, 0 bajo AA · «»
+ajustes-cuenta-cliente-390-oscuro.png            CSP 0 · <style> 0 · 22 pares, 0 bajo AA · «»
+ajustes-apariencia-cliente-1440-claro.png        CSP 0 · <style> 0 · 37 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-apariencia-cliente-1440-oscuro.png       CSP 0 · <style> 0 · 37 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-apariencia-cliente-390-claro.png         CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «»
+ajustes-apariencia-cliente-390-oscuro.png        CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «»
+ajustes-idioma-cliente-1440-claro.png            CSP 0 · <style> 0 · 35 pares, 4 bajo AA · «Tus preferencias.»
+ajustes-idioma-cliente-1440-oscuro.png           CSP 0 · <style> 0 · 35 pares, 2 bajo AA · «Tus preferencias.»
+ajustes-idioma-cliente-390-claro.png             CSP 0 · <style> 0 · 16 pares, 4 bajo AA · «»
+ajustes-idioma-cliente-390-oscuro.png            CSP 0 · <style> 0 · 16 pares, 2 bajo AA · «»
+ajustes-notificaciones-cliente-1440-claro.png    CSP 0 · <style> 0 · 40 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-notificaciones-cliente-1440-oscuro.png   CSP 0 · <style> 0 · 40 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-notificaciones-cliente-390-claro.png     CSP 0 · <style> 0 · 21 pares, 0 bajo AA · «»
+ajustes-notificaciones-cliente-390-oscuro.png    CSP 0 · <style> 0 · 21 pares, 0 bajo AA · «»
+ajustes-privacidad-cliente-1440-claro.png        CSP 0 · <style> 0 · 35 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-privacidad-cliente-1440-oscuro.png       CSP 0 · <style> 0 · 35 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-privacidad-cliente-390-claro.png         CSP 0 · <style> 0 · 16 pares, 0 bajo AA · «»
+ajustes-privacidad-cliente-390-oscuro.png        CSP 0 · <style> 0 · 16 pares, 0 bajo AA · «»
+ajustes-taller-cliente-1440-claro.png            CSP 0 · <style> 0 · 48 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-taller-cliente-1440-oscuro.png           CSP 0 · <style> 0 · 48 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-taller-cliente-390-claro.png             CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «»
+ajustes-taller-cliente-390-oscuro.png            CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «»
+ajustes-acerca-cliente-1440-claro.png            CSP 0 · <style> 0 · 54 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-acerca-cliente-1440-oscuro.png           CSP 0 · <style> 0 · 54 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-acerca-cliente-390-claro.png             CSP 0 · <style> 0 · 35 pares, 0 bajo AA · «»
+ajustes-acerca-cliente-390-oscuro.png            CSP 0 · <style> 0 · 35 pares, 0 bajo AA · «»
+bienvenida-cliente-1440-claro.png                CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Tus datos.»
+bienvenida-cliente-1440-oscuro.png               CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Tus datos.»
+bienvenida-cliente-390-claro.png                 CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Tus datos.»
+bienvenida-cliente-390-oscuro.png                CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Tus datos.»
+talleres-cliente-1440-claro.png                  CSP 0 · <style> 0 · 36 pares, 0 bajo AA · «Talleres abiertos.»
+talleres-cliente-1440-oscuro.png                 CSP 0 · <style> 0 · 36 pares, 0 bajo AA · «Talleres abiertos.»
+talleres-cliente-390-claro.png                   CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «Talleres abiertos.»
+talleres-cliente-390-oscuro.png                  CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «Talleres abiertos.»
+mis-talleres-cliente-1440-claro.png              CSP 0 · <style> 0 · 33 pares, 0 bajo AA · «Mis talleres.»
+mis-talleres-cliente-1440-oscuro.png             CSP 0 · <style> 0 · 33 pares, 0 bajo AA · «Mis talleres.»
+mis-talleres-cliente-390-claro.png               CSP 0 · <style> 0 · 26 pares, 0 bajo AA · «Mis talleres.»
+mis-talleres-cliente-390-oscuro.png              CSP 0 · <style> 0 · 26 pares, 0 bajo AA · «Mis talleres.»
+inicio-dueno-1440-claro.png                      CSP 0 · <style> 0 · 27 pares, 0 bajo AA · «Hola, Armando.»
+inicio-dueno-1440-oscuro.png                     CSP 0 · <style> 0 · 27 pares, 0 bajo AA · «Hola, Armando.»
+inicio-dueno-390-claro.png                       CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «Hola, Armando.»
+inicio-dueno-390-oscuro.png                      CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «Hola, Armando.»
+alertas-dueno-1440-claro.png                     CSP 0 · <style> 0 · 37 pares, 0 bajo AA · «Lo que hay que mirar.»
+alertas-dueno-1440-oscuro.png                    CSP 0 · <style> 0 · 37 pares, 0 bajo AA · «Lo que hay que mirar.»
+alertas-dueno-390-claro.png                      CSP 0 · <style> 0 · 28 pares, 0 bajo AA · «Lo que hay que mirar.»
+alertas-dueno-390-oscuro.png                     CSP 0 · <style> 0 · 28 pares, 0 bajo AA · «Lo que hay que mirar.»
+papelera-dueno-1440-claro.png                    CSP 0 · <style> 0 · 28 pares, 0 bajo AA · «Lo que borraste.»
+papelera-dueno-1440-oscuro.png                   CSP 0 · <style> 0 · 28 pares, 0 bajo AA · «Lo que borraste.»
+papelera-dueno-390-claro.png                     CSP 0 · <style> 0 · 19 pares, 0 bajo AA · «Lo que borraste.»
+papelera-dueno-390-oscuro.png                    CSP 0 · <style> 0 · 19 pares, 0 bajo AA · «Lo que borraste.»
+ajustes-lista-dueno-390-claro.png                CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-lista-dueno-390-oscuro.png               CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-perfil-dueno-1440-claro.png              CSP 0 · <style> 0 · 36 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-perfil-dueno-1440-oscuro.png             CSP 0 · <style> 0 · 36 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-perfil-dueno-390-claro.png               CSP 0 · <style> 0 · 15 pares, 0 bajo AA · «»
+ajustes-perfil-dueno-390-oscuro.png              CSP 0 · <style> 0 · 15 pares, 0 bajo AA · «»
+ajustes-cuenta-dueno-1440-claro.png              CSP 0 · <style> 0 · 52 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-cuenta-dueno-1440-oscuro.png             CSP 0 · <style> 0 · 52 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-cuenta-dueno-390-claro.png               CSP 0 · <style> 0 · 31 pares, 0 bajo AA · «»
+ajustes-cuenta-dueno-390-oscuro.png              CSP 0 · <style> 0 · 31 pares, 0 bajo AA · «»
+ajustes-apariencia-dueno-1440-claro.png          CSP 0 · <style> 0 · 39 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-apariencia-dueno-1440-oscuro.png         CSP 0 · <style> 0 · 39 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-apariencia-dueno-390-claro.png           CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «»
+ajustes-apariencia-dueno-390-oscuro.png          CSP 0 · <style> 0 · 18 pares, 0 bajo AA · «»
+ajustes-idioma-dueno-1440-claro.png              CSP 0 · <style> 0 · 37 pares, 4 bajo AA · «Tus preferencias.»
+ajustes-idioma-dueno-1440-oscuro.png             CSP 0 · <style> 0 · 37 pares, 2 bajo AA · «Tus preferencias.»
+ajustes-idioma-dueno-390-claro.png               CSP 0 · <style> 0 · 16 pares, 4 bajo AA · «»
+ajustes-idioma-dueno-390-oscuro.png              CSP 0 · <style> 0 · 16 pares, 2 bajo AA · «»
+ajustes-notificaciones-dueno-1440-claro.png      CSP 0 · <style> 0 · 42 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-notificaciones-dueno-1440-oscuro.png     CSP 0 · <style> 0 · 42 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-notificaciones-dueno-390-claro.png       CSP 0 · <style> 0 · 21 pares, 0 bajo AA · «»
+ajustes-notificaciones-dueno-390-oscuro.png      CSP 0 · <style> 0 · 21 pares, 0 bajo AA · «»
+ajustes-privacidad-dueno-1440-claro.png          CSP 0 · <style> 0 · 37 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-privacidad-dueno-1440-oscuro.png         CSP 0 · <style> 0 · 37 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-privacidad-dueno-390-claro.png           CSP 0 · <style> 0 · 16 pares, 0 bajo AA · «»
+ajustes-privacidad-dueno-390-oscuro.png          CSP 0 · <style> 0 · 16 pares, 0 bajo AA · «»
+ajustes-taller-dueno-1440-claro.png              CSP 0 · <style> 0 · 49 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-taller-dueno-1440-oscuro.png             CSP 0 · <style> 0 · 49 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-taller-dueno-390-claro.png               CSP 0 · <style> 0 · 28 pares, 0 bajo AA · «»
+ajustes-taller-dueno-390-oscuro.png              CSP 0 · <style> 0 · 28 pares, 0 bajo AA · «»
+ajustes-acerca-dueno-1440-claro.png              CSP 0 · <style> 0 · 56 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-acerca-dueno-1440-oscuro.png             CSP 0 · <style> 0 · 56 pares, 0 bajo AA · «Tus preferencias.»
+ajustes-acerca-dueno-390-claro.png               CSP 0 · <style> 0 · 35 pares, 0 bajo AA · «»
+ajustes-acerca-dueno-390-oscuro.png              CSP 0 · <style> 0 · 35 pares, 0 bajo AA · «»
+bienvenida-dueno-1440-claro.png                  CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Tus datos.»
+bienvenida-dueno-1440-oscuro.png                 CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Tus datos.»
+bienvenida-dueno-390-claro.png                   CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Tus datos.»
+bienvenida-dueno-390-oscuro.png                  CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Tus datos.»
+talleres-dueno-1440-claro.png                    CSP 0 · <style> 0 · 38 pares, 0 bajo AA · «Talleres abiertos.»
+talleres-dueno-1440-oscuro.png                   CSP 0 · <style> 0 · 38 pares, 0 bajo AA · «Talleres abiertos.»
+talleres-dueno-390-claro.png                     CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «Talleres abiertos.»
+talleres-dueno-390-oscuro.png                    CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «Talleres abiertos.»
+mis-talleres-dueno-1440-claro.png                CSP 0 · <style> 0 · 20 pares, 0 bajo AA · «Mis talleres.»
+mis-talleres-dueno-1440-oscuro.png               CSP 0 · <style> 0 · 20 pares, 0 bajo AA · «Mis talleres.»
+mis-talleres-dueno-390-claro.png                 CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Mis talleres.»
+mis-talleres-dueno-390-oscuro.png                CSP 0 · <style> 0 · 11 pares, 0 bajo AA · «Mis talleres.»
+equipo-dueno-1440-claro.png                      CSP 0 · <style> 0 · 41 pares, 0 bajo AA · «Tu equipo.»
+equipo-dueno-1440-oscuro.png                     CSP 0 · <style> 0 · 41 pares, 0 bajo AA · «Tu equipo.»
+equipo-dueno-390-claro.png                       CSP 0 · <style> 0 · 32 pares, 0 bajo AA · «Tu equipo.»
+equipo-dueno-390-oscuro.png                      CSP 0 · <style> 0 · 32 pares, 0 bajo AA · «Tu equipo.»
+panel-dueno-1440-claro.png                       CSP 0 · <style> 0 · 48 pares, 0 bajo AA · «Panel del equipo»
+panel-dueno-1440-oscuro.png                      CSP 0 · <style> 0 · 48 pares, 0 bajo AA · «Panel del equipo»
+panel-dueno-390-claro.png                        CSP 0 · <style> 0 · 39 pares, 0 bajo AA · «Panel del equipo»
+panel-dueno-390-oscuro.png                       CSP 0 · <style> 0 · 39 pares, 0 bajo AA · «Panel del equipo»
+inicio-cliente-1440-claro-en.png                 CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «Hi, Laura.»
+inicio-cliente-1440-claro-pt.png                 CSP 0 · <style> 0 · 29 pares, 0 bajo AA · «Olá, Laura.»
+ajustes-cuenta-cliente-1440-claro-en.png         CSP 0 · <style> 0 · 41 pares, 0 bajo AA · «Your preferences.»
+ajustes-cuenta-cliente-1440-claro-pt.png         CSP 0 · <style> 0 · 41 pares, 0 bajo AA · «Suas preferências.»
+ajustes-taller-cliente-1440-claro-en.png         CSP 0 · <style> 0 · 48 pares, 0 bajo AA · «Your preferences.»
+ajustes-taller-cliente-1440-claro-pt.png         CSP 0 · <style> 0 · 48 pares, 0 bajo AA · «Suas preferências.»
+
+Sin fallas.
+
+Propuestas al molde (fase-2 §12):
+Idioma (@moldes/ui): «en» no activo, #9A948C sobre #FAF7F1 = 2.81:1 (< 4.5)
+Idioma (@moldes/ui): «pt» no activo, #9A948C sobre #FAF7F1 = 2.81:1 (< 4.5)
+Idioma (@moldes/ui): «es» no activo, #9A948C sobre #FAF7F1 = 2.81:1 (< 4.5)

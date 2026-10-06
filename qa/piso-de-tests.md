@@ -18,15 +18,30 @@ alguien lo va a leer en el PR. Ése es el punto.
 | paquete | piso |
 |---|---|
 | `@codice/ui` | 41 |
-| `@codice/core` | 134 |
+| `@codice/core` | 140 |
 | `@codice/prompts` | 3 |
-| `@codice/db` | 184 |
+| `@codice/db` | 206 |
 | `@codice/web` | 83 |
-| `@codice/familia` | 228 |
-| `@codice/api` | 163 |
+| `@codice/familia` | 239 |
+| `@codice/api` | 178 |
 | `@codice/navegador` | 65 |
 
 
+
+## Lo que trae la orden #37, PR 3 — `core` 134 → 140, `db` 184 → 206, `familia` 228 → 239, `api` 163 → 178
+
+Mi espacio nace del molde: shell, Ajustes, Inicio, Centro de alertas, Papelera,
+Equipo y Bienvenida.
+
+- **`@codice/core` (+13 −7)**: `mi-espacio/molde.test.ts` (quién ve qué, las
+  alertas en sus cuatro tonos, la Bienvenida). Se van siete de lo que
+  reemplazó el molde: `inicialesDe`, `formasDeEntrar` y `seccionesDeAjustes`.
+- **`@codice/db` (+22)**: `ajustes-y-papelera.test.ts`, la 014.
+- **`@codice/familia` (+11)**: `molde/el-molde-por-dentro.test.tsx` (44) y los
+  de la Bienvenida y «Perfil del taller»; se van `el-marco.test.tsx` y
+  `los-ajustes.test.tsx`, que miraban la barra y «Tus preferencias.».
+- **`@codice/api` (+15)**: borrar la cuenta, la papelera, el equipo y
+  `codigo-reciente.spec.ts`.
 
 ## Lo que trae la orden #37, PR 2 — `ui` 42 → 41, `core` 123 → 134, `db` 107 → 184, `familia` 222 → 228, `api` 70 → 163
 
