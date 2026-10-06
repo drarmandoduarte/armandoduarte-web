@@ -23,7 +23,7 @@
  *
  * ── Lo que este banco tiene y el de Omnia no: el `aal` ────────────────────
  * `como(usuarioId, aal, hacer)` lleva el nivel de autenticación en los claims.
- * Sin eso no se puede probar S3 del Kit de Seguridad 512 —«lo que un miembro ve
+ * Sin eso no se puede probar S3 del Kit de Acceso —«lo que un miembro ve
  * de otras personas exige `aal2` en la base, no solo en la API»—, que es el test
  * que más importa de la orden #13.
  *

@@ -321,9 +321,9 @@ describe('los tokens de Códice', () => {
  * edita a mano, o cambia el canon sin regenerarlo, esto se pone rojo.
  */
 describe('el design.json de Mi espacio, en el esquema del molde (#35 · #37)', async () => {
-  const { generar, SALIDA_JSON, SALIDA_CSS, MAPA, MAPA_MOLDE, FRASE } = await import('./scripts/design-json.mjs');
+  const { generar, SALIDA_JSON, MAPA_MOLDE, FRASE } = await import('./scripts/design-json.mjs');
   const { validar, avisos, hojaDeDesign, COLORES } = await import('../moldes/design/index.js');
-  const { json, css, documento } = generar();
+  const { json, documento } = generar();
   const DESIGN_CSS = join(AQUI, '..', '..', 'apps', 'familia', 'public', 'design.css');
   const FUENTES = join(AQUI, '..', '..', 'apps', 'familia', 'public', 'fuentes');
 
@@ -357,10 +357,6 @@ describe('el design.json de Mi espacio, en el esquema del molde (#35 · #37)', a
     expect(hoja, 'nada se le pide a Google').not.toMatch(/googleapis|gstatic/);
   });
 
-  it('y la forma ejecutable de las pantallas de la #35 (las variables --acceso-*), también', () => {
-    expect(readFileSync(SALIDA_CSS, 'utf8'), 'corre `node packages/ui/scripts/design-json.mjs`').toBe(css);
-  });
-
   it('cada hex del design.json está en el canon, y es el de su token (siguiendo las ref)', () => {
     const canonCss = readFileSync(join(AQUI, 'codice-tokens.css'), 'utf8').toUpperCase();
     const enJson = readFileSync(SALIDA_JSON, 'utf8').match(/#[0-9A-Fa-f]{6}\b/g) ?? [];
@@ -383,8 +379,6 @@ describe('el design.json de Mi espacio, en el esquema del molde (#35 · #37)', a
     expect(documento.app).toEqual({ nombre: 'Armando Duarte', frase: FRASE, espanol: 'neutro' });
     expect(FRASE).toEqual({ es: 'Entra a tu *espacio*.', en: 'Enter your *space*.', pt: 'Entre no seu *espaço*.' });
     expect(documento.radio).toEqual({ boton: 2, campo: 2, tarjeta: 12 });
-    /* La #35 sigue: el borde de los campos de sus pantallas, ink.muted (auditoría #56). */
-    expect(MAPA.colores.borde).toBe('color.ink.muted');
   });
 
   it('el modo oscuro (v1.3.0): texto y texto2 a AA sobre fondo y papel, y acento, error, ok y aviso también', () => {

@@ -1,25 +1,26 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Boton, CampoMono, Enlace } from '@moldes/ui';
 import { api, ErrorDeApi } from '../comun/api';
-import { EnlaceInterno } from '../comun/navegacion';
+import { useNavegar } from '../comun/navegacion';
 import { RUTAS } from '../rutas';
-import { BotonDeAcceso, EnlacesDeAcceso, MarcoDeAcceso, useTextos } from './Marco';
+import { MarcoDeAcceso } from './Marco';
+import { useT } from './textos';
 
 /**
- * P6 · Recuperación (`/auth/2fa/recuperar`, desde P3) — guion v1, §4.
+ * P6 · Recuperación (`/auth/2fa/recuperar`, desde P3).
  *
- * El código de respaldo **no usa la casilla de 6** (§3): tiene diez caracteres
- * y va en un campo único, monoespaciado, con espacios permitidos. La regla es
- * del kit y no cambió: `POST /api/respaldo/usar` (una de las dos rutas con
+ * El código de respaldo **no usa la casilla de 6**: tiene diez caracteres y va
+ * en el campo monoespaciado del molde (`CampoMono`), con espacios permitidos.
+ * La regla es del kit y no cambió: `POST /api/respaldo/usar` (con
  * `@SinSegundoPaso`) borra el autenticador viejo y `App` manda a P4 a
  * configurar uno nuevo; nunca es un atajo hacia los datos.
  *
- * Mi espacio es de **rescate solo** (Armando no resetea el autenticador de
- * nadie, #13): por eso el segundo enlace, «Tampoco tengo los códigos» → P6b.
+ * Mi espacio es de **rescate solo** (fase-2 §8): por eso el segundo enlace,
+ * «Tampoco tengo los códigos» → P6b.
  */
 export function Recuperar({ alRecuperar }: { alRecuperar: () => void }) {
-  const { ta } = useTextos();
-  const { t } = useTranslation();
+  const { t } = useT();
+  const navegar = useNavegar();
   const [codigo, setCodigo] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -33,41 +34,33 @@ export function Recuperar({ alRecuperar }: { alRecuperar: () => void }) {
       await api('respaldo/usar', { metodo: 'POST', cuerpo: { codigo: codigo.replace(/\s+/g, '').toUpperCase() } });
       alRecuperar();
     } catch (fallo) {
-      /* NUESTRO texto, nunca el del servidor (ver `comun/api.ts`). El guion no
-         trae uno para «ese código no sirve»; va el de la casa (informe #35). */
-      setError(fallo instanceof ErrorDeApi && fallo.estado === 400 ? t('acceso.respaldoInvalido') : t('comun.errorGenerico'));
+      /* NUESTRO texto, nunca el del servidor (ver `comun/api.ts`). */
+      setError(fallo instanceof ErrorDeApi && fallo.estado === 400 ? t('auth.recover.invalid') : t('auth.error.generic'));
     } finally {
       setEnviando(false);
     }
   }
 
   return (
-    <MarcoDeAcceso antetitulo={ta('recover.eyebrow')} titulo={ta('recover.title')} subtitulo={ta('recover.subtitle')}>
-      <form onSubmit={usar} noValidate>
-        {/* El guion no pone etiqueta visible en P6 (§4): el campo se nombra para
-            el lector de pantalla con la palabra del antetítulo. */}
-        <input
+    <MarcoDeAcceso antetitulo={t('auth.recover.eyebrow')} titulo={t('auth.recover.title')} subtitulo={t('auth.recover.subtitle')}>
+      <form className="acceso__formulario" onSubmit={usar} noValidate>
+        <CampoMono
           id="respaldo"
-          aria-label={ta('recover.eyebrow')}
-          className="acceso__campo acceso__campo--mono"
+          aria-label={t('auth.recover.label')}
           value={codigo}
           onChange={(e) => setCodigo(e.target.value.toUpperCase())}
           autoComplete="one-time-code"
           autoCapitalize="characters"
           spellCheck={false}
           autoFocus
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? 'respaldo-error' : undefined}
+          error={error ?? undefined}
         />
-        {error ? <p className="acceso__error" id="respaldo-error" role="alert">{error}</p> : null}
-        <div className="acceso__acciones acceso__acciones--ancho">
-          <BotonDeAcceso ancho flecha cargando={enviando}>{ta('recover.continue')}</BotonDeAcceso>
-        </div>
+        <Boton type="submit" ancho="completo" flecha cargando={enviando}>{t('auth.recover.continue')}</Boton>
       </form>
-      <EnlacesDeAcceso>
-        <EnlaceInterno a={RUTAS.reto} className="acceso__enlace">{ta('recover.back')}</EnlaceInterno>
-        <EnlaceInterno a={RUTAS.reseteo} className="acceso__enlace acceso__enlace--apagado">{ta('recover.noCodes')}</EnlaceInterno>
-      </EnlacesDeAcceso>
+      <div className="acceso__enlaces">
+        <Enlace href={RUTAS.reto} onClick={(e) => { e.preventDefault(); navegar(RUTAS.reto); }}>{t('auth.recover.back')}</Enlace>
+        <Enlace tono="apagado" href={RUTAS.reseteo} onClick={(e) => { e.preventDefault(); navegar(RUTAS.reseteo); }}>{t('auth.recover.noCodes')}</Enlace>
+      </div>
     </MarcoDeAcceso>
   );
 }

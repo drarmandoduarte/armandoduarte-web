@@ -1,7 +1,7 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import type { UsuarioVerificado } from '../seguridad-512/nucleo/verificador-de-token';
+import type { UsuarioVerificado } from '../acceso/nucleo/verificador-de-token';
 
 /**
  * El enchufe que el kit pide: «dame el usuario de este token, o tirá».

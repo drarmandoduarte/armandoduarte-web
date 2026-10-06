@@ -1,0 +1,21 @@
+$ git diff --stat apps/api/src/acceso/nucleo/roles.ts
+ apps/api/src/acceso/nucleo/roles.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+$ pnpm test   # (la línea del guardián, que va primero)
+guardian/check.mjs: OK
+guardian/huellas.mjs: OK
+guardian/revisar.mjs: OK
+
+GUARDIÁN DE LOS MOLDES · rojo (1):
+  Cambió el núcleo del Kit de Acceso: apps/api/src/acceso/nucleo/roles.ts. No se edita dentro de una app: se revierte, o se propone al molde.
+
+salida: 1
+
+$ (se revierte: vuelve la copia de antes de la coma)
+$ pnpm test
+guardian/check.mjs: OK
+guardian/huellas.mjs: OK
+guardian/revisar.mjs: OK
+Guardián de los moldes · v1.1.2 · 379 archivos idénticos a sus huellas.
+salida: 0

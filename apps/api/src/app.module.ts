@@ -1,7 +1,7 @@
 import { Module, type MiddlewareConsumer, type NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { Aal2Guard } from './seguridad-512/nucleo/aal2.guard';
-import { VERIFICADOR_DE_TOKEN } from './seguridad-512/nucleo/verificador-de-token';
+import { Aal2Guard } from './acceso/nucleo/aal2.guard';
+import { VERIFICADOR_DE_TOKEN } from './acceso/nucleo/verificador-de-token';
 import { SupabaseService } from './identidad/supabase.service';
 import { RolMiddleware } from './identidad/rol.middleware';
 import { SaludController } from './salud.controller';
@@ -15,6 +15,8 @@ import { TalleresRepositorio } from './talleres/talleres.repositorio';
 import { PagosController } from './pagos/pagos.controller';
 import { PagosRepositorio } from './pagos/pagos.repositorio';
 import { CorreoService } from './correo/correo.service';
+import { RescateController } from './rescate/rescate.controller';
+import { RescateRepositorio } from './rescate/rescate.repositorio';
 
 /**
  * El módulo raíz de la API de Mi espacio.
@@ -28,16 +30,21 @@ import { CorreoService } from './correo/correo.service';
  *
  * Y `VERIFICADOR_DE_TOKEN` apuntando a `SupabaseService`, que es el enchufe que
  * el núcleo declara y no implementa. Son las dos únicas puertas por las que
- * entra algo de esta app al kit; la tercera es `seguridad-512.config.ts`.
+ * entra algo de esta app al kit; la tercera es `acceso.config.ts`.
  */
 @Module({
-  controllers: [SaludController, YoController, RespaldoController, SesionesController, EquipoController, TalleresController, PagosController],
+  controllers: [
+    SaludController, YoController, RespaldoController, SesionesController, EquipoController, TalleresController, PagosController,
+    /* #37 PR 2 · el rescate solo (fase-2 §8). */
+    RescateController,
+  ],
   providers: [
     SupabaseService,
     EquipoRepositorio,
     TalleresRepositorio,
     PagosRepositorio,
     CorreoService,
+    RescateRepositorio,
     { provide: VERIFICADOR_DE_TOKEN, useExisting: SupabaseService },
     { provide: APP_GUARD, useClass: Aal2Guard },
   ],

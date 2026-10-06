@@ -36,8 +36,11 @@ vi.mock('../supabase', () => ({
 
 import i18n from '../i18n';
 import { App } from '../App';
+import { tDelMolde } from '../molde/arranque';
 
 const t = (clave: string, o?: Record<string, unknown>) => i18n.t(clave, o);
+/* #37 PR 2: los textos de las pantallas de acceso (P5, P8) son los del molde. */
+const tm = (clave: string) => tDelMolde('es')(clave);
 const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 const token = (aal: string) => `${b64({ alg: 'HS256' })}.${b64({ aal })}.c2lnbmF0dXJh`;
 const sesionDe = (aal: string, proveedores = ['google']) =>
@@ -236,17 +239,17 @@ describe('#35 · regenerar los códigos: P8 si la verificación no es reciente, 
     render(<App />);
     fireEvent.click(await screen.findByRole('button', { name: t('respaldo.regenerar') }));
     const mismo = (esperado: string) => (nombre: string) => nombre.replace(/\s+/g, '') === esperado.replace(/[\s*]/g, '');
-    expect(await screen.findByRole('heading', { level: 1, name: mismo(t('auth.stepup.title')) })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: mismo(tm('auth.stepup.title')) })).toBeTruthy();
     expect(document.querySelectorAll('[data-casilla]')).toHaveLength(6);
-    fireEvent.change(screen.getByLabelText(t('auth.code.label')), { target: { value: '123456' } });
+    fireEvent.change(screen.getByLabelText(tm('auth.code.label')), { target: { value: '123456' } });
     await waitFor(() => expect(falso.salidas).toContain('verify:123456'));
     /* Reintentó y llegaron los diez: P5, con «Listo» apagado hasta guardarlos. */
-    expect(await screen.findByRole('heading', { level: 1, name: mismo(t('auth.backup.title')) })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: mismo(tm('auth.backup.title')) })).toBeTruthy();
     expect(screen.getAllByRole('listitem')).toHaveLength(10);
-    const listo = screen.getByRole('button', { name: new RegExp(t('auth.backup.done')) }) as HTMLButtonElement;
+    const listo = screen.getByRole('button', { name: new RegExp(tm('auth.backup.done'), 'i') }) as HTMLButtonElement;
     expect(listo.disabled).toBe(true);
     Object.assign(navigator, { clipboard: { writeText: vi.fn(async () => {}) } });
-    fireEvent.click(screen.getByRole('button', { name: t('auth.backup.copy') }));
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tm('auth.backup.copy'), 'i') }));
     await waitFor(() => expect(listo.disabled).toBe(false));
   });
 
@@ -256,7 +259,7 @@ describe('#35 · regenerar los códigos: P8 si la verificación no es reciente, 
     ir('/ajustes/seguridad');
     render(<App />);
     fireEvent.click(await screen.findByRole('button', { name: t('respaldo.regenerar') }));
-    fireEvent.click(await screen.findByRole('button', { name: t('auth.stepup.cancel') }));
+    fireEvent.click(await screen.findByRole('button', { name: new RegExp(tm('auth.stepup.cancel'), 'i') }));
     expect(await screen.findByText(t('respaldo.regenerarTitulo'))).toBeTruthy();
   });
 });
@@ -267,5 +270,24 @@ describe('Inicio', () => {
     render(<App />);
     const tarjeta = (await screen.findByText(t('inicio.datosTitulo'))).closest('section')!;
     expect(within(tarjeta).getByRole('link').getAttribute('href')).toBe('/ajustes/perfil');
+  });
+});
+
+describe('#37 PR 2 · «Reseteo pendiente» (rescate solo, fase-2 §8)', () => {
+  it('EL CASO: con un reseteo pedido, Seguridad lo dice con el texto del molde y la fecha en que vence', async () => {
+    comoEquipo();
+    yo = { ...yo, reseteoPendiente: { vence: '2026-10-08T15:00:00.000Z', confirmado: true } };
+    ir('/ajustes/seguridad');
+    render(<App />);
+    expect(await screen.findByText(tm('settings.security.resetPending'))).toBeTruthy();
+    expect(screen.getByText(/Pediste resetear el autenticador\. Vence el .*8 de octubre/)).toBeTruthy();
+  });
+
+  it('sin reseteo pedido, no hay línea', async () => {
+    comoEquipo();
+    ir('/ajustes/seguridad');
+    render(<App />);
+    await screen.findByText(t('respaldo.regenerarTitulo'));
+    expect(screen.queryByText(tm('settings.security.resetPending'))).toBeNull();
   });
 });

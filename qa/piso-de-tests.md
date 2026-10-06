@@ -17,16 +17,43 @@ alguien lo va a leer en el PR. Ése es el punto.
 
 | paquete | piso |
 |---|---|
-| `@codice/ui` | 42 |
-| `@codice/core` | 123 |
+| `@codice/ui` | 41 |
+| `@codice/core` | 134 |
 | `@codice/prompts` | 3 |
-| `@codice/db` | 107 |
+| `@codice/db` | 184 |
 | `@codice/web` | 83 |
-| `@codice/familia` | 222 |
-| `@codice/api` | 70 |
+| `@codice/familia` | 228 |
+| `@codice/api` | 163 |
 | `@codice/navegador` | 65 |
 
 
+
+## Lo que trae la orden #37, PR 2 — `ui` 42 → 41, `core` 123 → 134, `db` 107 → 184, `familia` 222 → 228, `api` 70 → 163
+
+El Kit de Acceso 1.3.0 en lugar del Kit de Seguridad 512, y el rescate solo.
+
+- **`@codice/ui` (−1, a propósito)**: se fue «la forma ejecutable de las
+  pantallas de la #35 (las variables `--acceso-*`)». Esas pantallas son ahora
+  las del molde y leen el `design.json`; la hoja que el test comparaba ya no se
+  genera.
+- **`@codice/core` (+11)**: `mi-espacio/rescate.test.ts` — las 48 horas, el
+  estado de un rescate, «Reseteo pendiente» y los enlaces del correo.
+- **`@codice/db` (+13 de `rescates.test.ts`)**: la 013 contra el banco (48 h,
+  nadie lee más que lo suyo, solo se agrega y se cierra, uno abierto por
+  persona). El resto de la diferencia son tests de las #27–#34 que entraron sin
+  subir el piso.
+- **`@codice/familia` (+6)**: el test de las pantallas pasa a ser
+  `acceso/el-acceso-del-molde.test.tsx` (19, con `/rescate` y P6b con
+  backend), `los-ajustes` suma «Reseteo pendiente» y `el-molde-esta-instalado`
+  suma el §7 (el nombre viejo del kit en cero, con su piso). Se fue el test de
+  la casilla de seis de la #35 (`comun/OtpInput.test.tsx`): la casilla es la del
+  molde y la cuida su paquete.
+- **`@codice/api` (+93)**: los tests por app del 1.3.0, adaptados, en
+  `src/acceso/` (incluido `guard-de-sesion-y-aal2.spec.ts`, nuevo), el
+  `usuario-del-pedido.spec.ts` del núcleo —que con el 1.1.0 no se podía correr—,
+  el bloque del rescate en `las-consultas-corren-contra-la-base.spec.ts` (con
+  Resend simulado) y `rescate/rescate.spec.ts`. El resto, tests de las #24–#34
+  que entraron sin subir el piso.
 
 ## Lo que trae la orden #37, PR 1 — `ui` 38 → 42, `familia` 169 → 222
 

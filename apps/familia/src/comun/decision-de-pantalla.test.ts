@@ -2,7 +2,7 @@
  * La pantalla no enrola a quien no conoce — orden Códice #15, punto 3.
  *
  * La tabla de nueve casos del kit la prueba el kit
- * (`seguridad-512/nucleo/decidir-reto.test.ts`). Acá se prueba **lo que esta app
+ * (`acceso/nucleo/decidir-reto.test.ts`). Acá se prueba **lo que esta app
  * le agrega**: que un `/api/yo` que no contestó no se lea como «cuenta de equipo
  * sin factor».
  */

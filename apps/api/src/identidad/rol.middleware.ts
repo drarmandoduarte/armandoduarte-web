@@ -1,7 +1,7 @@
 import { Injectable, type NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 import { SupabaseService } from './supabase.service';
-import { usuarioDelPedido } from '../seguridad-512/nucleo/usuario-del-pedido';
+import { usuarioDelPedido } from '../acceso/nucleo/usuario-del-pedido';
 
 /**
  * Deja el rol de quien pide en `request.profile.role`, **antes** del guard.

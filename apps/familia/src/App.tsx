@@ -13,6 +13,7 @@ import { Recuperar } from './acceso/Recuperar';
 import { Reseteo } from './acceso/Reseteo';
 import { Respaldo } from './acceso/Respaldo';
 import { Confirmacion } from './acceso/Confirmacion';
+import { Rescate } from './acceso/Rescate';
 import { PaginaDeMisTalleres, PaginaDeTalleres } from './mi-espacio/MiEspacio';
 import { Ajustes } from './mi-espacio/Ajustes';
 import { Inicio } from './mi-espacio/Inicio';
@@ -111,6 +112,21 @@ export function App() {
     setRuta(window.location.pathname);
   }, [cargando, sesion, yo, decision, faltanDatos, ruta, codigosNuevos]);
 
+  /* #37 PR 2 · cumplidas las 48 h de un rescate confirmado, la persona entra
+     con el código por correo y queda en el reto: acá se le pide a la API que
+     aplique el reseteo. Si lo aplicó, su autenticador ya no existe y, al
+     recargar, el núcleo (`decidirReto()`) la manda a enrolar uno nuevo. Si no
+     había nada listo, no cambia nada. Una vez por llegada al reto. */
+  const quien = sesion?.user?.id ?? null;
+  useEffect(() => {
+    if (decision !== 'reto' || !quien) return;
+    let vivo = true;
+    void api<{ aplicado: boolean }>('rescate/aplicar', { metodo: 'POST' })
+      .then((r) => { if (vivo && r.aplicado) void recargar(); })
+      .catch(() => { /* Sin rescate o sin red: sigue el reto de siempre. */ });
+    return () => { vivo = false; };
+  }, [decision, quien, recargar]);
+
   /* Lo primero, antes que cualquier pantalla: si falta una variable, se dice
      SU NOMBRE. Quien va a leer esto es dirección cargando el proyecto en
      Vercel, y lo único que necesita saber es cuál falta. Nunca un valor. */
@@ -125,6 +141,10 @@ export function App() {
       </Pantalla>
     );
   }
+
+  /* Los enlaces de los correos del rescate: antes que cualquier otra pantalla,
+     con o sin sesión (`rutaQueCorresponde()` no la mueve). */
+  if (ruta === RUTAS.rescate) return <Rescate />;
 
   /* `esperando`: hay sesión y el `/api/yo` está en camino (recién entró). */
   if (cargando || decision === 'esperando') {
@@ -216,7 +236,7 @@ export function App() {
     return (
       <ProveedorDeNavegacion navegar={navegar}>
         {ruta === RUTAS.recuperar ? <Recuperar alRecuperar={alVerificar} />
-          : ruta === RUTAS.reseteo ? <Reseteo />
+          : ruta === RUTAS.reseteo ? <Reseteo correo={sesion?.user?.email ?? null} />
             : <Verificacion alVerificar={alVerificar} alSalir={() => void salir('deliberada')} />}
       </ProveedorDeNavegacion>
     );

@@ -1,44 +1,52 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Boton, BotonGoogle, Campo, Cartel, Enlace, OtpInput, PieLegal, Separador, type OtpInputHandle } from '@moldes/ui';
 import { SEGUNDOS_PARA_REENVIAR, intentosQueQuedan } from '@codice/core';
 import { supabase } from '../supabase';
-import { OtpInput } from '../comun/OtpInput';
 import { useNavegar } from '../comun/navegacion';
 import { RUTAS, WEB } from '../rutas';
-import { consumeInactivityLogout, consumeSesionDesaparecida } from '../seguridad-512/nucleo/useAalWindow';
-import { BotonDeAcceso, EnlacesDeAcceso, Etiqueta, MarcoDeAcceso, useTextos } from './Marco';
+import { consumeInactivityLogout, consumeSesionDesaparecida } from './nucleo/useAalWindow';
+import { tituloDeEntrada } from './nucleo/titulo-de-entrada';
+import { design } from '../molde/arranque';
+import { ErrorDeAcceso, MarcoDeAcceso, Rotulo } from './Marco';
+import { useT } from './textos';
 
 /**
- * P1 · Entrada (`/login`) y P2 · Código por correo (`/login/codigo`) — guion v1
- * del Kit 512, §4 (orden #35). Y P7 · Sesión cerrada, que es lo que ve quien
- * vuelve después de 30 minutos sin actividad.
+ * P1 · Entrada (`/login`) y P2 · Código por correo (`/login/codigo`). Y las dos
+ * pantallas de un solo mensaje que se ven al volver: P7 · Sesión cerrada (30
+ * minutos sin actividad) y P9 · Pasó un tiempo (la sesión desapareció sin que
+ * nadie la cerrara). Orden #37, PR 2: las piezas son las del molde.
  *
- * Lo del kit que no cambió: sin contraseña y sin «registrarse» (la cuenta nace
- * con el primer código: `signInWithOtp` con `shouldCreateUser`); Google arriba
- * y el correo a un separador de distancia; la sesión la decide
- * `onAuthStateChange` en `App`, no esta pantalla.
+ * Lo que no cambió: sin contraseña y sin «registrarse» (la cuenta nace con el
+ * primer código: `signInWithOtp` con `shouldCreateUser`); Google arriba y el
+ * correo a un separador de distancia; la sesión la decide `onAuthStateChange`
+ * en `App`, no esta pantalla.
  *
- * P2 tiene su dirección (`/login/codigo`, como pide el guion), pero el correo
- * vive en la memoria de esta pantalla: si alguien recarga en `/login/codigo`,
- * no hay a qué correo verificar y se vuelve a P1. No se guarda en el navegador
- * a propósito: es un dato de la persona.
+ * El título de P1 es la frase de marca del `design.json` en el idioma de la
+ * pantalla (`tituloDeEntrada`, del núcleo del kit): «Entra a tu *espacio*.»;
+ * sin frase en ese idioma, el genérico del molde en ese idioma, nunca la frase
+ * en otro.
+ *
+ * P2 tiene su dirección, pero el correo vive en la memoria de esta pantalla: si
+ * alguien recarga en `/login/codigo`, no hay a qué correo verificar y se vuelve
+ * a P1. No se guarda en el navegador a propósito: es un dato de la persona.
  */
 export function Login({ ruta }: { ruta: string }) {
-  const { ta, i18n } = useTextos();
-  const t = i18n.t.bind(i18n);
+  const { t, idioma } = useT();
   const navegar = useNavegar();
+  const otp = useRef<OtpInputHandle>(null);
   const [correo, setCorreo] = useState('');
   const [enviado, setEnviado] = useState<string | null>(null);
   const [codigo, setCodigo] = useState('');
   const [fallidos, setFallidos] = useState(0);
+  const [mal, setMal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [correoMal, setCorreoMal] = useState(false);
   const [segundos, setSegundos] = useState(0);
   /* P7: el aviso del kit se consume una sola vez. */
   const [sesionCerrada, setSesionCerrada] = useState(() => consumeInactivityLogout());
-  /* El otro aviso del kit, que el guion no cubre (la orden #35 lo deja): la
-     sesión desapareció sin que nadie la cerrara. Una línea en P1, una vez. */
-  const [sesionPerdida] = useState(() => !sesionCerrada && consumeSesionDesaparecida());
+  /* P9: la sesión desapareció sin que nadie la cerrara. También una sola vez. */
+  const [sesionPerdida, setSesionPerdida] = useState(() => !sesionCerrada && consumeSesionDesaparecida());
 
   const enCodigo = ruta === RUTAS.loginCodigo && enviado !== null;
 
@@ -58,19 +66,19 @@ export function Login({ ruta }: { ruta: string }) {
     setEnviando(true);
     const { error: fallo } = await supabase.auth.signInWithOtp({ email: direccion, options: { shouldCreateUser: true } });
     setEnviando(false);
-    /* El guion no trae texto para «no se pudo mandar»: va el genérico de la
-       casa, que existe solo en español (declarado en el informe #35). */
-    if (fallo) return setError(t('comun.errorGenerico'));
+    /* El molde no trae texto para «no se pudo mandar»: va el genérico de Mi espacio, en los tres idiomas. */
+    if (fallo) return setError(t('auth.error.generic'));
     setEnviado(direccion);
     setCodigo('');
     setFallidos(0);
+    setMal(false);
     setSegundos(SEGUNDOS_PARA_REENVIAR);
     if (ruta !== RUTAS.loginCodigo) navegar(`${RUTAS.loginCodigo}${window.location.search}`);
   }
 
   async function verificar(valor: string) {
-    if (valor.length !== 6) return document.getElementById('codigo')?.focus();
-    if (!enviado || intentosQueQuedan(fallidos) === 0) return;
+    if (valor.length !== 6) return otp.current?.focus();
+    if (!enviado || intentosQueQuedan(fallidos) === 0 || enviando) return;
     setError(null);
     setEnviando(true);
     const { error: fallo } = await supabase.auth.verifyOtp({ email: enviado, token: valor, type: 'email' });
@@ -78,7 +86,9 @@ export function Login({ ruta }: { ruta: string }) {
     if (fallo) {
       const n = fallidos + 1;
       setFallidos(n);
-      setError(ta('code.wrong', { n: intentosQueQuedan(n) }));
+      setMal(true);
+      setError(t('auth.code.wrong', { n: intentosQueQuedan(n) }));
+      otp.current?.reset();
     }
     /* Bien: no se navega a mano. `onAuthStateChange` avisa y `App` decide. */
   }
@@ -90,11 +100,24 @@ export function Login({ ruta }: { ruta: string }) {
 
   if (sesionCerrada) {
     return (
-      <MarcoDeAcceso antetitulo={ta('session.eyebrow')} titulo={ta('session.title')} subtitulo={ta('session.subtitle')}>
-        <div className="acceso__acciones">
-          <BotonDeAcceso type="button" flecha onClick={() => setSesionCerrada(false)}>{ta('session.again')}</BotonDeAcceso>
-        </div>
-      </MarcoDeAcceso>
+      <Cartel
+        lang={idioma}
+        antetitulo={t('auth.session.eyebrow')}
+        titulo={t('auth.session.title')}
+        texto={t('auth.session.subtitle')}
+        accion={{ texto: t('auth.session.again'), onClick: () => setSesionCerrada(false) }}
+      />
+    );
+  }
+
+  if (sesionPerdida) {
+    return (
+      <Cartel
+        lang={idioma}
+        titulo={t('auth.evicted.title')}
+        texto={t('auth.evicted.subtitle')}
+        accion={{ texto: t('auth.evicted.enter'), onClick: () => setSesionPerdida(false) }}
+      />
     );
   }
 
@@ -103,39 +126,38 @@ export function Login({ ruta }: { ruta: string }) {
     return (
       <MarcoDeAcceso
         centrada
-        antetitulo={ta('code.eyebrow')}
-        titulo={ta('code.title')}
-        subtitulo={ta('code.subtitle', { email: enviado })}
+        antetitulo={t('auth.code.eyebrow')}
+        titulo={t('auth.code.title')}
+        subtitulo={t('auth.code.subtitle', { email: enviado })}
       >
-        <form className="acceso__codigo" onSubmit={(e) => { e.preventDefault(); void verificar(codigo); }} noValidate>
-          <Etiqueta htmlFor="codigo">{ta('code.label')}</Etiqueta>
+        <form className="acceso__formulario" onSubmit={(e) => { e.preventDefault(); void verificar(codigo); }} noValidate>
+          <Rotulo>{t('auth.code.label')}</Rotulo>
           <OtpInput
-            id="codigo"
+            ref={otp}
             value={codigo}
-            onChange={setCodigo}
-            onComplete={(c) => void verificar(c)}
-            errores={fallidos}
+            onChange={(v) => { setCodigo(v); setMal(false); }}
+            onCompleto={(c) => void verificar(c)}
+            error={mal}
             disabled={enviando || sinIntentos}
             autoFocus
-            aria-describedby={error ? 'codigo-error' : undefined}
+            aria-label={t('auth.code.label')}
           />
-          {error ? <p className="acceso__error" id="codigo-error" role="alert">{error}</p> : null}
-          <BotonDeAcceso ancho cargando={enviando} disabled={sinIntentos}>{ta('code.enter')}</BotonDeAcceso>
+          {error ? <ErrorDeAcceso id="codigo-error">{error}</ErrorDeAcceso> : null}
+          <Boton type="submit" ancho="completo" cargando={enviando} disabled={sinIntentos}>{t('auth.code.enter')}</Boton>
         </form>
-        <EnlacesDeAcceso>
+        <div className="acceso__enlaces">
           {segundos > 0 ? (
-            <span className="acceso__enlace acceso__enlace--espera" aria-live="polite">{ta('code.resendIn', { s: segundos })}</span>
+            <span className="acceso__bajada" aria-live="polite">{t('auth.code.resendIn', { s: segundos })}</span>
           ) : (
-            <button type="button" className="acceso__enlace" onClick={() => void pedirCodigo(enviado)}>{ta('code.resend')}</button>
+            <Enlace onClick={() => void pedirCodigo(enviado)}>{t('auth.code.resend')}</Enlace>
           )}
-          <button
-            type="button"
-            className="acceso__enlace acceso__enlace--apagado"
-            onClick={() => { setEnviado(null); setCodigo(''); setFallidos(0); setError(null); navegar(`${RUTAS.login}${window.location.search}`); }}
+          <Enlace
+            tono="apagado"
+            onClick={() => { setEnviado(null); setCodigo(''); setFallidos(0); setMal(false); setError(null); navegar(`${RUTAS.login}${window.location.search}`); }}
           >
-            {ta('code.otherEmail')}
-          </button>
-        </EnlacesDeAcceso>
+            {t('auth.code.otherEmail')}
+          </Enlace>
+        </div>
       </MarcoDeAcceso>
     );
   }
@@ -143,68 +165,43 @@ export function Login({ ruta }: { ruta: string }) {
   const correoValido = /.+@.+\..+/.test(correo.trim());
   return (
     <MarcoDeAcceso
-      titulo={ta('login.title')}
-      subtitulo={ta('login.subtitle')}
-      pie={(
-        <p className="acceso__legal">
-          <LegalConEnlaces texto={ta('legal')} />
-        </p>
-      )}
+      portada
+      titulo={tituloDeEntrada(design.app.frase, idioma, t('auth.login.titleDefault'))}
+      subtitulo={t('auth.login.subtitle')}
     >
-      {sesionPerdida ? <p className="acceso__aviso" role="status">{t('acceso.sesionPerdida')}</p> : null}
-      <button type="button" className="acceso__google" onClick={() => void conGoogle()}>
-        {/* El logo de Google sin recolorear: marca de un tercero, la única
-            excepción de color de la app (`check:tokens`, tope 1). */}
-        <img src="/img/google.svg" width={20} height={20} alt="" />
-        <span>{ta('google')}</span>
-      </button>
-      <div className="acceso__separador" aria-hidden="true"><span /></div>
+      <BotonGoogle onClick={() => void conGoogle()}>{t('auth.google')}</BotonGoogle>
+      <Separador />
       <form
+        className="acceso__formulario"
         onSubmit={(e) => {
           e.preventDefault();
-          /* El botón no se apaga (la referencia del kit lo muestra entero con
-             el campo vacío): sin un correo válido, se marca el campo y el foco
-             vuelve a él. */
+          /* El botón no se apaga con el campo vacío (la referencia lo muestra
+             entero): sin un correo válido, se marca el campo y el foco vuelve. */
           if (correoValido) return void pedirCodigo(correo.trim());
           setCorreoMal(true);
           document.getElementById('correo')?.focus();
         }}
         noValidate
       >
-        <Etiqueta htmlFor="correo">{ta('email.label')}</Etiqueta>
-        <input
+        <Campo
           id="correo"
-          className="acceso__campo"
+          etiqueta={t('auth.email.label')}
           type="email"
           inputMode="email"
           autoComplete="email"
-          placeholder={ta('email.placeholder')}
+          placeholder={t('auth.email.placeholder')}
           value={correo}
           onChange={(e) => { setCorreo(e.target.value); setCorreoMal(false); }}
-          aria-invalid={error || correoMal ? true : undefined}
-          aria-describedby={error ? 'correo-error' : undefined}
+          error={error ?? undefined}
+          aria-invalid={correoMal || error ? true : undefined}
         />
-        {error ? <p className="acceso__error" id="correo-error" role="alert">{error}</p> : null}
-        <div className="acceso__acciones">
-          <BotonDeAcceso flecha cargando={enviando}>{ta('login.send')}</BotonDeAcceso>
-        </div>
+        <div><Boton type="submit" flecha cargando={enviando}>{t('auth.login.send')}</Boton></div>
       </form>
+      <PieLegal
+        texto={t('auth.legal')}
+        terminos={{ texto: t('auth.legal.terms'), href: `${WEB}/terminos` }}
+        privacidad={{ texto: t('auth.legal.privacy'), href: `${WEB}/privacidad` }}
+      />
     </MarcoDeAcceso>
-  );
-}
-
-/**
- * El pie legal (§2): «Al continuar aceptas nuestros Términos y la Política de
- * Privacidad.», con los dos enlaces. La frase es la del guion, tal cual, y los
- * enlaces se ponen sobre sus palabras — en los tres idiomas son la palabra
- * que empieza con «T» y la frase que empieza con «P» con mayúscula.
- */
-function LegalConEnlaces({ texto }: { texto: string }) {
-  const m = texto.match(/^(.*?)(Terms|Termos|Términos)(.*?)((?:Política de )?Privac[a-z]+(?: Policy)?|Privacy Policy|Política de Privacidade)(.*)$/);
-  if (!m) return <>{texto}</>;
-  return (
-    <>
-      {m[1]}<a href={`${WEB}/terminos`}>{m[2]}</a>{m[3]}<a href={`${WEB}/privacidad`}>{m[4]}</a>{m[5]}
-    </>
   );
 }

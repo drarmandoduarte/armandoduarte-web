@@ -14,7 +14,7 @@
 -- tests porque es parte del banco, no del producto.
 --
 -- ── Lo que se le AGREGÓ al de Omnia, y por qué ────────────────────────────
---   · `auth.jwt()` — Omnia no la necesitaba. Códice sí: el Kit de Seguridad 512
+--   · `auth.jwt()` — Omnia no la necesitaba. Códice sí: el Kit de Acceso
 --     (S3) exige que lo que un miembro ve de otras personas dependa de `aal2`
 --     **en la base**, y el nivel de autenticación llega en el claim `aal`. Sin
 --     esta función, `con_segundo_paso()` no se puede probar — y es el test que

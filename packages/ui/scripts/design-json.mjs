@@ -4,7 +4,7 @@
  *
  *     node packages/ui/scripts/design-json.mjs
  *
- * El guion v1 del Kit de Seguridad 512 dice que las pantallas de acceso son las
+ * El guion v1 del Kit de Acceso dice que las pantallas de acceso son las
  * mismas en todas las apps y que lo único que cambia por app sale de su
  * `design.json`: colores, tipografía, radio y nombre (§1). Ese archivo **no se
  * escribe a mano** (dirección, 2/10: «tomar colores y todo lo de diseño del
@@ -18,10 +18,9 @@
  *     molde** (`packages/moldes/design/design.schema.json`): `app`, `color`,
  *     `colorOscuro`, `tipografia` y `radio`, y nada más (el esquema no admite
  *     otras claves; de dónde sale cada valor queda en `$comment` y en `MAPA`);
- *   · `apps/familia/src/acceso/design.css` — las variables `--acceso-*` que
- *     usan las pantallas de acceso de la #35, **por referencia** a las del
- *     canon (`var(--teal)`), nunca con el hex. Se va en el PR 2 de la #37,
- *     cuando esas pantallas pasan a ser las del molde.
+ *   · (Hasta el PR 2 de la #37 escribía también `apps/familia/src/acceso/design.css`,
+ *     las variables `--acceso-*` de las pantallas de la #35. Se fue con ellas:
+ *     las pantallas de acceso son las del molde y leen el `design.json`.)
  *
  * De `design.json` salen, con las herramientas del molde y sin tocarlas,
  * `apps/familia/public/design.css` (`generar-css.mjs`) y
@@ -37,7 +36,6 @@ import { fileURLToPath } from 'node:url';
 const UI = join(dirname(fileURLToPath(import.meta.url)), '..');
 const RAIZ = join(UI, '..', '..');
 export const SALIDA_JSON = join(RAIZ, 'apps', 'familia', 'design.json');
-export const SALIDA_CSS = join(RAIZ, 'apps', 'familia', 'src', 'acceso', 'design.css');
 
 /**
  * El mapa de la orden #37: rol del molde → ruta del token en el canon.
@@ -72,69 +70,10 @@ export const MAPA_MOLDE = {
 /** La frase de marca en los tres idiomas (orden #37). */
 export const FRASE = { es: 'Entra a tu *espacio*.', en: 'Enter your *space*.', pt: 'Entre no seu *espaço*.' };
 
-/** El mapa de la orden #35 para las pantallas de acceso de entonces (`--acceso-*`). */
-export const MAPA = {
-  colores: {
-    fondo: 'color.background.cream',
-    superficie: 'color.background.surfaceWarm',
-    texto: 'color.ink.primary',
-    secundario: 'color.ink.muted',
-    /* Mi espacio usa la paleta CFF de Armando (decisión del 29/9). */
-    acento: 'color.cff.tealDark',
-    /* El borde de campos y casillas. Era el hairline (1,18:1 sobre crema, no
-       llega al 3:1 de WCAG 1.4.11 y en P3 casi no se veía); auditoría del CEO
-       del PR #56: ink.muted, 4,99:1. */
-    borde: 'color.ink.muted',
-    error: 'color.semantic.danger',
-    /* Las líneas que NO son borde de un control: la del separador de P1 y el
-       recuadro de los códigos de P5. Siguen en el hairline (auditoría #56:
-       el cambio es «en campos y casillas»). */
-    linea: 'color.border.hairline',
-  },
-  tipografia: {
-    sans: 'typography.families.structure',
-    lectura: 'typography.families.reading',
-  },
-  radio: 'radius.casa',
-};
-
 const leer = (obj, ruta) => ruta.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
-
-/** `color.cff.tealDark` → `--teal`, leído de los comentarios de `codice-tokens.css`. */
-function variablesDelCanon(css) {
-  const mapa = new Map();
-  for (const m of css.matchAll(/^\s*(--[a-z-]+):([^;]+);\s*\/\*\s*([a-zA-Z.]+)/gm)) mapa.set(m[3], { css: m[1], valor: m[2].trim() });
-  return mapa;
-}
 
 export function generar() {
   const canon = JSON.parse(readFileSync(join(UI, 'codice-tokens.json'), 'utf8'));
-  const vars = variablesDelCanon(readFileSync(join(UI, 'codice-tokens.css'), 'utf8'));
-  const variable = (ruta) => {
-    const v = vars.get(ruta);
-    if (!v) throw new Error(`design-json: ${ruta} no tiene variable en codice-tokens.css`);
-    return v.css;
-  };
-
-  const colores = {};
-  for (const [rol, ruta] of Object.entries(MAPA.colores)) {
-    const nodo = leer(canon, ruta);
-    const hex = typeof nodo === 'string' ? nodo : nodo?.value;
-    if (!/^#[0-9A-F]{6}$/i.test(hex ?? '')) throw new Error(`design-json: ${ruta} no es un color del canon`);
-    colores[rol] = { token: ruta, hex: hex.toUpperCase(), css: variable(ruta) };
-  }
-  const familia = (ruta) => {
-    const f = leer(canon, ruta);
-    return { token: ruta, familia: f.family, pesos: f.weights, css: variable(ruta) };
-  };
-  const radioCrudo = String(leer(canon, MAPA.radio)).match(/^\d+px/)?.[0];
-  if (!radioCrudo) throw new Error(`design-json: ${MAPA.radio} no es un radio`);
-
-  const documentoDeAcceso = {
-    tipografia: { sans: familia(MAPA.tipografia.sans), lectura: familia(MAPA.tipografia.lectura) },
-    radio: { css: variable(MAPA.radio) },
-  };
-
   /* ── El design.json del molde ─────────────────────────────────────────── */
   /** El hex de un token, siguiendo una `ref` del canon (una sola vuelta). */
   const hexDe = (ruta) => {
@@ -160,26 +99,11 @@ export function generar() {
   };
 
   const json = `${JSON.stringify(documento, null, 2)}\n`;
-  const lineas = [
-    ...Object.entries(colores).map(([rol, c]) => `  --acceso-${rol}:var(${c.css});${' '.repeat(Math.max(1, 14 - rol.length))}/* ${c.token} */`),
-    `  --acceso-sans:var(${documentoDeAcceso.tipografia.sans.css});`,
-    `  --acceso-lectura:var(${documentoDeAcceso.tipografia.lectura.css});`,
-    `  --acceso-radio:var(${documentoDeAcceso.radio.css});         /* ${MAPA.radio} · ${radioCrudo} */`,
-  ];
-  const css = `/* GENERADO por packages/ui/scripts/design-json.mjs desde el canon (orden Códice #35).
-   No se edita a mano: tokens.test.mjs lo regenera y lo compara byte a byte.
-   Es el design.json de Mi espacio en forma ejecutable, por referencia a las
-   variables del canon (ningún hex vive acá). */
-.acceso{
-${lineas.join('\n')}
-}
-`;
-  return { json, css, documento };
+  return { json, documento };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const { json, css } = generar();
+  const { json } = generar();
   writeFileSync(SALIDA_JSON, json);
-  writeFileSync(SALIDA_CSS, css);
-  process.stdout.write(`design-json: ${SALIDA_JSON.replace(`${RAIZ}/`, '')} y ${SALIDA_CSS.replace(`${RAIZ}/`, '')} generados.\n`);
+  process.stdout.write(`design-json: ${SALIDA_JSON.replace(`${RAIZ}/`, '')} generado.\n`);
 }

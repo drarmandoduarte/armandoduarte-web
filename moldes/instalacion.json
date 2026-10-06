@@ -1,3 +1,7 @@
 {
-  "paquetes": "packages/moldes"
+  "paquetes": "packages/moldes",
+  "acceso": {
+    "backend": "apps/api/src/acceso",
+    "frontend": "apps/familia/src/acceso"
+  }
 }

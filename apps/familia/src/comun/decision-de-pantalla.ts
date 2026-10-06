@@ -1,4 +1,4 @@
-import { decidirReto, type Decision, type EstadoDeLaSesion } from '../seguridad-512/nucleo/decidir-reto';
+import { decidirReto, type Decision, type EstadoDeLaSesion } from '../acceso/nucleo/decidir-reto';
 
 /**
  * Qué pantalla corresponde, **contando también que `/api/yo` puede no contestar**.

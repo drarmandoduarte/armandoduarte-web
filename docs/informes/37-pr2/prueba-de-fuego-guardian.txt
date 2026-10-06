@@ -1,0 +1,17 @@
+$ (process.exit(1) → process.exit(0) en guardian/check.mjs)
+ guardian/check.mjs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+$ pnpm test   # (la línea del guardián)
+sha256sum: WARNING: 1 computed checksum did NOT match
+guardian/check.mjs: FAILED
+guardian/huellas.mjs: OK
+guardian/revisar.mjs: OK
+salida: 1
+
+$ (se revierte)
+$ pnpm test
+guardian/check.mjs: OK
+guardian/huellas.mjs: OK
+guardian/revisar.mjs: OK
+Guardián de los moldes · v1.1.2 · 379 archivos idénticos a sus huellas.
+salida: 0

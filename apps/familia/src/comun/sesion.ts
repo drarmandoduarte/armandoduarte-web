@@ -11,7 +11,7 @@ import {
   useAalWindow,
   markInactivityLogout,
   marcarSalidaDeliberada,
-} from '../seguridad-512/nucleo/useAalWindow';
+} from '../acceso/nucleo/useAalWindow';
 
 /**
  * La sesión, y qué corresponde mostrar con ella.

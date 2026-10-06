@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../identidad/supabase.service';
 import { tokenDelPedido } from '../identidad/token';
-import { usuarioDelPedido } from '../seguridad-512/nucleo/usuario-del-pedido';
-import { esEquipo } from '../seguridad-512/nucleo/roles';
+import { usuarioDelPedido } from '../acceso/nucleo/usuario-del-pedido';
+import { esEquipo } from '../acceso/nucleo/roles';
 import { CorreoService } from '../correo/correo.service';
 import { TEXTOS_DE_CORREO, rellenar } from '../correo/textos';
 import { DeclararDto, ResolverDto } from './pagos.dto';

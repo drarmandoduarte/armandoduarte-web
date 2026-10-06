@@ -22,6 +22,10 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
+    /* Kit de Acceso 1.3.0 (fase-2 §7.8, orden #37 PR 2): `useAalWindow.test.tsx`
+       del núcleo usa `@testing-library/react`, que limpia lo dibujado después de
+       cada test solo si `afterEach` es global. */
+    globals: true,
     exclude: ['**/node_modules/**', '**/dist/**', 'e2e/**'],
     setupFiles: ['./src/prueba/entorno.ts'],
   },

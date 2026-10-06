@@ -96,8 +96,10 @@ function archivosDe(dir: string): string[] {
     if (statSync(completo).isDirectory()) {
       /* El núcleo del kit no es de esta app: viaja con su huella y no se edita.
          Si alguna vez trajera un `.from(`, el que tiene que decirlo es el
-         guardián del kit, no este barrido. */
-      if (entrada === 'seguridad-512') continue;
+         guardián de los moldes, no este barrido. Se saltea SOLO el núcleo
+         (`acceso/nucleo/`): desde la #37 la carpeta `acceso/` también tiene
+         las pantallas de la app, y ésas sí se barren. */
+      if (entrada === 'nucleo' && dir.endsWith('acceso')) continue;
       salida.push(...archivosDe(completo));
     } else if (/\.tsx?$/.test(entrada)) {
       salida.push(completo);

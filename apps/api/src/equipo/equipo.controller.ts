@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../identidad/supabase.service';
 import { tokenDelPedido } from '../identidad/token';
-import { usuarioDelPedido } from '../seguridad-512/nucleo/usuario-del-pedido';
-import { esEquipo } from '../seguridad-512/nucleo/roles';
+import { usuarioDelPedido } from '../acceso/nucleo/usuario-del-pedido';
+import { esEquipo } from '../acceso/nucleo/roles';
 import { EquipoRepositorio } from './equipo.repositorio';
 import { CursoDto, EdicionDto, EdicionNuevaDto, NotaDto, SumarAlEquipoDto } from './equipo.dto';
 

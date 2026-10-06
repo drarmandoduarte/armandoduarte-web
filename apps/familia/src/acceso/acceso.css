@@ -1,105 +1,26 @@
-/* ═══════════════════════════════════════════════════════════════════════
-   Las pantallas de acceso · guion v1 del Kit de Seguridad 512 (orden #35)
-   ═══════════════════════════════════════════════════════════════════════
-   La anatomía es la del guion (§2) y no se discute por app; lo de Armando
-   (colores, tipografía, radio) llega SOLO por las variables `--acceso-*` de
-   `design.css`, que genera `packages/ui/scripts/design-json.mjs` desde el
-   canon. Acá no se nombra ningún token de la casa directamente: si mañana el
-   acento cambia en el canon, cambia acá sin tocar este archivo.
+/* Las pantallas de acceso del Kit de Acceso 1.3.0 — orden #37, PR 2.
 
-   Medidas del guion: columna de 560 (24 de margen a 390), campos de 56,
-   casillas de 80×72 con 12 entre ellas (48×56 y 8 en el teléfono). */
-.acceso{min-height:100svh;background:var(--acceso-fondo);color:var(--acceso-texto);font-family:var(--acceso-lectura)}
-.acceso__columna{max-width:560px;margin:0 auto;padding:clamp(32px,9vh,112px) 0 clamp(48px,8vh,96px)}
-@media (max-width:607px){
-  .acceso__columna{margin:0 24px}
-  /* «← ARMANDO DUARTE» y «ES · EN · PT» en un renglón a 390. */
-  .acceso__volver{letter-spacing:.14em}
-  .acceso__idiomas{gap:4px;letter-spacing:.08em}
-}
-
-.acceso__cabeza{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:clamp(48px,8vh,88px)}
-.acceso__volver,.acceso__idiomas{font-family:var(--acceso-sans);font-size:12px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--acceso-secundario)}
-.acceso__volver{display:inline-flex;white-space:nowrap;align-items:center;min-height:44px;text-decoration:none;transition:color .4s ease-out}
-.acceso__volver:hover{color:var(--acceso-texto)}
-.acceso__idiomas{display:flex;align-items:center;gap:6px;letter-spacing:.14em}
-.acceso__idiomas svg{margin-right:4px;flex:none}
-.acceso__idioma-item{display:inline-flex;align-items:center;gap:6px}
-.acceso__idioma{min-height:44px;min-width:28px;font:inherit;letter-spacing:inherit;color:var(--acceso-secundario);background:none;border:0;cursor:pointer}
-.acceso__idioma--activo{font-weight:700;color:var(--acceso-texto)}
-.acceso__punto{color:var(--acceso-secundario)}
-
-.acceso__cuerpo--centrada{text-align:center}
-.acceso__antetitulo{font-family:var(--acceso-sans);font-size:12px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--acceso-acento);margin-bottom:20px}
-.acceso__titulo{font-family:var(--acceso-sans);font-weight:400;font-size:clamp(36px,5.2vw,56px);line-height:1.1;letter-spacing:-.01em;color:var(--acceso-texto);text-wrap:balance}
-/* §1.2: no hay serif en la marca → la palabra va en la misma sans, cursiva y en el acento. */
-.acceso__cuerpo--centrada .acceso__titulo{font-size:clamp(32px,4vw,44px)}
-.acceso__palabra{font-style:italic;color:var(--acceso-acento)}
-.acceso__subtitulo{margin-top:24px;font-size:17px;line-height:1.6;color:var(--acceso-secundario)}
-
-/* Google, ancho completo, borde del color de texto (§2). */
-.acceso__google{display:flex;align-items:center;justify-content:center;gap:16px;width:100%;min-height:64px;margin-top:48px;padding:0 24px;font-family:var(--acceso-sans);font-size:16px;font-weight:500;color:var(--acceso-texto);background:transparent;border:1px solid var(--acceso-texto);border-radius:var(--acceso-radio);cursor:pointer;transition:background-color .4s ease-out}
-.acceso__google:hover{background:color-mix(in oklab, var(--acceso-texto) 4%, transparent)}
-/* La línea con el círculo en el medio. */
-.acceso__separador{display:flex;align-items:center;gap:32px;margin:40px 0}
-.acceso__separador::before,.acceso__separador::after{content:'';flex:1;height:1px;background:var(--acceso-linea)}
-.acceso__separador span{width:10px;height:10px;border-radius:50%;border:1px solid var(--acceso-secundario);flex:none}
-
-.acceso__etiqueta{display:block;margin-bottom:14px;font-family:var(--acceso-sans);font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--acceso-acento)}
-.acceso__campo{display:block;width:100%;height:56px;padding:0 20px;font-family:var(--acceso-lectura);font-size:16px;color:var(--acceso-texto);background:var(--acceso-superficie);border:1px solid var(--acceso-borde);border-radius:var(--acceso-radio)}
-.acceso__campo::placeholder{color:var(--acceso-secundario)}
-.acceso__campo:focus{outline:none;border-color:var(--acceso-acento);box-shadow:0 0 0 1px var(--acceso-acento)}
-.acceso__campo[aria-invalid='true']{border-color:var(--acceso-error)}
-/* §3: los códigos de respaldo, en un campo monoespaciado. */
-.acceso__campo--mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:18px;letter-spacing:.12em}
-.acceso__aviso{margin-top:32px;font-size:15px;line-height:1.5;color:var(--acceso-texto)}
-.acceso__error{margin-top:14px;font-size:14px;line-height:1.5;color:var(--acceso-error)}
-
-/* El botón principal: contorno del acento, nunca relleno (§2). */
-.acceso__acciones{margin-top:32px}
-.acceso__boton{display:inline-flex;align-items:center;justify-content:center;gap:20px;min-height:56px;padding:0 36px;font-family:var(--acceso-sans);font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--acceso-acento);background:transparent;border:1px solid var(--acceso-acento);border-radius:var(--acceso-radio);cursor:pointer;transition:background-color .4s ease-out}
-.acceso__boton:hover:not(:disabled){background:color-mix(in oklab, var(--acceso-acento) 6%, transparent)}
-.acceso__boton:disabled{opacity:.45;cursor:not-allowed}
-.acceso__boton--ancho{display:flex;width:100%}
-
-/* Los enlaces secundarios: centrados, uno debajo del otro; el primero en acento, el segundo apagado. */
-.acceso__enlaces{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:32px;text-align:center}
-.acceso__enlace{min-height:32px;font-family:var(--acceso-lectura);font-size:15px;line-height:1.5;color:var(--acceso-acento);text-decoration:underline;text-underline-offset:4px;background:none;border:0;cursor:pointer}
-.acceso__enlace--apagado{color:var(--acceso-secundario)}
-.acceso__enlace--espera{text-decoration:none;color:var(--acceso-secundario);cursor:default}
-
-.acceso__legal{margin-top:48px;font-size:15px;line-height:1.6;color:var(--acceso-secundario)}
-.acceso__legal a{color:inherit;text-underline-offset:3px}
-
-/* ── La casilla de 6 huecos (§3) ──────────────────────────────────────── */
-.acceso__codigo{display:flex;flex-direction:column;align-items:center;margin-top:40px}
-.acceso__codigo .acceso__boton{margin-top:32px}
-.otp{position:relative;display:grid;grid-template-columns:repeat(6,80px);gap:12px;justify-content:center}
-.otp__entrada{position:absolute;inset:0;z-index:1;width:100%;height:100%;opacity:0;border:0;padding:0;font-size:16px;cursor:text}
-.otp__entrada:disabled{cursor:not-allowed}
-.otp__casilla{position:relative;display:flex;align-items:center;justify-content:center;height:72px;font-family:var(--acceso-sans);font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--acceso-texto);background:transparent;border:1px solid var(--acceso-borde);border-radius:var(--acceso-radio);transition:border-color .2s ease-out,background-color .2s ease-out}
-.otp__casilla--activa{border-color:var(--acceso-acento);background:var(--acceso-superficie)}
-.otp__entrada[aria-invalid='true'] ~ .otp__casilla{border-color:var(--acceso-error)}
-.otp__entrada:disabled ~ .otp__casilla{opacity:.5}
-.otp__cursor{width:1px;height:28px;background:var(--acceso-texto)}
-@media (prefers-reduced-motion:no-preference){
-  .otp__cursor{animation:otp-cursor 1s steps(2) infinite}
-  .otp--tiembla{animation:otp-tiembla .4s ease-out}
-}
-@keyframes otp-cursor{0%,49%{opacity:1}50%,100%{opacity:0}}
-@keyframes otp-tiembla{0%,100%{transform:none}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-@media (max-width:607px){
-  .otp{grid-template-columns:repeat(6,48px);gap:8px}
-  .otp__casilla{height:56px;font-size:24px}
-}
-
-/* P4 · el QR centrado (200 px) y los dos botones chicos. */
-.acceso__qr{display:flex;justify-content:center;margin-top:40px}
-.acceso__qr img,.acceso__qr-vacio{display:block;width:200px;height:200px;background:var(--acceso-superficie)}
-.acceso__chicos{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:20px}
-.acceso__chicos--izquierda{justify-content:flex-start}
-.acceso__chico{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;font-family:var(--acceso-sans);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--acceso-texto);background:transparent;border:1px solid var(--acceso-secundario);border-radius:var(--acceso-radio);cursor:pointer;transition:background-color .4s ease-out}
-.acceso__chico:hover{background:color-mix(in oklab, var(--acceso-texto) 4%, transparent)}
-
-/* P5 · los diez códigos, en dos columnas, monoespaciados. */
-.acceso__codigos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 32px;margin-top:40px;padding:24px 28px;list-style:none;background:var(--acceso-superficie);border:1px solid var(--acceso-linea);border-radius:var(--acceso-radio);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:17px;letter-spacing:.08em;color:var(--acceso-texto)}
+   Las piezas son del molde (`@moldes/ui`: Titulo, Antetitulo, Boton, Campo,
+   OtpInput, CodigosRespaldo, Cartel…) y traen su cara. Esta hoja pone SOLO el
+   marco que las ordena —el mismo de la galería del molde
+   (`storybook/principal.jsx`, `Marco` y `Barrita`)—, con las variables del
+   `design.json` que enlaza `aplicarDesign()`. Ningún color, ninguna fuente,
+   ningún radio propio: eso lo dice el `design.json`. La hoja de la #35 y sus
+   variables `--acceso-*` se fueron con esta orden. */
+.acceso{min-height:100dvh;background:var(--bg);color:var(--text)}
+.acceso>.molde-columna{display:flex;flex-direction:column;gap:var(--space-12);padding-block:var(--space-20)}
+.acceso__cabeza{display:flex;justify-content:space-between;align-items:center;width:100%}
+.acceso__volver{font-size:var(--text-sm);letter-spacing:var(--tracking-brand);text-transform:uppercase;color:var(--text-3);text-decoration:none}
+.acceso__cuerpo{display:flex;flex-direction:column;gap:var(--space-12);margin-top:var(--space-16)}
+.acceso__cuerpo--centrada{align-items:center;text-align:center}
+.acceso__bajada{font-size:var(--text-lg);color:var(--text-3)}
+.acceso__bajada--portada{font-size:var(--text-xl)}
+.acceso__rotulo{margin-top:var(--space-8);font-size:var(--text-xs);letter-spacing:var(--tracking-rotulo);text-transform:uppercase;color:var(--text-3)}
+.acceso__error{color:var(--danger-text)}
+.acceso__aviso{color:var(--text-2)}
+.acceso__formulario{display:flex;flex-direction:column;gap:var(--space-12);width:100%}
+.acceso__cuerpo--centrada .acceso__formulario{align-items:center}
+.acceso__enlaces{display:flex;flex-direction:column;align-items:center;gap:var(--space-6);width:100%}
+.acceso__chicos{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-8)}
+.acceso__qr{display:flex;justify-content:center}
+.acceso__qr img,.acceso__qr-vacio{display:block;width:200px;height:200px;background:var(--surface);border-radius:var(--radius-campo)}

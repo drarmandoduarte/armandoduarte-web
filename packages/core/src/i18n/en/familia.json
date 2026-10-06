@@ -1,89 +1,47 @@
 {
   "auth": {
-    "back": "← {app}",
-    "login": {
-      "subtitle": "We'll email you a code. No passwords.",
-      "send": "Send code",
-      "title": "Enter your *space*."
-    },
-    "google": "Continue with Google",
-    "email": {
-      "label": "Email",
-      "placeholder": "you@email.com"
-    },
-    "legal": "By continuing you accept our Terms and Privacy Policy.",
-    "code": {
-      "eyebrow": "Code",
-      "title": "Check your *email*.",
-      "subtitle": "We sent a 6-digit code to {email}.",
-      "label": "6-digit code",
-      "enter": "Sign in",
-      "resend": "Resend code",
-      "resendIn": "Resend in {s}s",
-      "otherEmail": "Use another email",
-      "wrong": "Wrong code. {n} attempts left."
-    },
-    "totp": {
-      "eyebrow": "Verification",
-      "title": "Verify your *identity*.",
-      "subtitle": "Enter the 6-digit code from your authenticator app.",
-      "verify": "Verify",
-      "lost": "I don't have my phone · use a backup code"
-    },
-    "signout": "Sign out",
-    "enroll": {
-      "eyebrow": "Authenticator",
-      "title": "Set up your *second step*.",
-      "subtitle": "Scan the code with your authenticator app, or open it from this phone.",
-      "open": "Open in my authenticator app",
-      "copy": "Copy the key",
-      "confirmLabel": "Confirm with the code",
-      "confirm": "Confirm"
-    },
-    "backup": {
-      "eyebrow": "Backup",
-      "title": "Save these *codes*.",
-      "subtitle": "If you lose your phone, each one lets you in once. They won't be shown again.",
-      "download": "Download",
-      "copy": "Copy",
-      "share": "Share",
-      "done": "Done, I saved them"
+    "error": {
+      "generic": "Something went wrong. Please try again."
     },
     "recover": {
-      "eyebrow": "Recovery",
-      "title": "Use a *backup* code.",
-      "subtitle": "Using it disables your previous authenticator; you'll set up a new one.",
-      "continue": "Continue",
-      "back": "Back",
-      "noCodes": "I don't have the codes either"
+      "invalid": "That code is not valid or has already been used."
     },
     "reset": {
-      "eyebrow": "Reset",
-      "title": "Request a *reset*.",
-      "subtitle": "We'll email you to confirm. If nobody cancels it, in 48 hours you'll be able to set up a new authenticator.",
-      "request": "Request the reset",
       "waitTitle": "Your reset is *on its way*.",
-      "waitSubtitle": "You will be able to set up a new authenticator on {fecha}."
-    },
-    "session": {
-      "eyebrow": "Session",
-      "title": "We closed your *session*.",
-      "subtitle": "30 minutes passed without activity. It's a security measure.",
-      "again": "Sign in again"
-    },
-    "stepup": {
-      "eyebrow": "Confirmation",
-      "title": "Confirm it's *you*.",
-      "subtitle": "This action requires the code from your authenticator app.",
-      "cancel": "Cancel"
-    },
-    "evicted": {
-      "title": "It's been a *while*.",
-      "subtitle": "Your phone cleared the app's saved data. Just sign in again.",
-      "enter": "Sign in"
-    },
-    "lang": {
-      "label": "Language"
+      "waitSubtitle": "You will be able to set up a new authenticator on {fecha}.",
+      "confirm": {
+        "title": "Confirm the *reset*.",
+        "subtitle": "If you asked for it, confirm it. After 48 hours you will be able to sign in with the email code and set up a new authenticator.",
+        "button": "Confirm the reset"
+      },
+      "confirmed": {
+        "title": "Reset *confirmed*.",
+        "subtitle": "On {fecha} you will be able to sign in with the email code and set up a new authenticator."
+      },
+      "cancel": {
+        "title": "Cancel the *reset*.",
+        "subtitle": "If you didn't ask for it, cancel it: your authenticator stays as it is.",
+        "button": "Cancel the reset"
+      },
+      "cancelled": {
+        "title": "Reset *cancelled*.",
+        "subtitle": "Your authenticator stays as it was."
+      },
+      "invalid": {
+        "title": "This link no longer *works*.",
+        "subtitle": "It may have been used, cancelled or expired. If you need it, request the reset again from the sign-in page."
+      },
+      "toLogin": "Go to sign in",
+      "mail": {
+        "confirm": {
+          "subject": "Confirm the reset of your authenticator",
+          "body": "Hello,\n\nYou asked to reset the authenticator of your account. To confirm it, open this link:\n\n{{enlace}}\n\nAfter 48 hours, on {{fecha}}, you will be able to sign in with the email code and set up a new authenticator.\n\nIf you didn't ask for it, do nothing: without confirmation, the reset does not go ahead.\n\nArmando Duarte's team"
+        },
+        "notice": {
+          "subject": "Notice: a reset of your authenticator was requested",
+          "body": "Hello,\n\nSomeone asked to reset the authenticator of your account. If it was you, just confirm it from the other email.\n\nIf it was NOT you, cancel it from this link and your authenticator stays as it is:\n\n{{enlace}}\n\nArmando Duarte's team"
+        }
+      }
     }
   }
 }

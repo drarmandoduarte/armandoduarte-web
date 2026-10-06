@@ -258,20 +258,14 @@ function main() {
   }
 
   /*
-   * EL KIT DE SEGURIDAD 512, ANTES QUE TODO LO DEMÁS.
-   *
-   * Lo pide el `LEEME.md` del kit con esas palabras —«el check entra en
-   * `npm run test`, antes que todo lo demás»— y la orden #15 (C) lo repite. El
-   * porqué del orden: lo que este guardián vigila es que el **núcleo del kit no
-   * haya sido editado dentro de la app**, y si lo fue, todo lo que venga
-   * después mide sobre un kit que ya no es el kit. Un guard del segundo paso
-   * con un `return true` de más pasa sus propios tests sin despeinarse.
-   *
-   * Corre antes incluso que el build por la misma razón por la que el
-   * auto-examen corre antes que las suites: es la comprobación de la que
-   * dependen todas las demás para significar algo.
+   * El guardián del kit ya no corre acá (orden #37, PR 2). Desde el Kit de
+   * Acceso 1.3.0 el núcleo lo cuida el guardián de los moldes, que el `test`
+   * de la raíz corre ANTES que este archivo —con la verificación de afuera de
+   * sus propias huellas—, y si está rojo este archivo no llega a correr. Lo
+   * que decía este bloque sigue valiendo, solo cambió quién lo hace: un guard
+   * del segundo paso editado pasa sus propios tests, así que el núcleo se
+   * revisa antes que todo lo demás.
    */
-  revisarElKit();
 
   /*
    * El build, ANTES de las suites.
@@ -380,26 +374,6 @@ function main() {
     + `sobre la web dibujada—, ${saltados} saltados (todos con permiso escrito), ninguna suite por debajo `
     + 'de su piso.\n',
   );
-}
-
-/**
- * El guardián del Kit de Seguridad 512, corrido de primero.
- *
- * No devuelve nada ni entra a `analizar()`: no es una suite con tests, es un
- * portero. O el núcleo está intacto o no se mide nada más — por eso corta acá
- * mismo con el código del script, que ya imprimió su propio detalle.
- */
-function revisarElKit() {
-  try {
-    execFileSync('node', ['scripts/check-seguridad-512.mjs'], { cwd: RAIZ, stdio: 'inherit' });
-  } catch (e) {
-    console.error(
-      '\n  El núcleo del kit no está como el kit lo dejó, así que nada de lo que siga\n'
-      + '  significaría nada: un guard del segundo paso editado pasa sus propios tests.\n'
-      + '  No se corrió nada más.\n',
-    );
-    process.exit(typeof e.status === 'number' ? e.status : 1);
-  }
 }
 
 /**

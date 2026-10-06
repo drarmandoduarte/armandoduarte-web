@@ -26,6 +26,9 @@ export const RUTAS = {
   recuperar: '/auth/2fa/recuperar',
   /** P6b · Reseteo con espera (rescate solo). El guion no le da dirección; ésta es la de la casa. */
   reseteo: '/auth/2fa/reseteo',
+  /** Los enlaces de los correos del rescate (#37 PR 2): confirmar o cancelar. Con o sin sesión.
+   *  La escribe `RUTA_DEL_RESCATE` de `@codice/core`, que es la que arma los enlaces. */
+  rescate: '/rescate',
   miEspacio: '/mi-espacio',
   /** El panel del equipo (orden #24 A). Solo `dueno` y `equipo`; a un cliente lo devuelve a Mi espacio. */
   equipo: '/equipo',

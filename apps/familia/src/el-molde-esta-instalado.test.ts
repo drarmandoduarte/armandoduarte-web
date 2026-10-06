@@ -45,11 +45,12 @@ describe('§1 · el molde se instaló como dice fase-2', () => {
     expect(spec).toContain('node guardian/check.mjs');
   });
 
-  it('moldes/instalacion.json: los paquetes en packages/moldes, y nada que el guardián no admita', () => {
+  it('moldes/instalacion.json: los paquetes en packages/moldes, el Kit de Acceso en api y familia, y nada más', () => {
     const instalacion = JSON.parse(leer(RAIZ, 'moldes', 'instalacion.json')) as Record<string, unknown>;
     expect(instalacion.paquetes).toBe('packages/moldes');
-    /* `acceso` entra en el PR 2, con el núcleo: declararlo antes pone rojo al
-       guardián (exige `acceso.config.ts` y `nucleo/` en las dos carpetas). */
+    /* #37 PR 2 (fase-2 §7.4): las dos instalaciones del núcleo, que el guardián
+       de los moldes revisa archivo por archivo. */
+    expect(instalacion.acceso).toEqual({ backend: 'apps/api/src/acceso', frontend: 'apps/familia/src/acceso' });
     expect(Object.keys(instalacion).every((k) => ['paquetes', 'acceso'].includes(k))).toBe(true);
     for (const archivo of ['HUELLAS.txt', 'VERSION', 'guardian/check.mjs', 'guardian/huellas.mjs', 'guardian/revisar.mjs']) {
       expect(existsSync(join(RAIZ, archivo)), archivo).toBe(true);
@@ -159,5 +160,59 @@ describe('§4 · el design.json de Mi espacio', () => {
 
   it('la frase de marca en los tres idiomas', () => {
     expect(design.app.frase).toEqual({ es: 'Entra a tu *espacio*.', en: 'Enter your *space*.', pt: 'Entre no seu *espaço*.' });
+  });
+});
+
+describe('§7 · el Kit de Acceso 1.3.0 reemplazó al Kit de Seguridad 512 (orden #37, PR 2)', () => {
+  /*
+   * Qué busca: el nombre viejo del kit —las cuatro formas de fase-2 §7— en el
+   * CÓDIGO del repo: `.ts .tsx .js .jsx .mjs .cjs .json .sql .css` fuera de
+   * `node_modules`, `dist`, `.git`, los reportes generados (`.vitest-report.json`)
+   * y la historia (`docs/`, `qa/`). Qué no busca, a propósito:
+   *   · los documentos, donde el nombre viejo es historia y se queda (fase-2
+   *     §7: «solo puede quedar en la historia»);
+   *   · el propio molde (`packages/moldes/`), que trae la tabla del renombre;
+   *   · las migraciones ya aplicadas (`packages/db/migrations/`): son
+   *     inmutables (CLAUDE.md del repo) y la `005` se llama `005_seguridad_512`
+   *     desde el 29/9. El nombre ahí es historia de la base.
+   */
+  const VIEJO = /seguridad-512|SEGURIDAD_512|Seguridad 512|seguridad512/;
+  const CODIGO = /\.(ts|tsx|js|jsx|mjs|cjs|json|sql|css)$/;
+  const FUERA = new Set(['node_modules', 'dist', '.git', 'docs', 'qa', 'moldes', 'test-results', '.vercel']);
+  const MIGRACIONES = join(RAIZ, 'packages', 'db', 'migrations');
+  const ruta = (dir: string, n: string) => join(dir, n);
+  const recorrer = (dir: string): string[] => readdirSync(dir).flatMap((n) => {
+    if (FUERA.has(n) || n.startsWith('.vitest-report') || ruta(dir, n) === MIGRACIONES) return [];
+    const camino = join(dir, n);
+    if (statSync(camino).isDirectory()) return recorrer(camino);
+    return CODIGO.test(n) && camino !== join(SRC, 'el-molde-esta-instalado.test.ts') ? [camino] : [];
+  });
+  const archivos = [...recorrer(join(RAIZ, 'apps')), ...recorrer(join(RAIZ, 'packages')), ...recorrer(join(RAIZ, 'scripts'))];
+
+  it('EL PISO, PRIMERO: el barrido leyó el código del repo', () => {
+    expect(archivos.length, 'el glob no vio el repo').toBeGreaterThan(300);
+    expect(archivos.some((a) => a.endsWith(join('apps', 'api', 'src', 'acceso', 'nucleo', 'roles.ts'))), 'vio el núcleo instalado').toBe(true);
+  });
+
+  it('el nombre viejo del kit no está en ningún archivo de código', () => {
+    expect(archivos.filter((a) => VIEJO.test(readFileSync(a, 'utf8'))).map((a) => a.replace(`${RAIZ}/`, ''))).toEqual([]);
+  });
+
+  it('el guardián viejo se apagó: ni su script, ni su carpeta, ni su línea en el test', () => {
+    /* Este archivo puede escribir el nombre viejo: el barrido de arriba lo saltea. */
+    expect(existsSync(join(RAIZ, 'scripts', 'check-seguridad-512.mjs'))).toBe(false);
+    expect(existsSync(join(RAIZ, 'seguridad-512'))).toBe(false);
+    const pkg = leer(RAIZ, 'package.json');
+    expect(VIEJO.test(pkg)).toBe(false);
+  });
+
+  it('lo que la #35 copió a mano se fue: su casilla de seis y la hoja --acceso-*', () => {
+    expect(existsSync(join(SRC, 'comun', 'OtpInput.tsx'))).toBe(false);
+    expect(existsSync(join(SRC, 'acceso', 'design.css'))).toBe(false);
+    const pantallas = readdirSync(join(SRC, 'acceso')).filter((n) => /^[A-Z].*\.tsx$/.test(n));
+    expect(pantallas.length, 'las pantallas de acceso').toBeGreaterThanOrEqual(8);
+    for (const p of pantallas) {
+      expect(leer(SRC, 'acceso', p), `${p} usa piezas del molde`).toMatch(/from '@moldes\/ui'/);
+    }
   });
 });

@@ -50,6 +50,7 @@ vi.mock('../supabase', () => ({
 }));
 
 import i18n from '../i18n';
+import { design } from '../molde/arranque';
 import { App } from '../App';
 
 /** Un JWT con `aal: aal1`. La firma no importa: la app no la verifica. */
@@ -85,13 +86,13 @@ afterEach(() => {
 });
 
 const t = (clave: string) => i18n.t(clave);
-/* El título de /login (P1 del guion v1, #35) lleva su palabra entre
-   asteriscos: se busca como encabezado, por su nombre accesible, sin ellos. */
+/* El título de /login (P1) es la frase de marca del design.json (#37 PR 2),
+   con su palabra entre asteriscos: se busca como encabezado, sin ellos. */
 const sinEspacios = (s: string) => s.replace(/[\s*]/g, '');
 /* jsdom arma el nombre accesible con espacios alrededor del `<span>` de la
    palabra; el navegador no. Se compara sin espacios para medir lo que importa. */
 const tituloDeEntrar = () => screen.findByRole('heading', {
-  name: (nombre) => sinEspacios(nombre) === sinEspacios(t('auth.login.title')),
+  name: (nombre) => sinEspacios(nombre) === sinEspacios((design.app.frase as { es: string }).es),
 });
 const pedidosDeYo = () => pedidos.filter((u) => u === '/api/yo').length;
 

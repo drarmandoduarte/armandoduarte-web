@@ -51,9 +51,14 @@ const PISO_DE_CLAVES = 299;
    512: traen `familia.json` con `auth.*` y nada más. En ellos se compara **ese
    prefijo**, en las dos direcciones, y se exige ese namespace; lo demás cae a
    `es`. El piso de abajo es el número de claves `auth.*` del guion (57) más
-   las cuatro que agrega Mi espacio: si una se pierde, rojo. */
+   las cuatro que agrega Mi espacio: si una se pierde, rojo.
+   ── 61 → 21, por la orden #37 (PR 2) ─────────────────────────────────
+   Bajó a propósito: los textos del acceso los trae el molde (`@moldes/idiomas`,
+   en los tres idiomas) y las 57 copias de la #35 se borraron. Quedan los de Mi
+   espacio que el molde no tiene: el rescate solo (pantallas y correos, 18), el
+   error genérico y el de un código de respaldo que no sirve. */
 const PARCIALES = { en: { familia: 'auth.' }, pt: { familia: 'auth.' } };
-const PISO_PARCIAL = 61;
+const PISO_PARCIAL = 21;
 
 const destinos = readdirSync(LOCALES).filter(
   (e) => e !== FUENTE && !e.startsWith('.') && statSync(join(LOCALES, e)).isDirectory(),
