@@ -7,6 +7,7 @@ import './i18n';
    `public/` (la CSP es `style-src 'self'`). */
 import '@moldes/ui/styles.css';
 import { arrancarElMolde } from './molde/arranque';
+import { arrancarApariencia } from './molde/apariencia';
 /* El orden importa y es el contrato de la #09: primero la marca —las fuentes
    locales y los tokens, que vienen juntos en `styles.css`— y después el CSS de
    esta app, que usa esos tokens. Al revés, las reglas de la app se escribirían
@@ -18,6 +19,8 @@ import './acceso/acceso.css';
 import { App } from './App';
 
 arrancarElMolde();
+/* #37 PR 3 · Ajustes → Apariencia: el tema y el tamaño de este aparato, antes de pintar nada. */
+arrancarApariencia();
 
 const raiz = document.getElementById('raiz');
 if (!raiz) throw new Error('Falta #raiz en index.html');

@@ -43,6 +43,7 @@ export function CampoWhatsApp({
   alCambiar,
   error,
   paisSugerido,
+  sinRotulo = false,
 }: {
   id: string;
   rotulo: string;
@@ -53,6 +54,8 @@ export function CampoWhatsApp({
   error?: string | null;
   /** El País del formulario, si lo hay. */
   paisSugerido?: string | null;
+  /** #37 PR 3: dentro de una fila de Ajustes, el nombre ya lo dice la fila; el rótulo queda para el lector de pantalla. */
+  sinRotulo?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   /* Lo guardado, partido una sola vez al montar: después manda lo que se escribe. */
@@ -180,7 +183,7 @@ export function CampoWhatsApp({
 
   return (
     <div className="campo whatsapp" ref={caja}>
-      <label className="campo__rotulo" htmlFor={id}>{rotulo}</label>
+      <label className={sinRotulo ? 'solo-lectura' : 'campo__rotulo'} htmlFor={id}>{rotulo}</label>
       <div className={`whatsapp__caja${error ? ' whatsapp__caja--error' : ''}`} data-whatsapp>
         <button
           ref={boton}

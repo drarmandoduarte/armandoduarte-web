@@ -1,23 +1,26 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  NIVELES_EDUCATIVOS, edadDesdeAnio, paisesParaElegir, perfilParaEnviar, puedeDeclarar, validarPerfil,
-  type CampoDelPerfil, type PerfilEntrada,
-} from '@codice/core';
-import { api, ErrorDeApi, type Yo } from '../comun/api';
-import { BotonPrincipal, Campo, Selector, Titulo } from '../comun/Piezas';
-import { CampoWhatsApp } from '../comun/CampoWhatsApp';
-import { CabeceraDeContenido } from '../comun/Marco';
+import { Pantalla } from '@moldes/app-shell';
+import { puedeDeclarar } from '@codice/core';
+import { api, type Yo } from '../comun/api';
 import { EnlaceInterno, useNavegar } from '../comun/navegacion';
-import { RUTAS, WEB } from '../rutas';
+import { RUTAS } from '../rutas';
 import {
   ConfirmacionDeLugar, MisTalleres, TalleresAbiertos, type Confirmacion, type TallerAbierto, type TallerMio,
 } from './Talleres';
 import type { Cobro } from './Comprobante';
-import { fechaDeVencimiento, useT } from '../acceso/textos';
+import { useT } from '../acceso/textos';
 
 /**
  * Las pantallas de Mi espacio por dentro — orden #29, B.
+ *
+ * ── Desde la #37 (PR 3), dentro del shell del molde ─────────────────────
+ * Talleres y Mis talleres son **módulos** del `<Shell>`: lo de adentro (los
+ * talleres, «Me anoto», el comprobante) no cambió; la cabecera es `Pantalla`
+ * del molde (`§ · MÓDULO`, el título con su palabra acentuada y una línea),
+ * con los textos del molde en los tres idiomas. El cuerpo sigue en español
+ * (lo declara el informe). «Tus datos» y Seguridad se fueron a Ajustes del
+ * molde (`molde/ajustes.tsx`).
  *
  * Hasta la #28 todo esto era **una** pantalla (`/mi-espacio`): saludo, talleres
  * abiertos, mis talleres, tus datos, seguridad y cerrar sesión, apilados. La
@@ -80,14 +83,13 @@ export function PaginaDeTalleres({ yo, slugElegido = null, recargar }: {
   slugElegido?: string | null;
   recargar: () => Promise<void>;
 }) {
-  const { t } = useTranslation();
+  const { t: tm } = useT();
   const navegar = useNavegar();
   const { talleres, leer } = useTalleres();
   const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
 
   return (
-    <>
-      <CabeceraDeContenido titulo={<Titulo texto={t('paginas.talleres')} />} bajada={t('paginas.talleresBajada')} />
+    <Pantalla antetitulo={tm('mi.modulos.talleres')} titulo={tm('mi.paginas.talleres')} hint={tm('mi.paginas.talleres.hint')}>
       {confirmacion ? (
         <ConfirmacionDeLugar c={confirmacion} yo={yo} alCerrar={() => navegar(RUTAS.misTalleres)} />
       ) : talleres.estado !== 'listo' ? (
@@ -109,17 +111,17 @@ export function PaginaDeTalleres({ yo, slugElegido = null, recargar }: {
           alCambiar={() => void leer()}
         />
       )}
-    </>
+    </Pantalla>
   );
 }
 
 /** `/mis-talleres`: mis inscripciones, su estado y el comprobante (#24 B + #27 C). */
 export function PaginaDeMisTalleres({ yo }: { yo: Yo }) {
   const { t } = useTranslation();
+  const { t: tm } = useT();
   const { talleres, leer } = useTalleres();
   return (
-    <>
-      <CabeceraDeContenido titulo={<Titulo texto={t('paginas.misTalleres')} />} bajada={t('paginas.misTalleresBajada')} />
+    <Pantalla antetitulo={tm('mi.modulos.misTalleres')} titulo={tm('mi.paginas.misTalleres')} hint={tm('mi.paginas.misTalleres.hint')}>
       {talleres.estado !== 'listo' ? (
         <EstadoDeLaLista talleres={talleres} leer={leer} />
       ) : talleres.mios.length === 0 ? (
@@ -137,189 +139,6 @@ export function PaginaDeMisTalleres({ yo }: { yo: Yo }) {
           alDeclarar={() => void leer()}
         />
       )}
-    </>
-  );
-}
-
-/**
- * Ajustes → Perfil (#34 B.1; hasta la #33, `/mis-datos`).
- *
- * «Tus datos» — y, desde la #27 D, el perfil: país, ciudad, año de nacimiento
- * y nivel educativo. **Todo opcional**; «Guardar» es uno y guarda todo junto
- * (`POST /api/yo`). La edad se calcula al lado del año y nunca se pide la
- * fecha. Debajo, en gris, para qué se piden y el enlace al aviso de privacidad
- * (`armandoduarte.com/privacidad#perfil`).
- *
- * Qué es válido lo dice `@codice/core` (`validarPerfil`); la base lo vuelve a
- * mirar con los `check` de la 001 y la 011.
- */
-export function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: () => Promise<void>; principal: boolean }) {
-  const { t, i18n } = useTranslation();
-  const p = yo.persona;
-  const faltan = !p?.nombre || !p?.apellido || !p?.whatsapp || !p?.pais;
-  const [datos, setDatos] = useState<PerfilEntrada>(() => ({
-    nombre: p?.nombre ?? '',
-    apellido: p?.apellido ?? '',
-    whatsapp: p?.whatsapp ?? '',
-    pais: p?.pais ?? '',
-    ciudad: p?.ciudad ?? '',
-    anio_nacimiento: p?.anio_nacimiento ? String(p.anio_nacimiento) : '',
-    nivel_educativo: p?.nivel_educativo ?? '',
-  }));
-  const [errores, setErrores] = useState<Partial<Record<CampoDelPerfil, string>>>({});
-  const [estado, setEstado] = useState<'quieto' | 'guardando' | 'guardado' | 'error'>('quieto');
-  const paises = useMemo(() => paisesParaElegir(i18n.language || 'es'), [i18n.language]);
-
-  const cambiar = (campo: CampoDelPerfil) => (e: { target: { value: string } }) => {
-    setDatos((d) => ({ ...d, [campo]: e.target.value }));
-    setEstado('quieto');
-  };
-  const anio = /^\d{4}$/.test(datos.anio_nacimiento.trim()) ? Number(datos.anio_nacimiento.trim()) : null;
-  const edad = edadDesdeAnio(anio);
-
-  async function guardar(evento: React.FormEvent) {
-    evento.preventDefault();
-    const encontrados = validarPerfil(datos);
-    setErrores(encontrados);
-    if (Object.keys(encontrados).length > 0) return;
-    setEstado('guardando');
-    try {
-      await api('yo', { metodo: 'POST', cuerpo: perfilParaEnviar(datos) });
-      setEstado('guardado');
-      await recargar();
-    } catch {
-      setEstado('error');
-    }
-  }
-
-  const error = (campo: CampoDelPerfil) => (errores[campo] ? t(errores[campo]!) : null);
-
-  return (
-    <section className="seccion" id="tus-datos" aria-labelledby="tus-datos-titulo">
-      <h2 className="solo-lectura" id="tus-datos-titulo">{t('miEspacio.datosTitulo')}</h2>
-      {faltan ? <p className="nota">{t('miEspacio.datosFaltan')}</p> : null}
-      <form onSubmit={guardar} noValidate>
-        <Campo id="nombre" rotulo={t('miEspacio.nombre')} value={datos.nombre} autoComplete="given-name"
-          error={error('nombre')} onChange={cambiar('nombre')} />
-        <Campo id="apellido" rotulo={t('miEspacio.apellido')} value={datos.apellido} autoComplete="family-name"
-          error={error('apellido')} onChange={cambiar('apellido')} />
-        <CampoWhatsApp id="whatsapp" rotulo={t('miEspacio.whatsapp')} ayuda={t('miEspacio.whatsappAyuda')}
-          valor={datos.whatsapp} paisSugerido={datos.pais || null} error={errores.whatsapp}
-          alCambiar={(v) => cambiar('whatsapp')({ target: { value: v } })} />
-        <Selector id="pais" rotulo={t('miEspacio.pais')} value={datos.pais} autoComplete="country"
-          error={error('pais')} onChange={cambiar('pais')}
-          opciones={[{ valor: '', texto: t('miEspacio.sinElegir') }, ...paises.map((x) => ({ valor: x.codigo, texto: x.nombre }))]} />
-        <Campo id="ciudad" rotulo={t('miEspacio.ciudad')} value={datos.ciudad} autoComplete="address-level2"
-          maxLength={120} error={error('ciudad')} onChange={cambiar('ciudad')} />
-        <Campo id="anio_nacimiento" rotulo={t('miEspacio.anioNacimiento')} value={datos.anio_nacimiento}
-          inputMode="numeric" maxLength={4} autoComplete="bday-year"
-          ayuda={edad !== null ? t('miEspacio.edad', { edad }) : t('miEspacio.anioAyuda')}
-          error={error('anio_nacimiento')} onChange={cambiar('anio_nacimiento')} />
-        <Selector id="nivel_educativo" rotulo={t('miEspacio.nivelEducativo')} value={datos.nivel_educativo}
-          error={error('nivel_educativo')} onChange={cambiar('nivel_educativo')}
-          opciones={[{ valor: '', texto: t('miEspacio.sinElegir') }, ...NIVELES_EDUCATIVOS.map((n) => ({ valor: n, texto: t(`miEspacio.niveles.${n}`) }))]} />
-        <p className="nota nota--para-que">
-          <b>{t('miEspacio.perfil.paraQue')}</b> {t('miEspacio.perfil.paraQueTexto')}{' '}
-          <a className="enlace" href={`${WEB}/privacidad#perfil`}>{t('miEspacio.perfil.aviso')}</a>
-        </p>
-        <div className="fila">
-          {principal ? (
-            <BotonPrincipal cargando={estado === 'guardando'} textoCargando={t('miEspacio.guardando')}>
-              {t('miEspacio.guardar')}
-            </BotonPrincipal>
-          ) : (
-            <button type="submit" className="btn btn--ancho" disabled={estado === 'guardando'}>
-              {estado === 'guardando' ? t('miEspacio.guardando') : t('miEspacio.guardar')}
-            </button>
-          )}
-        </div>
-        {estado === 'guardado' ? <p className="exito" role="status">{t('miEspacio.guardado')}</p> : null}
-        {estado === 'error' ? <p className="error" role="alert">{t('miEspacio.errorAlGuardar')}</p> : null}
-      </form>
-    </section>
-  );
-}
-
-/**
- * Ajustes → Seguridad (#34 B.4): solo para el equipo. Los códigos de respaldo,
- * tal cual estaban al final de Mis datos. «Cerrar las otras sesiones» se mudó a
- * Ajustes → Sesiones, que ven todos.
- */
-export function SeccionDeSeguridad({ alRegenerar, alPedirPasoReciente, reseteoPendiente = null }: {
-  alRegenerar: (codigos: string[]) => void;
-  /** #37 PR 2 · el rescate solo (fase-2 §8): el reseteo que pidió esta persona, si hay uno en curso. */
-  reseteoPendiente?: { vence: string; confirmado: boolean } | null;
-  /** #35 · P8: la API pidió el código del autenticador; con él, se reintenta. */
-  alPedirPasoReciente: (accion: { reintentar: () => void; cancelar: () => void }) => void;
-}) {
-  const { t } = useTranslation();
-  const { t: tm, idioma } = useT();
-  const [quedan, setQuedan] = useState<number | null>(null);
-  const [regenerando, setRegenerando] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let vivo = true;
-    void (async () => {
-      try {
-        const r = await api<{ quedan: number }>('respaldo/cuantos');
-        if (vivo) setQuedan(r.quedan);
-      } catch {
-        /* No se pinta nada: cuántos códigos quedan es información útil, no
-           crítica, y un error acá no tiene por qué ensuciar la pantalla. */
-      }
-    })();
-    return () => { vivo = false; };
-  }, []);
-
-  async function regenerar() {
-    setError(null);
-    setRegenerando(true);
-    try {
-      const r = await api<{ codigos: string[] }>('respaldo/generar', { metodo: 'POST' });
-      alRegenerar(r.codigos);
-    } catch (fallo) {
-      /* `PASO_RECIENTE_REQUERIDO` es el 403 del kit cuando la verificación del
-         autenticador ya no es reciente: desde la #35 se pide con P8 (la
-         casilla de 6) y, confirmado, se reintenta. El `message` del kit está en
-         voseo y nunca se pinta (`comun/api.ts`). */
-      if (fallo instanceof ErrorDeApi && fallo.codigo === 'PASO_RECIENTE_REQUERIDO') {
-        alPedirPasoReciente({ reintentar: () => void regenerar(), cancelar: () => {} });
-      } else {
-        setError(t('comun.errorGenerico'));
-      }
-    } finally {
-      setRegenerando(false);
-    }
-  }
-
-  const pocos = quedan !== null && quedan <= 3;
-
-  return (
-    <div>
-      {/* «Reseteo pendiente» (fase-2 §8, `valores.reseteoPendiente` de Ajustes
-          del molde, que entra en el PR 3): lo ve solo la persona que lo pidió,
-          con el texto del molde. Si no fue ella, lo cancela desde el correo de aviso. */}
-      {reseteoPendiente ? (
-        <div className="seccion" role="status">
-          <h3 className="subtitulo">{tm('settings.security.resetPending')}</h3>
-          <p className="nota">{tm('settings.security.resetPending.d', { fecha: fechaDeVencimiento(new Date(reseteoPendiente.vence), idioma) })}</p>
-        </div>
-      ) : null}
-      <h3 className="subtitulo">{t('respaldo.regenerarTitulo')}</h3>
-      {quedan === null ? null : (
-        <p className="nota">
-          {pocos ? t('respaldo.quedanPocos', { cuantos: quedan }) : t('respaldo.quedan', { cuantos: quedan })}
-        </p>
-      )}
-      <p className="nota">{t('respaldo.regenerarAviso')}</p>
-      <div className="fila">
-        <button type="button" className="btn btn--ancho" onClick={regenerar} disabled={regenerando}>
-          {regenerando ? t('respaldo.regenerando') : t('respaldo.regenerar')}
-        </button>
-      </div>
-
-      {error ? <p className="error" role="alert">{error}</p> : null}
-    </div>
+    </Pantalla>
   );
 }

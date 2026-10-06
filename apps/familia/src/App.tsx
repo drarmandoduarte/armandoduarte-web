@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Toast } from '@moldes/ui';
+import type { Idioma } from '@moldes/idiomas';
+import { necesitaEmpezar, slugDeMeAnoto } from '@codice/core';
 import { useSesion } from './comun/sesion';
 import { api } from './comun/api';
-import { SECCIONES_DE_AJUSTES, necesitaEmpezar, slugDeMeAnoto, type SeccionDeAjustes } from '@codice/core';
+import { guardarIdioma } from './comun/idioma';
 import { rutaQueCorresponde } from './comun/ruta-que-corresponde';
 import { destinoGuardado, guardarDestinoDeLaUrl, olvidarDestino } from './comun/destino';
 import { Pantalla } from './comun/Piezas';
@@ -14,14 +17,19 @@ import { Reseteo } from './acceso/Reseteo';
 import { Respaldo } from './acceso/Respaldo';
 import { Confirmacion } from './acceso/Confirmacion';
 import { Rescate } from './acceso/Rescate';
+import { useT } from './acceso/textos';
 import { PaginaDeMisTalleres, PaginaDeTalleres } from './mi-espacio/MiEspacio';
-import { Ajustes } from './mi-espacio/Ajustes';
-import { Inicio } from './mi-espacio/Inicio';
-import { Empezar } from './mi-espacio/Empezar';
-import { Marco } from './comun/Marco';
 import { ProveedorDeNavegacion } from './comun/navegacion';
 import { Panel } from './equipo/Panel';
-import { RUTAS, RUTA_DE_SECCION } from './rutas';
+import { Esqueleto } from './molde/Esqueleto';
+import { useLectura } from './molde/lectura';
+import { PaginaDeInicio } from './molde/inicio';
+import { PaginaDeAjustes, autenticadorDe } from './molde/ajustes';
+import { PaginaDeAlertas, alertasTraducidas } from './molde/alertas';
+import { PaginaDePapelera } from './molde/papelera';
+import { PaginaDeEquipo } from './molde/equipo';
+import { PaginaDeBienvenida } from './molde/bienvenida';
+import { RUTAS, lugarDeRuta, rutaDeAjustes } from './rutas';
 import { variablesQueFaltan } from './supabase';
 
 /**
@@ -35,59 +43,74 @@ import { variablesQueFaltan } from './supabase';
  * escrita otra vez y con más superficie—. Con estados, la única forma de llegar
  * a una pantalla es que la sesión esté en la condición que la produce.
  *
- * Las rutas que sí existen (`/mi-espacio` y, desde la #29, los lugares de la
- * barra lateral y `/empezar`) viven en `rutas.ts` y las usa el `vercel.json`
- * para servir el `index.html` en cualquiera: es una SPA y el servidor no sabe de
+ * Las rutas que sí existen viven en `rutas.ts` y las usa el `vercel.json` para
+ * servir el `index.html` en cualquiera: es una SPA y el servidor no sabe de
  * estados.
  *
  * ── Desde la #35, los estados tienen dirección ──────────────────────────
  * El guion v1 del Kit 512 le da una URL a cada pantalla de acceso (`/login`,
  * `/auth/2fa`…). Siguen siendo estados: la URL **acompaña** a la decisión
- * (`rutaQueCorresponde()`), y escribir una a mano no salta ningún paso. Lo que
- * sí cambia es que dentro de un estado la ruta elige la pantalla: en `reto`,
- * `/auth/2fa` es P3, `/auth/2fa/recuperar` es P6 y `/auth/2fa/reseteo` es P6b.
+ * (`rutaQueCorresponde()`), y escribir una a mano no salta ningún paso.
+ *
+ * ── Desde la #37 (PR 3), adentro es el molde ───────────────────────────
+ * Con la sesión en `pasar`, todo vive en `<Shell>` del molde (`Esqueleto`):
+ * Inicio, Talleres, Mis talleres, el Panel, el Centro de alertas, la Papelera,
+ * Equipo y Ajustes. La primera entrada es la `<Bienvenida>` del molde. Lo del
+ * negocio (talleres, «Me anoto», comprobantes, el panel) no cambió: cuelga del
+ * shell como módulo.
  *
  * ── Quién decide ────────────────────────────────────────────────────────
  * `decidirReto()`, del núcleo del kit. Este componente solo traduce su
- * respuesta a una pantalla. El orden de las reglas —y por qué «sin factor» va
- * antes que «ventana vencida»— está escrito allá, con su motivo.
+ * respuesta a una pantalla.
  */
 export function App() {
-  const { t } = useTranslation();
+  const { t: ti, i18n } = useTranslation();
+  const { t, idioma } = useT();
   const { cargando, sesion, yo, decision, recargar, salir, marcarVerificado } = useSesion();
   /** Los diez códigos recién generados, mientras P5 los muestra. */
   const [codigosNuevos, setCodigosNuevos] = useState<string[] | null>(null);
   /** P8: la acción que espera el código del autenticador (`PASO_RECIENTE_REQUERIDO`). */
   const [pasoReciente, setPasoReciente] = useState<{ reintentar: () => void; cancelar: () => void } | null>(null);
-  /** La ruta que la pantalla pinta. Es estado (#24 B) porque `replaceState` no
-   *  vuelve a pintar: sin esto, al llegar a `/me-anoto/<slug>` después de
-   *  entrar, la pantalla seguía mostrando lo de la ruta anterior. */
+  /** P4 por elección (#37 PR 3): un cliente que activa su autenticador, o cualquiera que suma un segundo. */
+  const [activando, setActivando] = useState(false);
+  /** El cartel de la app (fase-2 §6: avisar el error de una acción es de la app). */
+  const [aviso, setAviso] = useState<{ texto: string; tono: 'neutral' | 'success' | 'danger' } | null>(null);
+  /** La ruta y la búsqueda que la pantalla pinta. Son estado (#24 B) porque `replaceState` no vuelve a pintar. */
   const [ruta, setRuta] = useState(() => window.location.pathname);
-  /** #29 C: a la ficha le falta nombre, apellido o WhatsApp → primero `/empezar`. Lo decide `core`. */
+  const [busqueda, setBusqueda] = useState(() => window.location.search);
+  /** #29 C: a la ficha le falta nombre, apellido o WhatsApp → primero la Bienvenida. Lo decide `core`. */
   const faltanDatos = yo ? necesitaEmpezar(yo.persona) : false;
+  const adentro = Boolean(yo) && decision === 'pasar' && !faltanDatos;
+  const lectura = useLectura(adentro ? yo : null);
 
-  /* #29: la barra lateral navega sin recargar (ver `comun/navegacion.tsx`).
-     `pushState` y no `replaceState`: entre Talleres y Ajustes el «atrás»
-     del navegador sí tiene que volver. */
+  const leerUbicacion = useCallback(() => {
+    setRuta(window.location.pathname);
+    setBusqueda(window.location.search);
+  }, []);
+
+  /* El shell navega sin recargar. `pushState` y no `replaceState`: entre
+     Talleres y Ajustes el «atrás» del navegador sí tiene que volver. */
   const navegar = useCallback((destino: string) => {
     window.history.pushState(null, '', destino);
-    setRuta(window.location.pathname);
+    leerUbicacion();
     window.scrollTo({ top: 0 });
-  }, []);
+  }, [leerUbicacion]);
   useEffect(() => {
-    const alVolver = () => setRuta(window.location.pathname);
-    window.addEventListener('popstate', alVolver);
-    return () => window.removeEventListener('popstate', alVolver);
-  }, []);
+    window.addEventListener('popstate', leerUbicacion);
+    return () => window.removeEventListener('popstate', leerUbicacion);
+  }, [leerUbicacion]);
 
-  /* F · la URL dice dónde está la persona: `/mi-espacio` cuando entró,
-     `/entrar` cuando no. Quién decide es `rutaQueCorresponde()`, pura y con
-     tabla; acá solo se aplica. `replaceState` y no `pushState`: el «atrás»
-     del navegador no tiene que volver a una pantalla de entrada que ya no
-     corresponde. */
+  const avisar = useCallback((texto: string, tono: 'neutral' | 'success' | 'danger' = 'neutral') => setAviso({ texto, tono }), []);
   useEffect(() => {
-    /* #24 B: el `?ir=` de `/entrar` se guarda antes de decidir, y se olvida
-       en cuanto se lo usa (ver `comun/destino.ts`). */
+    if (!aviso) return;
+    const reloj = setTimeout(() => setAviso(null), 6000);
+    return () => clearTimeout(reloj);
+  }, [aviso]);
+
+  /* La URL dice dónde está la persona. Quién decide es `rutaQueCorresponde()`,
+     pura y con tabla; acá solo se aplica. `replaceState` y no `pushState`: el
+     «atrás» no tiene que volver a una pantalla que ya no corresponde. */
+  useEffect(() => {
     guardarDestinoDeLaUrl();
     const guardado = destinoGuardado();
     const destino = rutaQueCorresponde({
@@ -97,26 +120,47 @@ export function App() {
       decision,
       rutaActual: window.location.pathname,
       esEquipo: yo?.tipo === 'equipo',
+      esDueno: yo?.rol === 'dueno',
       destinoGuardado: guardado,
       faltanDatos,
       mostrandoCodigos: codigosNuevos !== null,
       busqueda: window.location.search,
     });
-    /* El destino se olvida cuando se usa, y no mientras falten los datos:
-       ahí espera a que `/empezar` termine (#29 C). */
     if (sesion && yo && decision === 'pasar' && !faltanDatos) olvidarDestino();
     if (destino) {
       window.history.replaceState(null, '', destino);
       guardarDestinoDeLaUrl();
     }
-    setRuta(window.location.pathname);
-  }, [cargando, sesion, yo, decision, faltanDatos, ruta, codigosNuevos]);
+    leerUbicacion();
+  }, [cargando, sesion, yo, decision, faltanDatos, ruta, busqueda, codigosNuevos, leerUbicacion]);
+
+  /* El idioma: gana el del perfil (fase-2 §5, `elegirIdioma`). Si la persona
+     entró con otro en la entrada, la app pasa al suyo y este aparato lo recuerda. */
+  const idiomaDelPerfil = yo?.persona?.idioma;
+  useEffect(() => {
+    if (!idiomaDelPerfil || idiomaDelPerfil === i18n.language) return;
+    guardarIdioma(idiomaDelPerfil);
+    void i18n.changeLanguage(idiomaDelPerfil);
+  }, [idiomaDelPerfil, i18n]);
+
+  const cambiarIdioma = useCallback(async (nuevo: Idioma) => {
+    guardarIdioma(nuevo);
+    await i18n.changeLanguage(nuevo);
+    await api('yo', { metodo: 'POST', cuerpo: { idioma: nuevo } });
+    await recargar();
+  }, [i18n, recargar]);
+
+  /* Inicio y el Centro de alertas muestran lo último: al llegar, se vuelve a leer. */
+  const lugar = lugarDeRuta(ruta);
+  const releer = lectura.releer;
+  useEffect(() => {
+    if (adentro && (lugar === 'inicio' || lugar === 'alertas')) void releer();
+  }, [adentro, lugar, releer]);
 
   /* #37 PR 2 · cumplidas las 48 h de un rescate confirmado, la persona entra
      con el código por correo y queda en el reto: acá se le pide a la API que
      aplique el reseteo. Si lo aplicó, su autenticador ya no existe y, al
-     recargar, el núcleo (`decidirReto()`) la manda a enrolar uno nuevo. Si no
-     había nada listo, no cambia nada. Una vez por llegada al reto. */
+     recargar, el núcleo (`decidirReto()`) la manda a enrolar uno nuevo. */
   const quien = sesion?.user?.id ?? null;
   useEffect(() => {
     if (decision !== 'reto' || !quien) return;
@@ -127,14 +171,26 @@ export function App() {
     return () => { vivo = false; };
   }, [decision, quien, recargar]);
 
+  /** Recién activado un autenticador (P4): se generan los códigos de respaldo y se muestran. */
+  const alActivado = async () => {
+    marcarVerificado();
+    try {
+      const r = await api<{ codigos: string[] }>('respaldo/generar', { metodo: 'POST' });
+      setCodigosNuevos(r.codigos);
+    } catch {
+      /* Si la generación falla, no se traba nada: los códigos se generan
+         después desde Cuenta y seguridad. */
+      await recargar();
+    }
+  };
+
   /* Lo primero, antes que cualquier pantalla: si falta una variable, se dice
-     SU NOMBRE. Quien va a leer esto es dirección cargando el proyecto en
-     Vercel, y lo único que necesita saber es cuál falta. Nunca un valor. */
+     SU NOMBRE. Nunca un valor. */
   const faltan = variablesQueFaltan();
   if (faltan.length > 0) {
     return (
       <Pantalla>
-        <h1 className="titulo">{t('comun.errorGenerico')}</h1>
+        <h1 className="titulo">{ti('comun.errorGenerico')}</h1>
         <p className="bajada">
           Faltan variables de entorno en este despliegue: <code>{faltan.join(', ')}</code>
         </p>
@@ -146,11 +202,10 @@ export function App() {
      con o sin sesión (`rutaQueCorresponde()` no la mueve). */
   if (ruta === RUTAS.rescate) return <Rescate />;
 
-  /* `esperando`: hay sesión y el `/api/yo` está en camino (recién entró). */
   if (cargando || decision === 'esperando') {
     return (
       <Pantalla>
-        <p className="bajada" role="status">{t('comun.cargando')}</p>
+        <p className="bajada" role="status">{ti('comun.cargando')}</p>
       </Pantalla>
     );
   }
@@ -167,7 +222,7 @@ export function App() {
     return (
       <Respaldo
         codigos={codigosNuevos}
-        alTerminar={() => { setCodigosNuevos(null); void recargar(); }}
+        alTerminar={() => { setCodigosNuevos(null); setActivando(false); void recargar(); }}
       />
     );
   }
@@ -182,26 +237,18 @@ export function App() {
     );
   }
 
-  /* ── Antes que cualquier pantalla del flujo, y después de los códigos ──
-     Si `/api/yo` no contestó, no se sabe quién es quien está del otro lado: no
-     corresponde ni enrolar, ni el reto, ni Mi espacio. Va después de
-     `codigosNuevos` a propósito —esos se ven una sola vez y no se pueden volver
-     a pedir— y antes de todo lo demás.
-
-     Quién decide es `decidirPantalla()`, que para eso es una función pura y
-     está probada con tabla; acá solo se pinta lo que decidió. */
   if (decision === 'error') {
     return (
       <Pantalla>
-        <h1 className="titulo">{t('comun.noConfirmamos')}</h1>
+        <h1 className="titulo">{ti('comun.noConfirmamos')}</h1>
         <div className="seccion">
           <button type="button" className="btn btn--ancho" onClick={() => void recargar()}>
-            {t('comun.reintentar')}
+            {ti('comun.reintentar')}
           </button>
         </div>
         <div className="seccion">
           <button type="button" className="btn btn--ancho" onClick={() => void salir('deliberada')}>
-            {t('comun.cerrarSesion')}
+            {ti('comun.cerrarSesion')}
           </button>
         </div>
       </Pantalla>
@@ -209,26 +256,7 @@ export function App() {
   }
 
   if (decision === 'enrolar') {
-    return (
-      <Activar
-        alSalir={() => void salir('deliberada')}
-        alTerminar={async () => {
-          marcarVerificado();
-          /* Recién enrolado, la cuenta todavía no tiene códigos de respaldo.
-             Se generan y se muestran acá mismo: es el único momento del flujo
-             en que se puede obligar a guardarlos antes de seguir. */
-          try {
-            const r = await api<{ codigos: string[] }>('respaldo/generar', { metodo: 'POST' });
-            setCodigosNuevos(r.codigos);
-          } catch {
-            /* Si la generación falla, no se traba la entrada: la persona ya
-               tiene su autenticador. Los códigos se pueden generar después
-               desde Seguridad, y la pantalla lo ofrece. */
-            await recargar();
-          }
-        }}
-      />
-    );
+    return <Activar alSalir={() => void salir('deliberada')} alTerminar={() => void alActivado()} />;
   }
 
   if (decision === 'reto') {
@@ -248,7 +276,7 @@ export function App() {
     void salir('inactividad');
     return (
       <Pantalla>
-        <p className="bajada" role="status">{t('comun.cargando')}</p>
+        <p className="bajada" role="status">{ti('comun.cargando')}</p>
       </Pantalla>
     );
   }
@@ -256,55 +284,100 @@ export function App() {
   if (!yo) {
     return (
       <Pantalla>
-        <p className="bajada" role="status">{t('comun.cargando')}</p>
+        <p className="bajada" role="status">{ti('comun.cargando')}</p>
       </Pantalla>
     );
   }
 
-  /* #29 C: sin nombre, apellido o WhatsApp, `/empezar` antes que cualquier
-     otra pantalla — también mientras la URL todavía no cambió, para que no
-     asome un segundo otra cosa. */
-  if (faltanDatos) return <Empezar yo={yo} recargar={recargar} />;
+  /* P4 por elección: el cliente activa su autenticador (opcional, fase-2 §5)
+     o alguien suma un segundo. Se puede cancelar: no es la P4 obligatoria. */
+  if (activando) {
+    return <Activar alCancelar={() => setActivando(false)} alSalir={() => void salir('deliberada')} alTerminar={() => void alActivado()} />;
+  }
+
+  const autenticador = autenticadorDe(sesion);
+
+  /* La primera entrada (#29 C → #37 PR 3): sin nombre, apellido o WhatsApp,
+     la Bienvenida antes que cualquier otra pantalla — también mientras la URL
+     todavía no cambió, para que no asome un segundo otra cosa. */
+  if (faltanDatos) {
+    return (
+      <PaginaDeBienvenida t={t} yo={yo} autenticadorActivo={Boolean(autenticador)} alActivar={() => setActivando(true)} alTerminar={recargar} />
+    );
+  }
 
   const esEquipo = yo.tipo === 'equipo';
+  const esDueno = yo.rol === 'dueno';
   const slug = slugDeMeAnoto(ruta);
-  /* `/equipo` (#24 A): el panel, solo para el equipo. A un cliente que escribe
-     `/equipo` se le muestra Inicio y `rutaQueCorresponde()` corrige la URL:
-     nunca ve un error. La API y la base lo frenan igual (`SOLO_EQUIPO`, RLS). */
-  const enElPanel = ruta === RUTAS.equipo && esEquipo;
-  /* #34 B: la sección de Ajustes que dice la ruta. `/ajustes/seguridad` para
-     un cliente no es suya: Inicio, y la URL la corrige `rutaQueCorresponde()`. */
-  const seccion: SeccionDeAjustes | null = SECCIONES_DE_AJUSTES.find((s) => RUTA_DE_SECCION[s] === ruta) ?? null;
-  const enAjustes = seccion !== null && (seccion !== 'seguridad' || esEquipo);
-  const correo = sesion?.user?.email ?? null;
-  const proveedores = (sesion?.user?.app_metadata?.providers as string[] | undefined) ?? null;
-  const pagina = enElPanel ? <Panel yo={yo} />
-    : slug !== null || ruta === RUTAS.talleres ? <PaginaDeTalleres key={ruta} yo={yo} slugElegido={slug} recargar={recargar} />
-      : ruta === RUTAS.misTalleres ? <PaginaDeMisTalleres yo={yo} />
-        : enAjustes ? (
-          <Ajustes
-            yo={yo}
-            correo={correo}
-            proveedores={proveedores}
-            seccion={seccion}
-            recargar={recargar}
-            alRegenerar={setCodigosNuevos}
-            alPedirPasoReciente={setPasoReciente}
-            alSalirDeTodo={() => salir('deliberada', 'global')}
-          />
-        )
-          : <Inicio yo={yo} />;
+  const alertas = alertasTraducidas(t, idioma, yo, lectura, navegar);
+  const releerTodo = async () => { await recargar(); await lectura.releer(); };
+
+  let pagina;
+  if (ruta === RUTAS.equipo && esEquipo) pagina = <Panel yo={yo} />;
+  else if (ruta === RUTAS.equipoPersonas && esDueno) pagina = <PaginaDeEquipo t={t} yo={yo} onIr={navegar} alAvisar={avisar} />;
+  else if (slug !== null || ruta === RUTAS.talleres) pagina = <PaginaDeTalleres key={ruta} yo={yo} slugElegido={slug} recargar={releerTodo} />;
+  else if (ruta === RUTAS.misTalleres) pagina = <PaginaDeMisTalleres yo={yo} />;
+  else if (ruta === RUTAS.alertas) pagina = <PaginaDeAlertas t={t} alertas={alertas} />;
+  else if (ruta === RUTAS.papelera) pagina = <PaginaDePapelera t={t} yo={yo} alAvisar={avisar} />;
+  else if (ruta === RUTAS.ajustes) {
+    pagina = (
+      <PaginaDeAjustes
+        t={t}
+        yo={yo}
+        sesion={sesion}
+        seccion={new URLSearchParams(busqueda).get('s')}
+        onSeccion={(s) => navegar(rutaDeAjustes(s))}
+        app={{
+          recargar,
+          alAvisar: avisar,
+          alActivar: () => setActivando(true),
+          alRegenerar: setCodigosNuevos,
+          alPedirPasoReciente: setPasoReciente,
+          alSalirDeTodo: () => salir('deliberada', 'global'),
+          alBorrada: () => salir('deliberada', 'global'),
+          cambiarIdioma,
+        }}
+      />
+    );
+  } else {
+    pagina = (
+      <PaginaDeInicio
+        t={t}
+        yo={yo}
+        lectura={lectura}
+        alertas={alertas}
+        onIr={navegar}
+        alGuardar={async (config) => {
+          try {
+            await api('yo', { metodo: 'POST', cuerpo: { inicio: config } });
+            await recargar();
+          } catch (e) {
+            avisar(t('mi.ajustes.error'), 'danger');
+            throw e;
+          }
+        }}
+      />
+    );
+  }
 
   return (
     <ProveedorDeNavegacion navegar={navegar}>
-      <Marco
-        ruta={enElPanel ? RUTAS.equipo : ruta}
-        usuario={{ yo, correo }}
-        alSalir={() => void salir('deliberada')}
-        ancha={enElPanel || enAjustes}
+      <Esqueleto
+        t={t}
+        yo={yo}
+        correo={sesion?.user?.email ?? null}
+        activo={lugar}
+        alertas={alertas.length}
+        onIr={navegar}
+        onSalir={() => void salir('deliberada')}
       >
         {pagina}
-      </Marco>
+      </Esqueleto>
+      {aviso ? (
+        <div className="aviso-de-la-app" role="status">
+          <Toast closeLabel={t('comun.cerrar')} tone={aviso.tono} title={aviso.texto} onClose={() => setAviso(null)} />
+        </div>
+      ) : null}
     </ProveedorDeNavegacion>
   );
 }

@@ -115,7 +115,7 @@ describe('la sesión, después de entrar', () => {
       falso.avisar?.('SIGNED_IN', sesionNueva);
     });
 
-    expect(await screen.findByText(t('miEspacio.bajada'))).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: /^Hola/ })).toBeTruthy();
     expect(screen.queryByText(t('comun.noConfirmamos'))).toBeNull();
     expect(pedidosDeYo()).toBe(1);
   });
@@ -133,13 +133,13 @@ describe('la sesión, después de entrar', () => {
 
     expect(screen.getByRole('status').textContent).toBe(t('comun.cargando'));
     expect(screen.queryByText(t('comun.noConfirmamos'))).toBeNull();
-    await screen.findByText(t('miEspacio.bajada'));
+    await screen.findByRole('heading', { name: /^Hola/ });
   });
 
   it('salir → vuelve a la entrada, no al error', async () => {
     falso.sesion = sesionNueva;
     render(<App />);
-    await screen.findByText(t('miEspacio.bajada'));
+    await screen.findByRole('heading', { name: /^Hola/ });
 
     await act(async () => {
       falso.sesion = null;

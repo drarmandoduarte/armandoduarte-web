@@ -1,12 +1,14 @@
 /**
  * «Tus datos» con el perfil, y la tarjeta «Completa tu perfil» — orden #27 D.2.
+ * Desde la #37 (PR 3), el perfil es «Perfil del taller», la sección propia de
+ * Mi espacio en Ajustes del molde: cada campo guarda lo suyo.
  *
  * Supabase y la API simulados, con datos de prueba. Lo que la base permite
  * (el cliente edita lo suyo, el año en rango) está probado en el banco
  * (`packages/db/src/el-perfil.test.ts`) y en la API contra el esquema.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 const falso = vi.hoisted(() => ({ sesion: null as Session | null }));
@@ -25,6 +27,7 @@ vi.mock('../supabase', () => ({
 
 import i18n from '../i18n';
 import { App } from '../App';
+import { tDelMolde } from '../molde/arranque';
 
 const t = (clave: string, o?: Record<string, unknown>) => i18n.t(clave, o);
 const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
@@ -59,8 +62,8 @@ beforeEach(() => {
     if (ruta === '/api/talleres/inscribirme') return json({ referencia: 'AD-0042', ya_estaba: false, cobro: null });
     return json({});
   }));
-  /* #29: «Tus datos» vive en su propia pantalla. */
-  window.history.replaceState(null, '', '/ajustes/perfil');
+  /* #37 PR 3: «Perfil del taller» es una sección de Ajustes del molde. */
+  window.history.replaceState(null, '', '/ajustes?s=taller');
   window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 });
 afterEach(() => {
@@ -68,63 +71,66 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const guardar = () => fireEvent.click(screen.getByRole('button', { name: t('miEspacio.guardar') }));
+const tm = tDelMolde('es');
+/** La fila de un campo de «Perfil del taller»: el campo y su «Guardar». */
+const fila = (nombre: string) => screen.getByLabelText(nombre).closest('form') as HTMLFormElement;
+const guardarFila = (nombre: string) => fireEvent.click(within(fila(nombre)).getByRole('button', { name: tm('settings.save') }));
+const posts = () => pedidos.filter((p) => p.ruta === '/api/yo' && p.metodo === 'POST').map((p) => p.cuerpo);
 
-describe('Tus datos: el perfil', () => {
-  it('los cuatro campos nuevos, todos vacíos y opcionales; país con México primero', async () => {
+describe('Ajustes → «Perfil del taller» (la sección propia de Mi espacio, #37 PR 3)', () => {
+  it('EL CASO: el cliente la ve en el grupo de la app, con sus campos y los valores de su ficha', async () => {
+    persona = { ...base, ciudad: 'Mérida', anio_nacimiento: 1984, nivel_educativo: 'posgrado' };
     render(<App />);
-    const pais = await screen.findByLabelText(t('miEspacio.pais')) as HTMLSelectElement;
-    expect([...pais.options].slice(0, 2).map((o) => o.value)).toEqual(['', 'MX']);
-    expect(pais.value).toBe('MX');
-    expect(screen.getByLabelText(new RegExp(`^${t('miEspacio.ciudad')}`))).toBeTruthy();
-    expect(screen.getByLabelText(t('miEspacio.nivelEducativo'))).toBeTruthy();
-    expect(document.getElementById('anio_nacimiento')).not.toBeNull();
+    expect(await screen.findByRole('heading', { name: /^Perfil del taller/ })).toBeTruthy();
+    expect((screen.getByLabelText(tm('mi.campos.apellido.nombre')) as HTMLInputElement).value).toBe('Prueba');
+    expect((screen.getByLabelText(tm('mi.campos.ciudad.nombre')) as HTMLInputElement).value).toBe('Mérida');
+    expect((screen.getByLabelText(tm('mi.campos.anio.nombre')) as HTMLInputElement).value).toBe('1984');
+    /* La edad, al lado del año (nunca se pide la fecha). */
+    expect(screen.getByText(tm('mi.campos.anio.edad', { edad: new Date().getFullYear() - 1984 }))).toBeTruthy();
+    expect(screen.getByRole('combobox', { name: tm('mi.campos.pais.nombre') })).toBeTruthy();
+    expect(screen.getByRole('combobox', { name: tm('mi.campos.nivel.nombre') })).toBeTruthy();
   });
 
-  it('al escribir el año aparece la edad al lado', async () => {
+  it('«¿Para qué pedimos esto?» y el enlace al bloque #perfil del aviso de privacidad', async () => {
     render(<App />);
-    const anio = await screen.findByLabelText(new RegExp(`^${t('miEspacio.anioNacimiento')}`));
-    fireEvent.change(anio, { target: { value: '1984' } });
-    expect(screen.getByText(t('miEspacio.edad', { edad: new Date().getFullYear() - 1984 }))).toBeTruthy();
-  });
-
-  it('«¿Para qué pedimos esto?» enlaza al bloque #perfil del aviso de privacidad', async () => {
-    render(<App />);
-    await screen.findByLabelText(t('miEspacio.nivelEducativo'));
-    /* El pie también dice «Aviso de privacidad»: se busca dentro de «Tus datos». */
-    const enlace = within(document.getElementById('tus-datos')!).getByRole('link', { name: t('miEspacio.perfil.aviso') }) as HTMLAnchorElement;
+    expect(await screen.findByText(tm('mi.ajustes.taller.paraQue.texto'))).toBeTruthy();
+    const enlace = screen.getByRole('link', { name: tm('mi.ajustes.taller.aviso') }) as HTMLAnchorElement;
     expect(enlace.href).toBe('https://armandoduarte.com/privacidad#perfil');
-    expect(screen.getByText(t('miEspacio.perfil.paraQue'))).toBeTruthy();
   });
 
-  it('Guardar manda todo junto a POST /api/yo, con vacío como null y el año como número', async () => {
+  it('cada campo guarda lo suyo: la ciudad manda solo la ciudad, y dice «Guardado»', async () => {
     render(<App />);
-    fireEvent.change(await screen.findByLabelText(new RegExp(`^${t('miEspacio.ciudad')}`)), { target: { value: 'Mérida' } });
-    fireEvent.change(screen.getByLabelText(new RegExp(`^${t('miEspacio.anioNacimiento')}`)), { target: { value: '1984' } });
-    fireEvent.change(screen.getByLabelText(t('miEspacio.nivelEducativo')), { target: { value: 'prefiero_no_decir' } });
-    guardar();
-    expect(await screen.findByText(t('miEspacio.guardado'))).toBeTruthy();
-    expect(pedidos.find((p) => p.ruta === '/api/yo' && p.metodo === 'POST')?.cuerpo).toEqual({
-      /* #32: el WhatsApp viaja en E.164. */
-      nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+529990000000', pais: 'MX',
-      ciudad: 'Mérida', anio_nacimiento: 1984, nivel_educativo: 'prefiero_no_decir',
-    });
+    fireEvent.change(await screen.findByLabelText(tm('mi.campos.ciudad.nombre')), { target: { value: 'Mérida' } });
+    guardarFila(tm('mi.campos.ciudad.nombre'));
+    expect(await screen.findByText(tm('settings.saved'))).toBeTruthy();
+    expect(posts()).toEqual([{ ciudad: 'Mérida' }]);
   });
 
-  it('un año fuera de rango se dice en el campo, y no se manda nada', async () => {
+  it('el año va como número; un año fuera de rango se dice en el campo y no se manda nada', async () => {
     render(<App />);
-    fireEvent.change(await screen.findByLabelText(new RegExp(`^${t('miEspacio.anioNacimiento')}`)), { target: { value: '1900' } });
-    guardar();
+    fireEvent.change(await screen.findByLabelText(tm('mi.campos.anio.nombre')), { target: { value: '1900' } });
+    guardarFila(tm('mi.campos.anio.nombre'));
     expect(await screen.findByText(t('miEspacio.perfil.errores.anio'))).toBeTruthy();
-    expect(pedidos.some((p) => p.ruta === '/api/yo' && p.metodo === 'POST')).toBe(false);
+    expect(posts()).toEqual([]);
+    fireEvent.change(screen.getByLabelText(tm('mi.campos.anio.nombre')), { target: { value: '1984' } });
+    guardarFila(tm('mi.campos.anio.nombre'));
+    await waitFor(() => expect(posts()).toEqual([{ anio_nacimiento: 1984 }]));
   });
 
-  it('si la API falla, se dice', async () => {
+  it('el nivel educativo se elige de la lista y guarda solo, sin botón', async () => {
+    render(<App />);
+    fireEvent.click(await screen.findByRole('combobox', { name: tm('mi.campos.nivel.nombre') }));
+    fireEvent.click(screen.getByRole('option', { name: t('miEspacio.niveles.prefiero_no_decir') }));
+    await waitFor(() => expect(posts()).toEqual([{ nivel_educativo: 'prefiero_no_decir' }]));
+  });
+
+  it('si la API falla, el cartel de la app lo dice y la fila no dice «Guardado»', async () => {
     guardarFalla = true;
     render(<App />);
-    await screen.findByLabelText(t('miEspacio.nivelEducativo'));
-    guardar();
-    expect(await screen.findByText(t('miEspacio.errorAlGuardar'))).toBeTruthy();
+    fireEvent.change(await screen.findByLabelText(tm('mi.campos.ciudad.nombre')), { target: { value: 'Mérida' } });
+    guardarFila(tm('mi.campos.ciudad.nombre'));
+    expect(await screen.findByText(tm('mi.ajustes.error'))).toBeTruthy();
+    expect(screen.queryByText(tm('settings.saved'))).toBeNull();
   });
 });
 
@@ -139,7 +145,7 @@ describe('«Completa tu perfil», después de «Me anoto»', () => {
   it('si faltan datos del perfil, la tarjeta suave con el enlace a «Tus datos»; no bloquea nada', async () => {
     await anotarse();
     expect(screen.getByText(t('miEspacio.perfil.completaTitulo'))).toBeTruthy();
-    expect((screen.getByRole('link', { name: t('miEspacio.perfil.completaEnlace') }) as HTMLAnchorElement).getAttribute('href')).toBe('/ajustes/perfil');
+    expect((screen.getByRole('link', { name: t('miEspacio.perfil.completaEnlace') }) as HTMLAnchorElement).getAttribute('href')).toBe('/ajustes?s=taller');
   });
 
   it('con el perfil completo, no aparece', async () => {

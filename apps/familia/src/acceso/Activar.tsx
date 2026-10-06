@@ -10,7 +10,9 @@ import { verificarTotp } from './totp';
 /**
  * P4 · Activar el autenticador (`/auth/2fa/activar`), obligatoria para el
  * equipo. **Sin forma de saltearla**: la única salida es cerrar sesión (regla
- * del kit: un «después» es un «nunca» con buenos modales). También es adonde
+ * del kit: un «después» es un «nunca» con buenos modales). Desde la #37 PR 3
+ * también es la de quien lo activa por elección —un cliente desde Cuenta y
+ * seguridad, o cualquiera que suma un segundo—: ahí sí se cancela (`alCancelar`). También es adonde
  * llega quien terminó un rescate (#37 PR 2, §8): su autenticador viejo se borró
  * y el núcleo la manda acá.
  *
@@ -19,7 +21,12 @@ import { verificarTotp } from './totp';
  * «Abrir en mi app de autenticación» es el enlace `otpauth://`, para quien
  * está en el mismo teléfono que muestra el QR.
  */
-export function Activar({ alTerminar, alSalir }: { alTerminar: () => void; alSalir: () => void }) {
+export function Activar({ alTerminar, alSalir, alCancelar }: {
+  alTerminar: () => void;
+  alSalir: () => void;
+  /** #37 PR 3: cuando es por elección (un cliente, o un segundo autenticador), la salida es «Cancelar» y no cerrar la sesión. */
+  alCancelar?: () => void;
+}) {
   const { t } = useT();
   const otp = useRef<OtpInputHandle>(null);
   const [factor, setFactor] = useState<{ id: string; qr: string; secreto: string; uri: string } | null>(null);
@@ -87,7 +94,9 @@ export function Activar({ alTerminar, alSalir }: { alTerminar: () => void; alSal
         <Boton type="submit" ancho="completo" cargando={confirmando} disabled={!factor || sinIntentos}>{t('auth.enroll.confirm')}</Boton>
       </form>
       <div className="acceso__enlaces">
-        <Enlace tono="apagado" onClick={alSalir}>{t('auth.signout')}</Enlace>
+        {alCancelar
+          ? <Enlace tono="apagado" onClick={alCancelar}>{t('comun.cancelar')}</Enlace>
+          : <Enlace tono="apagado" onClick={alSalir}>{t('auth.signout')}</Enlace>}
       </div>
     </MarcoDeAcceso>
   );

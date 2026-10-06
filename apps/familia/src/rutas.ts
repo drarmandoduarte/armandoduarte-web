@@ -29,54 +29,88 @@ export const RUTAS = {
   /** Los enlaces de los correos del rescate (#37 PR 2): confirmar o cancelar. Con o sin sesión.
    *  La escribe `RUTA_DEL_RESCATE` de `@codice/core`, que es la que arma los enlaces. */
   rescate: '/rescate',
+  /** Inicio (`<Inicio>` del molde, #37 PR 3). */
   miEspacio: '/mi-espacio',
   /** El panel del equipo (orden #24 A). Solo `dueno` y `equipo`; a un cliente lo devuelve a Mi espacio. */
   equipo: '/equipo',
   /** «Me anoto» con un taller elegido: `/me-anoto/<slug>` (orden #24 B). El
    *  prefijo y cómo se lee el slug viven en `@codice/core` (`slugDeMeAnoto`). */
   meAnoto: '/me-anoto',
-  /* Orden #29: la barra lateral. Inicio es `miEspacio`. */
   /** Los talleres abiertos y «Me anoto». */
   talleres: '/talleres',
   /** Mis inscripciones: estado y comprobante. */
   misTalleres: '/mis-talleres',
-  /** «Tus datos» hasta la #33. Desde la #34 es Ajustes → Perfil: `/mis-datos`
-   *  responde 308 hacia allá (`vercel.json`) y, si se llega sin recargar,
-   *  `rutaQueCorresponde()` la corrige. Se nombra para poder redirigirla. */
-  misDatos: '/mis-datos',
-  /** «Tus preferencias.» (#34 B). `/ajustes` a secas va a Perfil. */
+  /* ── Lo que trae el molde (orden #37, PR 3 · §9) ── */
+  /** El Centro de alertas. */
+  alertas: '/alertas',
+  /** La Papelera. Del equipo; a un cliente se le muestra vacía (no borra nada). */
+  papelera: '/papelera',
+  /** La pantalla Equipo del molde: solo el dueño. `/equipo` sigue siendo el panel. */
+  equipoPersonas: '/equipo/personas',
+  /** `<Ajustes>` del molde. La sección va en `?s=` (`/ajustes?s=cuenta`). */
   ajustes: '/ajustes',
-  ajustesPerfil: '/ajustes/perfil',
-  ajustesCuenta: '/ajustes/cuenta',
-  ajustesNotificaciones: '/ajustes/notificaciones',
-  /** Solo para el equipo (B.4): a un cliente lo devuelve a Inicio. */
-  ajustesSeguridad: '/ajustes/seguridad',
-  ajustesSesiones: '/ajustes/sesiones',
-  ajustesPrivacidad: '/ajustes/privacidad',
-  /** La primera entrada: nombre, apellido y WhatsApp antes de cualquier otra cosa (#29 C). */
+  /** La primera entrada (`<Bienvenida>` del molde): reemplaza a `/empezar`. */
+  bienvenida: '/bienvenida',
+  /* ── Las que ya no son lugares: 308 en `vercel.json` y, si se llega sin
+     recargar, `rutaQueCorresponde()` las corrige ── */
+  /** «Tus datos» hasta la #33 → Ajustes → Perfil. */
+  misDatos: '/mis-datos',
+  /** La primera entrada de la #29 → `/bienvenida`. */
   empezar: '/empezar',
 } as const;
 
 /**
+ * Las secciones de «Tus preferencias.» de la #34 eran rutas
+ * (`/ajustes/perfil`…). Desde el molde son `?s=`: `/ajustes/<id>` → `/ajustes?s=<id>`,
+ * y el `alias` del adaptador lleva `seguridad` y `sesiones` a «Cuenta y seguridad».
+ */
+export const SECCIONES_VIEJAS = ['perfil', 'cuenta', 'notificaciones', 'seguridad', 'sesiones', 'privacidad'] as const;
+
+/** `/ajustes/perfil` → `perfil`; cualquier otra cosa, `null`. */
+export function seccionVieja(ruta: string): string | null {
+  const m = /^\/ajustes\/([a-z]+)$/.exec(ruta);
+  return m && (SECCIONES_VIEJAS as readonly string[]).includes(m[1]) ? m[1] : null;
+}
+
+/** `/ajustes?s=<id>` (o `/ajustes` a secas). */
+export const rutaDeAjustes = (seccion?: string | null) => (seccion ? `${RUTAS.ajustes}?s=${encodeURIComponent(seccion)}` : RUTAS.ajustes);
+
+/**
  * Los lugares de Mi espacio que cualquiera con sesión puede tener en la barra
- * de direcciones (#29). `/equipo` también es un lugar, pero solo para el equipo,
- * y `/me-anoto/<slug>` se reconoce por su forma (`slugDeMeAnoto`).
+ * de direcciones (#29). `/equipo` y `/equipo/personas` también son lugares,
+ * pero solo para el equipo y el dueño, y `/me-anoto/<slug>` se reconoce por su
+ * forma (`slugDeMeAnoto`).
  */
 export const LUGARES_CON_SESION: readonly string[] = [
-  RUTAS.miEspacio, RUTAS.talleres, RUTAS.misTalleres,
-  /* #34 B: las secciones de Ajustes. Seguridad no: es del equipo, como `/equipo`. */
-  RUTAS.ajustesPerfil, RUTAS.ajustesCuenta, RUTAS.ajustesNotificaciones, RUTAS.ajustesSesiones, RUTAS.ajustesPrivacidad,
+  RUTAS.miEspacio, RUTAS.talleres, RUTAS.misTalleres, RUTAS.alertas, RUTAS.papelera, RUTAS.ajustes,
 ];
 
-/** La ruta de cada sección de «Tus preferencias.» (#34 B), en el orden de `SECCIONES_DE_AJUSTES`. */
-export const RUTA_DE_SECCION = {
-  perfil: RUTAS.ajustesPerfil,
-  cuenta: RUTAS.ajustesCuenta,
-  notificaciones: RUTAS.ajustesNotificaciones,
-  seguridad: RUTAS.ajustesSeguridad,
-  sesiones: RUTAS.ajustesSesiones,
-  privacidad: RUTAS.ajustesPrivacidad,
+/**
+ * Cada lugar del shell del molde (`onIr(id)`) y su ruta. `perfil` es el avatar
+ * de la barra: abre Ajustes → Perfil.
+ */
+export const RUTA_DE_LUGAR = {
+  inicio: RUTAS.miEspacio,
+  talleres: RUTAS.talleres,
+  misTalleres: RUTAS.misTalleres,
+  panel: RUTAS.equipo,
+  alertas: RUTAS.alertas,
+  papelera: RUTAS.papelera,
+  equipo: RUTAS.equipoPersonas,
+  ajustes: RUTAS.ajustes,
+  perfil: rutaDeAjustes('perfil'),
 } as const;
+export type Lugar = keyof typeof RUTA_DE_LUGAR;
+
+/** El lugar activo del shell para una ruta. `/me-anoto/<slug>` es Talleres. */
+export function lugarDeRuta(ruta: string): Lugar {
+  if (ruta.startsWith(`${RUTAS.meAnoto}/`)) return 'talleres';
+  if (ruta === RUTAS.equipoPersonas) return 'equipo';
+  if (ruta === RUTAS.equipo) return 'panel';
+  if (ruta.startsWith(RUTAS.ajustes)) return 'ajustes';
+  const par = (Object.entries(RUTA_DE_LUGAR) as Array<[Lugar, string]>).find(([, r]) => r === ruta);
+  return par ? par[0] : 'inicio';
+}
 
 /** A dónde va alguien que llega a `/` o a una ruta que no existe. */
 export const RUTA_POR_DEFECTO = RUTAS.miEspacio;

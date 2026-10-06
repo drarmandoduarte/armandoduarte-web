@@ -32,6 +32,7 @@ vi.mock('../supabase', () => ({
 
 import i18n from '../i18n';
 import { App } from '../App';
+import { tDelMolde } from '../molde/arranque';
 
 const t = (clave: string, o?: Record<string, unknown>) => i18n.t(clave, o);
 const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
@@ -186,49 +187,65 @@ describe('?ir= (orden #24 B, a)', () => {
   });
 });
 
-describe('#29 C: sin los tres datos, primero /empezar — y el taller espera', () => {
-  it('EL CASO: llega a /me-anoto/<slug> sin apellido ni WhatsApp → /empezar; al guardar, de vuelta al taller', async () => {
+describe('#29 C → #37 PR 3: sin los tres datos, primero la Bienvenida del molde — y el taller espera', () => {
+  const tm = tDelMolde('es');
+  const siguiente = () => screen.getByRole('button', { name: new RegExp(tm('bienvenida.siguiente')) });
+
+  it('EL CASO: llega a /me-anoto/<slug> sin apellido ni WhatsApp → /bienvenida; al terminar, de vuelta al taller', async () => {
     respuestas.yo = { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: 'Prueba', apellido: null, whatsapp: null, pais: 'MX' } };
+    let guardados = 0;
     respuestas.guardarYo = () => {
-      respuestas.yo = { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 123 4567', pais: 'MX' } };
+      guardados += 1;
+      /* Recién con los dos pasos guardados la ficha está completa (el segundo es País y ciudad). */
+      if (guardados === 2) respuestas.yo = { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+52 999 123 4567', pais: 'MX' } };
     };
     window.history.replaceState(null, '', '/entrar?ir=%2Fme-anoto%2F' + SLUG);
     render(<App />);
-    expect(await screen.findByRole('button', { name: t('empezar.guardar') })).toBeTruthy();
-    await waitFor(() => expect(window.location.pathname).toBe('/empezar'));
-    /* El destino no se olvidó: espera a que termine /empezar. */
+    expect(await screen.findByRole('heading', { name: /^Tus datos/ })).toBeTruthy();
+    await waitFor(() => expect(window.location.pathname).toBe('/bienvenida'));
+    /* El destino no se olvidó: espera a que termine la Bienvenida. */
     expect(window.sessionStorage.getItem('codice.destino-despues-de-entrar')).toBe(`/me-anoto/${SLUG}`);
-    expect(naranjas(), 'un botón: «Guardar y entrar»').toBe(1);
+    expect(screen.getByText(new RegExp(tm('bienvenida.paso', { n: 1, total: 2 })))).toBeTruthy();
 
-    fireEvent.change(document.getElementById('empezar-apellido')!, { target: { value: 'Prueba' } });
-    fireEvent.change(document.getElementById('empezar-whatsapp')!, { target: { value: '+52 999 123 4567' } });
-    fireEvent.click(screen.getByRole('button', { name: t('empezar.guardar') }));
+    fireEvent.change(screen.getByLabelText(tm('mi.campos.apellido.nombre')), { target: { value: 'Prueba' } });
+    fireEvent.change(document.getElementById('bienvenida-whatsapp')!, { target: { value: '+52 999 123 4567' } });
+    fireEvent.click(siguiente());
+
+    /* Paso 2: País y ciudad. «Empezar» guarda y termina. */
+    expect(await screen.findByRole('heading', { name: /^¿Desde dónde/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tm('bienvenida.empezar')) }));
 
     expect(await screen.findByRole('button', { name: t('miEspacio.confirmarLugar') })).toBeTruthy();
     expect(window.location.pathname).toBe(`/me-anoto/${SLUG}`);
-    /* #32: el WhatsApp viaja en E.164. */
-    expect(pedidos.find((p) => p.ruta === '/api/yo' && p.cuerpo)?.cuerpo).toEqual({
-      nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+529991234567', pais: 'MX',
-    });
+    /* #32: el WhatsApp viaja en E.164. Cada paso manda lo suyo; la ciudad vacía no viaja. */
+    expect(pedidos.filter((p) => p.ruta === '/api/yo' && p.cuerpo).map((p) => p.cuerpo)).toEqual([
+      { nombre: 'Prueba', apellido: 'Prueba', whatsapp: '+529991234567' },
+      { pais: 'MX' },
+    ]);
   });
 
-  it('los tres son obligatorios: sin ellos no se manda nada y cada campo lo dice', async () => {
+  it('los tres son obligatorios: sin ellos no se avanza ni se manda nada, y cada campo lo dice; el primer paso no se salta', async () => {
     respuestas.yo = { rol: 'cliente', tipo: 'cliente', persona: { id: 'u', nombre: null, apellido: null, whatsapp: null, pais: null } };
     window.history.replaceState(null, '', '/mi-espacio');
     render(<App />);
-    fireEvent.click(await screen.findByRole('button', { name: t('empezar.guardar') }));
+    await screen.findByRole('heading', { name: /^Tus datos/ });
+    expect(screen.queryByRole('button', { name: tm('bienvenida.saltar') })).toBeNull();
+    fireEvent.click(siguiente());
     expect(await screen.findByText(t('miEspacio.errores.nombre'))).toBeTruthy();
     expect(screen.getByText(t('miEspacio.errores.apellido'))).toBeTruthy();
     expect(screen.getByText(t('miEspacio.errores.whatsapp'))).toBeTruthy();
     expect(pedidos.some((p) => p.ruta === '/api/yo' && p.cuerpo)).toBe(false);
-    /* País, México por defecto. */
-    expect((document.getElementById('empezar-pais') as HTMLSelectElement).value).toBe('MX');
+    expect(screen.getByRole('heading', { name: /^Tus datos/ })).toBeTruthy();
   });
 
-  it('con los tres datos, /empezar escrita a mano va a Inicio', async () => {
-    window.history.replaceState(null, '', '/empezar');
-    render(<App />);
-    await waitFor(() => expect(window.location.pathname).toBe('/mi-espacio'));
-    expect(screen.queryByRole('button', { name: t('empezar.guardar') })).toBeNull();
+  it('con los tres datos, /empezar y /bienvenida escritas a mano van a Inicio', async () => {
+    for (const ruta of ['/empezar', '/bienvenida']) {
+      window.history.replaceState(null, '', ruta);
+      render(<App />);
+      await waitFor(() => expect(window.location.pathname).toBe('/mi-espacio'));
+      /* La Bienvenida del molde marca su paso en `data-paso`: no está. */
+      expect(document.querySelector('[data-paso]')).toBeNull();
+      cleanup();
+    }
   });
 });
