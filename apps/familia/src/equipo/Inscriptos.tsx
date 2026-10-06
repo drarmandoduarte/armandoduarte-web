@@ -72,7 +72,7 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
     void cargar(elegida, true);
   }, [elegida, cargar]);
 
-  if (ediciones.length === 0) return <p className="nota">{t('equipo.inscriptos.sinEdiciones')}</p>;
+  if (ediciones.length === 0) return <p className="nota">{t('panel.inscriptos.sinEdiciones')}</p>;
 
   const actual = ediciones.find((x) => x.edicion.id === elegida);
   const zona = actual?.edicion.zona ?? 'America/Merida';
@@ -85,18 +85,18 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
 
   const historial = (f: Inscripto) => {
     if (!f.ultimo_tipo || !f.ultimo_el) return null;
-    const tipo = t(`equipo.inscriptos.tiposDelLibro.${f.ultimo_tipo}`);
+    const tipo = t(`panel.inscriptos.tiposDelLibro.${f.ultimo_tipo}`);
     const linea = f.ultimo_por
-      ? t('equipo.inscriptos.historial', { tipo, fecha: fecha(f.ultimo_el), quien: f.ultimo_por })
-      : t('equipo.inscriptos.historialSinQuien', { tipo, fecha: fecha(f.ultimo_el) });
+      ? t('panel.inscriptos.historial', { tipo, fecha: fecha(f.ultimo_el), quien: f.ultimo_por })
+      : t('panel.inscriptos.historialSinQuien', { tipo, fecha: fecha(f.ultimo_el) });
     return f.ultima_nota ? `${linea} · ${f.ultima_nota}` : linea;
   };
 
   const exportar = () => {
     const claves = ['referencia', 'nombre', 'correo', 'whatsapp', 'pais', 'fecha', 'estado', 'ultimoMovimiento', 'montoDeclarado', 'montoConfirmado'];
-    const csv = aCsv(claves.map((k) => t(`equipo.inscriptos.encabezados.${k}`)), visibles.map((f) => [
+    const csv = aCsv(claves.map((k) => t(`panel.inscriptos.encabezados.${k}`)), visibles.map((f) => [
       f.referencia, nombreCompleto(f, ''), f.email, f.whatsapp, f.pais, f.inscripto_el,
-      t(`equipo.estadosInscripcion.${f.estado}`), f.ultimo_el, f.monto_declarado, f.monto_confirmado,
+      t(`panel.estadosInscripcion.${f.estado}`), f.ultimo_el, f.monto_declarado, f.monto_confirmado,
     ]));
     descargar(nombreDeArchivo(`inscriptos-${actual?.curso.slug ?? 'edicion'}`, new Date()), csv);
   };
@@ -105,7 +105,7 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
     setAviso(null);
     const ok = await abrirEnOtraPestana(async () =>
       (await api<{ url: string }>(`pagos/comprobante/${f.inscripcion_id}`)).url);
-    if (!ok) setAviso({ id: f.inscripcion_id, texto: t('equipo.inscriptos.pago.errores.ver'), error: true });
+    if (!ok) setAviso({ id: f.inscripcion_id, texto: t('panel.inscriptos.pago.errores.ver'), error: true });
   }
 
   async function resolver() {
@@ -124,15 +124,15 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
       setResolviendo(null);
       /* #34 B.3: `apagado` es la persona que pidió no recibir correos; igual hay que avisarle. */
       const clave = r.correo === 'no_enviado' ? 'correoNoSalio' : r.correo === 'apagado' ? 'correoApagado' : 'hecho';
-      setAviso({ id, texto: t(`equipo.inscriptos.pago.${clave}`) });
+      setAviso({ id, texto: t(`panel.inscriptos.pago.${clave}`) });
       await cargar(elegida, false);
     } catch (e) {
       const codigo = e instanceof ErrorDeApi ? e.codigoDelServidor : undefined;
       setErrorDeResolucion(t(
-        codigo === 'NO_ESTA_EN_REVISION' ? 'equipo.inscriptos.pago.errores.noEnRevision'
-          : codigo === 'SOLO_DUENO' || codigo === 'SIN_PERMISO' ? 'equipo.inscriptos.pago.errores.sinPermiso'
-            : codigo === 'FALTA_MOTIVO' ? 'equipo.inscriptos.pago.errores.motivo'
-              : 'equipo.inscriptos.pago.errores.generico',
+        codigo === 'NO_ESTA_EN_REVISION' ? 'panel.inscriptos.pago.errores.noEnRevision'
+          : codigo === 'SOLO_DUENO' || codigo === 'SIN_PERMISO' ? 'panel.inscriptos.pago.errores.sinPermiso'
+            : codigo === 'FALTA_MOTIVO' ? 'panel.inscriptos.pago.errores.motivo'
+              : 'panel.inscriptos.pago.errores.generico',
       ));
     } finally {
       setTrabajando(false);
@@ -153,7 +153,7 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
       <div className="barra barra--filtros">
         <Selector
           id="inscriptos-edicion"
-          rotulo={t('equipo.inscriptos.edicion')}
+          rotulo={t('panel.inscriptos.edicion')}
           value={elegida}
           onChange={(x) => { setElegida(x.target.value); setConsulta(''); }}
           opciones={ediciones.map(({ curso, edicion }) => ({
@@ -161,46 +161,46 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
             texto: `${curso.titulo} — ${fechaLarga(edicion.inicio, edicion.zona)}`,
           }))}
         />
-        <Campo id="inscriptos-buscar" type="search" rotulo={t('equipo.inscriptos.buscar')} ayuda={t('equipo.inscriptos.buscarAyuda')}
+        <Campo id="inscriptos-buscar" type="search" rotulo={t('panel.inscriptos.buscar')} ayuda={t('panel.inscriptos.buscarAyuda')}
           value={consulta} onChange={(x) => setConsulta(x.target.value)} />
         <div className="barra__accion">
           <button type="button" className="btn" onClick={exportar} disabled={!filas || visibles.length === 0}>
-            {t('equipo.inscriptos.exportar')}
+            {t('panel.inscriptos.exportar')}
           </button>
         </div>
       </div>
 
-      <div className="filtros" role="group" aria-label={t('equipo.inscriptos.filtro')}>
+      <div className="filtros" role="group" aria-label={t('panel.inscriptos.filtro')}>
         {FILTROS_DE_INSCRIPTOS.map((x) => (
           <button key={x} type="button" className={`filtro${filtro === x ? ' filtro--activo' : ''}`} aria-pressed={filtro === x}
             onClick={() => setFiltro(x)}>
-            {t(`equipo.inscriptos.filtros.${x}`)}
+            {t(`panel.inscriptos.filtros.${x}`)}
             {filas ? <span className="filtro__cuenta">{filtrarPorEstado(filas, x).length}</span> : null}
           </button>
         ))}
       </div>
 
-      {error ? <p className="error" role="alert">{t('equipo.errorAlCargar')}</p> : null}
-      {filas === null && !error ? <p className="nota" role="status">{t('equipo.cargando')}</p> : null}
-      {filas && filas.length === 0 ? <p className="nota">{t('equipo.inscriptos.vacio')}</p> : null}
-      {filas && filas.length > 0 && visibles.length === 0 ? <p className="nota">{t('equipo.inscriptos.sinResultados')}</p> : null}
+      {error ? <p className="error" role="alert">{t('panel.errorAlCargar')}</p> : null}
+      {filas === null && !error ? <p className="nota" role="status">{t('panel.cargando')}</p> : null}
+      {filas && filas.length === 0 ? <p className="nota">{t('panel.inscriptos.vacio')}</p> : null}
+      {filas && filas.length > 0 && visibles.length === 0 ? <p className="nota">{t('panel.inscriptos.sinResultados')}</p> : null}
 
       {filas && visibles.length > 0 ? (
         <>
-          <p className="nota" role="status">{t('equipo.inscriptos.cuantos', { cuantos: visibles.length, total: filas.length })}</p>
+          <p className="nota" role="status">{t('panel.inscriptos.cuantos', { cuantos: visibles.length, total: filas.length })}</p>
           <div className="tabla-marco">
             <table className="tabla tabla--inscriptos">
               <thead>
                 <tr>
                   {['referencia', 'nombre', 'correo', 'whatsapp', 'pais', 'fecha', 'estado', 'acciones'].map((k) => (
-                    <th key={k} scope="col">{t(`equipo.inscriptos.encabezados.${k}`)}</th>
+                    <th key={k} scope="col">{t(`panel.inscriptos.encabezados.${k}`)}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {visibles.map((f) => {
                   const nombre = nombreCompleto(f, f.email);
-                  const enlace = enlaceDeSaludo(f.whatsapp, t('equipo.inscriptos.saludo', {
+                  const enlace = enlaceDeSaludo(f.whatsapp, t('panel.inscriptos.saludo', {
                     nombre: f.nombre ?? '', curso: actual?.curso.titulo ?? '',
                   }).trim());
                   const acciones = accionesDePago(yo.rol, f);
@@ -214,16 +214,16 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
                       <td>
                         {enlace ? (
                           <a className="enlace" href={enlace} target="_blank" rel="noopener"
-                            aria-label={t('equipo.inscriptos.escribirle', { nombre })}>{formatearWhatsapp(f.whatsapp)}</a>
+                            aria-label={t('panel.inscriptos.escribirle', { nombre })}>{formatearWhatsapp(f.whatsapp)}</a>
                         ) : (f.whatsapp ? formatearWhatsapp(f.whatsapp) : '—')}
                       </td>
                       <td>{f.pais ?? '—'}</td>
                       <td className="tabla__numero">{fecha(f.inscripto_el)}</td>
                       <td className="tabla__estado">
-                        <span className={`estado estado--${tonoDeEstado(f.estado)}`}>{t(`equipo.estadosInscripcion.${f.estado}`)}</span>
+                        <span className={`estado estado--${tonoDeEstado(f.estado)}`}>{t(`panel.estadosInscripcion.${f.estado}`)}</span>
                         {linea ? <span className="tabla__sub">{linea}</span> : null}
                         {f.monto_declarado !== null && f.estado === 'en_revision' ? (
-                          <span className="tabla__sub">{t('equipo.inscriptos.declaro', {
+                          <span className="tabla__sub">{t('panel.inscriptos.declaro', {
                             monto: dinero(f.monto_declarado, f.moneda_declarada),
                             banco: f.banco ?? '—',
                             fecha: f.fecha_transferencia ?? '—',
@@ -233,38 +233,38 @@ export function Inscriptos({ cursos, yo }: { cursos: CursoDelPanel[]; yo: Yo }) 
                       <td className="tabla__acciones">
                         {!aca ? (
                           <div className="acciones">
-                            {acciones.ver ? <button type="button" className="enlace" onClick={() => void ver(f)}>{t('equipo.inscriptos.pago.ver')}</button> : null}
-                            {acciones.confirmar ? <button type="button" className="btn btn--chico btn--teal" onClick={() => abrir(f, 'confirmado')}>{t('equipo.inscriptos.pago.confirmar')}</button> : null}
-                            {acciones.rechazar ? <button type="button" className="btn btn--chico" onClick={() => abrir(f, 'rechazado')}>{t('equipo.inscriptos.pago.rechazar')}</button> : null}
-                            {acciones.anular ? <button type="button" className="enlace" onClick={() => abrir(f, 'anulado')}>{t('equipo.inscriptos.pago.anular')}</button> : null}
+                            {acciones.ver ? <button type="button" className="enlace" onClick={() => void ver(f)}>{t('panel.inscriptos.pago.ver')}</button> : null}
+                            {acciones.confirmar ? <button type="button" className="btn btn--chico btn--teal" onClick={() => abrir(f, 'confirmado')}>{t('panel.inscriptos.pago.confirmar')}</button> : null}
+                            {acciones.rechazar ? <button type="button" className="btn btn--chico" onClick={() => abrir(f, 'rechazado')}>{t('panel.inscriptos.pago.rechazar')}</button> : null}
+                            {acciones.anular ? <button type="button" className="enlace" onClick={() => abrir(f, 'anulado')}>{t('panel.inscriptos.pago.anular')}</button> : null}
                           </div>
                         ) : (
                           <div className="confirmar">
                             {aca.tipo === 'confirmado' ? (
                               <>
-                                <Campo id={`monto-${f.inscripcion_id}`} rotulo={t('equipo.inscriptos.pago.monto')} inputMode="decimal"
+                                <Campo id={`monto-${f.inscripcion_id}`} rotulo={t('panel.inscriptos.pago.monto')} inputMode="decimal"
                                   value={aca.monto} onChange={(x) => setResolviendo({ ...aca, monto: x.target.value })} />
-                                <Campo id={`nota-${f.inscripcion_id}`} rotulo={t('equipo.inscriptos.pago.nota')} maxLength={MOTIVO_MAXIMO}
+                                <Campo id={`nota-${f.inscripcion_id}`} rotulo={t('panel.inscriptos.pago.nota')} maxLength={MOTIVO_MAXIMO}
                                   value={aca.nota} onChange={(x) => setResolviendo({ ...aca, nota: x.target.value })} />
-                                <p className="nota">{t('equipo.inscriptos.pago.confirmarAviso', { nombre })}</p>
+                                <p className="nota">{t('panel.inscriptos.pago.confirmarAviso', { nombre })}</p>
                               </>
                             ) : (
                               <>
-                                <Campo id={`motivo-${f.inscripcion_id}`} rotulo={t('equipo.inscriptos.pago.motivo')} maxLength={MOTIVO_MAXIMO}
-                                  ayuda={t('equipo.inscriptos.pago.motivoAyuda', { nombre })} autoFocus
+                                <Campo id={`motivo-${f.inscripcion_id}`} rotulo={t('panel.inscriptos.pago.motivo')} maxLength={MOTIVO_MAXIMO}
+                                  ayuda={t('panel.inscriptos.pago.motivoAyuda', { nombre })} autoFocus
                                   value={aca.nota} onChange={(x) => setResolviendo({ ...aca, nota: x.target.value })} />
-                                {aca.tipo === 'anulado' ? <p className="nota">{t('equipo.inscriptos.pago.anularAviso')}</p> : null}
+                                {aca.tipo === 'anulado' ? <p className="nota">{t('panel.inscriptos.pago.anularAviso')}</p> : null}
                               </>
                             )}
                             {errorDeResolucion ? <p className="error" role="alert">{errorDeResolucion}</p> : null}
                             <div className="confirmar__botones">
                               <button type="button" disabled={trabajando} onClick={() => void resolver()}
                                 className={`btn btn--chico${aca.tipo === 'confirmado' ? ' btn--teal' : ''}`}>
-                                {t(aca.tipo === 'confirmado' ? 'equipo.inscriptos.pago.siConfirmar'
-                                  : aca.tipo === 'rechazado' ? 'equipo.inscriptos.pago.siRechazar' : 'equipo.inscriptos.pago.siAnular')}
+                                {t(aca.tipo === 'confirmado' ? 'panel.inscriptos.pago.siConfirmar'
+                                  : aca.tipo === 'rechazado' ? 'panel.inscriptos.pago.siRechazar' : 'panel.inscriptos.pago.siAnular')}
                               </button>
                               <button type="button" className="enlace" onClick={() => setResolviendo(null)} disabled={trabajando}>
-                                {t('equipo.cancelar')}
+                                {t('panel.cancelar')}
                               </button>
                             </div>
                           </div>

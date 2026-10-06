@@ -131,11 +131,11 @@ describe('Inscriptos: filtro y acciones', () => {
 
   it('rechazar y anular piden motivo; confirmar no; el motivo tiene tope; las claves tienen texto', () => {
     expect(validarResolucion('confirmado', '')).toBeNull();
-    expect(validarResolucion('rechazado', '  ')).toBe('equipo.inscriptos.pago.errores.motivo');
-    expect(validarResolucion('anulado', '')).toBe('equipo.inscriptos.pago.errores.motivo');
-    expect(validarResolucion('rechazado', 'x'.repeat(501))).toBe('equipo.inscriptos.pago.errores.largo');
+    expect(validarResolucion('rechazado', '  ')).toBe('panel.inscriptos.pago.errores.motivo');
+    expect(validarResolucion('anulado', '')).toBe('panel.inscriptos.pago.errores.motivo');
+    expect(validarResolucion('rechazado', 'x'.repeat(501))).toBe('panel.inscriptos.pago.errores.largo');
     expect(validarResolucion('rechazado', 'El monto no coincide')).toBeNull();
-    for (const c of ['equipo.inscriptos.pago.errores.motivo', 'equipo.inscriptos.pago.errores.largo']) expect(existe(c), c).toBe(true);
+    for (const c of ['panel.inscriptos.pago.errores.motivo', 'panel.inscriptos.pago.errores.largo']) expect(existe(c), c).toBe(true);
   });
 
   it('el tono de cada estado', () => {

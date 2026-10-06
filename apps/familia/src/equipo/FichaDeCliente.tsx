@@ -41,7 +41,7 @@ export function FichaDeCliente({ personaId, nombre, alAgregar }: { personaId: st
     evento.preventDefault();
     const limpio = texto.trim();
     if (limpio === '' || limpio.length > 2000) {
-      setErrorDeNota(t('equipo.clientes.detalle.errores.nota'));
+      setErrorDeNota(t('panel.clientes.detalle.errores.nota'));
       return;
     }
     setErrorDeNota(null);
@@ -52,20 +52,20 @@ export function FichaDeCliente({ personaId, nombre, alAgregar }: { personaId: st
       await cargar();
       alAgregar();
     } catch {
-      setErrorDeNota(t('equipo.clientes.detalle.errores.generico'));
+      setErrorDeNota(t('panel.clientes.detalle.errores.generico'));
     } finally {
       setAgregando(false);
     }
   }
 
-  if (error) return <p className="error" role="alert">{t('equipo.clientes.detalle.error')}</p>;
-  if (!ficha) return <p className="nota" role="status">{t('equipo.clientes.detalle.cargando')}</p>;
+  if (error) return <p className="error" role="alert">{t('panel.clientes.detalle.error')}</p>;
+  if (!ficha) return <p className="nota" role="status">{t('panel.clientes.detalle.cargando')}</p>;
 
   return (
     <div className="ficha" aria-label={nombre}>
       <div>
-        <h3 className="ficha__titulo">{t('equipo.clientes.detalle.inscripciones')}</h3>
-        {ficha.inscripciones.length === 0 ? <p className="nota">{t('equipo.clientes.detalle.sinInscripciones')}</p> : (
+        <h3 className="ficha__titulo">{t('panel.clientes.detalle.inscripciones')}</h3>
+        {ficha.inscripciones.length === 0 ? <p className="nota">{t('panel.clientes.detalle.sinInscripciones')}</p> : (
           <ul className="ficha__lista">
             {ficha.inscripciones.map((i) => (
               <li key={i.inscripcion_id}>
@@ -73,7 +73,7 @@ export function FichaDeCliente({ personaId, nombre, alAgregar }: { personaId: st
                 {i.inicio && i.zona ? <span className="tabla__sub">{fechaLarga(i.inicio, i.zona)}</span> : null}
                 <span className="tabla__sub">
                   <span className="tabla__ref">{i.referencia}</span>{' '}
-                  <span className={`estado estado--${tonoDeEstado(i.estado)}`}>{t(`equipo.estadosInscripcion.${i.estado}`, { defaultValue: t(claveDeEstado(i.estado)) })}</span>
+                  <span className={`estado estado--${tonoDeEstado(i.estado)}`}>{t(`panel.estadosInscripcion.${i.estado}`, { defaultValue: t(claveDeEstado(i.estado)) })}</span>
                 </span>
               </li>
             ))}
@@ -81,23 +81,23 @@ export function FichaDeCliente({ personaId, nombre, alAgregar }: { personaId: st
         )}
       </div>
       <div>
-        <h3 className="ficha__titulo">{t('equipo.clientes.detalle.notas')}</h3>
-        {ficha.notas.length === 0 ? <p className="nota">{t('equipo.clientes.detalle.sinNotas')}</p> : (
+        <h3 className="ficha__titulo">{t('panel.clientes.detalle.notas')}</h3>
+        {ficha.notas.length === 0 ? <p className="nota">{t('panel.clientes.detalle.sinNotas')}</p> : (
           <ul className="ficha__lista">
             {ficha.notas.map((n) => (
               <li key={n.id}>
                 <span className="ficha__nota">{n.texto}</span>
-                <span className="tabla__sub">{t('equipo.clientes.detalle.notaPor', { fecha: fechaCorta(n.created_at, ZONA_DEL_EQUIPO), quien: n.autor ?? '—' })}</span>
+                <span className="tabla__sub">{t('panel.clientes.detalle.notaPor', { fecha: fechaCorta(n.created_at, ZONA_DEL_EQUIPO), quien: n.autor ?? '—' })}</span>
               </li>
             ))}
           </ul>
         )}
         <form onSubmit={agregar} noValidate className="confirmar">
-          <AreaDeTexto id={`nota-${personaId}`} rotulo={t('equipo.clientes.detalle.nota')} ayuda={t('equipo.clientes.detalle.notaAyuda')}
+          <AreaDeTexto id={`nota-${personaId}`} rotulo={t('panel.clientes.detalle.nota')} ayuda={t('panel.clientes.detalle.notaAyuda')}
             maxLength={2000} rows={3} value={texto} error={errorDeNota} onChange={(e) => setTexto(e.target.value)} />
           <div className="confirmar__botones">
             <button type="submit" className="btn btn--chico" disabled={agregando}>
-              {agregando ? t('equipo.clientes.detalle.agregando') : t('equipo.clientes.detalle.agregar')}
+              {agregando ? t('panel.clientes.detalle.agregando') : t('panel.clientes.detalle.agregar')}
             </button>
           </div>
         </form>

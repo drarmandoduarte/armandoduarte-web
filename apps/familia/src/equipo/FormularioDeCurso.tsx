@@ -62,8 +62,8 @@ export function FormularioDeCurso({
       await alGuardar();
     } catch (fallo) {
       const codigo = fallo instanceof ErrorDeApi ? fallo.codigoDelServidor : undefined;
-      if (codigo === 'SLUG_REPETIDO') setErrores({ slug: 'equipo.errores.slugRepetido' });
-      else setGeneral(t(codigo === 'SIN_PERMISO' ? 'equipo.errores.sinPermiso' : 'equipo.errores.generico'));
+      if (codigo === 'SLUG_REPETIDO') setErrores({ slug: 'panel.errores.slugRepetido' });
+      else setGeneral(t(codigo === 'SIN_PERMISO' ? 'panel.errores.sinPermiso' : 'panel.errores.generico'));
     } finally {
       setGuardando(false);
     }
@@ -73,27 +73,27 @@ export function FormularioDeCurso({
 
   return (
     <form className="formulario" onSubmit={enviar} noValidate>
-      <h3 className="subtitulo">{t(curso ? 'equipo.curso.tituloEditar' : 'equipo.curso.tituloNuevo')}</h3>
+      <h3 className="subtitulo">{t(curso ? 'panel.curso.tituloEditar' : 'panel.curso.tituloNuevo')}</h3>
       <div className="formulario__rejilla">
-        <Campo id="curso-titulo" rotulo={t('equipo.curso.titulo')} value={e.titulo} error={error('titulo')}
+        <Campo id="curso-titulo" rotulo={t('panel.curso.titulo')} value={e.titulo} error={error('titulo')}
           onChange={(x) => poner('titulo', x.target.value)} autoFocus />
-        <Campo id="curso-slug" rotulo={t('equipo.curso.slug')} ayuda={t('equipo.curso.slugAyuda')} value={e.slug}
+        <Campo id="curso-slug" rotulo={t('panel.curso.slug')} ayuda={t('panel.curso.slugAyuda')} value={e.slug}
           error={error('slug')} onChange={(x) => { setSlugAMano(true); poner('slug', x.target.value); }} />
-        <Campo id="curso-bajada" rotulo={t('equipo.curso.bajada')} ayuda={t('equipo.curso.bajadaAyuda')} value={e.bajada}
+        <Campo id="curso-bajada" rotulo={t('panel.curso.bajada')} ayuda={t('panel.curso.bajadaAyuda')} value={e.bajada}
           error={error('bajada')} onChange={(x) => poner('bajada', x.target.value)} />
-        <Selector id="curso-modalidad" rotulo={t('equipo.curso.modalidad')} value={e.modalidad} error={error('modalidad')}
+        <Selector id="curso-modalidad" rotulo={t('panel.curso.modalidad')} value={e.modalidad} error={error('modalidad')}
           onChange={(x) => poner('modalidad', x.target.value)}
-          opciones={MODALIDADES.map((m) => ({ valor: m, texto: t(`equipo.modalidades.${m}`) }))} />
-        <Selector id="curso-estado" rotulo={t('equipo.curso.estado')} value={e.estado} error={error('estado')}
+          opciones={MODALIDADES.map((m) => ({ valor: m, texto: t(`panel.modalidades.${m}`) }))} />
+        <Selector id="curso-estado" rotulo={t('panel.curso.estado')} value={e.estado} error={error('estado')}
           onChange={(x) => poner('estado', x.target.value)}
-          opciones={ESTADOS_DE_CURSO.map((m) => ({ valor: m, texto: t(`equipo.estadosCurso.${m}`) }))} />
+          opciones={ESTADOS_DE_CURSO.map((m) => ({ valor: m, texto: t(`panel.estadosCurso.${m}`) }))} />
       </div>
-      <AreaDeTexto id="curso-descripcion" rotulo={t('equipo.curso.descripcion')} value={e.descripcion} rows={4}
+      <AreaDeTexto id="curso-descripcion" rotulo={t('panel.curso.descripcion')} value={e.descripcion} rows={4}
         onChange={(x) => poner('descripcion', x.target.value)} />
       {general ? <p className="error" role="alert">{general}</p> : null}
       <div className="formulario__botones">
-        <BotonPrincipal cargando={guardando} textoCargando={t('equipo.guardando')}>{t('equipo.guardar')}</BotonPrincipal>
-        <button type="button" className="btn" onClick={alCancelar}>{t('equipo.cancelar')}</button>
+        <BotonPrincipal cargando={guardando} textoCargando={t('panel.guardando')}>{t('panel.guardar')}</BotonPrincipal>
+        <button type="button" className="btn" onClick={alCancelar}>{t('panel.cancelar')}</button>
       </div>
     </form>
   );

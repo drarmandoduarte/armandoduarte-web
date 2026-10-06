@@ -114,3 +114,10 @@ export {
   reseteoPendiente, venceDelRescate,
 } from './mi-espacio/rescate';
 export type { AccionDelRescate, EstadoDelRescate, FilaDeRescate } from './mi-espacio/rescate';
+
+// ── Mi espacio con el molde (orden #37, PR 3 · fase-2 §6 y §9) ───────────────
+export {
+  CUADROS_DE_MI_ESPACIO, DIAS_DE_PROXIMAMENTE, INICIO_POR_ROL, MODULOS, alertasDeMiEspacio, contextoDeAjustes,
+  contextoDeInicio, diasHasta, modulosDe, pasosDeBienvenida,
+} from './mi-espacio/molde';
+export type { AlertaDeMiEspacio, DestinoDeAlerta, Modulo, PasoDeBienvenida, TonoDeAlerta } from './mi-espacio/molde';

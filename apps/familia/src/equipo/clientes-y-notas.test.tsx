@@ -69,7 +69,7 @@ describe('Clientes con el perfil', () => {
 describe('la ficha y las notas', () => {
   it('abrir muestra sus inscripciones con estado y las notas firmadas', async () => {
     render(<Panel yo={yo} />);
-    fireEvent.click(within(await filaDe('Ana')).getByRole('button', { name: t('equipo.clientes.abrirAria', { nombre: 'Ana Prueba' }) }));
+    fireEvent.click(within(await filaDe('Ana')).getByRole('button', { name: t('panel.clientes.abrirAria', { nombre: 'Ana Prueba' }) }));
     expect(await screen.findByText('Pagó en efectivo en el taller')).toBeTruthy();
     expect(screen.getByText(/· Gabi$/)).toBeTruthy();
     expect(screen.getByText('AD-0042')).toBeTruthy();
@@ -77,20 +77,20 @@ describe('la ficha y las notas', () => {
 
   it('una nota vacía no sale; una con texto se manda a la API', async () => {
     render(<Panel yo={yo} />);
-    fireEvent.click(within(await filaDe('Ana')).getByRole('button', { name: t('equipo.clientes.abrirAria', { nombre: 'Ana Prueba' }) }));
+    fireEvent.click(within(await filaDe('Ana')).getByRole('button', { name: t('panel.clientes.abrirAria', { nombre: 'Ana Prueba' }) }));
     await screen.findByText('Pagó en efectivo en el taller');
-    fireEvent.click(screen.getByRole('button', { name: t('equipo.clientes.detalle.agregar') }));
-    expect(await screen.findByText(t('equipo.clientes.detalle.errores.nota'))).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: t('panel.clientes.detalle.agregar') }));
+    expect(await screen.findByText(t('panel.clientes.detalle.errores.nota'))).toBeTruthy();
     expect(falso.pedidos.some((p) => p.ruta.endsWith('/notas'))).toBe(false);
-    fireEvent.change(screen.getByLabelText(new RegExp(`^${t('equipo.clientes.detalle.nota')}`)), { target: { value: 'Pidió factura' } });
-    fireEvent.click(screen.getByRole('button', { name: t('equipo.clientes.detalle.agregar') }));
+    fireEvent.change(screen.getByLabelText(new RegExp(`^${t('panel.clientes.detalle.nota')}`)), { target: { value: 'Pidió factura' } });
+    fireEvent.click(screen.getByRole('button', { name: t('panel.clientes.detalle.agregar') }));
     await screen.findByText('Pagó en efectivo en el taller');
     expect(falso.pedidos).toContainEqual({ ruta: `equipo/clientes/${ANA}/notas`, cuerpo: { texto: 'Pidió factura' } });
   });
 
   it('ninguna pantalla ofrece borrar ni editar una nota', async () => {
     render(<Panel yo={yo} />);
-    fireEvent.click(within(await filaDe('Ana')).getByRole('button', { name: t('equipo.clientes.abrirAria', { nombre: 'Ana Prueba' }) }));
+    fireEvent.click(within(await filaDe('Ana')).getByRole('button', { name: t('panel.clientes.abrirAria', { nombre: 'Ana Prueba' }) }));
     await screen.findByText('Pagó en efectivo en el taller');
     expect(screen.queryByRole('button', { name: /borrar|eliminar|editar/i })).toBeNull();
   });

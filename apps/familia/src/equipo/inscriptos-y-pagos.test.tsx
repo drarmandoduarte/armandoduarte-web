@@ -75,14 +75,14 @@ describe('el filtro', () => {
     render(<Panel yo={yo('equipo')} />);
     await filaDe('Ana');
     const activo = screen.getByRole('button', { pressed: true });
-    expect(activo.textContent).toContain(t('equipo.inscriptos.filtros.en_revision'));
+    expect(activo.textContent).toContain(t('panel.inscriptos.filtros.en_revision'));
     expect(screen.queryByText('Bea Prueba')).toBeNull();
   });
 
   it('«Todos» muestra las tres, con el historial corto («Rechazado el … por Diana · motivo»)', async () => {
     render(<Panel yo={yo('equipo')} />);
     await filaDe('Ana');
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${t('equipo.inscriptos.filtros.todos')}`) }));
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${t('panel.inscriptos.filtros.todos')}`) }));
     const cata = await filaDe('Cata');
     expect(within(cata).getByText(/^Rechazado el .* por Diana · El monto no coincide$/)).toBeTruthy();
     expect(screen.getByText('Bea Prueba')).toBeTruthy();
@@ -92,7 +92,7 @@ describe('el filtro', () => {
     falso.respuestas[`equipo/inscriptos/${EDICION}`] = { inscriptos: INSCRIPTOS.slice(1) };
     render(<Panel yo={yo('equipo')} />);
     await filaDe('Bea');
-    expect(screen.getByRole('button', { pressed: true }).textContent).toContain(t('equipo.inscriptos.filtros.todos'));
+    expect(screen.getByRole('button', { pressed: true }).textContent).toContain(t('panel.inscriptos.filtros.todos'));
   });
 });
 
@@ -100,35 +100,35 @@ describe('las acciones', () => {
   it('en revisión: Ver, Confirmar (teal) y Rechazar; el equipo no ve Anular', async () => {
     render(<Panel yo={yo('equipo')} />);
     const ana = await filaDe('Ana');
-    expect(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.ver') })).toBeTruthy();
-    expect(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.confirmar') }).className).toContain('btn--teal');
-    expect(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.rechazar') }).className).not.toContain('btn--naranja');
-    expect(within(ana).queryByRole('button', { name: t('equipo.inscriptos.pago.anular') })).toBeNull();
+    expect(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.ver') })).toBeTruthy();
+    expect(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.confirmar') }).className).toContain('btn--teal');
+    expect(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.rechazar') }).className).not.toContain('btn--naranja');
+    expect(within(ana).queryByRole('button', { name: t('panel.inscriptos.pago.anular') })).toBeNull();
     expect(document.querySelectorAll('.btn--naranja')).toHaveLength(0);
   });
 
   it('el dueño ve Anular', async () => {
     render(<Panel yo={yo('dueno')} />);
     const ana = await filaDe('Ana');
-    expect(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.anular') })).toBeTruthy();
+    expect(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.anular') })).toBeTruthy();
   });
 
   it('rechazar sin motivo NO sale: lo dice en el mismo lugar', async () => {
     render(<Panel yo={yo('equipo')} />);
     const ana = await filaDe('Ana');
-    fireEvent.click(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.rechazar') }));
-    fireEvent.click(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.siRechazar') }));
-    expect(await within(ana).findByText(t('equipo.inscriptos.pago.errores.motivo'))).toBeTruthy();
+    fireEvent.click(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.rechazar') }));
+    fireEvent.click(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.siRechazar') }));
+    expect(await within(ana).findByText(t('panel.inscriptos.pago.errores.motivo'))).toBeTruthy();
     expect(falso.pedidos.some((p) => p.ruta === 'pagos/resolver')).toBe(false);
   });
 
   it('rechazar con motivo manda el tipo y la nota', async () => {
     render(<Panel yo={yo('equipo')} />);
     const ana = await filaDe('Ana');
-    fireEvent.click(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.rechazar') }));
-    fireEvent.change(within(ana).getByLabelText(new RegExp(`^${t('equipo.inscriptos.pago.motivo')}`)), { target: { value: 'El monto no coincide' } });
-    fireEvent.click(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.siRechazar') }));
-    await screen.findByText(t('equipo.inscriptos.pago.hecho'));
+    fireEvent.click(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.rechazar') }));
+    fireEvent.change(within(ana).getByLabelText(new RegExp(`^${t('panel.inscriptos.pago.motivo')}`)), { target: { value: 'El monto no coincide' } });
+    fireEvent.click(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.siRechazar') }));
+    await screen.findByText(t('panel.inscriptos.pago.hecho'));
     expect(falso.pedidos).toContainEqual({
       ruta: 'pagos/resolver',
       cuerpo: { inscripcion_id: INSCRIPTOS[0].inscripcion_id, tipo: 'rechazado', monto: null, nota: 'El monto no coincide' },
@@ -138,10 +138,10 @@ describe('las acciones', () => {
   it('confirmar pide confirmación en el mismo lugar, con el monto declarado prellenado', async () => {
     render(<Panel yo={yo('equipo')} />);
     const ana = await filaDe('Ana');
-    fireEvent.click(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.confirmar') }));
-    expect((within(ana).getByLabelText(t('equipo.inscriptos.pago.monto')) as HTMLInputElement).value).toBe('1170');
-    fireEvent.click(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.siConfirmar') }));
-    await screen.findByText(t('equipo.inscriptos.pago.hecho'));
+    fireEvent.click(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.confirmar') }));
+    expect((within(ana).getByLabelText(t('panel.inscriptos.pago.monto')) as HTMLInputElement).value).toBe('1170');
+    fireEvent.click(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.siConfirmar') }));
+    await screen.findByText(t('panel.inscriptos.pago.hecho'));
     expect(falso.pedidos).toContainEqual({
       ruta: 'pagos/resolver',
       cuerpo: { inscripcion_id: INSCRIPTOS[0].inscripcion_id, tipo: 'confirmado', monto: 1170, nota: null },
@@ -152,9 +152,9 @@ describe('las acciones', () => {
     falso.respuestas['pagos/resolver'] = { ok: true, correo: 'no_enviado' };
     render(<Panel yo={yo('equipo')} />);
     const ana = await filaDe('Ana');
-    fireEvent.click(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.confirmar') }));
-    fireEvent.click(within(ana).getByRole('button', { name: t('equipo.inscriptos.pago.siConfirmar') }));
-    expect(await screen.findByText(t('equipo.inscriptos.pago.correoNoSalio'))).toBeTruthy();
+    fireEvent.click(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.confirmar') }));
+    fireEvent.click(within(ana).getByRole('button', { name: t('panel.inscriptos.pago.siConfirmar') }));
+    expect(await screen.findByText(t('panel.inscriptos.pago.correoNoSalio'))).toBeTruthy();
   });
 });
 
@@ -162,8 +162,8 @@ describe('el CSV', () => {
   it('suma estado, último movimiento, monto declarado y monto confirmado', async () => {
     render(<Panel yo={yo('equipo')} />);
     await filaDe('Ana');
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${t('equipo.inscriptos.filtros.todos')}`) }));
-    fireEvent.click(screen.getByRole('button', { name: t('equipo.inscriptos.exportar') }));
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${t('panel.inscriptos.filtros.todos')}`) }));
+    fireEvent.click(screen.getByRole('button', { name: t('panel.inscriptos.exportar') }));
     const [encabezado, , bea] = falso.descargas[0].contenido.replace('﻿', '').split('\r\n');
     expect(encabezado).toBe('Referencia,Nombre,Correo,WhatsApp,País,Inscripción,Estado,Último movimiento,Monto declarado,Monto confirmado');
     expect(bea).toContain('Confirmada,2026-10-02T16:00:00Z,1170.00,1170.00');

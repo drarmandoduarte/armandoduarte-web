@@ -233,7 +233,7 @@
     "guardando": "Guardando…",
     "error": "No pudimos guardar tus datos. Vuelve a intentarlo."
   },
-  "equipo": {
+  "panel": {
     "titulo": "Panel del [equipo]",
     "bajada": "Los cursos, quién se anotó y quién está registrado. Cada quien ve lo de su territorio.",
     "volver": "Mi espacio",

@@ -67,7 +67,7 @@ export function Clientes({ yo }: { yo: Yo }) {
       await cargar();
     } catch (e) {
       const codigo = e instanceof ErrorDeApi ? e.codigoDelServidor : undefined;
-      setFallo(t(codigo === 'SOLO_DUENO' || codigo === 'SIN_PERMISO' ? 'equipo.errores.sinPermiso' : 'equipo.errores.generico'));
+      setFallo(t(codigo === 'SOLO_DUENO' || codigo === 'SIN_PERMISO' ? 'panel.errores.sinPermiso' : 'panel.errores.generico'));
     } finally {
       setTrabajando(false);
     }
@@ -76,7 +76,7 @@ export function Clientes({ yo }: { yo: Yo }) {
   const exportar = () => {
     /* #27 D.3: ciudad, edad (calculada; nunca el año) y nivel. */
     const encabezados = ['nombre', 'correo', 'whatsapp', 'pais', 'ciudad', 'edad', 'nivel', 'alta', 'cursos']
-      .map((k) => t(`equipo.clientes.encabezados.${k}`));
+      .map((k) => t(`panel.clientes.encabezados.${k}`));
     const csv = aCsv(encabezados, visibles.map((f) => [
       nombreCompleto(f, ''), f.email, f.whatsapp, f.pais, f.ciudad, edadDesdeAnio(f.anio_nacimiento),
       f.nivel_educativo ? t(`miEspacio.niveles.${f.nivel_educativo}`) : null, f.alta, f.cursos,
@@ -87,39 +87,39 @@ export function Clientes({ yo }: { yo: Yo }) {
   return (
     <div>
       <div className="barra barra--filtros">
-        <Campo id="clientes-buscar" type="search" rotulo={t('equipo.clientes.buscar')} ayuda={t('equipo.clientes.buscarAyuda')}
+        <Campo id="clientes-buscar" type="search" rotulo={t('panel.clientes.buscar')} ayuda={t('panel.clientes.buscarAyuda')}
           value={consulta} onChange={(x) => setConsulta(x.target.value)} />
         <div className="barra__accion">
           <button type="button" className="btn" onClick={exportar} disabled={!filas || visibles.length === 0}>
-            {t('equipo.clientes.exportar')}
+            {t('panel.clientes.exportar')}
           </button>
         </div>
       </div>
 
-      {error ? <p className="error" role="alert">{t('equipo.errorAlCargar')}</p> : null}
-      {filas === null && !error ? <p className="nota" role="status">{t('equipo.cargando')}</p> : null}
-      {filas && filas.length === 0 ? <p className="nota">{t('equipo.clientes.vacio')}</p> : null}
-      {filas && filas.length > 0 && visibles.length === 0 ? <p className="nota">{t('equipo.clientes.sinResultados')}</p> : null}
+      {error ? <p className="error" role="alert">{t('panel.errorAlCargar')}</p> : null}
+      {filas === null && !error ? <p className="nota" role="status">{t('panel.cargando')}</p> : null}
+      {filas && filas.length === 0 ? <p className="nota">{t('panel.clientes.vacio')}</p> : null}
+      {filas && filas.length > 0 && visibles.length === 0 ? <p className="nota">{t('panel.clientes.sinResultados')}</p> : null}
       {fallo ? <p className="error" role="alert">{fallo}</p> : null}
 
       {filas && visibles.length > 0 ? (
         <>
-          <p className="nota" role="status">{t('equipo.clientes.cuantos', { cuantos: visibles.length, total: filas.length })}</p>
+          <p className="nota" role="status">{t('panel.clientes.cuantos', { cuantos: visibles.length, total: filas.length })}</p>
           <div className="tabla-marco">
             <table className="tabla">
               <thead>
                 <tr>
                   {['nombre', 'correo', 'whatsapp', 'pais', 'ciudad', 'edad', 'nivel', 'alta', 'cursos', 'notas'].map((k) => (
-                    <th key={k} scope="col">{t(`equipo.clientes.encabezados.${k}`)}</th>
+                    <th key={k} scope="col">{t(`panel.clientes.encabezados.${k}`)}</th>
                   ))}
-                  {conColumnaDeEquipo ? <th scope="col">{t('equipo.clientes.encabezados.equipo')}</th> : null}
+                  {conColumnaDeEquipo ? <th scope="col">{t('panel.clientes.encabezados.equipo')}</th> : null}
                 </tr>
               </thead>
               <tbody>
                 {visibles.map((f) => {
-                  const nombre = nombreCompleto(f, t('equipo.clientes.sinNombre'));
+                  const nombre = nombreCompleto(f, t('panel.clientes.sinNombre'));
                   const accion = accionDeEquipo(rol, miId, f);
-                  const enlace = enlaceDeSaludo(f.whatsapp, t('equipo.clientes.saludo', { nombre: f.nombre ?? '' }).replace(' ,', ','));
+                  const enlace = enlaceDeSaludo(f.whatsapp, t('panel.clientes.saludo', { nombre: f.nombre ?? '' }).replace(' ,', ','));
                   const esta = confirmando?.persona === f.persona_id ? confirmando : null;
                   return (
                     <Fragment key={f.persona_id}>
@@ -134,41 +134,41 @@ export function Clientes({ yo }: { yo: Yo }) {
                       <td className="tabla__numero">{fechaCorta(f.alta, ZONA_DEL_EQUIPO)}</td>
                       <td>
                         {f.cursos}
-                        {f.ultimo_curso ? <span className="tabla__sub">{t('equipo.clientes.ultimo', { curso: f.ultimo_curso })}</span> : null}
+                        {f.ultimo_curso ? <span className="tabla__sub">{t('panel.clientes.ultimo', { curso: f.ultimo_curso })}</span> : null}
                       </td>
                       <td>
                         <button type="button" className="enlace" aria-expanded={abierta === f.persona_id}
-                          aria-label={t(abierta === f.persona_id ? 'equipo.clientes.cerrar' : 'equipo.clientes.abrirAria', { nombre })}
+                          aria-label={t(abierta === f.persona_id ? 'panel.clientes.cerrar' : 'panel.clientes.abrirAria', { nombre })}
                           onClick={() => setAbierta(abierta === f.persona_id ? null : f.persona_id)}>
-                          {abierta === f.persona_id ? t('equipo.clientes.cerrar') : `${t('equipo.clientes.abrir')} (${f.cuantas_notas ?? 0})`}
+                          {abierta === f.persona_id ? t('panel.clientes.cerrar') : `${t('panel.clientes.abrir')} (${f.cuantas_notas ?? 0})`}
                         </button>
                       </td>
                       {conColumnaDeEquipo ? (
                         <td className="tabla__equipo">
-                          {f.rol === 'dueno' ? <span className="chip">{t('equipo.clientes.esDueno')}</span> : null}
+                          {f.rol === 'dueno' ? <span className="chip">{t('panel.clientes.esDueno')}</span> : null}
                           {f.rol === 'equipo' && f.activo && f.territorio ? (
-                            <span className="chip">{t('equipo.clientes.esEquipo', { territorio: t(`equipo.territorios.${f.territorio}`) })}</span>
+                            <span className="chip">{t('panel.clientes.esEquipo', { territorio: t(`panel.territorios.${f.territorio}`) })}</span>
                           ) : null}
                           {accion && !esta ? (
                             <button type="button" className="enlace"
                               onClick={() => { setFallo(null); setConfirmando({ persona: f.persona_id, accion, territorio: 'mexico' }); }}>
-                              {t(accion === 'sumar' ? 'equipo.clientes.sumar' : 'equipo.clientes.quitar')}
+                              {t(accion === 'sumar' ? 'panel.clientes.sumar' : 'panel.clientes.quitar')}
                             </button>
                           ) : null}
                           {esta ? (
                             <div className="confirmar">
                               {esta.accion === 'sumar' ? (
-                                <Selector id={`territorio-${f.persona_id}`} rotulo={t('equipo.clientes.territorio')} value={esta.territorio}
+                                <Selector id={`territorio-${f.persona_id}`} rotulo={t('panel.clientes.territorio')} value={esta.territorio}
                                   onChange={(x) => setConfirmando({ ...esta, territorio: x.target.value })}
-                                  opciones={TERRITORIOS.map((x) => ({ valor: x, texto: t(`equipo.territorios.${x}`) }))} />
+                                  opciones={TERRITORIOS.map((x) => ({ valor: x, texto: t(`panel.territorios.${x}`) }))} />
                               ) : (
-                                <p className="nota">{t('equipo.clientes.quitarAviso')}</p>
+                                <p className="nota">{t('panel.clientes.quitarAviso')}</p>
                               )}
                               <div className="confirmar__botones">
                                 <button type="button" className="btn btn--chico" onClick={() => void confirmar()} disabled={trabajando}>
-                                  {t(esta.accion === 'sumar' ? 'equipo.clientes.confirmarSumar' : 'equipo.clientes.confirmarQuitar', { nombre })}
+                                  {t(esta.accion === 'sumar' ? 'panel.clientes.confirmarSumar' : 'panel.clientes.confirmarQuitar', { nombre })}
                                 </button>
-                                <button type="button" className="enlace" onClick={() => setConfirmando(null)}>{t('equipo.cancelar')}</button>
+                                <button type="button" className="enlace" onClick={() => setConfirmando(null)}>{t('panel.cancelar')}</button>
                               </div>
                             </div>
                           ) : null}
