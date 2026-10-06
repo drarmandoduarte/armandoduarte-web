@@ -1133,11 +1133,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 
 /* ── «El dolor de un matrimonio herido…» · dos filas alternadas ──────── */
 .dolor__fila+.dolor__fila{margin-top:var(--s7)}
-/* La de arriba es apaisada (`dolor-llanto`, 3:2) y la de abajo vertical
-   (`dolor-hijo`), recortada al 4:5 de las tarjetas de la casa. */
+/* #39: dos filas espejo, la misma rejilla y la misma foto 3:2 (`dolor-llanto`
+   arriba a la izquierda, `dolor-hijo-mirando` abajo a la derecha), cada una
+   del ancho de su columna: el borde exterior de la foto es el de la rejilla. */
 .dolor__foto img{aspect-ratio:3/2}
-.dolor__foto--vertical{max-width:340px;justify-self:end}
-.dolor__foto--vertical img{aspect-ratio:4/5}
 #dolor .cita{max-width:52ch}
 /* El título es largo para su columna, y `balance` (el de la casa, #16 B) lo
    reparte en cuatro renglones parejos dejando «matrimonio» solo en el segundo,
@@ -1214,7 +1213,8 @@ a,button{-webkit-tap-highlight-color:transparent}
 }
 @media (max-width:900px){
   .tres--cuatro{grid-template-columns:1fr}
-  .dolor__foto--vertical{justify-self:auto;max-width:none}
+  /* #39: en el teléfono, en las dos filas, primero la foto. */
+  .dolor__fila--espejo .dolor__foto{order:-1}
   .ahora__segunda,.ahora__segunda-accion{grid-column:auto}
   .ahora__segunda{margin-top:var(--s3)}
 }

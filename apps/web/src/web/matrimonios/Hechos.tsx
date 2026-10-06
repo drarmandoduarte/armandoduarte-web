@@ -9,6 +9,11 @@ import { Icono } from '../comun/Icono';
  * Inicia, horario, modalidad y duración, en el orden de la orden. Los íconos
  * son los de la casa: el calendario, el reloj, la sesión (el mismo que
  * «Modalidad» en `/merida`) y el birrete de «Formación» para los seis meses.
+ *
+ * Desde la #39 (§3) no va debajo del hero sino después del giro, antes de las
+ * fortalezas: lo descriptivo baja y el gancho sube. Queda entre el blanco del
+ * giro y el crema de las fortalezas, así que el borde lo sigue poniendo el
+ * cambio de color.
  */
 export function Hechos() {
   const { t } = useTranslation();

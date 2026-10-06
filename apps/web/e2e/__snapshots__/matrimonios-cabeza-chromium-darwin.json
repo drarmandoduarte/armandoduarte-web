@@ -3,7 +3,7 @@
   "description": "Taller en línea vía Zoom con Armando Duarte para sanar tu matrimonio: 6 meses de acompañamiento. Inicia el jueves 29 de octubre de 2026, 7:00 a 9:00 pm (CDMX).",
   "canonical": "https://armandoduarte.com/matrimonios",
   "ogUrl": "https://armandoduarte.com/matrimonios",
-  "ogImage": "https://armandoduarte.com/img/og-matrimonios-1200x630.jpg?v=f5c2791f",
+  "ogImage": "https://armandoduarte.com/img/og-matrimonios-1200x630.jpg?v=9e471f2c",
   "hojas": [
     "/assets/style-<hash>.css"
   ],
@@ -16,8 +16,8 @@
       "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
       "eventStatus": "https://schema.org/EventScheduled",
       "image": [
-        "https://armandoduarte.com/img/og-matrimonios-1200x630.jpg?v=f5c2791f",
-        "https://armandoduarte.com/img/og-matrimonios-1200x1200.jpg?v=1f613b29"
+        "https://armandoduarte.com/img/og-matrimonios-1200x630.jpg?v=9e471f2c",
+        "https://armandoduarte.com/img/og-matrimonios-1200x1200.jpg?v=15d94dcc"
       ],
       "startDate": "2026-10-29T19:00:00-06:00",
       "endDate": "2026-10-29T21:00:00-06:00",
