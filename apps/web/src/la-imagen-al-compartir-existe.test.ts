@@ -88,7 +88,7 @@ describe('las imágenes al compartir el enlace', () => {
     expect(imagenesDe('taller'), '/merida declara dos: la apaisada y la cuadrada de WhatsApp')
       .toHaveLength(2);
     expect(imagenesDe('matrimonios').map((i) => i.url), '/matrimonios: los dos og-matrimonios-* del insumo, la apaisada primero')
-      .toEqual([`${SITIO}/img/og-matrimonios-1200x630.jpg`, `${SITIO}/img/og-matrimonios-1200x1200.jpg`]);
+      .toEqual([`${SITIO}/img/og-taller-matrimonio-herido-1200x630.jpg`, `${SITIO}/img/og-taller-matrimonio-herido-1200x1200.jpg`]);
     /* Las legales no se comparten y no declaran ninguna: es una decisión de la
        #01 y si alguien le pone una, esto lo dice. */
     for (const pagina of ['privacidad', 'terminos'] as Pagina[]) {

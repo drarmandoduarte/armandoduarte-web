@@ -84,8 +84,8 @@ const OG_IMAGENES: Record<'inicio' | 'taller' | 'matrimonios', { archivo: string
      apaisada (el cuadrado entero sobre el mismo póster desenfocado). Mismo
      orden que `/merida`: primero la de 630, después la cuadrada de WhatsApp. */
   matrimonios: [
-    { archivo: 'og-matrimonios-1200x630.jpg', ancho: 1200, alto: 630 },
-    { archivo: 'og-matrimonios-1200x1200.jpg', ancho: 1200, alto: 1200 },
+    { archivo: 'og-taller-matrimonio-herido-1200x630.jpg', ancho: 1200, alto: 630 },
+    { archivo: 'og-taller-matrimonio-herido-1200x1200.jpg', ancho: 1200, alto: 1200 },
   ],
 };
 
@@ -163,7 +163,7 @@ const EVENTO_MATRIMONIOS = {
   description: 'Taller en línea vía Zoom con Armando Duarte: 6 meses de formación, acompañamiento y guía para matrimonios.',
   eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
   eventStatus: 'https://schema.org/EventScheduled',
-  image: [`${SITIO}/img/og-matrimonios-1200x630.jpg`, `${SITIO}/img/og-matrimonios-1200x1200.jpg`],
+  image: [`${SITIO}/img/og-taller-matrimonio-herido-1200x630.jpg`, `${SITIO}/img/og-taller-matrimonio-herido-1200x1200.jpg`],
   startDate: '2026-10-29T19:00:00-06:00',
   endDate: '2026-10-29T21:00:00-06:00',
   location: { '@type': 'VirtualLocation', url: `${SITIO}/matrimonios` },
