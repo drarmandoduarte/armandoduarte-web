@@ -41,6 +41,13 @@ const RUTAS_SENSIBLES: ReadonlyArray<{ ruta: string; minutos: number; razon: str
       'regenerar los códigos de respaldo INVALIDA los que la persona tiene guardados: con la sesión '
       + 'viva alcanza para dejarla sin su vía de rescate',
   },
+  {
+    ruta: 'POST /cuenta/borrar',
+    minutos: 5,
+    razon:
+      'borrar la cuenta (#37 PR 3) anonimiza la ficha y no tiene vuelta: con una sesión olvidada abierta, '
+      + 'cualquiera la borraría. Al cliente, a quien el guard no le pide nada, lo frena la ruta (`codigo-reciente.ts`)',
+  },
 ];
 
 function makeJwt(payload: Record<string, unknown>): string {

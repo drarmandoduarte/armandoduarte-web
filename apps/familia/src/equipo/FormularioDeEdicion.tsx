@@ -67,47 +67,47 @@ export function FormularioDeEdicion({
       await alGuardar();
     } catch (fallo) {
       const codigo = fallo instanceof ErrorDeApi ? fallo.codigoDelServidor : undefined;
-      setGeneral(t(codigo === 'SIN_PERMISO' ? 'equipo.errores.sinPermiso' : 'equipo.errores.generico'));
+      setGeneral(t(codigo === 'SIN_PERMISO' ? 'panel.errores.sinPermiso' : 'panel.errores.generico'));
     } finally {
       setGuardando(false);
     }
   }
 
   const error = (campo: keyof EdicionEntrada) => (errores[campo] ? t(errores[campo] as string) : null);
-  const ayudaDeHora = t('equipo.edicion.horaAyuda');
+  const ayudaDeHora = t('panel.edicion.horaAyuda');
 
   return (
     <form className="formulario" onSubmit={enviar} noValidate>
       <h3 className="subtitulo">
-        {t(edicion ? 'equipo.edicion.tituloEditar' : 'equipo.edicion.tituloNuevo', { curso: curso.titulo })}
+        {t(edicion ? 'panel.edicion.tituloEditar' : 'panel.edicion.tituloNuevo', { curso: curso.titulo })}
       </h3>
       <div className="formulario__rejilla">
-        <Campo id="edicion-inicio" type="datetime-local" rotulo={t('equipo.edicion.inicio')} ayuda={ayudaDeHora}
+        <Campo id="edicion-inicio" type="datetime-local" rotulo={t('panel.edicion.inicio')} ayuda={ayudaDeHora}
           value={e.inicio} error={error('inicio')} onChange={(x) => poner('inicio', x.target.value)} autoFocus />
-        <Campo id="edicion-fin" type="datetime-local" rotulo={t('equipo.edicion.fin')} ayuda={ayudaDeHora}
+        <Campo id="edicion-fin" type="datetime-local" rotulo={t('panel.edicion.fin')} ayuda={ayudaDeHora}
           value={e.fin} error={error('fin')} onChange={(x) => poner('fin', x.target.value)} />
-        <Campo id="edicion-zona" rotulo={t('equipo.edicion.zona')} ayuda={t('equipo.edicion.zonaAyuda')}
+        <Campo id="edicion-zona" rotulo={t('panel.edicion.zona')} ayuda={t('panel.edicion.zonaAyuda')}
           value={e.zona} error={error('zona')} onChange={(x) => poner('zona', x.target.value.trim())} />
-        <Campo id="edicion-sede" rotulo={t('equipo.edicion.sede')} value={e.sede} error={error('sede')}
+        <Campo id="edicion-sede" rotulo={t('panel.edicion.sede')} value={e.sede} error={error('sede')}
           onChange={(x) => poner('sede', x.target.value)} />
-        <Campo id="edicion-ciudad" rotulo={t('equipo.edicion.ciudad')} value={e.ciudad} error={error('ciudad')}
+        <Campo id="edicion-ciudad" rotulo={t('panel.edicion.ciudad')} value={e.ciudad} error={error('ciudad')}
           onChange={(x) => poner('ciudad', x.target.value)} />
-        <Campo id="edicion-pais" rotulo={t('equipo.edicion.pais')} value={e.pais} maxLength={2} error={error('pais')}
+        <Campo id="edicion-pais" rotulo={t('panel.edicion.pais')} value={e.pais} maxLength={2} error={error('pais')}
           onChange={(x) => poner('pais', x.target.value.toUpperCase())} />
-        <Campo id="edicion-cupo" rotulo={t('equipo.edicion.cupo')} ayuda={t('equipo.edicion.cupoAyuda')} inputMode="numeric"
+        <Campo id="edicion-cupo" rotulo={t('panel.edicion.cupo')} ayuda={t('panel.edicion.cupoAyuda')} inputMode="numeric"
           value={e.cupo} error={error('cupo')} onChange={(x) => poner('cupo', x.target.value.trim())} />
-        <Campo id="edicion-precio" rotulo={t('equipo.edicion.precio')} inputMode="decimal"
+        <Campo id="edicion-precio" rotulo={t('panel.edicion.precio')} inputMode="decimal"
           value={e.precio} error={error('precio')} onChange={(x) => poner('precio', x.target.value.trim())} />
-        <Campo id="edicion-hasta" type="datetime-local" rotulo={t('equipo.edicion.hasta')} ayuda={t('equipo.edicion.hastaAyuda')}
+        <Campo id="edicion-hasta" type="datetime-local" rotulo={t('panel.edicion.hasta')} ayuda={t('panel.edicion.hastaAyuda')}
           value={e.inscripcionesHasta} error={error('inscripcionesHasta')} onChange={(x) => poner('inscripcionesHasta', x.target.value)} />
-        <Selector id="edicion-estado" rotulo={t('equipo.edicion.estado')} value={e.estado} error={error('estado')}
+        <Selector id="edicion-estado" rotulo={t('panel.edicion.estado')} value={e.estado} error={error('estado')}
           onChange={(x) => poner('estado', x.target.value)}
-          opciones={ESTADOS_DE_EDICION.map((m) => ({ valor: m, texto: t(`equipo.estadosEdicion.${m}`) }))} />
+          opciones={ESTADOS_DE_EDICION.map((m) => ({ valor: m, texto: t(`panel.estadosEdicion.${m}`) }))} />
       </div>
       {general ? <p className="error" role="alert">{general}</p> : null}
       <div className="formulario__botones">
-        <BotonPrincipal cargando={guardando} textoCargando={t('equipo.guardando')}>{t('equipo.guardar')}</BotonPrincipal>
-        <button type="button" className="btn" onClick={alCancelar}>{t('equipo.cancelar')}</button>
+        <BotonPrincipal cargando={guardando} textoCargando={t('panel.guardando')}>{t('panel.guardar')}</BotonPrincipal>
+        <button type="button" className="btn" onClick={alCancelar}>{t('panel.cancelar')}</button>
       </div>
     </form>
   );

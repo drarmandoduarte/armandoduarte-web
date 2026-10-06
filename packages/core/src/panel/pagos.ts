@@ -49,8 +49,8 @@ export const MOTIVO_MAXIMO = 500;
 
 export function validarResolucion(tipo: 'confirmado' | 'rechazado' | 'anulado', nota: string): string | null {
   const limpia = nota.trim();
-  if (tipo !== 'confirmado' && limpia === '') return 'equipo.inscriptos.pago.errores.motivo';
-  if (limpia.length > MOTIVO_MAXIMO) return 'equipo.inscriptos.pago.errores.largo';
+  if (tipo !== 'confirmado' && limpia === '') return 'panel.inscriptos.pago.errores.motivo';
+  if (limpia.length > MOTIVO_MAXIMO) return 'panel.inscriptos.pago.errores.largo';
   return null;
 }
 

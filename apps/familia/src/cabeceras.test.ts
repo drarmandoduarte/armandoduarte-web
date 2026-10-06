@@ -18,7 +18,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RUTAS } from './rutas';
+import { RUTAS, rutaDeAjustes } from './rutas';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG = JSON.parse(readFileSync(join(APP, 'vercel.json'), 'utf8')) as {
@@ -165,13 +165,16 @@ describe('las cabeceras de Mi espacio', () => {
     expect(robots).toMatch(/^Disallow: \/$/m);
   });
 
-  it('(9) #34 y #35: /mis-datos es un 308 a /ajustes/perfil y /entrar uno a /login — y no hay otras', () => {
-    /* «Mis datos» pasó a Ajustes → Perfil. Un enlace guardado o un correo viejo
-       a `/mis-datos` no cae en un lugar que ya no existe. 308 y no 301: el
-       navegador no cambia el método. */
+  it('(9) #34, #35 y #37: /mis-datos, /ajustes/<sección> y /empezar son 308 a su lugar del molde, /entrar a /login — y no hay otras', () => {
+    /* «Mis datos» pasó a Ajustes → Perfil, y desde la #37 (PR 3) las secciones
+       de Ajustes van en `?s=` y la primera entrada es /bienvenida. Un enlace
+       guardado o un correo viejo no cae en un lugar que ya no existe. 308 y no
+       301: el navegador no cambia el método. */
     /* /entrar es la dirección que la web y los correos viejos tienen escrita; Vercel le pasa el ?ir= a /login. */
     expect(CONFIG.redirects).toEqual([
-      { source: RUTAS.misDatos, destination: RUTAS.ajustesPerfil, permanent: true },
+      { source: RUTAS.misDatos, destination: rutaDeAjustes('perfil'), permanent: true },
+      { source: `${RUTAS.ajustes}/:seccion`, destination: `${RUTAS.ajustes}?s=:seccion`, permanent: true },
+      { source: RUTAS.empezar, destination: RUTAS.bienvenida, permanent: true },
       { source: RUTAS.entrar, destination: RUTAS.login, permanent: true },
     ]);
   });

@@ -53,10 +53,10 @@ describe('cursos', () => {
   it('un curso completo no tiene errores; uno vacío los dice campo por campo', () => {
     expect(validarCurso(bueno)).toEqual({});
     expect(validarCurso({ ...bueno, titulo: '  ', slug: 'Con Mayúscula', modalidad: 'x', estado: 'y' })).toEqual({
-      titulo: 'equipo.errores.tituloFalta',
-      slug: 'equipo.errores.slugForma',
-      modalidad: 'equipo.errores.modalidad',
-      estado: 'equipo.errores.estado',
+      titulo: 'panel.errores.tituloFalta',
+      slug: 'panel.errores.slugForma',
+      modalidad: 'panel.errores.modalidad',
+      estado: 'panel.errores.estado',
     });
   });
 
@@ -82,13 +82,13 @@ describe('ediciones', () => {
 
   it('el fin antes del inicio, el cupo en cero, el precio con tres decimales y la zona inventada', () => {
     expect(validarEdicion({ ...buena, fin: '2026-11-05T08:00', cupo: '0', precio: '10.999', zona: 'Merida' })).toEqual({
-      zona: 'equipo.errores.zona', cupo: 'equipo.errores.cupo', precio: 'equipo.errores.precio',
+      zona: 'panel.errores.zona', cupo: 'panel.errores.cupo', precio: 'panel.errores.precio',
     });
-    expect(validarEdicion({ ...buena, fin: '2026-11-05T08:00' }).fin).toBe('equipo.errores.finAntes');
+    expect(validarEdicion({ ...buena, fin: '2026-11-05T08:00' }).fin).toBe('panel.errores.finAntes');
     expect(validarEdicion({ ...buena, inscripcionesHasta: '2026-11-06T10:00' }).inscripcionesHasta)
-      .toBe('equipo.errores.hastaDespues');
-    expect(validarEdicion({ ...buena, inicio: '' }).inicio).toBe('equipo.errores.inicioFalta');
-    expect(validarEdicion({ ...buena, pais: 'Mexico' }).pais).toBe('equipo.errores.pais');
+      .toBe('panel.errores.hastaDespues');
+    expect(validarEdicion({ ...buena, inicio: '' }).inicio).toBe('panel.errores.inicioFalta');
+    expect(validarEdicion({ ...buena, pais: 'Mexico' }).pais).toBe('panel.errores.pais');
   });
 
   it('cupo y precio vacíos son válidos: sin tope y sin precio', () => {

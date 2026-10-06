@@ -1,5 +1,5 @@
 import { rutaInternaSegura, slugDeMeAnoto } from '@codice/core';
-import { LUGARES_CON_SESION, RUTAS } from '../rutas';
+import { LUGARES_CON_SESION, RUTAS, rutaDeAjustes, seccionVieja } from '../rutas';
 import type { DecisionDePantalla } from './decision-de-pantalla';
 
 /**
@@ -39,12 +39,17 @@ import type { DecisionDePantalla } from './decision-de-pantalla';
  *   · con los datos completos, `/empezar` no es un lugar: va a Inicio (o al
  *     destino guardado, si hay).
  *
- * ── Y desde la #34, Ajustes ─────────────────────────────────────────────
- *   · las secciones de `/ajustes/*` son lugares; `/ajustes` a secas va a
- *     Perfil, como «Tus preferencias» de Bitácora;
- *   · `/ajustes/seguridad` es del equipo, como `/equipo`: un cliente va a Inicio;
- *   · `/mis-datos` ya no existe: va a `/ajustes/perfil` (en Vercel es un 308;
- *     esto cubre el «atrás» y los enlaces que navegan sin recargar).
+ * ── Y desde la #37 (PR 3), el molde ─────────────────────────────────────
+ *   · `/ajustes` es un lugar y la sección va en `?s=` (`<Ajustes>` del molde);
+ *     las rutas de la #34 (`/ajustes/perfil`…) van a `/ajustes?s=perfil`, y
+ *     `/mis-datos` a `/ajustes?s=perfil` (en Vercel son 308; esto cubre el
+ *     «atrás» y los enlaces que navegan sin recargar);
+ *   · `?s=equipo` va a la pantalla Equipo del menú (fase-2 §6: el molde no le
+ *     da alias a propósito), que es solo del dueño: a los demás, a Ajustes;
+ *   · `/alertas` y `/papelera` son lugares para todos; `/equipo/personas` (la
+ *     pantalla Equipo), solo del dueño;
+ *   · la primera entrada es `/bienvenida` (`<Bienvenida>` del molde), que
+ *     reemplaza a `/empezar`: `/empezar` va ahí si faltan datos, y si no, a Inicio.
  *
  * ── Y desde la #35, las direcciones del guion v1 del Kit 512 ─────────────
  * Las pantallas de acceso siguen siendo **estados** de la sesión, pero el guion
@@ -70,6 +75,8 @@ export function rutaQueCorresponde(estado: {
   rutaActual: string;
   /** Si quien entró es del equipo. Sin `yo`, falso. */
   esEquipo?: boolean;
+  /** #37 PR 3: si es el dueño (la pantalla Equipo es suya). Sin `yo`, falso. */
+  esDueno?: boolean;
   /** El `?ir=` que se guardó al llegar a `/entrar` (#24 B). Se vuelve a validar acá. */
   destinoGuardado?: string | null;
   /** #29 C: a la ficha le falta nombre, apellido o WhatsApp (`necesitaEmpezar()`). */
@@ -101,9 +108,10 @@ export function rutaQueCorresponde(estado: {
   if (!estado.hayYo || estado.decision !== 'pasar') return null;
 
   /* #29 C: antes que nada, completar los datos. El destino guardado se queda
-     esperando (lo cuida `App.tsx`, que no lo olvida mientras falten). */
+     esperando (lo cuida `App.tsx`, que no lo olvida mientras falten). Desde la
+     #37 PR 3, en la Bienvenida del molde. */
   if (estado.faltanDatos === true) {
-    return estado.rutaActual === RUTAS.empezar ? null : RUTAS.empezar;
+    return estado.rutaActual === RUTAS.bienvenida ? null : RUTAS.bienvenida;
   }
 
   const guardado = rutaInternaSegura(estado.destinoGuardado);
@@ -116,10 +124,18 @@ export function rutaQueCorresponde(estado: {
      que escribe `/equipo` se lo lleva a Mi espacio, sin error. Y
      `/me-anoto/<slug>` es un lugar para cualquiera con sesión (#24 B). */
   if (enMeAnoto) return null;
+  if (estado.rutaActual === RUTAS.ajustes) {
+    /* `?s=equipo` no es una sección: es la pantalla Equipo del menú. */
+    if (new URLSearchParams(estado.busqueda ?? '').get('s') === 'equipo') {
+      return estado.esDueno === true ? RUTAS.equipoPersonas : RUTAS.ajustes;
+    }
+    return null;
+  }
   if (LUGARES_CON_SESION.includes(estado.rutaActual)) return null;
-  if (estado.rutaActual === RUTAS.ajustes || estado.rutaActual === RUTAS.misDatos) return RUTAS.ajustesPerfil;
-  const soloEquipo = estado.rutaActual === RUTAS.equipo || estado.rutaActual === RUTAS.ajustesSeguridad;
-  const sePuedeQuedar = soloEquipo && estado.esEquipo === true;
-  const destino = sePuedeQuedar ? estado.rutaActual : RUTAS.miEspacio;
-  return destino !== estado.rutaActual ? destino : null;
+  if (estado.rutaActual === RUTAS.misDatos) return rutaDeAjustes('perfil');
+  const vieja = seccionVieja(estado.rutaActual);
+  if (vieja) return rutaDeAjustes(vieja);
+  if (estado.rutaActual === RUTAS.equipo && estado.esEquipo === true) return null;
+  if (estado.rutaActual === RUTAS.equipoPersonas && estado.esDueno === true) return null;
+  return RUTAS.miEspacio !== estado.rutaActual ? RUTAS.miEspacio : null;
 }

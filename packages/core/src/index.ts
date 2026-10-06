@@ -9,7 +9,7 @@
 // En la orden #01 no hay ninguna regla de negocio todavía: la web pública es
 // texto y presentación. Lo único que vive acá es el idioma y el contacto.
 
-export { RECURSOS_I18N, IDIOMAS } from './i18n/recursos';
+export { RECURSOS_I18N, IDIOMAS, TEXTOS_DEL_MOLDE } from './i18n/recursos';
 export type { Idioma } from './i18n/recursos';
 export {
   TELEFONO_GABY,
@@ -97,11 +97,8 @@ export {
   whatsappValido,
 } from './mi-espacio/whatsapp';
 
-// ── La barra y los ajustes (orden #34) ───────────────────────────────────────
-export {
-  FORMAS_DE_ENTRAR, SECCIONES_DE_AJUSTES, claveDelRol, formasDeEntrar, inicialesDe, nombreDelBloque, seccionesDeAjustes,
-} from './mi-espacio/ajustes';
-export type { FormaDeEntrar, SeccionDeAjustes } from './mi-espacio/ajustes';
+// ── El bloque del usuario de la barra (orden #34; desde la #37, el del shell) ─
+export { claveDelRol, nombreDelBloque } from './mi-espacio/ajustes';
 
 // ── Las pantallas de acceso del guion v1 del Kit 512 (orden #35) ─────────────
 export {
@@ -114,3 +111,10 @@ export {
   reseteoPendiente, venceDelRescate,
 } from './mi-espacio/rescate';
 export type { AccionDelRescate, EstadoDelRescate, FilaDeRescate } from './mi-espacio/rescate';
+
+// ── Mi espacio con el molde (orden #37, PR 3 · fase-2 §6 y §9) ───────────────
+export {
+  CUADROS_DE_MI_ESPACIO, DIAS_DE_PROXIMAMENTE, INICIO_POR_ROL, MODULOS, alertasDeMiEspacio, contextoDeAjustes,
+  contextoDeInicio, diasHasta, modulosDe, pasosDeBienvenida,
+} from './mi-espacio/molde';
+export type { AlertaDeMiEspacio, DestinoDeAlerta, Modulo, PasoDeBienvenida, TonoDeAlerta } from './mi-espacio/molde';

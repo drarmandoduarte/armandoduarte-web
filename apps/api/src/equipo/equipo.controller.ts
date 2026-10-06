@@ -137,6 +137,17 @@ export class EquipoController {
     }
   }
 
+  /**
+   * La pantalla Equipo del molde (orden #37, PR 3, §9): quiénes son el equipo,
+   * con su rol, su territorio y si están activos. Solo el dueño (es quien la ve
+   * en la barra); la base lo vuelve a decir (`miembros_dueno_lee`, 001).
+   */
+  @Get('miembros')
+  async miembros(@Req() pedido: unknown) {
+    const { token } = await this.quienPide(pedido, true);
+    return { miembros: await this.repositorio.miembros(token) };
+  }
+
   @Post('miembros')
   async sumar(@Req() pedido: unknown, @Body() cuerpo: SumarAlEquipoDto) {
     const { token, id } = await this.quienPide(pedido, true);

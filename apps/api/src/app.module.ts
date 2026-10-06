@@ -17,6 +17,9 @@ import { PagosRepositorio } from './pagos/pagos.repositorio';
 import { CorreoService } from './correo/correo.service';
 import { RescateController } from './rescate/rescate.controller';
 import { RescateRepositorio } from './rescate/rescate.repositorio';
+import { CuentaController } from './cuenta/cuenta.controller';
+import { CuentaRepositorio } from './cuenta/cuenta.repositorio';
+import { PapeleraController } from './papelera/papelera.controller';
 
 /**
  * El módulo raíz de la API de Mi espacio.
@@ -37,6 +40,8 @@ import { RescateRepositorio } from './rescate/rescate.repositorio';
     SaludController, YoController, RespaldoController, SesionesController, EquipoController, TalleresController, PagosController,
     /* #37 PR 2 · el rescate solo (fase-2 §8). */
     RescateController,
+    /* #37 PR 3 · borrar la cuenta (§6) y la papelera (§9). */
+    CuentaController, PapeleraController,
   ],
   providers: [
     SupabaseService,
@@ -45,6 +50,7 @@ import { RescateRepositorio } from './rescate/rescate.repositorio';
     PagosRepositorio,
     CorreoService,
     RescateRepositorio,
+    CuentaRepositorio,
     { provide: VERIFICADOR_DE_TOKEN, useExisting: SupabaseService },
     { provide: APP_GUARD, useClass: Aal2Guard },
   ],

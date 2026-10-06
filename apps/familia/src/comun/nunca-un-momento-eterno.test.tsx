@@ -80,6 +80,6 @@ describe('nunca un «Un momento…» eterno', () => {
   it('y cuando todo contesta, nada cambió: Mi espacio', async () => {
     falso.niveles = () => Promise.resolve({ data: { currentLevel: 'aal1', nextLevel: 'aal1' }, error: null });
     render(<App />);
-    expect(await screen.findByText(t('miEspacio.bajada'))).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: /^Hola/ })).toBeTruthy();
   });
 });

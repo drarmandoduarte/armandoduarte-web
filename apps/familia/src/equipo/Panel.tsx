@@ -58,13 +58,13 @@ export function Panel({ yo }: { yo: Yo }) {
     <>
       <div className="panel-cabeza">
         <div>
-          <Titulo texto={t('equipo.titulo')} />
-          <p className="bajada">{t('equipo.bajada')}</p>
+          <Titulo texto={t('panel.titulo')} />
+          <p className="bajada">{t('panel.bajada')}</p>
         </div>
-        <a href={RUTAS.miEspacio} className="enlace">← {t('equipo.volver')}</a>
+        <a href={RUTAS.miEspacio} className="enlace">← {t('panel.volver')}</a>
       </div>
 
-      <div className="pestanas" role="tablist" aria-label={t('equipo.titulo').replace(/[[\]]/g, '')}>
+      <div className="pestanas" role="tablist" aria-label={t('panel.titulo').replace(/[[\]]/g, '')}>
         {PESTANAS.map((p) => (
           <button
             key={p}
@@ -76,7 +76,7 @@ export function Panel({ yo }: { yo: Yo }) {
             className={`pestana${pestana === p ? ' pestana--activa' : ''}`}
             onClick={() => elegir(p)}
           >
-            {t(`equipo.pestanas.${p}`)}
+            {t(`panel.pestanas.${p}`)}
           </button>
         ))}
       </div>
@@ -84,11 +84,11 @@ export function Panel({ yo }: { yo: Yo }) {
       <section role="tabpanel" id={`panel-${pestana}`} aria-labelledby={`pestana-${pestana}`} className="pestana-contenido">
         {error ? (
           <div className="aviso" role="alert">
-            {t('equipo.errorAlCargar')}{' '}
-            <button type="button" className="enlace" onClick={() => void cargar()}>{t('equipo.reintentar')}</button>
+            {t('panel.errorAlCargar')}{' '}
+            <button type="button" className="enlace" onClick={() => void cargar()}>{t('panel.reintentar')}</button>
           </div>
         ) : cursos === null ? (
-          <p className="nota" role="status">{t('equipo.cargando')}</p>
+          <p className="nota" role="status">{t('panel.cargando')}</p>
         ) : pestana === 'cursos' ? (
           <Cursos cursos={cursos} alCambiar={cargar} />
         ) : pestana === 'inscriptos' ? (

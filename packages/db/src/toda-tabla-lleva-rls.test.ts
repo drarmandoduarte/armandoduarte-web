@@ -91,10 +91,13 @@ const PENDIENTES: Record<string, string> = {
   '013_rescates.sql':
     'orden #37 PR 2 (rescate solo): la tabla rescates. La corre el CEO ANTES del merge del PR 2: sin ella, '
     + 'pedir, confirmar, cancelar y aplicar el reseteo fallan (y «Reseteo pendiente» no aparece)',
+  '014_ajustes_y_papelera.sql':
+    'orden #37 PR 3 (Ajustes, Inicio y papelera): las columnas de Ajustes e Inicio, borrar la cuenta y la papelera. '
+    + 'La corre el CEO ANTES del merge del PR 3: sin ella, /api/yo da 42703 y nadie entra',
 };
 
 describe('las migraciones', () => {
-  it('son trece, numeradas de tres dígitos y en orden', async () => {
+  it('son catorce, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -109,6 +112,7 @@ describe('las migraciones', () => {
       '011_el_perfil.sql',
       '012_avisos_por_correo.sql',
       '013_rescates.sql',
+      '014_ajustes_y_papelera.sql',
     ]);
   });
 

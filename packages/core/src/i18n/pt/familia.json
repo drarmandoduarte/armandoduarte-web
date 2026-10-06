@@ -43,5 +43,45 @@
         }
       }
     }
+  },
+  "miEspacio": {
+    "whatsappCampo": {
+      "pais": "País do número",
+      "paisElegido": "País do número: {{pais}} ({{prefijo}})",
+      "buscar": "Busque seu país",
+      "lista": "Países",
+      "sinResultados": "Não encontramos esse país."
+    },
+    "errores": {
+      "nombre": "Escreva seu nome.",
+      "apellido": "Escreva seu sobrenome.",
+      "whatsapp": "Escreva seu WhatsApp.",
+      "whatsappPais": "Esse número não parece ser de {{pais}}. Confira se está completo.",
+      "largo": "É longo demais.",
+      "sinLugares": "Não há mais vagas nesta oficina.",
+      "edicionCerrada": "Esta oficina não recebe mais inscrições."
+    },
+    "perfil": {
+      "errores": {
+        "pais": "Escolha um país da lista.",
+        "anio": "Escreva o ano com quatro dígitos (por exemplo, 1984).",
+        "nivel": "Escolha uma opção da lista."
+      }
+    },
+    "niveles": {
+      "primaria": "Ensino fundamental I",
+      "secundaria": "Ensino fundamental II",
+      "preparatoria": "Ensino médio",
+      "licenciatura": "Graduação",
+      "posgrado": "Pós-graduação",
+      "prefiero_no_decir": "Prefiro não dizer"
+    },
+    "estados": {
+      "pendiente_de_pago": "Falta o seu pagamento",
+      "en_revision": "Comprovante recebido, estamos analisando",
+      "confirmada": "Sua vaga está confirmada",
+      "anulada": "Cancelada",
+      "desconocido": "—"
+    }
   }
 }

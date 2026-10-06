@@ -27,7 +27,7 @@ export function Cursos({ cursos, alCambiar }: { cursos: CursoDelPanel[]; alCambi
 
   const alGuardar = async () => {
     setAbierto(null);
-    setAviso(t('equipo.guardado'));
+    setAviso(t('panel.guardado'));
     await alCambiar();
   };
   const abrir = (a: Abierto) => { setAviso(null); setAbierto(a); };
@@ -36,9 +36,9 @@ export function Cursos({ cursos, alCambiar }: { cursos: CursoDelPanel[]; alCambi
     <div>
       <div className="barra">
         <button type="button" className="btn" onClick={() => abrir({ que: 'curso', curso: null })}>
-          {t('equipo.cursos.nuevo')}
+          {t('panel.cursos.nuevo')}
         </button>
-        <p className="nota">{t('equipo.nadaSeBorra')}</p>
+        <p className="nota">{t('panel.nadaSeBorra')}</p>
       </div>
       {aviso ? <p className="exito" role="status">{aviso}</p> : null}
 
@@ -46,7 +46,7 @@ export function Cursos({ cursos, alCambiar }: { cursos: CursoDelPanel[]; alCambi
         <FormularioDeCurso curso={null} alGuardar={alGuardar} alCancelar={() => setAbierto(null)} />
       ) : null}
 
-      {cursos.length === 0 ? <p className="nota u-mt-6">{t('equipo.cursos.vacio')}</p> : null}
+      {cursos.length === 0 ? <p className="nota u-mt-6">{t('panel.cursos.vacio')}</p> : null}
 
       <ul className="cursos">
         {cursos.map((curso) => (
@@ -58,16 +58,16 @@ export function Cursos({ cursos, alCambiar }: { cursos: CursoDelPanel[]; alCambi
                 <div>
                   <h2 className="curso__titulo">{curso.titulo}</h2>
                   <p className="nota">
-                    <span className={`chip chip--${curso.estado}`}>{t(`equipo.estadosCurso.${curso.estado}`)}</span>
-                    {' · '}{t(`equipo.modalidades.${curso.modalidad}`)}{' · '}/{curso.slug}
+                    <span className={`chip chip--${curso.estado}`}>{t(`panel.estadosCurso.${curso.estado}`)}</span>
+                    {' · '}{t(`panel.modalidades.${curso.modalidad}`)}{' · '}/{curso.slug}
                   </p>
                 </div>
                 <div className="curso__acciones">
                   <button type="button" className="btn btn--chico" onClick={() => abrir({ que: 'curso', curso })}>
-                    {t('equipo.cursos.editar')}
+                    {t('panel.cursos.editar')}
                   </button>
                   <button type="button" className="btn btn--chico" onClick={() => abrir({ que: 'edicion', curso, edicion: null })}>
-                    {t('equipo.cursos.nuevaEdicion')}
+                    {t('panel.cursos.nuevaEdicion')}
                   </button>
                 </div>
               </div>
@@ -78,18 +78,18 @@ export function Cursos({ cursos, alCambiar }: { cursos: CursoDelPanel[]; alCambi
             ) : null}
 
             {curso.ediciones.length === 0 ? (
-              <p className="nota u-mt-4">{t('equipo.cursos.sinEdiciones')}</p>
+              <p className="nota u-mt-4">{t('panel.cursos.sinEdiciones')}</p>
             ) : (
               <div className="tabla-marco">
                 <table className="tabla">
                   <thead>
                     <tr>
-                      <th scope="col">{t('equipo.cursos.edicionEncabezados.fecha')}</th>
-                      <th scope="col">{t('equipo.cursos.edicionEncabezados.lugar')}</th>
-                      <th scope="col">{t('equipo.cursos.edicionEncabezados.inscriptos')}</th>
-                      <th scope="col">{t('equipo.cursos.edicionEncabezados.precio')}</th>
-                      <th scope="col">{t('equipo.cursos.edicionEncabezados.estado')}</th>
-                      <th scope="col"><span className="solo-lectura">{t('equipo.cursos.editar')}</span></th>
+                      <th scope="col">{t('panel.cursos.edicionEncabezados.fecha')}</th>
+                      <th scope="col">{t('panel.cursos.edicionEncabezados.lugar')}</th>
+                      <th scope="col">{t('panel.cursos.edicionEncabezados.inscriptos')}</th>
+                      <th scope="col">{t('panel.cursos.edicionEncabezados.precio')}</th>
+                      <th scope="col">{t('panel.cursos.edicionEncabezados.estado')}</th>
+                      <th scope="col"><span className="solo-lectura">{t('panel.cursos.editar')}</span></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -103,16 +103,16 @@ export function Cursos({ cursos, alCambiar }: { cursos: CursoDelPanel[]; alCambi
                       ) : (
                         <tr key={e.id}>
                           <td>
-                            {t('equipo.cursos.horario', { fecha: fechaLarga(e.inicio, e.zona), fin: horaCorta(e.fin, e.zona) })}
-                            <span className="tabla__sub">{t('equipo.cursos.enZona', { zona: e.ciudad ?? e.zona })}</span>
+                            {t('panel.cursos.horario', { fecha: fechaLarga(e.inicio, e.zona), fin: horaCorta(e.fin, e.zona) })}
+                            <span className="tabla__sub">{t('panel.cursos.enZona', { zona: e.ciudad ?? e.zona })}</span>
                           </td>
                           <td>{[e.sede, e.ciudad, e.pais].filter(Boolean).join(' · ') || '—'}</td>
                           <td className="tabla__numero">{ocupacion(e.inscriptos, e.cupo)}</td>
                           <td className="tabla__numero">{formatearPrecio(e.precio_monto, e.precio_moneda)}</td>
-                          <td><span className={`chip chip--${e.estado}`}>{t(`equipo.estadosEdicion.${e.estado}`)}</span></td>
+                          <td><span className={`chip chip--${e.estado}`}>{t(`panel.estadosEdicion.${e.estado}`)}</span></td>
                           <td>
                             <button type="button" className="enlace" onClick={() => abrir({ que: 'edicion', curso, edicion: e })}>
-                              {t('equipo.cursos.editar')}
+                              {t('panel.cursos.editar')}
                             </button>
                           </td>
                         </tr>

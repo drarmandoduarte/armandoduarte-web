@@ -93,12 +93,24 @@ importers:
       '@codice/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@moldes/ajustes':
+        specifier: workspace:*
+        version: link:../../packages/moldes/ajustes
+      '@moldes/app-shell':
+        specifier: workspace:*
+        version: link:../../packages/moldes/app-shell
+      '@moldes/bienvenida':
+        specifier: workspace:*
+        version: link:../../packages/moldes/bienvenida
       '@moldes/design':
         specifier: workspace:*
         version: link:../../packages/moldes/design
       '@moldes/idiomas':
         specifier: workspace:*
         version: link:../../packages/moldes/idiomas
+      '@moldes/inicio':
+        specifier: workspace:*
+        version: link:../../packages/moldes/inicio
       '@moldes/ui':
         specifier: workspace:*
         version: link:../../packages/moldes/ui

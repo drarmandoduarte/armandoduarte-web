@@ -1,6 +1,6 @@
 import { aplicarDesign } from '@moldes/design';
 import { crearT, elegirIdioma, type Idioma, type T } from '@moldes/idiomas';
-import { RECURSOS_I18N } from '@codice/core';
+import { RECURSOS_I18N, TEXTOS_DEL_MOLDE } from '@codice/core';
 import type { Design } from '@moldes/design';
 import designDelRepo from '../../design.json';
 import { idiomaGuardado } from '../comun/idioma';
@@ -15,12 +15,11 @@ import { idiomaGuardado } from '../comun/idioma';
  * de Mi espacio es `style-src 'self'`, y un `<style>` no se aplicaría.
  *
  * ── Y el `t` del molde ───────────────────────────────────────────────────
- * Las pantallas que la app arme con piezas del molde (PR 2 y PR 3) pasan sus
- * textos por este `t`. Hasta entonces las pantallas de hoy siguen con
- * i18next (`src/i18n.ts`); los textos propios de Mi espacio entran como
- * `extras`, planos, los mismos que i18next ya tiene. Lo que gana: el molde trae
- * `comun.cerrar`, `comun.confirmar`… en los tres idiomas, y la app suma los
- * suyos sin escribirlos dos veces.
+ * Las pantallas que la app arma con piezas del molde (el acceso, y desde el
+ * PR 3 el shell, Inicio, Ajustes, el Centro de alertas, la Papelera, Equipo y
+ * la Bienvenida) pasan sus textos por este `t`. Las del negocio (talleres, el
+ * panel) siguen con i18next (`src/i18n.ts`). El molde trae `comun.cerrar`,
+ * `comun.confirmar`… en los tres idiomas, y la app suma los suyos.
  */
 
 /** Un JSON anidado de i18next (`{ auth: { login: { … } } }`) → plano (`auth.login.…`). */
@@ -34,11 +33,16 @@ export function aplanar(objeto: Record<string, unknown>, prefijo = ''): Record<s
   return salida;
 }
 
-/** Los textos de Mi espacio en cada idioma del molde. `en` y `pt` traen lo que tienen (hoy, el acceso). */
+/**
+ * Los textos de Mi espacio en cada idioma del molde: los de `familia.json`
+ * (aplanados; en `en` y `pt`, los que esas pantallas usan) y, encima, los de
+ * `molde.json` (#37 PR 3), que son los de las pantallas del molde y algunos que
+ * pisan un texto del molde que en Mi espacio diría algo que no pasa.
+ */
 export const EXTRAS = {
-  es: aplanar(RECURSOS_I18N.es.familia),
-  en: aplanar(RECURSOS_I18N.en.familia),
-  pt: aplanar(RECURSOS_I18N.pt.familia),
+  es: { ...aplanar(RECURSOS_I18N.es.familia), ...TEXTOS_DEL_MOLDE.es },
+  en: { ...aplanar(RECURSOS_I18N.en.familia), ...TEXTOS_DEL_MOLDE.en },
+  pt: { ...aplanar(RECURSOS_I18N.pt.familia), ...TEXTOS_DEL_MOLDE.pt },
 } as const;
 
 /**

@@ -6,7 +6,7 @@
  * manda**: si esto se equivoca, el `check` de Postgres rechaza igual. Lo que se
  * gana acá es el mensaje claro antes de ir y volver.
  *
- * Los errores son **claves de i18n** (`equipo.errores.*`), no textos: el texto
+ * Los errores son **claves de i18n** (`panel.errores.*`), no textos: el texto
  * es de `familia.json`.
  */
 import { esZonaValida, instanteDesdeHoraDePared } from './zonas';
@@ -57,13 +57,13 @@ export interface CursoEntrada {
 export function validarCurso(e: CursoEntrada): Errores<keyof CursoEntrada> {
   const errores: Errores<keyof CursoEntrada> = {};
   const titulo = e.titulo.trim();
-  if (titulo.length === 0) errores.titulo = 'equipo.errores.tituloFalta';
-  else if (titulo.length > 140) errores.titulo = 'equipo.errores.tituloLargo';
-  if (e.bajada.trim().length > 280) errores.bajada = 'equipo.errores.bajadaLarga';
-  if (!e.slug) errores.slug = 'equipo.errores.slugFalta';
-  else if (!PATRON_DE_SLUG.test(e.slug)) errores.slug = 'equipo.errores.slugForma';
-  if (!(MODALIDADES as readonly string[]).includes(e.modalidad)) errores.modalidad = 'equipo.errores.modalidad';
-  if (!(ESTADOS_DE_CURSO as readonly string[]).includes(e.estado)) errores.estado = 'equipo.errores.estado';
+  if (titulo.length === 0) errores.titulo = 'panel.errores.tituloFalta';
+  else if (titulo.length > 140) errores.titulo = 'panel.errores.tituloLargo';
+  if (e.bajada.trim().length > 280) errores.bajada = 'panel.errores.bajadaLarga';
+  if (!e.slug) errores.slug = 'panel.errores.slugFalta';
+  else if (!PATRON_DE_SLUG.test(e.slug)) errores.slug = 'panel.errores.slugForma';
+  if (!(MODALIDADES as readonly string[]).includes(e.modalidad)) errores.modalidad = 'panel.errores.modalidad';
+  if (!(ESTADOS_DE_CURSO as readonly string[]).includes(e.estado)) errores.estado = 'panel.errores.estado';
   return errores;
 }
 
@@ -104,28 +104,28 @@ const MONTO = /^\d+(\.\d{1,2})?$/;
 export function validarEdicion(e: EdicionEntrada): Errores<keyof EdicionEntrada> {
   const errores: Errores<keyof EdicionEntrada> = {};
   const zonaValida = esZonaValida(e.zona);
-  if (!zonaValida) errores.zona = 'equipo.errores.zona';
+  if (!zonaValida) errores.zona = 'panel.errores.zona';
 
   const inicio = zonaValida ? instanteDesdeHoraDePared(e.inicio, e.zona) : null;
   const fin = zonaValida ? instanteDesdeHoraDePared(e.fin, e.zona) : null;
-  if (!e.inicio) errores.inicio = 'equipo.errores.inicioFalta';
-  else if (zonaValida && !inicio) errores.inicio = 'equipo.errores.fechaForma';
-  if (!e.fin) errores.fin = 'equipo.errores.finFalta';
-  else if (zonaValida && !fin) errores.fin = 'equipo.errores.fechaForma';
-  else if (inicio && fin && Date.parse(fin) <= Date.parse(inicio)) errores.fin = 'equipo.errores.finAntes';
+  if (!e.inicio) errores.inicio = 'panel.errores.inicioFalta';
+  else if (zonaValida && !inicio) errores.inicio = 'panel.errores.fechaForma';
+  if (!e.fin) errores.fin = 'panel.errores.finFalta';
+  else if (zonaValida && !fin) errores.fin = 'panel.errores.fechaForma';
+  else if (inicio && fin && Date.parse(fin) <= Date.parse(inicio)) errores.fin = 'panel.errores.finAntes';
 
   if (e.inscripcionesHasta) {
     const hasta = zonaValida ? instanteDesdeHoraDePared(e.inscripcionesHasta, e.zona) : null;
-    if (zonaValida && !hasta) errores.inscripcionesHasta = 'equipo.errores.fechaForma';
+    if (zonaValida && !hasta) errores.inscripcionesHasta = 'panel.errores.fechaForma';
     else if (hasta && fin && Date.parse(hasta) > Date.parse(fin)) {
-      errores.inscripcionesHasta = 'equipo.errores.hastaDespues';
+      errores.inscripcionesHasta = 'panel.errores.hastaDespues';
     }
   }
 
-  if (e.pais && !/^[A-Z]{2}$/.test(e.pais)) errores.pais = 'equipo.errores.pais';
-  if (e.cupo && (!ENTERO.test(e.cupo) || Number(e.cupo) < 1)) errores.cupo = 'equipo.errores.cupo';
-  if (e.precio && !MONTO.test(e.precio)) errores.precio = 'equipo.errores.precio';
-  if (!(ESTADOS_DE_EDICION as readonly string[]).includes(e.estado)) errores.estado = 'equipo.errores.estado';
+  if (e.pais && !/^[A-Z]{2}$/.test(e.pais)) errores.pais = 'panel.errores.pais';
+  if (e.cupo && (!ENTERO.test(e.cupo) || Number(e.cupo) < 1)) errores.cupo = 'panel.errores.cupo';
+  if (e.precio && !MONTO.test(e.precio)) errores.precio = 'panel.errores.precio';
+  if (!(ESTADOS_DE_EDICION as readonly string[]).includes(e.estado)) errores.estado = 'panel.errores.estado';
   return errores;
 }
 

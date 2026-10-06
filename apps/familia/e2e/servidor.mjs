@@ -80,13 +80,17 @@ const TIPOS = {
 const VERCEL = join(dirname(fileURLToPath(import.meta.url)), '..', 'vercel.json');
 const CONFIG = JSON.parse(readFileSync(VERCEL, 'utf8'));
 
-/** `/(.*)` → /^\/.*$/. Un source que no se sepa traducir detiene el servidor. */
+/**
+ * `/(.*)` → /^\/.*$/, y desde la #37 PR 3 un parámetro con nombre
+ * (`/ajustes/:seccion` → /^\/ajustes\/(?<seccion>[^/]+)$/), que es como Vercel lo
+ * lee. Un source que no se sepa traducir detiene el servidor.
+ */
 const traducir = (source) => {
-  if (!/^\/(\(\.\*\)|[A-Za-z0-9/_-]*(\(\.\*\))?)$/.test(source)) {
+  if (!/^\/(\(\.\*\)|[A-Za-z0-9/_:-]*(\(\.\*\))?)$/.test(source)) {
     console.error(`servidor: no sé traducir el source ${source} de vercel.json.`);
     process.exit(1);
   }
-  return new RegExp(`^${source.replace(/\(\.\*\)/g, '.*')}$`);
+  return new RegExp(`^${source.replace(/\(\.\*\)/g, '.*').replace(/:([a-z]+)/g, '(?<$1>[^/]+)')}$`);
 };
 
 const REGLAS = (CONFIG.headers ?? [])
@@ -113,7 +117,7 @@ const REGLAS = (CONFIG.headers ?? [])
 const REWRITES = (CONFIG.rewrites ?? []).map((r) => ({ re: traducir(r.source), destination: r.destination }));
 
 /**
- * Las redirecciones del `vercel.json` (#34: `/mis-datos` → `/ajustes/perfil`),
+ * Las redirecciones del `vercel.json` (#34, y en la #37 PR 3 `/ajustes/:seccion` → `/ajustes?s=:seccion`),
  * leídas igual que los rewrites. Vercel las aplica **antes** que el sistema de
  * archivos y que los rewrites; `permanent: true` es un 308.
  */
@@ -130,7 +134,12 @@ createServer((req, res) => {
     /* Vercel pasa el query del pedido al destino de la redirección: `/entrar?ir=…`
        llega a `/login?ir=…` (#35). Acá, lo mismo. */
     const query = new URL(req.url, 'http://x').search;
-    res.writeHead(redireccion.estado, { Location: `${redireccion.destination}${query}`, ...cabecerasDe(pedido) });
+    /* El parámetro del source va al destino (`?s=:seccion`), y si el destino
+       ya trae un `?`, el del pedido se suma con `&`, como Vercel. */
+    const grupos = redireccion.re.exec(pedido)?.groups ?? {};
+    const destino = redireccion.destination.replace(/:([a-z]+)/g, (_, n) => grupos[n] ?? '');
+    const resto = query && destino.includes('?') ? `&${query.slice(1)}` : query;
+    res.writeHead(redireccion.estado, { Location: `${destino}${resto}`, ...cabecerasDe(pedido) });
     res.end();
     return;
   }
