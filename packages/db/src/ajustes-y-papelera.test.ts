@@ -5,7 +5,7 @@
  * Los perfiles de siempre: **Armando** (dueño), **Gabi** (equipo, México),
  * **Diana** (equipo, internacional), **Laura** (clienta, México) y **Pilar**
  * (clienta, España). Lo que se afirma es lo que dice la orden:
- *   · Ajustes e Inicio se guardan en la ficha de cada quien, y nada más;
+ *   · Inicio se guarda en la ficha de cada quien, y nada más;
  *   · borrar la cuenta anonimiza la ficha y conserva inscripciones y libro, y un
  *     dueño no se borra si es el único;
  *   · a la papelera va lo archivado o cerrado SIN inscripciones, con quién y
@@ -43,12 +43,12 @@ const papelera = (quien: string, aal: 'aal1' | 'aal2' = 'aal2') => banco.como(qu
     `select * from public.en_la_papelera()`));
 
 describe('el piso', () => {
-  it('EL PISO, PRIMERO: la 014 corrió — las cuatro columnas y las funciones', async () => {
-    const columnas = await banco.sql<{ column_name: string; column_default: string | null }>(
-      `select column_name, column_default from information_schema.columns
+  it('EL PISO, PRIMERO: la 014 corrió — las dos columnas y las funciones (y el tema no: es del aparato)', async () => {
+    const columnas = await banco.sql<{ column_name: string }>(
+      `select column_name from information_schema.columns
         where table_schema = 'public' and table_name = 'personas'
           and column_name in ('tema', 'tamano_texto', 'inicio', 'borrada_el') order by column_name`);
-    expect(columnas.map((c) => c.column_name)).toEqual(['borrada_el', 'inicio', 'tamano_texto', 'tema']);
+    expect(columnas.map((c) => c.column_name)).toEqual(['borrada_el', 'inicio']);
     const funciones = await banco.sql<{ proname: string }>(
       `select proname from pg_proc where pronamespace = 'public'::regnamespace
           and proname in ('borrar_mi_cuenta', 'en_la_papelera', 'restaurar_de_la_papelera', 'vaciar_la_papelera')
@@ -56,36 +56,35 @@ describe('el piso', () => {
     expect(funciones.map((f) => f.proname)).toEqual(['borrar_mi_cuenta', 'en_la_papelera', 'restaurar_de_la_papelera', 'vaciar_la_papelera']);
   });
 
-  it('nacen con lo de siempre: tema del sistema, texto normal, Inicio sin tocar', async () => {
+  it('nacen con Inicio sin tocar y sin borrar', async () => {
     const f = await ficha(s.pilar);
-    expect([f.tema, f.tamano_texto, f.inicio, f.borrada_el]).toEqual(['sistema', 'normal', null, null]);
+    expect([f.inicio, f.borrada_el]).toEqual([null, null]);
   });
 });
 
-describe('Ajustes e Inicio: cada quien guarda lo suyo', () => {
-  it('EL CASO: Laura guarda su tema, su tamaño y cómo acomodó su Inicio', async () => {
+describe('Inicio: cada quien guarda lo suyo', () => {
+  it('EL CASO: Laura guarda cómo acomodó su Inicio', async () => {
     await banco.como(s.laura, 'aal1', () => banco.sql(
-      `update public.personas set tema = 'oscuro', tamano_texto = 'grande', inicio = $2 where id = $1 returning id`,
+      `update public.personas set inicio = $2 where id = $1 returning id`,
       [s.laura, JSON.stringify({ orden: ['proximo', 'ayuda'] })]));
-    const f = await ficha(s.laura);
-    expect([f.tema, f.tamano_texto, f.inicio]).toEqual(['oscuro', 'grande', { orden: ['proximo', 'ayuda'] }]);
+    expect((await ficha(s.laura)).inicio).toEqual({ orden: ['proximo', 'ayuda'] });
   });
 
   it('nadie guarda lo de otra persona: Laura no toca a Pilar, ni el dueño a Laura', async () => {
+    const otro = JSON.stringify({ orden: ['ayuda'] });
     const r1 = await banco.como(s.laura, 'aal1', () => banco.sql(
-      `update public.personas set tema = 'claro' where id = $1 returning id`, [s.pilar]));
+      `update public.personas set inicio = $2 where id = $1 returning id`, [s.pilar, otro]));
     const r2 = await banco.como(s.armando, 'aal2', () => banco.sql(
-      `update public.personas set tema = 'claro' where id = $1 returning id`, [s.laura]));
+      `update public.personas set inicio = $2 where id = $1 returning id`, [s.laura, otro]));
     expect([r1.length, r2.length]).toEqual([0, 0]);
   });
 
-  it('LA MUTACIÓN: un tema, un tamaño o un Inicio con otra forma no entran', async () => {
-    const intentar = (cambio: string, valor: unknown) => reventar(() => banco.como(s.pilar, 'aal1', () => banco.sql(
-      `update public.personas set ${cambio} = $2 where id = $1`, [s.pilar, valor])));
-    expect(await intentar('tema', 'rosa')).toMatch(/check/i);
-    expect(await intentar('tamano_texto', 'enorme')).toMatch(/check/i);
-    expect(await intentar('inicio', JSON.stringify(['proximo']))).toMatch(/check/i);
-    expect(await intentar('inicio', JSON.stringify({ orden: ['x'.repeat(5000)] }))).toMatch(/check/i);
+  it('LA MUTACIÓN: un Inicio que no es un objeto, o de más de 4 KB, no entra', async () => {
+    const intentar = (valor: unknown) => reventar(() => banco.como(s.pilar, 'aal1', () => banco.sql(
+      `update public.personas set inicio = $2 where id = $1`, [s.pilar, valor])));
+    expect(await intentar(JSON.stringify(['proximo']))).toMatch(/check/i);
+    expect(await intentar(JSON.stringify('proximo'))).toMatch(/check/i);
+    expect(await intentar(JSON.stringify({ orden: ['x'.repeat(5000)] }))).toMatch(/check/i);
   });
 
   it('nadie se marca como borrada ni se cambia el correo por su cuenta', async () => {

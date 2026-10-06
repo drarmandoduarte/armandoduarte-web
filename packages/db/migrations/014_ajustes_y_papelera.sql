@@ -2,9 +2,11 @@
 -- 014 · ajustes y papelera: lo que guarda Ajustes, borrar la cuenta y la papelera
 --
 -- QUÉ TRAE, en tres partes:
---   1. **Ajustes e Inicio** (fase-2 §6 y §9 del molde): cuatro columnas en
---      `personas` —el tema, el tamaño del texto, cómo acomodó su Inicio y
---      cuándo borró su cuenta—. El idioma ya estaba (`personas.idioma`, 001).
+--   1. **Inicio y la cuenta borrada** (fase-2 §9 del molde y §6 de la orden):
+--      dos columnas en `personas` —cómo acomodó su Inicio y cuándo borró su
+--      cuenta—. El idioma ya estaba (`personas.idioma`, 001). El tema y el
+--      tamaño del texto NO van acá: el molde los define «en este aparato»
+--      (`settings.appearance.hint`), y viven en el navegador.
 --   2. **Borrar mi cuenta** (§6 de la orden: «borrar cuenta con palabra y
 --      código, obligatorio»): `borrar_mi_cuenta()`, que anonimiza la ficha y
 --      conserva inscripciones y libro, que son registros contables.
@@ -22,14 +24,11 @@
 -- llaman a las funciones de abajo. Migración corrida, mergeá.
 -- ===========================================================================
 
--- ── 1 · Ajustes e Inicio ───────────────────────────────────────────────────
--- Por persona y no por aparato: «Apariencia» e «Inicio» son de la persona, y
--- quien entra desde el teléfono y la computadora ve lo mismo en los dos.
+-- ── 1 · Inicio y la cuenta borrada ─────────────────────────────────────────
+-- Inicio es de la persona y no del aparato (fase-2 §9: «guarda la
+-- configuración de cada persona»): quien entra desde el teléfono y la
+-- computadora ve su Inicio acomodado igual en los dos.
 alter table public.personas
-  add column tema text not null default 'sistema'
-    check (tema in ('claro', 'oscuro', 'sistema')),
-  add column tamano_texto text not null default 'normal'
-    check (tamano_texto in ('normal', 'grande')),
   -- Cómo acomodó su Inicio: `{ orden: [...], tamanos: {...} }`. Nulo = lo que
   -- el molde propone para su rol (y lo que proponga mañana). La forma la vigila
   -- `sanear()` del molde al leerla; acá solo se pone un techo para que nadie
