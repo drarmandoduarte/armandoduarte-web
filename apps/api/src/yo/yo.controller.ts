@@ -72,6 +72,9 @@ export class YoController {
             nivel_educativo: persona.nivel_educativo,
             /* #34 B.3: Ajustes → Notificaciones. */
             avisos_por_correo: persona.avisos_por_correo,
+            /* #37 PR 3: Ajustes del molde (Idioma, 001) e Inicio (014). */
+            idioma: persona.idioma,
+            inicio: persona.inicio,
           }
         : null,
       rol,
@@ -96,7 +99,7 @@ export class YoController {
     if (typeof cuerpo.anio_nacimiento === 'number' && cuerpo.anio_nacimiento > new Date().getFullYear() - 14) {
       throw new BadRequestException({ message: 'El año no es válido.', code: 'NO_VALIDO' });
     }
-    const cambios: Record<string, string | number | boolean | null> = {};
+    const cambios: Record<string, string | number | boolean | Record<string, unknown> | null> = {};
     for (const campo of ['nombre', 'apellido', 'whatsapp', 'pais', 'ciudad', 'anio_nacimiento', 'nivel_educativo'] as const) {
       const valor = cuerpo[campo];
       if (valor === undefined) continue;
@@ -104,6 +107,12 @@ export class YoController {
     }
     /* #34 B.3: sí o no, nunca nulo (la 012 es `not null`). */
     if (typeof cuerpo.avisos_por_correo === 'boolean') cambios.avisos_por_correo = cuerpo.avisos_por_correo;
+    /* #37 PR 3: el idioma (no nulable) e Inicio, donde `null` es «como al
+       principio» (los defaults del rol). Tema y tamaño son del aparato. */
+    if (typeof cuerpo.idioma === 'string') cambios.idioma = cuerpo.idioma;
+    /* El objeto tal cual: PostgREST lo manda como `jsonb`. Un `JSON.stringify` acá lo guardaría como
+       texto, y el `check` de la 014 (`jsonb_typeof = 'object'`) lo rechazaría. */
+    if (cuerpo.inicio !== undefined) cambios.inicio = cuerpo.inicio;
     if (Object.keys(cambios).length > 0) {
       const { data, error } = await this.supabase.comoElUsuario(token)
         .from('personas').update(cambios).eq('id', usuario.id).select('id');

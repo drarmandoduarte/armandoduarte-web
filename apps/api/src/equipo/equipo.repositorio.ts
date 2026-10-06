@@ -170,6 +170,35 @@ export class EquipoRepositorio {
     if (error) throw this.traducir(error, 'sumar al equipo');
   }
 
+  /**
+   * El equipo, para la pantalla Equipo (#37 PR 3): `miembros` + el nombre y el
+   * correo de `personas`. Con el token del dueño: `miembros_dueno_lee` le deja
+   * ver todas las filas y su territorio `todos`, todas las personas.
+   */
+  async miembros(token: string): Promise<Array<{
+    id: string; nombre: string | null; apellido: string | null; email: string | null;
+    rol: string; territorio: string; activo: boolean;
+  }>> {
+    const cliente = this.supabase.comoElUsuario(token);
+    const { data, error } = await cliente.from('miembros').select('user_id, rol, territorio, activo');
+    if (error) throw this.traducir(error, 'leer el equipo');
+    const filas = (data ?? []) as Array<{ user_id: string; rol: string; territorio: string; activo: boolean }>;
+    /* Una lectura por persona: el equipo son tres o cuatro, y así cada una pasa
+       por la RLS de `personas` con su propio `eq` (sin un `in` que traiga de más). */
+    const salida = [];
+    for (const f of filas) {
+      const { data: p, error: alLeer } = await cliente
+        .from('personas').select('nombre, apellido, email').eq('id', f.user_id).maybeSingle();
+      if (alLeer) throw this.traducir(alLeer, 'leer el equipo');
+      const persona = p as { nombre: string | null; apellido: string | null; email: string | null } | null;
+      salida.push({
+        id: f.user_id, nombre: persona?.nombre ?? null, apellido: persona?.apellido ?? null, email: persona?.email ?? null,
+        rol: f.rol, territorio: f.territorio, activo: f.activo,
+      });
+    }
+    return salida;
+  }
+
   /** Quitar del equipo es desactivar: la fila se queda, con su historia (001). */
   async quitarDelEquipo(token: string, personaId: string): Promise<void> {
     const { data, error } = await this.supabase

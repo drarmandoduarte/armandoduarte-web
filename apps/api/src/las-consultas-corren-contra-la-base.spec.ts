@@ -79,6 +79,9 @@ import type { Correo, CorreoService } from './correo/correo.service';
 import { BACKUP_CODE_COUNT } from './acceso/nucleo/backup-codes';
 import { RescateController, hashDelToken } from './rescate/rescate.controller';
 import { RescateRepositorio } from './rescate/rescate.repositorio';
+import { CuentaController } from './cuenta/cuenta.controller';
+import { CuentaRepositorio, correoBorrado } from './cuenta/cuenta.repositorio';
+import { PapeleraController } from './papelera/papelera.controller';
 
 /* El constructor de `SupabaseService` exige la variable, y hace bien: es la
    regla de la orden #15 §B. Acá se le da una que no resuelve a ninguna parte,
@@ -258,9 +261,19 @@ function clienteSobreElBanco(ejecutar: Ejecutar, factores?: FactoresDeMentira): 
     /* #37 PR 2: los autenticadores viven en `auth.mfa_factors`, que el banco no
        tiene (es de Supabase Auth). El rescate solo los lista y los borra por la
        API de administración: acá, una lista en memoria por persona. */
-    auth: { admin: { mfa: {
+    auth: { admin: {
+      /* #37 PR 3 · borrar la cuenta: el correo de `auth.users` y las sesiones. Se anotan para afirmarlas. */
+      updateUserById: async (id: string, cambios: Record<string, unknown>) => {
+        llamadasDeAuth.push({ que: 'updateUserById', id, cambios });
+        return { data: { user: { id } }, error: null };
+      },
+      signOut: async (jwt: string, alcance: string) => {
+        llamadasDeAuth.push({ que: 'signOut', id: jwt, cambios: { alcance } });
+        return { data: null, error: null };
+      },
+      mfa: {
       listFactors: async ({ userId }: { userId: string }) =>
-        ({ data: { factors: (factores?.get(userId) ?? []).map((id) => ({ id, factor_type: 'totp' })) }, error: null }),
+        ({ data: { factors: (factores?.get(userId) ?? []).map((id) => ({ id, factor_type: 'totp', status: 'verified' })) }, error: null }),
       deleteFactor: async ({ id, userId }: { id: string; userId: string }) => {
         factores?.set(userId, (factores.get(userId) ?? []).filter((f) => f !== id));
         return { data: { id }, error: null };
@@ -364,6 +377,8 @@ class Llamada implements PromiseLike<Resultado> {
  */
 /** Los autenticadores de cada persona, para `auth.admin.mfa` (#37 PR 2). */
 type FactoresDeMentira = Map<string, string[]>;
+/** Lo que se le pidió a `auth.admin` fuera de `mfa` (#37 PR 3): no hay `auth.users` en el banco. */
+const llamadasDeAuth: Array<{ que: string; id: string; cambios: Record<string, unknown> }> = [];
 
 class ServicioContraElBanco extends SupabaseService {
   constructor(private readonly banco: Banco, private readonly aal: Aal, private readonly factores?: FactoresDeMentira) {
@@ -450,13 +465,13 @@ describe('SupabaseService, contra el esquema', () => {
     expect(await servicio().territorioDe(s.laura, s.laura)).toBeNull();
   });
 
-  it('personaDe: devuelve la fila propia con las diez columnas que la pantalla usa (#27 D suma tres, #34 una)', async () => {
+  it('personaDe: devuelve la fila propia con las doce columnas que la pantalla usa (#27 D suma tres, #34 una, #37 PR 3 dos)', async () => {
     const persona = await servicio().personaDe(s.laura, s.laura);
     expect(persona).toMatchObject({ id: s.laura, nombre: 'Laura', pais: 'MX' });
     /* Que las seis columnas existan es la mitad del punto: un `zona_horaria`
        mal escrito sería otro 42703 en la misma ruta. */
     expect(Object.keys(persona as object).sort()).toEqual(
-      ['anio_nacimiento', 'apellido', 'avisos_por_correo', 'ciudad', 'id', 'nivel_educativo', 'nombre', 'pais', 'whatsapp', 'zona_horaria']);
+      ['anio_nacimiento', 'apellido', 'avisos_por_correo', 'ciudad', 'id', 'idioma', 'inicio', 'nivel_educativo', 'nombre', 'pais', 'whatsapp', 'zona_horaria']);
     expect((persona as { avisos_por_correo: boolean }).avisos_por_correo, 'nace encendida (012)').toBe(true);
   });
 });
@@ -1044,5 +1059,126 @@ describe('el rescate solo, contra el esquema', () => {
     await expect(rescate().aplicar(pedidoDe(s.armando))).resolves.toEqual({ aplicado: false });
     expect(factores.get(s.pilar)).toEqual(['factor-pilar']);
     expect(factores.get(s.armando)).toEqual(['factor-armando']);
+  });
+});
+
+/* ── #37 PR 3 · Ajustes, borrar la cuenta, la papelera y el equipo ─────── */
+
+/** Un JWT de mentira con lo que la ruta lee del `amr` (la firma no se mira acá). */
+const jwt = (sub: string, aal: Aal, amr: Array<{ method: string; timestamp: number }>) => {
+  const b64 = (o: unknown) => Buffer.from(JSON.stringify(o)).toString('base64url');
+  return `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub, aal, amr })}.firma`;
+};
+const subDe = (token: string) => (JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString('utf8')) as { sub: string }).sub;
+const ahoraSeg = () => Math.floor(Date.now() / 1000);
+
+/** El servicio contra el banco, pero el token es un JWT: la persona sale de su `sub` (borrar la cuenta lee el `amr`). */
+class ServicioConJwt extends ServicioContraElBanco {
+  override async getUserFromToken(token: string | undefined): Promise<{ id: string }> {
+    if (!token) throw new UnauthorizedException('Falta el token de acceso.');
+    return { id: subDe(token) };
+  }
+  override comoElUsuario(token: string): SupabaseClient {
+    return super.comoElUsuario(token.includes('.') ? subDe(token) : token);
+  }
+}
+
+describe('Ajustes del molde en /api/yo, contra el esquema — orden #37 PR 3', () => {
+  it('EL CASO: Pilar guarda su idioma y cómo acomodó su Inicio, y GET /api/yo los devuelve', async () => {
+    const yo = new YoController(servicio(), new RescateRepositorio(servicio()));
+    await yo.guardar(pedidoDe(s.pilar), { idioma: 'pt', inicio: { orden: ['ayuda', 'proximo'] } });
+    const r = await yo.yo(pedidoDe(s.pilar));
+    expect(r.persona).toMatchObject({ idioma: 'pt', inicio: { orden: ['ayuda', 'proximo'] } });
+  });
+
+  it('Inicio en null es «como al principio»; un idioma que no existe no entra (NO_VALIDO)', async () => {
+    const yo = new YoController(servicio(), new RescateRepositorio(servicio()));
+    await yo.guardar(pedidoDe(s.pilar), { inicio: null });
+    expect((await yo.yo(pedidoDe(s.pilar))).persona?.inicio).toBeNull();
+    await expect(yo.guardar(pedidoDe(s.pilar), { idioma: 'fr' as never })).rejects.toMatchObject({ response: { code: 'NO_VALIDO' } });
+  });
+});
+
+describe('borrar la cuenta (/api/cuenta/borrar), contra el esquema — orden #37 PR 3', () => {
+  const factores: FactoresDeMentira = new Map();
+  const cuenta = (aal: Aal) => { const sv = new ServicioConJwt(banco, aal, factores); return new CuentaController(sv, new CuentaRepositorio(sv)); };
+  const sembrarClienta = async (correo: string, nombre: string) => {
+    const [u] = await banco.sql<{ id: string }>(`insert into auth.users (email) values ($1) returning id`, [correo]);
+    await banco.sql(`update public.personas set nombre = $2, apellido = 'Prueba', whatsapp = '+529990001122', pais = 'MX' where id = $1`, [u.id, nombre]);
+    return u.id;
+  };
+
+  it('EL PISO, PRIMERO: borrar_mi_cuenta() está en el banco', async () => {
+    const [f] = await banco.sql<{ n: number }>(`select count(*)::int as n from pg_proc where proname = 'borrar_mi_cuenta'`);
+    expect(f.n).toBe(1);
+  });
+
+  it('LA MUTACIÓN QUE SE FRENA: una clienta sin código reciente recibe 403 PASO_RECIENTE_REQUERIDO y no se borra nada', async () => {
+    const ana = await sembrarClienta('ana@ejemplo.mx', 'Ana');
+    const viejo = jwt(ana, 'aal1', [{ method: 'otp', timestamp: ahoraSeg() - 6 * 60 }]);
+    await expect(cuenta('aal1').borrar(pedidoDe(viejo))).rejects.toMatchObject({ response: { code: 'PASO_RECIENTE_REQUERIDO' } });
+    const [p] = await banco.sql<{ nombre: string; borrada_el: unknown }>(`select nombre, borrada_el from public.personas where id = $1`, [ana]);
+    expect(p).toEqual({ nombre: 'Ana', borrada_el: null });
+  });
+
+  it('EL CASO: una clienta sin autenticador, con el código del correo recién puesto → la ficha queda anónima y auth se cierra', async () => {
+    const eva = await sembrarClienta('eva@ejemplo.mx', 'Eva');
+    llamadasDeAuth.length = 0;
+    const token = jwt(eva, 'aal1', [{ method: 'otp', timestamp: ahoraSeg() - 30 }]);
+    await expect(cuenta('aal1').borrar(pedidoDe(token))).resolves.toEqual({ ok: true });
+    const [p] = await banco.sql<{ nombre: unknown; whatsapp: unknown; email: string; borrada_el: unknown }>(
+      `select nombre, whatsapp, email, borrada_el from public.personas where id = $1`, [eva]);
+    expect([p.nombre, p.whatsapp, p.email]).toEqual([null, null, correoBorrado(eva)]);
+    expect(p.borrada_el).not.toBeNull();
+    expect(llamadasDeAuth.map((l) => l.que)).toEqual(['updateUserById', 'signOut']);
+    expect(llamadasDeAuth[0]).toMatchObject({ id: eva, cambios: { email: correoBorrado(eva), ban_duration: '876000h' } });
+    expect(llamadasDeAuth[1].cambios).toEqual({ alcance: 'global' });
+  });
+
+  it('una clienta CON autenticador necesita el del autenticador: el código del correo no le alcanza', async () => {
+    const flor = await sembrarClienta('flor@ejemplo.mx', 'Flor');
+    factores.set(flor, ['factor-flor']);
+    const conCorreo = jwt(flor, 'aal2', [{ method: 'otp', timestamp: ahoraSeg() - 10 }, { method: 'totp', timestamp: ahoraSeg() - 3600 }]);
+    await expect(cuenta('aal2').borrar(pedidoDe(conCorreo))).rejects.toMatchObject({ response: { code: 'PASO_RECIENTE_REQUERIDO' } });
+    const conTotp = jwt(flor, 'aal2', [{ method: 'totp', timestamp: ahoraSeg() - 10 }]);
+    await expect(cuenta('aal2').borrar(pedidoDe(conTotp))).resolves.toEqual({ ok: true });
+    expect(factores.get(flor), 'sus autenticadores se borran').toEqual([]);
+  });
+
+  it('EL CASO DEL DUEÑO: Armando, único dueño activo → 409 UNICO_DUENO y su ficha sigue', async () => {
+    const token = jwt(s.armando, 'aal2', [{ method: 'totp', timestamp: ahoraSeg() - 10 }]);
+    await expect(cuenta('aal2').borrar(pedidoDe(token))).rejects.toMatchObject({ response: { code: 'UNICO_DUENO' } });
+    const [p] = await banco.sql<{ borrada_el: unknown }>(`select borrada_el from public.personas where id = $1`, [s.armando]);
+    expect(p.borrada_el).toBeNull();
+  });
+});
+
+describe('la papelera (/api/papelera) y el equipo (/api/equipo/miembros), contra el esquema — orden #37 PR 3', () => {
+  const papelera = (aal: Aal = 'aal2') => new PapeleraController(servicio(aal));
+  const equipo = (aal: Aal = 'aal2') => { const sv = servicio(aal); return new EquipoController(sv, new EquipoRepositorio(sv)); };
+
+  it('EL CASO: Gabi archiva un curso sin inscripciones → lo ve en la papelera, con ella como autora, y lo restaura', async () => {
+    const [c] = await banco.sql<{ id: string }>(
+      `insert into public.cursos (slug, titulo, modalidad, estado) values ('papelera-api', 'Taller de la papelera', 'presencial', 'publicado') returning id`);
+    await banco.como(s.gabi, 'aal2', () => banco.sql(`update public.cursos set estado = 'archivado' where id = $1`, [c.id]));
+    const { items } = await papelera().leer(pedidoDe(s.gabi));
+    expect(items.find((x) => x.id === c.id)).toMatchObject({ tipo: 'curso', nombre: 'Taller de la papelera', persona: 'Gabi' });
+    await expect(papelera().restaurar(pedidoDe(s.gabi), { tipo: 'curso', id: c.id })).resolves.toEqual({ ok: true });
+    const [d] = await banco.sql<{ estado: string }>(`select estado from public.cursos where id = $1`, [c.id]);
+    expect(d.estado).toBe('publicado');
+    await expect(papelera().restaurar(pedidoDe(s.gabi), { tipo: 'curso', id: c.id })).rejects.toMatchObject({ response: { code: 'NO_ESTA' } });
+  });
+
+  it('una clienta no entra: 403 SOLO_EQUIPO', async () => {
+    await expect(papelera('aal1').leer(pedidoDe(s.pilar))).rejects.toMatchObject({ response: { code: 'SOLO_EQUIPO' } });
+  });
+
+  it('Equipo: el dueño ve a los tres, con rol, territorio y correo; Gabi no (403 SOLO_DUENO)', async () => {
+    const { miembros } = await equipo().miembros(pedidoDe(s.armando));
+    const porId = new Map(miembros.map((m) => [m.id, m]));
+    expect(porId.get(s.armando)).toMatchObject({ rol: 'dueno', territorio: 'todos', activo: true, nombre: 'Armando' });
+    expect(porId.get(s.gabi)).toMatchObject({ rol: 'equipo', territorio: 'mexico', email: 'gabi@armandoduarte.com' });
+    expect(porId.has(s.diana)).toBe(true);
+    await expect(equipo().miembros(pedidoDe(s.gabi))).rejects.toMatchObject({ response: { code: 'SOLO_DUENO' } });
   });
 });

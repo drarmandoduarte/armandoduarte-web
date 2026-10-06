@@ -1,4 +1,4 @@
-import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsObject, IsOptional, IsString, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 
 /**
  * Lo que guarda «Tus datos» — orden #27 D.2.
@@ -41,4 +41,16 @@ export class PerfilDto {
   /** #34 B.3: Ajustes → Notificaciones. Sí o no; `null` no (la columna es `not null`). */
   @IsOptional() @IsBoolean()
   avisos_por_correo?: boolean;
+
+  /* #37 PR 3 · Ajustes del molde → Idioma, con el `check` de la 001. */
+  @IsOptional() @IsIn(['es', 'en', 'pt'])
+  idioma?: 'es' | 'en' | 'pt';
+
+  /**
+   * #37 PR 3 · cómo acomodó su Inicio: `{ orden, tamanos }`, o `null` = como al
+   * principio. La forma la vigila `sanear()` del molde al leerla; acá solo que
+   * sea un objeto, y la 014 le pone techo de tamaño.
+   */
+  @IsOptional() @ValidateIf(NULO_O) @IsObject()
+  inicio?: Record<string, unknown> | null;
 }
