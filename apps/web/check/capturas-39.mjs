@@ -8,6 +8,10 @@
  *
  * `#dolor` a 1440 y a 390, con todo revelado y sin movimiento. Mide además las
  * dos fotos (tienen que ser iguales) y el aire entre el texto y su foto.
+ *
+ * Desde el §3 (el gancho primero) saca también la página entera a los dos
+ * anchos y lista las secciones en el orden del DOM con su fondo, para revisar
+ * las uniones entre vecinas.
  */
 import { chromium } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
@@ -26,7 +30,7 @@ for (const ancho of [1440, 390]) {
   await QUIETAR(p);
   await p.evaluate(() => {
     document.querySelectorAll('.reveal').forEach((e) => e.classList.add('in'));
-    document.querySelectorAll('#dolor img').forEach((i) => { i.loading = 'eager'; });
+    document.querySelectorAll('main img').forEach((i) => { i.loading = 'eager'; });
   });
   await p.waitForLoadState('networkidle');
   await p.waitForTimeout(500);
@@ -36,9 +40,12 @@ for (const ancho of [1440, 390]) {
     return { seccion: r(document.querySelector('#dolor')), contenedor: r(document.querySelector('#dolor .container')), filas };
   });
   console.log(ancho, JSON.stringify(m));
+  const orden = await p.evaluate(() => [...document.querySelectorAll('main > section')].map((s) => `${s.id || s.className} ${getComputedStyle(s).backgroundColor}`));
+  console.log(ancho, orden.join(' → '));
   /* La cabecera es fija: en una captura de elemento quedaría flotando encima. */
   await p.evaluate(() => { document.getElementById('hd').style.visibility = 'hidden'; });
   await p.locator('#dolor').screenshot({ path: join(SALIDA, `dolor-${ancho}.jpg`), type: 'jpeg', quality: 86 });
+  await p.screenshot({ path: join(SALIDA, `matrimonios-${ancho}.jpg`), type: 'jpeg', quality: 80, fullPage: true });
   await p.close();
 }
 await navegador.close();

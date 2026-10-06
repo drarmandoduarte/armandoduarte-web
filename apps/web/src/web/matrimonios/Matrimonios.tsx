@@ -23,16 +23,23 @@ import { Cierre } from './Cierre';
  * Se reserva por WhatsApp (la bandera de Mi espacio sigue apagada): el número
  * de México en la cabecera, el menú, el pie y los botones principales; el de
  * otros países en «Desde otro país» del cierre.
+ *
+ * ── El gancho primero (orden #39, 3; pedido de Armando, D23) ─────────────
+ * Lo primero que se lee después del hero son las preguntas y el dolor; lo
+ * descriptivo va más abajo. La banda de hechos baja de debajo del hero a
+ * después del giro, antes de las fortalezas. Un solo orden en todos los anchos
+ * y en el DOM (sin `order` de CSS): el lector de pantalla lee lo mismo que el
+ * ojo. «Ver el programa ↓» sigue yendo a `#programa`.
  */
 export function Matrimonios() {
   const { t } = useTranslation();
   return (
     <Marco pagina="matrimonios" mensaje={t(CLAVE_MENSAJE_MATRIMONIOS)}>
       <Hero />
-      <Hechos />
       <Mirarse />
       <Dolor />
       <Giro />
+      <Hechos />
       <Fortalezas />
       <Frases />
       <Facilitador />
