@@ -114,7 +114,7 @@ la página usa, sin JPG de respaldo: WebP lo entiende todo navegador desde 2020.
 |---|---|---|
 | `dolor-cama-{2400,1600,900}` | fondo de «¿Hace cuánto tiempo dejaron de mirarse con ilusión?» | `5.jpg`, de Armando (con su autorización) |
 | `dolor-llanto-{1600,900}` | «El dolor de un matrimonio herido…», primer bloque | `2.jpg`, de Armando |
-| `dolor-hijo-{1600,900}` | «El dolor…», el párrafo de los hijos | `4.jpg`, de Armando |
+| `dolor-hijo-mirando-{2400,1600,900}` | «El dolor…», la segunda fila, espejo de la primera (#39; reemplaza a `dolor-hijo`, la vertical, que quedó de reserva en los insumos) | `3.jpg`, de Armando |
 | `giro-manos-{1600,900}` | «¡Todo problema tiene solución!» (B/N) | Pexels · joyboy |
 | `esperanza-manos-anillo-{1600,900}` | «Frases poderosas…», 1 | Pexels · monika |
 | `esperanza-familia-{1600,900}` | «Frases poderosas…», 2 | Pexels · danikprihodko 19510859 |
