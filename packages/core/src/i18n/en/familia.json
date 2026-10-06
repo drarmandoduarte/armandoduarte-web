@@ -43,5 +43,45 @@
         }
       }
     }
+  },
+  "miEspacio": {
+    "whatsappCampo": {
+      "pais": "Country of the number",
+      "paisElegido": "Country of the number: {{pais}} ({{prefijo}})",
+      "buscar": "Search your country",
+      "lista": "Countries",
+      "sinResultados": "We couldn’t find that country."
+    },
+    "errores": {
+      "nombre": "Write your first name.",
+      "apellido": "Write your last name.",
+      "whatsapp": "Write your WhatsApp.",
+      "whatsappPais": "That number doesn’t look like it’s from {{pais}}. Check that it’s complete.",
+      "largo": "It’s too long.",
+      "sinLugares": "There are no spots left in this workshop.",
+      "edicionCerrada": "This workshop no longer takes sign-ups."
+    },
+    "perfil": {
+      "errores": {
+        "pais": "Choose a country from the list.",
+        "anio": "Write the year with four digits (for example, 1984).",
+        "nivel": "Choose an option from the list."
+      }
+    },
+    "niveles": {
+      "primaria": "Primary school",
+      "secundaria": "Middle school",
+      "preparatoria": "High school",
+      "licenciatura": "Bachelor’s degree",
+      "posgrado": "Graduate degree",
+      "prefiero_no_decir": "Prefer not to say"
+    },
+    "estados": {
+      "pendiente_de_pago": "Your payment is missing",
+      "en_revision": "Receipt received, we’re reviewing it",
+      "confirmada": "Your spot is confirmed",
+      "anulada": "Cancelled",
+      "desconocido": "—"
+    }
   }
 }

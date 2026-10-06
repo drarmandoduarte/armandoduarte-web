@@ -19,6 +19,9 @@ import esWeb from './es/web.json';
 import esFamilia from './es/familia.json';
 import enFamilia from './en/familia.json';
 import ptFamilia from './pt/familia.json';
+import esMolde from './es/molde.json';
+import enMolde from './en/molde.json';
+import ptMolde from './pt/molde.json';
 
 /* ── en y pt, desde la #35, solo para el acceso ────────────────────────────
    El guion v1 del Kit 512 pide las pantallas de acceso en tres idiomas (§5).
@@ -33,3 +36,13 @@ export const RECURSOS_I18N = {
   en: { familia: enFamilia },
   pt: { familia: ptFamilia },
 } as const;
+
+/* ── Los textos de Mi espacio en las pantallas del molde (#37, PR 3) ──────
+   Ajustes, Inicio, el shell, el Centro de alertas, la Papelera, Equipo y la
+   Bienvenida van en los tres idiomas (fase-2 §5). Sus textos propios están en
+   `molde.json`, **planos y con la sintaxis del molde** (`{x}`, `{n|uno|varios}`,
+   la palabra acentuada entre asteriscos), porque los lee el `t` del molde
+   (`crearT`, como `extras`) y no i18next. Algunos pisan un texto del molde
+   que en Mi espacio diría algo que no pasa (están al final del archivo y en el
+   informe). `check-i18n-parity` los compara enteros en los tres idiomas. */
+export const TEXTOS_DEL_MOLDE = { es: esMolde, en: enMolde, pt: ptMolde } as const;

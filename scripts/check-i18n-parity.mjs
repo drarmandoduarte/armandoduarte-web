@@ -57,8 +57,25 @@ const PISO_DE_CLAVES = 299;
    en los tres idiomas) y las 57 copias de la #35 se borraron. Quedan los de Mi
    espacio que el molde no tiene: el rescate solo (pantallas y correos, 18), el
    error genérico y el de un código de respaldo que no sirve. */
-const PARCIALES = { en: { familia: 'auth.' }, pt: { familia: 'auth.' } };
+/* ── Y desde la #37 (PR 3), las pantallas del molde ──────────────────────
+   Ajustes, Inicio, el shell, el Centro de alertas, la Papelera, Equipo y la
+   Bienvenida van en los tres idiomas (fase-2 §5). Sus textos nuevos están en
+   `molde.json` —con la sintaxis del molde (`{x}`)— y se comparan **enteros**
+   (prefijo vacío). De `familia.json` entran, además de `auth.*`, los textos que
+   ya existían y que esas pantallas reusan: el campo de WhatsApp de la #32, los
+   errores de los datos, los niveles educativos y el estado de una inscripción.
+   Lo demás de `familia` (los talleres, el panel) sigue en español: lo declara
+   el informe. El piso parcial sigue mirando `auth.*`. */
+const PREFIJOS_DE_FAMILIA = [
+  'auth.', 'miEspacio.whatsappCampo.', 'miEspacio.errores.', 'miEspacio.perfil.errores.', 'miEspacio.niveles.', 'miEspacio.estados.',
+];
+const PARCIALES = {
+  en: { familia: PREFIJOS_DE_FAMILIA, molde: [''] },
+  pt: { familia: PREFIJOS_DE_FAMILIA, molde: [''] },
+};
 const PISO_PARCIAL = 21;
+/* Y un piso para `molde.json`: hoy son 113 claves. Si un archivo se vacía, rojo. */
+const PISO_DEL_MOLDE = 113;
 
 const destinos = readdirSync(LOCALES).filter(
   (e) => e !== FUENTE && !e.startsWith('.') && statSync(join(LOCALES, e)).isDirectory(),
@@ -122,13 +139,16 @@ for (const destino of destinos) {
   for (const ns of soloEn(new Set(nsDestino), new Set(esperados))) problemas.push(`sobra ${destino}/${ns}.json (no corresponde a ${destino})`);
 
   for (const ns of esperados.filter((n) => nsDestino.includes(n))) {
-    const prefijo = parcial?.[ns];
-    const a = planoFuente[ns] && prefijo
-      ? Object.fromEntries(Object.entries(planoFuente[ns]).filter(([k]) => k.startsWith(prefijo)))
-      : planoFuente[ns];
+    const prefijos = parcial?.[ns];
+    const entra = (k) => !prefijos || prefijos.some((p) => k.startsWith(p));
+    const a = planoFuente[ns] ? Object.fromEntries(Object.entries(planoFuente[ns]).filter(([k]) => entra(k))) : undefined;
     if (!a) continue;
-    if (prefijo && Object.keys(a).length < PISO_PARCIAL) {
-      problemas.push(`${FUENTE}·${ns} tiene ${Object.keys(a).length} claves «${prefijo}*» y el piso es ${PISO_PARCIAL}`);
+    const deAuth = Object.keys(a).filter((k) => k.startsWith('auth.')).length;
+    if (prefijos?.includes('auth.') && deAuth < PISO_PARCIAL) {
+      problemas.push(`${FUENTE}·${ns} tiene ${deAuth} claves «auth.*» y el piso es ${PISO_PARCIAL}`);
+    }
+    if (ns === 'molde' && Object.keys(a).length < PISO_DEL_MOLDE) {
+      problemas.push(`${FUENTE}·molde tiene ${Object.keys(a).length} claves y el piso es ${PISO_DEL_MOLDE}`);
     }
     let b;
     try { b = aplanar(cargar(destino, ns)); } catch (err) {
