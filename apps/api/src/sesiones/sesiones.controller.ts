@@ -1,7 +1,7 @@
 import { Controller, Post, Req } from '@nestjs/common';
 import { SupabaseService } from '../identidad/supabase.service';
 import { tokenDelPedido } from '../identidad/token';
-import { usuarioDelPedido } from '../seguridad-512/nucleo/usuario-del-pedido';
+import { usuarioDelPedido } from '../acceso/nucleo/usuario-del-pedido';
 
 /**
  * Cerrar las otras sesiones.

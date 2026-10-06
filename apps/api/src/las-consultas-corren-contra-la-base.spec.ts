@@ -76,7 +76,9 @@ import { TalleresRepositorio } from './talleres/talleres.repositorio';
 import { PagosController } from './pagos/pagos.controller';
 import { PagosRepositorio } from './pagos/pagos.repositorio';
 import type { Correo, CorreoService } from './correo/correo.service';
-import { BACKUP_CODE_COUNT } from './seguridad-512/nucleo/backup-codes';
+import { BACKUP_CODE_COUNT } from './acceso/nucleo/backup-codes';
+import { RescateController, hashDelToken } from './rescate/rescate.controller';
+import { RescateRepositorio } from './rescate/rescate.repositorio';
 
 /* El constructor de `SupabaseService` exige la variable, y hace bien: es la
    regla de la orden #15 §B. Acá se le da una que no resuelve a ninguna parte,
@@ -111,6 +113,7 @@ class Consulta implements PromiseLike<Resultado> {
   private cambios: Record<string, unknown> = {};
   private devolver: string | null = null;
   private una = false;
+  private exacta = false;
 
   constructor(private readonly ejecutar: Ejecutar, private readonly tabla: string) {}
 
@@ -160,6 +163,13 @@ class Consulta implements PromiseLike<Resultado> {
     return this;
   }
 
+  /** Como `maybeSingle`, pero cero filas es un error (`PGRST116`), igual que en PostgREST. #37 PR 2. */
+  single(): this {
+    this.una = true;
+    this.exacta = true;
+    return this;
+  }
+
   /** El SQL y sus parámetros, en el orden en que Postgres los espera. */
   private armar(): { sql: string; params: unknown[] } {
     const params: unknown[] = [];
@@ -180,7 +190,9 @@ class Consulta implements PromiseLike<Resultado> {
       const valores = this.filas
         .map((fila) => `(${columnas.map((c) => marcador(fila[c])).join(', ')})`)
         .join(', ');
-      return { sql: `insert into ${tabla} (${columnas.join(', ')}) values ${valores}`, params };
+      /* El `.select()` después de un `insert` también es un `returning` (#37 PR 2). */
+      const returning = this.devolver ? ` returning ${this.devolver}` : '';
+      return { sql: `insert into ${tabla} (${columnas.join(', ')}) values ${valores}${returning}`, params };
     }
 
     if (this.verbo === 'update') {
@@ -220,8 +232,8 @@ class Consulta implements PromiseLike<Resultado> {
     if (this.soloLaCuenta) return { data: null, error: null, count: Number(filas[0]?.cuenta ?? 0) };
 
     if (this.una) {
-      if (filas.length > 1) {
-        return { data: null, error: { code: 'PGRST116', message: 'más de una fila' }, count: null };
+      if (filas.length > 1 || (this.exacta && filas.length === 0)) {
+        return { data: null, error: { code: 'PGRST116', message: filas.length ? 'más de una fila' : 'ninguna fila' }, count: null };
       }
       return { data: filas[0] ?? null, error: null, count: null };
     }
@@ -240,9 +252,20 @@ class Consulta implements PromiseLike<Resultado> {
  * cast está acá, en un solo lugar y en un archivo de test, y no en el código que
  * se despliega.
  */
-function clienteSobreElBanco(ejecutar: Ejecutar): SupabaseClient {
+function clienteSobreElBanco(ejecutar: Ejecutar, factores?: FactoresDeMentira): SupabaseClient {
   return {
     from: (tabla: string) => new Consulta(ejecutar, tabla),
+    /* #37 PR 2: los autenticadores viven en `auth.mfa_factors`, que el banco no
+       tiene (es de Supabase Auth). El rescate solo los lista y los borra por la
+       API de administración: acá, una lista en memoria por persona. */
+    auth: { admin: { mfa: {
+      listFactors: async ({ userId }: { userId: string }) =>
+        ({ data: { factors: (factores?.get(userId) ?? []).map((id) => ({ id, factor_type: 'totp' })) }, error: null }),
+      deleteFactor: async ({ id, userId }: { id: string; userId: string }) => {
+        factores?.set(userId, (factores.get(userId) ?? []).filter((f) => f !== id));
+        return { data: { id }, error: null };
+      },
+    } } },
     rpc: (funcion: string, argumentos?: Record<string, unknown>) => new Llamada(ejecutar, funcion, argumentos ?? {}),
     storage: { from: (bucket: string) => almacenSobreElBanco(ejecutar, bucket) },
   } as unknown as SupabaseClient;
@@ -339,8 +362,11 @@ class Llamada implements PromiseLike<Resultado> {
  * El token acá **es** el id de la persona. No se valida nada: de eso se ocupa
  * el otro archivo.
  */
+/** Los autenticadores de cada persona, para `auth.admin.mfa` (#37 PR 2). */
+type FactoresDeMentira = Map<string, string[]>;
+
 class ServicioContraElBanco extends SupabaseService {
-  constructor(private readonly banco: Banco, private readonly aal: Aal) {
+  constructor(private readonly banco: Banco, private readonly aal: Aal, private readonly factores?: FactoresDeMentira) {
     super();
   }
 
@@ -359,7 +385,7 @@ class ServicioContraElBanco extends SupabaseService {
 
   override comoElServicio(): SupabaseClient {
     return clienteSobreElBanco((sql, params) =>
-      this.banco.comoServicio(() => this.banco.sql(sql, params)));
+      this.banco.comoServicio(() => this.banco.sql(sql, params)), this.factores);
   }
 }
 
@@ -788,7 +814,7 @@ describe('PagosController (/api/pagos), contra el esquema — orden #27 C', () =
     await banco.sql(`update public.personas set nombre = 'Mara', pais = 'MX' where id = $1`, [u.id]);
     const [i] = await banco.sql<{ id: string }>(
       `insert into public.inscripciones (edicion_id, persona_id) values ($1, $2) returning id`, [s.edicionAbierta, u.id]);
-    await new YoController(servicio('aal1')).guardar(pedidoDe(u.id), { avisos_por_correo: false });
+    await new YoController(servicio('aal1'), new RescateRepositorio(servicio('aal1'))).guardar(pedidoDe(u.id), { avisos_por_correo: false });
     await pagos('aal1').declarar(pedidoDe(u.id), declaracion(i.id, await subir(u.id, i.id)));
     const antes = correos.length;
     await expect(pagos('aal2').resolver(pedidoDe(s.gabi), { inscripcion_id: i.id, tipo: 'confirmado' }))
@@ -843,7 +869,7 @@ describe('El perfil y las notas (/api/yo, /api/equipo/clientes/:id), contra el e
   });
 
   it('POST /api/yo guarda el perfil con el token de la persona, y GET /api/yo lo devuelve', async () => {
-    const yo = new YoController(servicio('aal1'));
+    const yo = new YoController(servicio('aal1'), new RescateRepositorio(servicio('aal1')));
     await expect(yo.guardar(pedidoDe(nora), { ciudad: ' Mérida ', anio_nacimiento: 1984, nivel_educativo: 'posgrado', pais: 'MX' }))
       .resolves.toEqual({ ok: true });
     const { persona } = await yo.yo(pedidoDe(nora)) as { persona: Record<string, unknown> };
@@ -851,7 +877,7 @@ describe('El perfil y las notas (/api/yo, /api/equipo/clientes/:id), contra el e
   });
 
   it('#34 · POST /api/yo apaga y prende los avisos por correo, y GET /api/yo lo devuelve', async () => {
-    const yo = new YoController(servicio('aal1'));
+    const yo = new YoController(servicio('aal1'), new RescateRepositorio(servicio('aal1')));
     await expect(yo.guardar(pedidoDe(nora), { avisos_por_correo: false })).resolves.toEqual({ ok: true });
     const leer = async () => ((await yo.yo(pedidoDe(nora))) as { persona: { avisos_por_correo: boolean } }).persona.avisos_por_correo;
     expect(await leer()).toBe(false);
@@ -860,7 +886,7 @@ describe('El perfil y las notas (/api/yo, /api/equipo/clientes/:id), contra el e
   });
 
   it('null borra un dato; un año de hace menos de 14 o un nivel inventado no entran', async () => {
-    const yo = new YoController(servicio('aal1'));
+    const yo = new YoController(servicio('aal1'), new RescateRepositorio(servicio('aal1')));
     await yo.guardar(pedidoDe(nora), { nivel_educativo: null });
     const [f] = await banco.sql<{ nivel_educativo: string | null }>(`select nivel_educativo from public.personas where id = $1`, [nora]);
     expect(f.nivel_educativo).toBeNull();
@@ -887,5 +913,136 @@ describe('El perfil y las notas (/api/yo, /api/equipo/clientes/:id), contra el e
   it('Clientes trae ciudad, año, nivel y cuántas notas', async () => {
     const { clientes } = await panel().clientes(pedidoDe(s.gabi)) as { clientes: Record<string, unknown>[] };
     expect(clientes.find((c) => c.persona_id === nora)).toMatchObject({ ciudad: 'Mérida', anio_nacimiento: 1984, cuantas_notas: 1 });
+  });
+});
+
+/* ── El rescate solo (orden #37, PR 2 · fase-2 §8) ──────────────────────────
+   La prueba obligatoria de la orden, contra el esquema de verdad (013) y con
+   Resend simulado: el pedido crea el registro con `vence_el` a 48 h y manda los
+   dos correos; confirmar y cancelar piden el token del enlace; a las 48 h,
+   aplicar borra el autenticador y los códigos; y nada de esto sirve para tocar
+   el autenticador de otra persona. */
+describe('el rescate solo, contra el esquema', () => {
+  const correos: Correo[] = [];
+  const correoDeMentira = { enviar: async (c: Correo) => { correos.push(c); return true; } } as unknown as CorreoService;
+  const factores: FactoresDeMentira = new Map();
+  const conFactores = (aal: Aal = 'aal1') => new ServicioContraElBanco(banco, aal, factores);
+  const rescate = () => { const sv = conFactores(); return new RescateController(sv, new RescateRepositorio(sv), correoDeMentira); };
+  const filaDe = async (persona: string) => (await banco.sql<{
+    id: string; pedido_el: Date; vence_el: Date; confirmado_el: Date | null; cancelado_el: Date | null; usado_el: Date | null; token_hash: string;
+  }>(`select * from public.rescates where user_id = $1 and cancelado_el is null and usado_el is null`, [persona]))[0];
+  const tokenDe = (c: Correo) => new URL(c.texto.match(/https:\/\/\S+/)?.[0] ?? 'https://x.invalid').searchParams.get('t') ?? '';
+
+  it('EL PISO, PRIMERO: la 013 está en el banco', async () => {
+    const [t] = await banco.sql<{ n: number }>(
+      `select count(*)::int as n from information_schema.tables where table_schema = 'public' and table_name = 'rescates'`);
+    expect(t.n).toBe(1);
+  });
+
+  it('EL CASO: Gabi (equipo, con autenticador) pide el reseteo → registro a 48 h y los DOS correos', async () => {
+    factores.set(s.gabi, ['factor-gabi']);
+    const [p] = await banco.sql<{ email: string }>(`select email from public.personas where id = $1`, [s.gabi]);
+    /* En mayúsculas a propósito: la persona lo escribe como le sale, y `personas.email` está en minúsculas. */
+    const r = await rescate().pedir({ correo: p.email.toUpperCase(), idioma: 'es' });
+    const fila = await filaDe(s.gabi);
+    expect(fila, 'no se creó el registro').toBeDefined();
+    expect(new Date(fila.vence_el).getTime() - new Date(fila.pedido_el).getTime()).toBe(48 * 60 * 60 * 1000);
+    expect(r.vence).toBe(new Date(fila.vence_el).toISOString());
+    expect([fila.confirmado_el, fila.cancelado_el, fila.usado_el]).toEqual([null, null, null]);
+    const dos = correos.slice(-2);
+    expect(dos.map((c) => c.asunto)).toEqual(['Confirma el reseteo de tu autenticador', 'Aviso: se pidió resetear tu autenticador']);
+    expect(dos[0].texto).toMatch(/\/rescate\?r=[0-9a-f-]{36}&t=[A-Za-z0-9_-]{43}&a=confirmar/);
+    expect(dos[1].texto).toMatch(/&a=cancelar/);
+    /* En la base, el hash del token del enlace; nunca el token. */
+    expect(fila.token_hash).toBe(hashDelToken(tokenDe(dos[0])));
+    expect(fila.token_hash).not.toContain(tokenDe(dos[0]));
+  });
+
+  it('pedir de nuevo con uno abierto: el mismo vencimiento y ningún correo más', async () => {
+    const [p] = await banco.sql<{ email: string }>(`select email from public.personas where id = $1`, [s.gabi]);
+    const antes = correos.length;
+    const vence = new Date((await filaDe(s.gabi)).vence_el).toISOString();
+    await expect(rescate().pedir({ correo: p.email })).resolves.toEqual({ vence });
+    expect(correos.length).toBe(antes);
+  });
+
+  it('un correo sin cuenta, o una cuenta sin autenticador: la misma respuesta, sin fila ni correo', async () => {
+    const antes = correos.length;
+    const r1 = await rescate().pedir({ correo: 'nadie@ejemplo.mx' });
+    const [p] = await banco.sql<{ email: string }>(`select email from public.personas where id = $1`, [s.laura]);
+    const r2 = await rescate().pedir({ correo: p.email });
+    for (const r of [r1, r2]) expect(new Date(r.vence).getTime() - Date.now()).toBeGreaterThan(47.9 * 60 * 60 * 1000);
+    expect(await filaDe(s.laura)).toBeUndefined();
+    expect(correos.length).toBe(antes);
+  });
+
+  it('confirmar con un token que no es el del enlace: 400, y no confirma', async () => {
+    const fila = await filaDe(s.gabi);
+    await expect(rescate().confirmar({ id: fila.id, token: 'x'.repeat(43) })).rejects.toThrow(/ya no es válido/);
+    expect((await filaDe(s.gabi)).confirmado_el).toBeNull();
+  });
+
+  it('antes de las 48 h, aplicar no hace nada aunque esté confirmado', async () => {
+    const fila = await filaDe(s.gabi);
+    const token = tokenDe(correos.find((c) => c.asunto.startsWith('Confirma'))!);
+    await rescate().confirmar({ id: fila.id, token });
+    expect((await filaDe(s.gabi)).confirmado_el).not.toBeNull();
+    await expect(rescate().aplicar(pedidoDe(s.gabi))).resolves.toEqual({ aplicado: false });
+    expect(factores.get(s.gabi)).toEqual(['factor-gabi']);
+  });
+
+  it('GET /api/yo dice «Reseteo pendiente» a la persona, confirmado y con su vencimiento', async () => {
+    const yo = new YoController(conFactores('aal2'), new RescateRepositorio(conFactores('aal2')));
+    const { reseteoPendiente } = await yo.yo(pedidoDe(s.gabi)) as { reseteoPendiente: { vence: string; confirmado: boolean } | null };
+    expect(reseteoPendiente).toEqual({ vence: new Date((await filaDe(s.gabi)).vence_el).toISOString(), confirmado: true });
+  });
+
+  it('a las 48 h: aplicar borra el autenticador y los códigos de respaldo, y cierra el rescate como usado', async () => {
+    /* Las 48 h, sin esperar 48 h: se corre el reloj de la fila. La 013 no deja
+       mover `vence_el` sola (es la regla), así que se corren las dos fechas
+       juntas, por fuera del trigger, como superusuario: es preparar el caso. */
+    const fila = await filaDe(s.gabi);
+    await banco.sql(`alter table public.rescates disable trigger rescates_solo_se_cierran`);
+    await banco.sql(`update public.rescates set pedido_el = pedido_el - interval '49 hours', vence_el = vence_el - interval '49 hours' where id = $1`, [fila.id]);
+    await banco.sql(`alter table public.rescates enable trigger rescates_solo_se_cierran`);
+    await banco.sql(`insert into public.totp_backup_codes (user_id, code_hash) values ($1, 'x'), ($1, 'y')`, [s.gabi]);
+
+    await expect(rescate().aplicar(pedidoDe(s.gabi))).resolves.toEqual({ aplicado: true });
+    expect(factores.get(s.gabi), 'el autenticador viejo deja de valer').toEqual([]);
+    const [c] = await banco.sql<{ n: number }>(`select count(*)::int as n from public.totp_backup_codes where user_id = $1`, [s.gabi]);
+    expect(c.n, 'y sus códigos de respaldo también').toBe(0);
+    const [cerrado] = await banco.sql<{ usado_el: Date | null }>(`select usado_el from public.rescates where id = $1`, [fila.id]);
+    expect(cerrado.usado_el).not.toBeNull();
+    /* Usado, ya no aplica dos veces. */
+    await expect(rescate().aplicar(pedidoDe(s.gabi))).resolves.toEqual({ aplicado: false });
+  });
+
+  it('cancelar desde el enlace del aviso: el rescate se cierra y aplicar no toca nada', async () => {
+    factores.set(s.diana, ['factor-diana']);
+    const [p] = await banco.sql<{ email: string }>(`select email from public.personas where id = $1`, [s.diana]);
+    await rescate().pedir({ correo: p.email, idioma: 'en' });
+    const aviso = correos.at(-1)!;
+    expect(aviso.asunto, 'el aviso sale en el idioma de la pantalla').toBe('Notice: a reset of your authenticator was requested');
+    const fila = await filaDe(s.diana);
+    await expect(rescate().cancelar({ id: fila.id, token: tokenDe(aviso) })).resolves.toEqual({ ok: true });
+    expect(await filaDe(s.diana), 'cancelado, ya no está abierto').toBeUndefined();
+    await expect(rescate().aplicar(pedidoDe(s.diana))).resolves.toEqual({ aplicado: false });
+    expect(factores.get(s.diana)).toEqual(['factor-diana']);
+  });
+
+  it('nadie resetea a otra persona: aplicar con la sesión de Armando no toca el rescate listo de otra', async () => {
+    factores.set(s.pilar, ['factor-pilar']);
+    factores.set(s.armando, ['factor-armando']);
+    const [p] = await banco.sql<{ email: string }>(`select email from public.personas where id = $1`, [s.pilar]);
+    await rescate().pedir({ correo: p.email });
+    const fila = await filaDe(s.pilar);
+    await rescate().confirmar({ id: fila.id, token: tokenDe(correos.find((c) => c.asunto.startsWith('Confirma') && c.para === p.email)!) });
+    await banco.sql(`alter table public.rescates disable trigger rescates_solo_se_cierran`);
+    await banco.sql(`update public.rescates set pedido_el = pedido_el - interval '49 hours', vence_el = vence_el - interval '49 hours' where id = $1`, [fila.id]);
+    await banco.sql(`alter table public.rescates enable trigger rescates_solo_se_cierran`);
+    /* El dueño entra y llama a aplicar: actúa sobre SU cuenta (no tiene rescate), nunca sobre la de Pilar. */
+    await expect(rescate().aplicar(pedidoDe(s.armando))).resolves.toEqual({ aplicado: false });
+    expect(factores.get(s.pilar)).toEqual(['factor-pilar']);
+    expect(factores.get(s.armando)).toEqual(['factor-armando']);
   });
 });

@@ -31,22 +31,27 @@ describe('partirTituloDeAcceso (§2)', () => {
   it('sin asteriscos, entero', () => {
     expect(partirTituloDeAcceso('Hola')).toEqual({ antes: 'Hola', palabra: null, despues: '' });
   });
-  it('todos los títulos del guion, en los tres idiomas, tienen su palabra acentuada', () => {
+  it('todos los títulos propios de Mi espacio (el rescate, #37 PR 2), en los tres idiomas, tienen su palabra acentuada', () => {
+    /* Los del guion los trae el molde desde la #37 (`@moldes/idiomas`) y los
+       cuida su propio test. Acá quedan los que agrega Mi espacio. */
+    const aplanar = (o: Record<string, unknown>, p = ''): [string, string][] => Object.entries(o).flatMap(([k, v]) =>
+      typeof v === 'string' ? [[`${p}${k}`, v] as [string, string]] : aplanar(v as Record<string, unknown>, `${p}${k}.`));
     for (const idioma of ['es', 'en', 'pt'] as const) {
-      const auth = RECURSOS_I18N[idioma].familia.auth as Record<string, Record<string, string>>;
-      const titulos = Object.entries(auth).flatMap(([k, v]) => (typeof v === 'object' ? Object.entries(v).filter(([c]) => c === 'title' || c === 'waitTitle').map(([c, t]) => [`${k}.${c}`, t]) : []));
-      expect(titulos.length, `${idioma}: el barrido vio los títulos`).toBeGreaterThanOrEqual(11);
+      const titulos = aplanar(RECURSOS_I18N[idioma].familia.auth as Record<string, unknown>).filter(([k]) => /(^|\.)(title|waitTitle)$/.test(k));
+      expect(titulos.length, `${idioma}: el barrido vio los títulos`).toBeGreaterThanOrEqual(6);
       for (const [clave, titulo] of titulos) expect(partirTituloDeAcceso(titulo).palabra, `${idioma} ${clave}`).not.toBeNull();
     }
   });
 });
 
-describe('los textos del guion, en español neutro (§5, D6)', () => {
-  it('los cuatro cambios permitidos están hechos (que no quede voseo lo mira `check:tuteo`, que barre este JSON)', () => {
+describe('los textos del acceso, en español neutro (§5, D6)', () => {
+  it('los de Mi espacio tutean (que no quede voseo lo mira `check:tuteo`, que barre este JSON); los del guion son del molde', () => {
     const es = JSON.stringify(RECURSOS_I18N.es.familia.auth);
-    expect(es).toContain('Si pierdes el teléfono');
-    expect(es).toContain('Pide un *reseteo*.');
-    expect(es).toContain('Confirma que eres *tú*.');
-    expect(es).toContain('Entra de nuevo y listo.');
+    expect(es).toContain('Si lo pediste tú, confírmalo.');
+    expect(es).toContain('Si no lo pediste tú, cancélalo');
+    /* Los cuatro cambios de la #35 («Si pierdes el teléfono», «Pide un
+       *reseteo*.», «Confirma que eres *tú*.», «Entra de nuevo y listo.») viven
+       desde la #37 en `packages/moldes/idiomas/es.json`, que la app no edita. */
+    expect(es).not.toContain('Pide un *reseteo*.');
   });
 });

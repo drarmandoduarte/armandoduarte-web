@@ -13,8 +13,7 @@ import { arrancarElMolde } from './molde/arranque';
    antes de que las variables existan. */
 import '@codice/ui/styles.css';
 import './estilos.css';
-/* #35: las pantallas de acceso del guion v1 del Kit 512, vestidas con el design.json. */
-import './acceso/design.css';
+/* #37 PR 2: el marco de las pantallas de acceso (las piezas son del molde). */
 import './acceso/acceso.css';
 import { App } from './App';
 

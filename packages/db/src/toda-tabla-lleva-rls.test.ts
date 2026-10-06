@@ -14,10 +14,10 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { levantarBanco, migracionesEnOrden, type Banco } from './banco';
 
-/** Las diez tablas que la orden #13 deja. El número es medido, no estimado. */
+/** Las diez tablas que la orden #13 deja, las notas de la #27 D y los rescates de la #37 (PR 2). Medido, no estimado. */
 const TABLAS_ESPERADAS = [
   'auditoria', 'cursos', 'datos_de_cobro', 'ediciones', 'inscripciones',
-  'miembros', 'notas_de_persona', 'pagos_libro', 'personas', 'security_devices', 'totp_backup_codes',
+  'miembros', 'notas_de_persona', 'pagos_libro', 'personas', 'rescates', 'security_devices', 'totp_backup_codes',
 ];
 
 let banco: Banco;
@@ -88,10 +88,13 @@ const PENDIENTES: Record<string, string> = {
   '012_avisos_por_correo.sql':
     'orden #34 B.3: personas.avisos_por_correo. La corre el CEO ANTES del merge de la #34: sin ella, '
     + 'GET /api/yo da 42703 y nadie entra a Mi espacio',
+  '013_rescates.sql':
+    'orden #37 PR 2 (rescate solo): la tabla rescates. La corre el CEO ANTES del merge del PR 2: sin ella, '
+    + 'pedir, confirmar, cancelar y aplicar el reseteo fallan (y «Reseteo pendiente» no aparece)',
 };
 
 describe('las migraciones', () => {
-  it('son doce, numeradas de tres dígitos y en orden', async () => {
+  it('son trece, numeradas de tres dígitos y en orden', async () => {
     expect(migracionesEnOrden()).toEqual([
       '001_personas_y_miembros.sql',
       '002_cursos_y_ediciones.sql',
@@ -105,6 +108,7 @@ describe('las migraciones', () => {
       '010_el_libro_en_el_panel.sql',
       '011_el_perfil.sql',
       '012_avisos_por_correo.sql',
+      '013_rescates.sql',
     ]);
   });
 

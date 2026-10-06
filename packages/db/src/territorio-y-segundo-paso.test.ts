@@ -1,5 +1,5 @@
 /**
- * El territorio (D11) y el segundo paso (Kit de Seguridad 512, S3), afirmados
+ * El territorio (D11) y el segundo paso (Kit de Acceso, S3), afirmados
  * fila por fila sobre un Postgres de verdad.
  *
  * Es el archivo que la orden #13 llama «lo que después nadie puede saltarse desde

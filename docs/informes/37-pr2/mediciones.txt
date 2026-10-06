@@ -1,0 +1,63 @@
+p1-entrada-1440-claro.png                    CSP 0 · <style> 0 · 16 pares, 4 bajo AA · columna 560 · «Entra a tu espacio.»
+p1-entrada-1440-claro-en.png                 CSP 0 · <style> 0 · 16 pares, 4 bajo AA · columna 560 · «Enter your space.»
+p1-entrada-1440-claro-pt.png                 CSP 0 · <style> 0 · 16 pares, 4 bajo AA · columna 560 · «Entre no seu espaço.»
+p1-entrada-1440-oscuro.png                   CSP 0 · <style> 0 · 16 pares, 2 bajo AA · columna 560 · «Entra a tu espacio.»
+p1-entrada-390-claro.png                     CSP 0 · <style> 0 · 16 pares, 4 bajo AA · columna 390 · «Entra a tu espacio.»
+p1-entrada-390-claro-en.png                  CSP 0 · <style> 0 · 16 pares, 4 bajo AA · columna 390 · «Enter your space.»
+p1-entrada-390-claro-pt.png                  CSP 0 · <style> 0 · 16 pares, 4 bajo AA · columna 390 · «Entre no seu espaço.»
+p1-entrada-390-oscuro.png                    CSP 0 · <style> 0 · 16 pares, 2 bajo AA · columna 390 · «Entra a tu espacio.»
+p2-codigo-por-mail-1440-claro.png            CSP 0 · <style> 0 · 14 pares, 4 bajo AA · columna 560 · «Revisa tu correo.»
+p2-codigo-por-mail-1440-oscuro.png           CSP 0 · <style> 0 · 14 pares, 2 bajo AA · columna 560 · «Revisa tu correo.»
+p2-codigo-por-mail-390-claro.png             CSP 0 · <style> 0 · 14 pares, 4 bajo AA · columna 390 · «Revisa tu correo.»
+p2-codigo-por-mail-390-oscuro.png            CSP 0 · <style> 0 · 14 pares, 2 bajo AA · columna 390 · «Revisa tu correo.»
+p3-verificacion-1440-claro.png               CSP 0 · <style> 0 · 14 pares, 4 bajo AA · columna 560 · «Verifica tu identidad.»
+p3-verificacion-1440-oscuro.png              CSP 0 · <style> 0 · 14 pares, 2 bajo AA · columna 560 · «Verifica tu identidad.»
+p3-verificacion-390-claro.png                CSP 0 · <style> 0 · 14 pares, 4 bajo AA · columna 390 · «Verifica tu identidad.»
+p3-verificacion-390-oscuro.png               CSP 0 · <style> 0 · 14 pares, 2 bajo AA · columna 390 · «Verifica tu identidad.»
+p4-activar-1440-claro.png                    CSP 0 · <style> 0 · 15 pares, 4 bajo AA · columna 560 · «Activa tu segundo paso.»
+p4-activar-1440-oscuro.png                   CSP 0 · <style> 0 · 15 pares, 2 bajo AA · columna 560 · «Activa tu segundo paso.»
+p4-activar-390-claro.png                     CSP 0 · <style> 0 · 15 pares, 4 bajo AA · columna 390 · «Activa tu segundo paso.»
+p4-activar-390-oscuro.png                    CSP 0 · <style> 0 · 15 pares, 2 bajo AA · columna 390 · «Activa tu segundo paso.»
+p5-respaldo-1440-claro.png                   CSP 0 · <style> 0 · 23 pares, 4 bajo AA · columna 560 · «Guarda estos códigos.»
+p5-respaldo-1440-oscuro.png                  CSP 0 · <style> 0 · 23 pares, 2 bajo AA · columna 560 · «Guarda estos códigos.»
+p5-respaldo-390-claro.png                    CSP 0 · <style> 0 · 23 pares, 4 bajo AA · columna 390 · «Guarda estos códigos.»
+p5-respaldo-390-oscuro.png                   CSP 0 · <style> 0 · 23 pares, 2 bajo AA · columna 390 · «Guarda estos códigos.»
+p6-recuperacion-1440-claro.png               CSP 0 · <style> 0 · 14 pares, 4 bajo AA · columna 560 · «Usa un código de respaldo.»
+p6-recuperacion-1440-oscuro.png              CSP 0 · <style> 0 · 14 pares, 2 bajo AA · columna 560 · «Usa un código de respaldo.»
+p6-recuperacion-390-claro.png                CSP 0 · <style> 0 · 14 pares, 4 bajo AA · columna 390 · «Usa un código de respaldo.»
+p6-recuperacion-390-oscuro.png               CSP 0 · <style> 0 · 14 pares, 2 bajo AA · columna 390 · «Usa un código de respaldo.»
+p6b-reseteo-1440-claro.png                   CSP 0 · <style> 0 · 12 pares, 4 bajo AA · columna 560 · «Pide un reseteo.»
+p6b-reseteo-1440-oscuro.png                  CSP 0 · <style> 0 · 12 pares, 2 bajo AA · columna 560 · «Pide un reseteo.»
+p6b-reseteo-390-claro.png                    CSP 0 · <style> 0 · 12 pares, 4 bajo AA · columna 390 · «Pide un reseteo.»
+p6b-reseteo-390-oscuro.png                   CSP 0 · <style> 0 · 12 pares, 2 bajo AA · columna 390 · «Pide un reseteo.»
+p6b-espera-1440-claro.png                    CSP 0 · <style> 0 · 11 pares, 4 bajo AA · columna 560 · «Tu reseteo está en camino.»
+p6b-espera-1440-oscuro.png                   CSP 0 · <style> 0 · 11 pares, 2 bajo AA · columna 560 · «Tu reseteo está en camino.»
+p6b-espera-390-claro.png                     CSP 0 · <style> 0 · 11 pares, 4 bajo AA · columna 390 · «Tu reseteo está en camino.»
+p6b-espera-390-oscuro.png                    CSP 0 · <style> 0 · 11 pares, 2 bajo AA · columna 390 · «Tu reseteo está en camino.»
+p7-sesion-cerrada-1440-claro.png             CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 560 · «Cerramos tu sesión.»
+p7-sesion-cerrada-1440-oscuro.png            CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 560 · «Cerramos tu sesión.»
+p7-sesion-cerrada-390-claro.png              CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 390 · «Cerramos tu sesión.»
+p7-sesion-cerrada-390-oscuro.png             CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 390 · «Cerramos tu sesión.»
+p8-confirmacion-1440-claro.png               CSP 0 · <style> 0 · 13 pares, 4 bajo AA · columna 560 · «Confirma que eres tú.»
+p8-confirmacion-1440-oscuro.png              CSP 0 · <style> 0 · 13 pares, 2 bajo AA · columna 560 · «Confirma que eres tú.»
+p8-confirmacion-390-claro.png                CSP 0 · <style> 0 · 13 pares, 4 bajo AA · columna 390 · «Confirma que eres tú.»
+p8-confirmacion-390-oscuro.png               CSP 0 · <style> 0 · 13 pares, 2 bajo AA · columna 390 · «Confirma que eres tú.»
+rescate-confirmar-1440-claro.png             CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 560 · «Confirma el reseteo.»
+rescate-confirmar-1440-oscuro.png            CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 560 · «Confirma el reseteo.»
+rescate-confirmar-390-claro.png              CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 390 · «Confirma el reseteo.»
+rescate-confirmar-390-oscuro.png             CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 390 · «Confirma el reseteo.»
+rescate-confirmado-1440-claro.png            CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 560 · «Reseteo confirmado.»
+rescate-confirmado-1440-oscuro.png           CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 560 · «Reseteo confirmado.»
+rescate-confirmado-390-claro.png             CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 390 · «Reseteo confirmado.»
+rescate-confirmado-390-oscuro.png            CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 390 · «Reseteo confirmado.»
+rescate-cancelar-1440-claro.png              CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 560 · «Cancela el reseteo.»
+rescate-cancelar-1440-oscuro.png             CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 560 · «Cancela el reseteo.»
+rescate-cancelar-390-claro.png               CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 390 · «Cancela el reseteo.»
+rescate-cancelar-390-oscuro.png              CSP 0 · <style> 0 · 5 pares, 0 bajo AA · columna 390 · «Cancela el reseteo.»
+
+Sin fallas.
+
+Propuestas al molde (fase-2 §12):
+Idioma (@moldes/ui): «en» no activo, #9A948C sobre #FAF7F1 = 2.81:1 (< 4.5)
+Idioma (@moldes/ui): «pt» no activo, #9A948C sobre #FAF7F1 = 2.81:1 (< 4.5)
+Idioma (@moldes/ui): «es» no activo, #9A948C sobre #FAF7F1 = 2.81:1 (< 4.5)

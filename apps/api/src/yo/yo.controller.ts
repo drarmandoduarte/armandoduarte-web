@@ -1,9 +1,10 @@
 import { BadRequestException, Body, Controller, Get, Logger, Post, Req } from '@nestjs/common';
 import { SupabaseService } from '../identidad/supabase.service';
 import { tokenDelPedido } from '../identidad/token';
-import { usuarioDelPedido } from '../seguridad-512/nucleo/usuario-del-pedido';
-import { esEquipo } from '../seguridad-512/nucleo/roles';
+import { usuarioDelPedido } from '../acceso/nucleo/usuario-del-pedido';
+import { esEquipo } from '../acceso/nucleo/roles';
 import { PerfilDto } from './yo.dto';
+import { RescateRepositorio } from '../rescate/rescate.repositorio';
 
 /**
  * `GET /api/yo` — quién es el que está del otro lado.
@@ -28,7 +29,10 @@ import { PerfilDto } from './yo.dto';
 export class YoController {
   private readonly logger = new Logger(YoController.name);
 
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly rescates: RescateRepositorio,
+  ) {}
 
   @Get()
   async yo(@Req() pedido: unknown) {
@@ -40,6 +44,16 @@ export class YoController {
     const persona = await this.supabase.personaDe(token, usuario.id);
     /* #34 A.3: el rol de la barra dice el territorio («Equipo · México»). */
     const territorio = esEquipo(rol) ? await this.supabase.territorioDe(token, usuario.id) : null;
+    /* #37 PR 2 · «Reseteo pendiente» de Cuenta y seguridad (fase-2 §8,
+       `valores.reseteoPendiente`). La regla es `reseteoPendiente()` de
+       `@codice/core`: uno abierto que todavía puede terminar en un autenticador
+       nuevo (un pedido sin confirmar que ya venció, no). Si la lectura falla, no
+       hay reseteo que mostrar y `/api/yo` sigue: no se traba la entrada. */
+    const rescate = await this.rescates.abiertoComoLaPersona(token, usuario.id);
+    const caducado = rescate !== null && !rescate.confirmado_el && new Date(rescate.vence_el).getTime() <= Date.now();
+    const reseteoPendiente = rescate && !caducado
+      ? { vence: new Date(rescate.vence_el).toISOString(), confirmado: rescate.confirmado_el !== null }
+      : null;
 
     return {
       persona: persona
@@ -63,6 +77,7 @@ export class YoController {
       rol,
       territorio,
       tipo: esEquipo(rol) ? ('equipo' as const) : ('cliente' as const),
+      reseteoPendiente,
     };
   }
 

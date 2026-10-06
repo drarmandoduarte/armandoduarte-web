@@ -14,6 +14,7 @@ import {
   ConfirmacionDeLugar, MisTalleres, TalleresAbiertos, type Confirmacion, type TallerAbierto, type TallerMio,
 } from './Talleres';
 import type { Cobro } from './Comprobante';
+import { fechaDeVencimiento, useT } from '../acceso/textos';
 
 /**
  * Las pantallas de Mi espacio por dentro — orden #29, B.
@@ -244,12 +245,15 @@ export function SeccionDeDatos({ yo, recargar, principal }: { yo: Yo; recargar: 
  * tal cual estaban al final de Mis datos. «Cerrar las otras sesiones» se mudó a
  * Ajustes → Sesiones, que ven todos.
  */
-export function SeccionDeSeguridad({ alRegenerar, alPedirPasoReciente }: {
+export function SeccionDeSeguridad({ alRegenerar, alPedirPasoReciente, reseteoPendiente = null }: {
   alRegenerar: (codigos: string[]) => void;
+  /** #37 PR 2 · el rescate solo (fase-2 §8): el reseteo que pidió esta persona, si hay uno en curso. */
+  reseteoPendiente?: { vence: string; confirmado: boolean } | null;
   /** #35 · P8: la API pidió el código del autenticador; con él, se reintenta. */
   alPedirPasoReciente: (accion: { reintentar: () => void; cancelar: () => void }) => void;
 }) {
   const { t } = useTranslation();
+  const { t: tm, idioma } = useT();
   const [quedan, setQuedan] = useState<number | null>(null);
   const [regenerando, setRegenerando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -293,6 +297,15 @@ export function SeccionDeSeguridad({ alRegenerar, alPedirPasoReciente }: {
 
   return (
     <div>
+      {/* «Reseteo pendiente» (fase-2 §8, `valores.reseteoPendiente` de Ajustes
+          del molde, que entra en el PR 3): lo ve solo la persona que lo pidió,
+          con el texto del molde. Si no fue ella, lo cancela desde el correo de aviso. */}
+      {reseteoPendiente ? (
+        <div className="seccion" role="status">
+          <h3 className="subtitulo">{tm('settings.security.resetPending')}</h3>
+          <p className="nota">{tm('settings.security.resetPending.d', { fecha: fechaDeVencimiento(new Date(reseteoPendiente.vence), idioma) })}</p>
+        </div>
+      ) : null}
       <h3 className="subtitulo">{t('respaldo.regenerarTitulo')}</h3>
       {quedan === null ? null : (
         <p className="nota">

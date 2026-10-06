@@ -23,7 +23,7 @@
  *
  * ── Lo que este banco tiene y el de Omnia no: el `aal` ────────────────────
  * `como(usuarioId, aal, hacer)` lleva el nivel de autenticación en los claims.
- * Sin eso no se puede probar S3 del Kit de Seguridad 512 —«lo que un miembro ve
+ * Sin eso no se puede probar S3 del Kit de Acceso —«lo que un miembro ve
  * de otras personas exige `aal2` en la base, no solo en la API»—, que es el test
  * que más importa de la orden #13.
  *
@@ -131,10 +131,11 @@ export async function levantarBanco(): Promise<Banco> {
      mueve, un renombre— `readdirSync` devuelve `[]`, las migraciones «corren»
      sin error y los tests fallan después hablando de tablas que no existen. Con
      esto, el rojo dice la causa. */
-  if (archivos.length < 11) {
+  if (archivos.length < 13) {
     throw new Error(
-      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 11 `
-      + '(seis de la #13, la 007 de permisos, la 008 del panel, la 009 de «me anoto», la 010 del libro en el panel y la 011 del perfil). '
+      `el banco encontró ${archivos.length} migraciones en ${MIGRACIONES} y hoy son 13 `
+      + '(seis de la #13, la 007 de permisos, la 008 del panel, la 009 de «me anoto», la 010 del libro en el panel, la 011 del perfil, '
+      + 'la 012 de los avisos y la 013 de los rescates). '
       + 'O el glob no las ve, o alguien las movió: no se corrió nada.',
     );
   }

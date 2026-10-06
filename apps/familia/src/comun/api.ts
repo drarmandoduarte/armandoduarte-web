@@ -4,10 +4,10 @@ import { supabase } from '../supabase';
  * El único camino de esta app hacia `apps/api`.
  *
  * ── Nunca se muestra el `message` del servidor ─────────────────────────
- * Y no es una preferencia de estilo: el núcleo del Kit de Seguridad 512 devuelve
+ * Y no es una preferencia de estilo: el núcleo del Kit de Acceso devuelve
  * sus mensajes en **voseo rioplatense**, porque nació en Cenit, que es uruguayo.
  * El caso concreto está en
- * `apps/api/src/seguridad-512/nucleo/aal2.guard.ts:147` —el `message` del 403
+ * `apps/api/src/acceso/nucleo/aal2.guard.ts:147` —el `message` del 403
  * con `PASO_RECIENTE_REQUERIDO`— y el núcleo no se edita dentro de una app, así
  * que ese texto no se puede arreglar desde este repo. Está anotado con sus
  * palabras exactas en `scripts/check-tuteo.mjs` y en el informe de la #15.
@@ -89,16 +89,21 @@ async function tokenActual(): Promise<string | null> {
  */
 export async function api<T>(
   ruta: string,
-  opciones: { metodo?: 'GET' | 'POST'; cuerpo?: unknown } = {},
+  opciones: {
+    metodo?: 'GET' | 'POST';
+    cuerpo?: unknown;
+    /** #37 PR 2: una ruta sin sesión (los enlaces del correo del rescate). No manda el token aunque haya. */
+    sinSesion?: boolean;
+  } = {},
 ): Promise<T> {
-  const token = await tokenActual();
-  if (!token) throw new ErrorDeApi('SIN_SESION', 401, 'no hay sesión en el navegador');
+  const token = opciones.sinSesion ? null : await tokenActual();
+  if (!token && !opciones.sinSesion) throw new ErrorDeApi('SIN_SESION', 401, 'no hay sesión en el navegador');
 
   const respuesta = await fetch(`/api/${ruta}`, {
     method: opciones.metodo ?? 'GET',
     credentials: 'same-origin',
     headers: {
-      Authorization: `Bearer ${token}`,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(opciones.cuerpo === undefined ? {} : { 'Content-Type': 'application/json' }),
     },
     body: opciones.cuerpo === undefined ? undefined : JSON.stringify(opciones.cuerpo),
@@ -154,4 +159,6 @@ export interface Yo {
   /** #34 A.3: el territorio del miembro, para «Equipo · México». Nulo para un cliente. */
   territorio?: 'mexico' | 'internacional' | 'todos' | null;
   tipo: 'equipo' | 'cliente';
+  /** #37 PR 2 · «Reseteo pendiente» de Cuenta y seguridad (rescate solo, fase-2 §8). */
+  reseteoPendiente?: { vence: string; confirmado: boolean } | null;
 }

@@ -2,15 +2,15 @@ import { Controller, Get, Post, Body, Req, BadRequestException } from '@nestjs/c
 import { IsString, Length, Matches } from 'class-validator';
 import { SupabaseService } from '../identidad/supabase.service';
 import { tokenDelPedido } from '../identidad/token';
-import { usuarioDelPedido } from '../seguridad-512/nucleo/usuario-del-pedido';
-import { SinSegundoPaso } from '../seguridad-512/nucleo/sin-segundo-paso.decorator';
-import { PasoReciente } from '../seguridad-512/nucleo/paso-reciente.decorator';
+import { usuarioDelPedido } from '../acceso/nucleo/usuario-del-pedido';
+import { SinSegundoPaso } from '../acceso/nucleo/sin-segundo-paso.decorator';
+import { PasoReciente } from '../acceso/nucleo/paso-reciente.decorator';
 import {
   BACKUP_CODE_COUNT,
   generateBackupCode,
   hashBackupCode,
   verifyBackupCode,
-} from '../seguridad-512/nucleo/backup-codes';
+} from '../acceso/nucleo/backup-codes';
 
 /**
  * Los códigos de respaldo, recableados a `totp_backup_codes` de la #13.

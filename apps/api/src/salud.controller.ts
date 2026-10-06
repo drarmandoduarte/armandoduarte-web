@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { SinSegundoPaso } from './seguridad-512/nucleo/sin-segundo-paso.decorator';
+import { SinSegundoPaso } from './acceso/nucleo/sin-segundo-paso.decorator';
 
 /**
  * `GET /api/salud` — ¿está viva la función?

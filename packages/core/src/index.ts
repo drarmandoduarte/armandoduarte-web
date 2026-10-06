@@ -107,3 +107,10 @@ export type { FormaDeEntrar, SeccionDeAjustes } from './mi-espacio/ajustes';
 export {
   INTENTOS_POR_CODIGO, SEGUNDOS_PARA_REENVIAR, intentosQueQuedan, partirTituloDeAcceso, rellenar,
 } from './mi-espacio/acceso';
+
+// ── El rescate solo (orden #37, PR 2 · fase-2 §8) ────────────────────────────
+export {
+  HORAS_DE_ESPERA_DEL_RESCATE, RUTA_DEL_RESCATE, enlaceDelRescate, estadoDelRescate, leerEnlaceDelRescate,
+  reseteoPendiente, venceDelRescate,
+} from './mi-espacio/rescate';
+export type { AccionDelRescate, EstadoDelRescate, FilaDeRescate } from './mi-espacio/rescate';

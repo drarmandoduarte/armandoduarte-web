@@ -66,9 +66,9 @@ const EXTENSIONES = ['.ts', '.tsx', '.js', '.jsx', '.json'];
  * ── Los otros idiomas ──────────────────────────────────────────────────
  * `en/` y `pt/` no son español y el patrón daría falsos positivos.
  *
- * ── Y el núcleo del Kit de Seguridad 512 (orden #15) ────────────────────
- * `seguridad-512/nucleo/` **no es de esta app**: viaja del kit byte por byte,
- * con su SHA-256 en `seguridad-512/HUELLAS.txt`, y `check-seguridad-512.mjs` se
+ * ── Y el núcleo del Kit de Acceso (orden #15; renombrado en la #37) ──────
+ * `acceso/nucleo/` **no es de esta app**: viaja del kit byte por byte,
+ * con su SHA-256 en `HUELLAS.txt`, y `guardian/check.mjs` se
  * pone rojo si alguien lo edita acá adentro. Las dos reglas chocaban de frente
  * —«la interfaz habla tuteo» contra «el núcleo no se toca»— y **el kit manda**:
  * está escrito así en su `LEEME.md` y en la orden de la noche.
@@ -90,7 +90,7 @@ const EXTENSIONES = ['.ts', '.tsx', '.js', '.jsx', '.json'];
  * **códigos** de error del kit a sus propios textos y nunca pinta el `message`
  * que viene del servidor. Anotado en el informe de la #15.
  */
-const FUERA = ['/i18n/en/', '/i18n/pt/', '/seguridad-512/nucleo/'];
+const FUERA = ['/i18n/en/', '/i18n/pt/', '/acceso/nucleo/'];
 
 const VOSEO = [
   'tenés', 'podés', 'querés', 'sabés', 'ponés', 'aceptás', 'cargás',

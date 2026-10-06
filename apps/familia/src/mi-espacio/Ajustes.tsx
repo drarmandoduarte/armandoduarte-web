@@ -52,7 +52,7 @@ export function Ajustes({ yo, correo, proveedores, seccion, recargar, alRegenera
   if (actual === 'perfil') cuerpo = <SeccionDePerfil yo={yo} recargar={recargar} />;
   else if (actual === 'cuenta') cuerpo = <SeccionDeCuenta correo={correo} proveedores={proveedores} alSalirDeTodo={alSalirDeTodo} />;
   else if (actual === 'notificaciones') cuerpo = <SeccionDeNotificaciones yo={yo} recargar={recargar} />;
-  else if (actual === 'seguridad') cuerpo = <Seccion clave="seguridad"><SeccionDeSeguridad alRegenerar={alRegenerar} alPedirPasoReciente={alPedirPasoReciente} /></Seccion>;
+  else if (actual === 'seguridad') cuerpo = <Seccion clave="seguridad"><SeccionDeSeguridad alRegenerar={alRegenerar} alPedirPasoReciente={alPedirPasoReciente} reseteoPendiente={yo.reseteoPendiente ?? null} /></Seccion>;
   else if (actual === 'sesiones') cuerpo = <SeccionDeSesiones />;
   else cuerpo = <SeccionDePrivacidad />;
 

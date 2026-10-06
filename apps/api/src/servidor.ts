@@ -23,7 +23,7 @@ export async function crearApp(): Promise<Express> {
     /* Sin `console`: el logger de Nest, que en Vercel va a su recolector. La
        regla de la casa es Pino y todavía no entró a este repo; hasta que entre,
        lo que NO se hace es `console.log`, y eso el kit lo vigila dentro de
-       `seguridad-512/`. Anotado en el informe. */
+       `acceso/`. Anotado en el informe. */
     logger: ['error', 'warn', 'log'],
   });
 

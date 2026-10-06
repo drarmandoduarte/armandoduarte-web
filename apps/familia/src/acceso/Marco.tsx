@@ -1,134 +1,69 @@
-import { useCallback, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe } from 'lucide-react';
-import { IDIOMAS, WEB_PUBLICA, partirTituloDeAcceso, rellenar, type Idioma } from '@codice/core';
+import { Antetitulo, Idioma, Titulo } from '@moldes/ui';
+import { IDIOMAS, WEB_PUBLICA, type Idioma as IdiomaDeLaCasa } from '@codice/core';
 import { guardarIdioma } from '../comun/idioma';
-import design from '../../design.json';
+import { useT } from './textos';
 
 /**
- * La anatomía de toda pantalla de acceso — guion v1 del Kit 512, §2 (orden #35).
+ * La anatomía de toda pantalla de acceso — orden #37, PR 2 (Kit de Acceso 1.3.0).
  *
- * Fondo liso, columna centrada de 560 (24 de margen a 390), `← ARMANDO DUARTE`
- * arriba a la izquierda hacia la web, el selector de idioma arriba a la derecha,
- * y debajo antetítulo, título con la palabra acentuada, subtítulo y lo que la
- * pantalla traiga. **Sin fotos ni paneles**: el guion lo prohíbe y es regla de
- * dirección para todas las apps; la foto de Armando de la #31 se fue con esto.
+ * Es el marco de la galería del molde (`storybook/principal.jsx`: `Marco` y
+ * `Barrita`) hecho pantalla: la columna del molde (`.molde-columna`, 560 de
+ * ancho y 24 de margen), `← ARMANDO DUARTE` arriba a la izquierda hacia la web,
+ * el selector de idioma del molde (`Idioma`) a la derecha, y debajo el
+ * antetítulo, el título con su palabra acentuada y la bajada. Las piezas son
+ * todas de `@moldes/ui`; lo de Armando (colores, letra, radio, nombre) lo pone
+ * el `design.json`. Sin fotos ni paneles.
  *
- * Lo que es de Armando sale del `design.json` (generado del canon): el nombre
- * (y desde la #37, en el esquema del molde, `design.app.nombre`; la web pasó a
- * `WEB_PUBLICA` de `@codice/core`) y, en las variables `--acceso-*` de `acceso/design.css`, los colores,
- * la tipografía y el radio. Nada de eso se escribe acá.
+ * Lo que la #35 tenía escrito a mano —el título partido, el selector, el botón,
+ * la casilla de seis— se fue: lo trae el molde.
  */
-
-/** Los textos `auth.*`, con `{app}` y las demás variables de una llave rellenadas. */
-export function useTextos() {
-  const { t, i18n } = useTranslation();
-  const ta = useCallback(
-    (clave: string, variables: Record<string, string | number> = {}) =>
-      rellenar(t(`auth.${clave}`), { app: design.app.nombre, ...variables }),
-    [t],
-  );
-  return { ta, idioma: (i18n.resolvedLanguage ?? 'es') as Idioma, i18n };
-}
-
-/** «Verifica tu *identidad*.» con la palabra en la sans, cursiva y en el acento (§1.2). */
-export function TituloDeAcceso({ texto }: { texto: string }) {
-  const { antes, palabra, despues } = partirTituloDeAcceso(texto);
-  return (
-    <h1 className="acceso__titulo">
-      {antes}
-      {palabra ? <em className="acceso__palabra">{palabra}</em> : null}
-      {despues}
-    </h1>
-  );
-}
-
-function SelectorDeIdioma() {
-  const { ta, idioma, i18n } = useTextos();
-  return (
-    <div className="acceso__idiomas" role="group" aria-label={ta('lang.label')}>
-      <Globe size={16} strokeWidth={1.5} aria-hidden />
-      {IDIOMAS.map((l, i) => (
-        <span key={l} className="acceso__idioma-item">
-          {i > 0 ? <span className="acceso__punto" aria-hidden="true">·</span> : null}
-          <button
-            type="button"
-            lang={l}
-            className={`acceso__idioma${l === idioma ? ' acceso__idioma--activo' : ''}`}
-            aria-pressed={l === idioma}
-            onClick={() => { guardarIdioma(l); void i18n.changeLanguage(l); }}
-          >
-            {l.toUpperCase()}
-          </button>
-        </span>
-      ))}
-    </div>
-  );
-}
-
 export function MarcoDeAcceso({
-  antetitulo, titulo, subtitulo, centrada = false, pie, children,
+  antetitulo, titulo, subtitulo, centrada = false, portada = false, children,
 }: {
   /** La palabra del `§ · PALABRA`. P1 no lleva. */
   antetitulo?: string;
+  /** Con la palabra acentuada entre asteriscos. */
   titulo: string;
   subtitulo?: ReactNode;
-  /** Las pantallas de código van centradas (§2). */
+  /** Las pantallas de código van centradas. */
   centrada?: boolean;
-  /** El pie legal: solo P1. */
-  pie?: ReactNode;
+  /** P1: el título grande de la entrada. */
+  portada?: boolean;
   children?: ReactNode;
 }) {
-  const { ta, idioma } = useTextos();
+  const { t, idioma } = useT();
+  const { i18n } = useTranslation();
   return (
     <div className="acceso" lang={idioma}>
-      <div className="acceso__columna">
+      <div className="molde-columna">
         <header className="acceso__cabeza">
-          <a className="acceso__volver" href={WEB_PUBLICA}>{ta('back')}</a>
-          <SelectorDeIdioma />
+          <a className="acceso__volver" href={WEB_PUBLICA}>{t('auth.back')}</a>
+          <Idioma
+            valor={idioma}
+            idiomas={[...IDIOMAS]}
+            etiqueta={t('comun.idioma')}
+            onCambiar={(l) => { guardarIdioma(l as IdiomaDeLaCasa); void i18n.changeLanguage(l); }}
+          />
         </header>
         <main className={`acceso__cuerpo${centrada ? ' acceso__cuerpo--centrada' : ''}`} id="contenido">
-          {antetitulo ? <p className="acceso__antetitulo">§ · {antetitulo}</p> : null}
-          <TituloDeAcceso texto={titulo} />
-          {subtitulo ? <p className="acceso__subtitulo">{subtitulo}</p> : null}
+          {antetitulo ? <Antetitulo texto={antetitulo} /> : null}
+          <Titulo texto={titulo} tamano={portada ? 'portada' : 'pantalla'} alineado={centrada ? 'centro' : 'inicio'} />
+          {subtitulo ? <p className={`acceso__bajada${portada ? ' acceso__bajada--portada' : ''}`}>{subtitulo}</p> : null}
           {children}
-          {pie}
         </main>
       </div>
     </div>
   );
 }
 
-/** El botón principal: contorno del acento, mayúsculas, `→` si lleva a otra pantalla (§2). */
-export function BotonDeAcceso({
-  children, flecha = false, ancho = false, cargando = false, ...resto
-}: {
-  children: ReactNode;
-  flecha?: boolean;
-  /** Del ancho de la columna (pantallas de código); si no, del ancho del texto. */
-  ancho?: boolean;
-  cargando?: boolean;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button
-      type="submit"
-      className={`acceso__boton${ancho ? ' acceso__boton--ancho' : ''}`}
-      disabled={cargando || resto.disabled}
-      aria-busy={cargando || undefined}
-      {...resto}
-    >
-      <span>{children}</span>
-      {flecha ? <span aria-hidden="true">→</span> : null}
-    </button>
-  );
+/** El rótulo en mayúsculas encima de la casilla de seis, como en la galería del molde (P3). */
+export function Rotulo({ children }: { children: ReactNode }) {
+  return <p className="acceso__rotulo" aria-hidden="true">{children}</p>;
 }
 
-/** Los enlaces secundarios, centrados, uno debajo del otro: el primero en acento, el segundo apagado (§2). */
-export function EnlacesDeAcceso({ children }: { children: ReactNode }) {
-  return <div className="acceso__enlaces">{children}</div>;
-}
-
-/** La etiqueta en mayúsculas y en acento, encima del campo (§2). */
-export function Etiqueta({ htmlFor, children }: { htmlFor: string; children: ReactNode }) {
-  return <label className="acceso__etiqueta" htmlFor={htmlFor}>{children}</label>;
+/** Un error de la pantalla, en el color del error del `design.json`, anunciado. */
+export function ErrorDeAcceso({ id, children }: { id?: string; children: ReactNode }) {
+  return <p className="acceso__error" id={id} role="alert">{children}</p>;
 }

@@ -80,6 +80,9 @@ export function rutaQueCorresponde(estado: {
   busqueda?: string;
 }): string | null {
   if (estado.cargando) return null;
+  /* #37 PR 2: `/rescate` (los enlaces del correo del rescate) se abre con o sin
+     sesión y en cualquier estado: vale el token del enlace, no la sesión. */
+  if (estado.rutaActual === RUTAS.rescate) return null;
   const enMeAnoto = slugDeMeAnoto(estado.rutaActual) !== null;
   const ir = (destino: string) => (destino === estado.rutaActual ? null : destino);
 
