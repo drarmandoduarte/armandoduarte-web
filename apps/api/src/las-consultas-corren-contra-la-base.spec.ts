@@ -250,7 +250,7 @@ class Consulta implements PromiseLike<Resultado> {
  * banco.
  *
  * El `as unknown as SupabaseClient` es el borde: `SupabaseClient` es un tipo
- * enorme del que esta API usa `.from(…)` y —en `cerrarOtrasSesiones`, que acá no
+ * enorme del que esta API usa `.from(…)` y —en `cuenta` y `rescate`, que acá
  * se ejercita— `.auth.admin`. Tipar el resto sería copiar la biblioteca. El
  * cast está acá, en un solo lugar y en un archivo de test, y no en el código que
  * se despliega.

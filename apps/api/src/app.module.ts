@@ -7,7 +7,6 @@ import { RolMiddleware } from './identidad/rol.middleware';
 import { SaludController } from './salud.controller';
 import { YoController } from './yo/yo.controller';
 import { RespaldoController } from './respaldo/respaldo.controller';
-import { SesionesController } from './sesiones/sesiones.controller';
 import { EquipoController } from './equipo/equipo.controller';
 import { EquipoRepositorio } from './equipo/equipo.repositorio';
 import { TalleresController } from './talleres/talleres.controller';
@@ -37,7 +36,7 @@ import { PapeleraController } from './papelera/papelera.controller';
  */
 @Module({
   controllers: [
-    SaludController, YoController, RespaldoController, SesionesController, EquipoController, TalleresController, PagosController,
+    SaludController, YoController, RespaldoController, EquipoController, TalleresController, PagosController,
     /* #37 PR 2 · el rescate solo (fase-2 §8). */
     RescateController,
     /* #37 PR 3 · borrar la cuenta (§6) y la papelera (§9). */

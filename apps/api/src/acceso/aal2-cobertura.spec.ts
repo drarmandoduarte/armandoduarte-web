@@ -72,7 +72,7 @@ import {
  *    `AAL2_REQUIRED` y la pantalla lo manda a enrolar o al reto.
  *  · `POST /respaldo/generar` y `GET /respaldo/cuantos` — con la sesión ya en
  *    `aal2`. Generar lleva además `@PasoReciente(5)`.
- *  · `POST /sesiones/cerrar-las-otras`, `/pagos/*`, `/talleres/*`, `/equipo/*`
+ *  · `/pagos/*`, `/talleres/*`, `/equipo/*`, `/cuenta/*`, `/papelera/*`
  *    — quien las pide ya está adentro; el cliente pasa con `aal1` por su rol.
  *  · **Ninguna ruta resetea el autenticador de otra persona.** Mi espacio es de
  *    rescate solo: no existe `/equipo/.../resetear`, y el piso de abajo lo
@@ -152,7 +152,6 @@ describe('Cobertura del segundo paso (AAL2) — guardián', () => {
       'POST /rescate/pedir',
       'POST /respaldo/generar',
       'POST /respaldo/usar',
-      'POST /sesiones/cerrar-las-otras',
       'POST /talleres/inscribirme',
       'POST /yo',
     ]);
