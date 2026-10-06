@@ -19,7 +19,7 @@
  * real: ni una clave, ni una sesión.
  */
 import { chromium } from '@playwright/test';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,6 +27,7 @@ const BASE = process.argv[2] || 'http://127.0.0.1:4190';
 const SALIDA = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'docs', 'informes', '37-pr1');
 mkdirSync(SALIDA, { recursive: true });
 const REF = 'jrscpjdscgycetyvenco';
+const DESIGN = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'design.json'), 'utf8'));
 
 const navegador = await chromium.launch();
 const fallas = [];
@@ -62,7 +63,10 @@ for (const ancho of [390, 1440]) {
     if (m.violaciones.length || consola.length) fallas.push(`${caso}: violaciones de CSP: ${[...m.violaciones, ...consola].join(' | ')}`);
     if (m.estilos) fallas.push(`${caso}: ${m.estilos} <style> en el documento`);
     if (!m.hojas.includes('/design.css') || !m.hojas.includes('/fuentes/fuentes.css')) fallas.push(`${caso}: no están enlazadas las dos hojas del molde (${m.hojas.join(', ')})`);
-    const esperado = tema === 'oscuro' ? ['#3D9CA4', '#16181C'] : ['#005761', '#FAF7F1'];
+    /* Lo esperado sale del design.json, no escrito acá: `check:tokens` no deja
+       un hex fuera del canon (y una copia sería una segunda verdad). */
+    const paleta = tema === 'oscuro' ? DESIGN.colorOscuro : DESIGN.color;
+    const esperado = [paleta.acento, paleta.fondo];
     if (m.acento.toUpperCase() !== esperado[0] || m.fondo.toUpperCase() !== esperado[1]) fallas.push(`${caso}: --c-acento ${m.acento} / --c-fondo ${m.fondo}, y el design.json dice ${esperado.join(' / ')}`);
     if (!m.montserrat || !m.deFuentes.some((n) => n.endsWith('.woff2'))) fallas.push(`${caso}: Montserrat no cargó desde /fuentes/`);
     if (aGoogle.length) fallas.push(`${caso}: ${aGoogle.length} pedidos a Google`);
