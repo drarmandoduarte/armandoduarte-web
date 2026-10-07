@@ -11,7 +11,9 @@
 -- aprobada por dirección el 2/10/2026, que define la columna con estas
 -- palabras. Commit propio, separado del código.
 --
--- APLICADA: —
+-- APLICADA: 2/10/2026 23:47 (UY), en `armandoduarte-familia`, desde 77b46d6.
+--   Guardada en el editor SQL como `012_avisos_por_correo`. Corrida por el CEO con
+--   autorización de Germán, desde la rama (mi-espacio/15-barra-y-ajustes, antes del merge de la #34).
 --
 -- ── IMPORTANTE: se corre ANTES del merge de la #34 ─────────────────────────
 -- `GET /api/yo` y el correo de `pagos` leen `avisos_por_correo`. Desplegada sin

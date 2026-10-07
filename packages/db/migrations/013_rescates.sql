@@ -14,7 +14,9 @@
 -- `usado_el` nulo, `token_hash`; RLS: nadie lee más que lo suyo, solo se agrega
 -- y se cierra)». Commit propio, separado del código.
 --
--- APLICADA: —
+-- APLICADA: 6/10/2026 00:46 (UY), en `armandoduarte-familia`, desde a20e155.
+--   Guardada en el editor SQL como `013_rescates`. Corrida por el CEO con
+--   autorización de Germán, desde la rama (molde/02-acceso, antes del merge del PR 2 de la #37).
 --
 -- ── IMPORTANTE: se corre ANTES del merge del PR 2 de la #37 ────────────────
 -- Las cuatro rutas de `/api/rescate/*` leen y escriben acá: desplegado sin esta

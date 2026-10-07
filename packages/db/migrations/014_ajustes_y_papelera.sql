@@ -16,7 +16,9 @@
 -- ORDEN QUE LA APROBÓ: Códice #37, PR 3 (`molde/03-ajustes-inicio-shell`),
 -- §6 y §9 de la orden. Commit propio, separado del código.
 --
--- APLICADA: —
+-- APLICADA: 6/10/2026 01:54 (UY), en `armandoduarte-familia`, desde c218248.
+--   Guardada en el editor SQL como `014_ajustes_y_papelera`. Corrida por el CEO con
+--   autorización de Germán, desde la rama (molde/03-ajustes-inicio-shell, antes del merge del PR 3 de la #37).
 --
 -- ── IMPORTANTE: se corre ANTES del merge del PR 3 de la #37 ────────────────
 -- `GET /api/yo` lee las columnas nuevas: desplegado sin esta migración, la
