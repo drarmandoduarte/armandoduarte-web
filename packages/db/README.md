@@ -69,7 +69,7 @@ regla que la próxima vez no va a frenar nada.
 
 ## Estado de las migraciones
 
-**LAS NUEVE ESTÁN APLICADAS.** Las seis de la #13 el 29/9/2026 a las 02:34
+**LAS CATORCE ESTÁN APLICADAS** (la 010–014 con su fecha en la tabla). Las seis de la #13 el 29/9/2026 a las 02:34
 (hora de Uruguay), desde el commit `fd93eab`; la 007 el mismo día a las 15:58,
 desde `c3a485e`, en su propia sesión; la 008 el 30/9/2026 a las 21:55, desde
 `db747a1` (`main` con el PR #37), y tres minutos después la semilla
@@ -89,7 +89,7 @@ CEO con autorización de Germán.
 | 007 | `007_permisos.sql` | los `grant` de tabla, secuencia y función que el proyecto no da solo | **29/9/2026 15:58** |
 | 008 | `008_el_panel_del_equipo.sql` | las cuatro consultas del panel `/equipo` (orden #24 A), sin tablas ni policies nuevas | **30/9/2026 21:55** |
 | 009 | `009_me_anoto.sql` | el cupo cumplido por la base y las tres consultas de «me anoto» (orden #24 B) | **30/9/2026 23:35** |
-| 010 | `010_el_libro_en_el_panel.sql` | `libro_de_edicion()` y `firma_del_libro()`: el último renglón del libro para Inscriptos (orden #27 C), sin tablas ni policies nuevas | pendiente (la corre el CEO después del merge del PR C) |
+| 010 | `010_el_libro_en_el_panel.sql` | `libro_de_edicion()` y `firma_del_libro()`: el último renglón del libro para Inscriptos (orden #27 C), sin tablas ni policies nuevas | **1/10/2026 09:38** |
 | 011 | `011_el_perfil.sql` | ciudad, año de nacimiento y nivel educativo en `personas`; `notas_de_persona` (solo se agrega, equipo por territorio con aal2, el cliente no la lee); `panel_clientes()` reemplazada con esas columnas (orden #27 D) | **1/10/2026 16:20** |
 | 012 | `012_avisos_por_correo.sql` | `personas.avisos_por_correo boolean not null default true`: la preferencia de Ajustes → Notificaciones (orden #34) | **2/10/2026 23:47** |
 | 013 | `013_rescates.sql` | `rescates`: el reseteo del autenticador con espera de 48 h; nadie lee más que lo suyo, solo se agrega y se cierra (orden #37, PR 2) | **6/10/2026 00:46** |

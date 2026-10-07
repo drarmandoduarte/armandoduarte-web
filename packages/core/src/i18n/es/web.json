@@ -119,7 +119,7 @@
       "unoTitulo": "Consultoría familiar",
       "unoTexto": "Sesiones privadas con padres, parejas y familias. Mil horas al año, una a la vez.",
       "dosTitulo": "Talleres y conferencias",
-      "dosTexto": "Encuentros presenciales y en vivo para padres de familia. El próximo: el taller para padres de adolescentes en Mérida.",
+      "dosTexto": "Encuentros presenciales y en vivo para padres de familia. Los próximos: el taller para padres de adolescentes en Mérida y «Cómo sanar un matrimonio herido», en línea.",
       "tresTitulo": "Libros",
       "tresTexto": "Dos títulos para leer en casa y volver a ellos: la familia fuerte y la crianza en la era digital."
     },
@@ -507,7 +507,9 @@
     "titulo": "Términos de uso",
     "lead": "Al usar este sitio aceptas lo que dice esta página. Es corta a propósito.",
     "queEsTitulo": "Qué es este sitio",
-    "queEsTexto": "armandoduarte.com es un sitio informativo: presenta el trabajo de Armando Duarte con las familias, los talleres y los libros, y te da una vía para ponerte en contacto. Desde él se entra a Mi espacio, donde puedes inscribirte a los talleres. La información que encuentras acá es orientativa: no sustituye una consulta profesional.",
+    "queEsTexto": "armandoduarte.com es un sitio informativo: presenta el trabajo de Armando Duarte con las familias, los talleres y los libros, y te da una vía para ponerte en contacto.",
+    "queEsMiEspacio": " Desde él se entra a Mi espacio, donde puedes inscribirte a los talleres.",
+    "queEsCierre": " La información que encuentras acá es orientativa: no sustituye una consulta profesional.",
     "reservasTitulo": "Reservas y pagos",
     "reservasTexto": "Los lugares en los talleres se reservan por WhatsApp con el equipo de Armando, que confirma cupo, forma de pago y condiciones de cada actividad. En este sitio no se cobra nada ni se procesan pagos.",
     "contenidoTitulo": "El contenido es de Armando",
@@ -516,6 +518,6 @@
     "talCualTexto": "Este sitio se ofrece tal como está. Su contenido puede cambiar o dejar de estar disponible en cualquier momento, y se procura que las fechas y los datos estén al día, sin que eso constituya una garantía.",
     "leyTitulo": "Ley aplicable",
     "leyTexto": "Estos términos se rigen por la legislación mexicana. Para cualquier controversia relacionada con este sitio, las partes se someten a los tribunales competentes de Mérida, Yucatán.",
-    "actualizacion": "Última actualización: 1 de octubre de 2026."
+    "actualizacion": "Última actualización: 7 de octubre de 2026."
   }
 }

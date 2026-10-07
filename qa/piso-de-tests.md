@@ -21,12 +21,18 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 140 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 206 |
-| `@codice/web` | 89 |
+| `@codice/web` | 91 |
 | `@codice/familia` | 239 |
 | `@codice/api` | 178 |
 | `@codice/navegador` | 65 |
 
 
+
+## Lo que trae la orden #42 — `web` 89 → 91
+
+`la-web-no-nombra-vercel.test.ts` +2: «Qué es este sitio» de Términos nombra
+Mi espacio solo con la bandera prendida, y «Qué hago» de la portada dice los
+dos talleres. Mutación: la frase de Mi espacio sin la bandera → cae 1.
 
 ## Lo que trae la orden #41 — `web` 85 → 89
 

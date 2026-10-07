@@ -15,7 +15,9 @@
 -- con `panel_inscriptos_v2` o una función `libro_de_inscripcion(uuid)`
 -- (`security invoker`, RLS manda) … Se declara cuál».
 --
--- APLICADA: —
+-- APLICADA: 1/10/2026 09:38 (UY), en `armandoduarte-familia`, desde 8c0e8cb.
+--   Guardada en el editor SQL como `010_el_libro_en_el_panel`. Corrida por el CEO
+--   con autorización de Germán, antes del merge del #42.
 --
 -- ── Cuál se eligió, y por qué ──────────────────────────────────────────────
 -- Ni `panel_inscriptos_v2` ni `libro_de_inscripcion(uuid)`:

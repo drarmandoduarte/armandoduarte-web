@@ -83,10 +83,8 @@ const PENDIENTES: Record<string, string> = {
      las 23:35, antes del merge del #39—: completada su cabecera en el PR C de
      la #27, el rojo pidió borrar su fila. Y el 7/10, con la 012, la 013 y la
      014 —corridas el 2/10 y el 6/10—: completadas sus cabeceras en la #41, el
-     rojo pidió borrar las tres.) */
-  '010_el_libro_en_el_panel.sql':
-    'orden #27 C: el último renglón del libro y la firma del equipo para Inscriptos. La corre el CEO '
-    + 'cuando se mergee el PR C: sin ella, Inscriptos no lista (la API la llama junto con la 008)',
+     rojo pidió borrar las tres. Y la 010 el 7/10, en la #42: otra vez el
+     rojo, otra vez vacía.) */
 };
 
 describe('las migraciones', () => {
