@@ -84,8 +84,8 @@ const OG_IMAGENES: Record<'inicio' | 'taller' | 'matrimonios', { archivo: string
      apaisada (el cuadrado entero sobre el mismo póster desenfocado). Mismo
      orden que `/merida`: primero la de 630, después la cuadrada de WhatsApp. */
   matrimonios: [
-    { archivo: 'og-matrimonios-1200x630.jpg', ancho: 1200, alto: 630 },
-    { archivo: 'og-matrimonios-1200x1200.jpg', ancho: 1200, alto: 1200 },
+    { archivo: 'og-taller-matrimonio-herido-1200x630.jpg', ancho: 1200, alto: 630 },
+    { archivo: 'og-taller-matrimonio-herido-1200x1200.jpg', ancho: 1200, alto: 1200 },
   ],
 };
 
@@ -163,7 +163,7 @@ const EVENTO_MATRIMONIOS = {
   description: 'Taller en línea vía Zoom con Armando Duarte: 6 meses de formación, acompañamiento y guía para matrimonios.',
   eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
   eventStatus: 'https://schema.org/EventScheduled',
-  image: [`${SITIO}/img/og-matrimonios-1200x630.jpg`, `${SITIO}/img/og-matrimonios-1200x1200.jpg`],
+  image: [`${SITIO}/img/og-taller-matrimonio-herido-1200x630.jpg`, `${SITIO}/img/og-taller-matrimonio-herido-1200x1200.jpg`],
   startDate: '2026-10-29T19:00:00-06:00',
   endDate: '2026-10-29T21:00:00-06:00',
   location: { '@type': 'VirtualLocation', url: `${SITIO}/matrimonios` },
@@ -189,7 +189,12 @@ export function etiquetasDe(pagina: Pagina): Etiqueta[] {
     title: string;
     description: string;
     ogImageAlt?: string;
+    /* El texto del enlace compartido, cuando es otro que el de Google (#41:
+       `/matrimonios`, escrito por Armando para la vista previa). Lo leen
+       `og:description` y `twitter:description`; la `description` no cambia. */
+    descripcionAlCompartir?: string;
   };
+  const alCompartir = textos.descripcionAlCompartir ?? textos.description;
 
   /* Las legales: sin Open Graph —no se comparten— y con `noindex, follow`, que
      es lo correcto para un aviso legal: que no aparezca en una búsqueda pero
@@ -220,7 +225,7 @@ export function etiquetasDe(pagina: Pagina): Etiqueta[] {
        para la misma dirección son dos verdades que un día no coinciden. */
     { tipo: 'meta', attrs: { property: 'og:url', content: CANONICA[pagina] } },
     { tipo: 'meta', attrs: { property: 'og:title', content: textos.title } },
-    { tipo: 'meta', attrs: { property: 'og:description', content: textos.description } },
+    { tipo: 'meta', attrs: { property: 'og:description', content: alCompartir } },
     { tipo: 'meta', attrs: { property: 'og:locale', content: 'es_MX' } },
     ...OG_IMAGENES[pagina].flatMap<Etiqueta>(({ archivo, ancho, alto }, i) => [
       { tipo: 'meta', attrs: { property: 'og:image', content: `${SITIO}/img/${archivo}` } },
@@ -233,6 +238,11 @@ export function etiquetasDe(pagina: Pagina): Etiqueta[] {
         : []),
     ]),
     { tipo: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
+    /* Solo donde hay texto propio para compartir: en las demás X cae a
+       `og:description`, que es la misma, y su `<head>` queda como estaba. */
+    ...(textos.descripcionAlCompartir
+      ? [{ tipo: 'meta' as const, attrs: { name: 'twitter:description', content: textos.descripcionAlCompartir } }]
+      : []),
     { tipo: 'link', attrs: { rel: 'canonical', href: CANONICA[pagina] } },
     ...ICONOS,
     ...(EVENTOS[pagina]
@@ -281,6 +291,9 @@ export function useCabeza(pagina: Pagina) {
        vuelve a escribir el de esta página, que es más corto de leer que
        comparar contenidos y no puede dejar uno viejo. */
     document.head.querySelectorAll('script[type="application/ld+json"]').forEach((n) => n.remove());
+    /* Lo mismo con `twitter:description`, que solo tiene `/matrimonios` (#41):
+       al salir de ahí no puede quedar colgada con su texto. */
+    document.head.querySelectorAll('meta[name="twitter:description"]').forEach((n) => n.remove());
 
     /* ── Y el resto, contando las repetidas ───────────────────────────────
        Desde la #12 `/merida` declara **dos** `og:image`, cada una con su

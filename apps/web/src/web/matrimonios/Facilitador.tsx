@@ -11,7 +11,12 @@ import { Seccion } from '../comun/Seccion';
  * La ficha es la misma de `/merida`, y por eso lee sus claves de
  * `taller.facilitador.*`: Familia, Práctica, Formación y Libros publicados con
  * los tres de la #36. Una ficha copiada en `matrimonios.*` sería la segunda
- * verdad que un día no coincide.
+ * verdad que un día no coincide. **Salvo el valor de Familia** (#41): Armando
+ * pidió esta landing sin las edades de los hijos, y `/merida` y la portada las
+ * siguen diciendo; por eso tiene su clave propia.
+ *
+ * La biografía es la de la #41, que reemplaza entera a la del `.docx` y ya no
+ * empieza con el nombre en negrita: el título de arriba lo dice.
  */
 export function Facilitador() {
   const { t } = useTranslation();
@@ -27,10 +32,10 @@ export function Facilitador() {
             {t('matrimonios.facilitador.titulo1')}<br /><span className="suave">{t('matrimonios.facilitador.titulo2')}</span>
           </h2>
           <p className="body u-mt-4 reveal" data-d="2">
-            <b>{t('matrimonios.facilitador.bioNombre')}</b>{t('matrimonios.facilitador.bio')}
+            {t('matrimonios.facilitador.bio')}
           </p>
           <ul className="ficha reveal" data-d="2">
-            <li><span>{t('taller.facilitador.familiaClave')}</span><span>{t('taller.facilitador.familiaValor')}</span></li>
+            <li><span>{t('taller.facilitador.familiaClave')}</span><span>{t('matrimonios.facilitador.familiaValor')}</span></li>
             <li><span>{t('taller.facilitador.practicaClave')}</span><span>{t('taller.facilitador.practicaValor')}</span></li>
             <li><span>{t('taller.facilitador.formacionClave')}</span><span>{t('taller.facilitador.formacionValor')}</span></li>
             <li><span>{t('taller.facilitador.librosClave')}</span><span>{t('taller.facilitador.librosValor')}</span></li>

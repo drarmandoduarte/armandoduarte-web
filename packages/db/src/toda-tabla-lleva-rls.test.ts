@@ -81,19 +81,12 @@ const PENDIENTES: Record<string, string> = {
      21:55, con la 008: completada su cabecera en la #24 B, el rojo pidió
      borrar esta fila. Y una tercera el 1/10, con la 009 —corrida el 30/9 a
      las 23:35, antes del merge del #39—: completada su cabecera en el PR C de
-     la #27, el rojo pidió borrar su fila.) */
+     la #27, el rojo pidió borrar su fila. Y el 7/10, con la 012, la 013 y la
+     014 —corridas el 2/10 y el 6/10—: completadas sus cabeceras en la #41, el
+     rojo pidió borrar las tres.) */
   '010_el_libro_en_el_panel.sql':
     'orden #27 C: el último renglón del libro y la firma del equipo para Inscriptos. La corre el CEO '
     + 'cuando se mergee el PR C: sin ella, Inscriptos no lista (la API la llama junto con la 008)',
-  '012_avisos_por_correo.sql':
-    'orden #34 B.3: personas.avisos_por_correo. La corre el CEO ANTES del merge de la #34: sin ella, '
-    + 'GET /api/yo da 42703 y nadie entra a Mi espacio',
-  '013_rescates.sql':
-    'orden #37 PR 2 (rescate solo): la tabla rescates. La corre el CEO ANTES del merge del PR 2: sin ella, '
-    + 'pedir, confirmar, cancelar y aplicar el reseteo fallan (y «Reseteo pendiente» no aparece)',
-  '014_ajustes_y_papelera.sql':
-    'orden #37 PR 3 (Ajustes, Inicio y papelera): las columnas de Ajustes e Inicio, borrar la cuenta y la papelera. '
-    + 'La corre el CEO ANTES del merge del PR 3: sin ella, /api/yo da 42703 y nadie entra',
 };
 
 describe('las migraciones', () => {

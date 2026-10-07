@@ -26,7 +26,7 @@ import { SaludController } from '../salud.controller';                   // ← 
 import { PagosController } from '../pagos/pagos.controller';             // ← ADAPTAR: hecho, un controlador de negocio
 import { RespaldoController } from '../respaldo/respaldo.controller';    // ← ADAPTAR: hecho, el de los códigos de respaldo
 import { RescateController } from '../rescate/rescate.controller';       // ← ADAPTAR: hecho, el rescate solo (§8)
-import { SesionesController } from '../sesiones/sesiones.controller';    // ← ADAPTAR: hecho, cerrar las otras sesiones
+import { CuentaController } from '../cuenta/cuenta.controller';    // ← ADAPTAR: hecho, borrar la cuenta (#37 PR 3)
 import type { SupabaseService } from '../identidad/supabase.service';    // ← ADAPTAR: hecho, el verificador de token de Mi espacio
 /* ← ADAPTAR: hecho. `TeamService`, `AuthRequest` y `Profile` eran del caso de
    resetear a otro, que en Mi espacio no existe (rescate solo). */
@@ -85,7 +85,7 @@ const PUERTAS: ReadonlyArray<{ nombre: string; controller: Ctor; metodo: string 
   { nombre: 'GET /equipo/clientes', controller: EquipoController as unknown as Ctor, metodo: 'clientes' },
   { nombre: 'POST /pagos/resolver', controller: PagosController as unknown as Ctor, metodo: 'resolver' },
   { nombre: 'POST /respaldo/generar', controller: RespaldoController as unknown as Ctor, metodo: 'generar' },
-  { nombre: 'POST /sesiones/cerrar-las-otras', controller: SesionesController as unknown as Ctor, metodo: 'cerrarLasOtras' },
+  { nombre: 'POST /cuenta/borrar', controller: CuentaController as unknown as Ctor, metodo: 'borrar' },
 ];
 
 describe('Segundo paso obligatorio en las rutas que estaban abiertas', () => {
@@ -293,10 +293,10 @@ describe('el guard global, sobre las rutas de esta app', () => {
     ).resolves.toBe(true);
   });
 
-  it('POST /api/sesiones/cerrar-las-otras exige el segundo paso', async () => {
+  it('POST /api/cuenta/borrar exige el segundo paso a una cuenta de equipo', async () => {
     const { guard } = guardConVerificador();
     await expect(
-      guard.canActivate(contexto(SesionesController as unknown as Ctor, 'cerrarLasOtras', TOKEN_AAL1, 'equipo')),
+      guard.canActivate(contexto(CuentaController as unknown as Ctor, 'borrar', TOKEN_AAL1, 'equipo')),
     ).rejects.toMatchObject({ response: { code: AAL2_REQUIRED_CODE } });
   });
 

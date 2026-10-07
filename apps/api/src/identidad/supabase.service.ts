@@ -200,12 +200,6 @@ export class SupabaseService {
     return t === 'mexico' || t === 'internacional' || t === 'todos' ? t : null;
   }
 
-  /** Cierra todas las otras sesiones de esta persona. Único uso de service_role. */
-  async cerrarOtrasSesiones(personaId: string): Promise<void> {
-    const { error } = await this.clienteAdministrador().auth.admin.signOut(personaId, 'others');
-    if (error) throw new UnauthorizedException('No pudimos cerrar las otras sesiones.');
-  }
-
   /** El cliente con el token del usuario, para lo que se rige por RLS. */
   comoElUsuario(token: string): SupabaseClient {
     return this.clienteConToken(token);

@@ -21,12 +21,31 @@ alguien lo va a leer en el PR. Ése es el punto.
 | `@codice/core` | 140 |
 | `@codice/prompts` | 3 |
 | `@codice/db` | 206 |
-| `@codice/web` | 83 |
+| `@codice/web` | 89 |
 | `@codice/familia` | 239 |
 | `@codice/api` | 178 |
 | `@codice/navegador` | 65 |
 
 
+
+## Lo que trae la orden #41 — `web` 85 → 89
+
+`lo-que-mando-armando.test.ts` suma una suite contra el insumo del 6/10
+(`2026-10-06-matrimonios-ajustes/LEEME.md`): el piso (los tres textos leídos y
+la página en `dist/`, con el autoexamen del lector), el texto del enlace en
+`og:description` y `twitter:description` con la `description` sin tocar, la
+biografía nueva, y la ficha sin edades (sin «23 a 7» en `matrimonios.html`,
+con `/merida` y la portada como estaban). En la suite del `.docx` la biografía
+vieja pasa a «no es texto de la página», con su motivo. Mutación: la ficha de
+`/matrimonios` leyendo otra vez la clave compartida → cae 1.
+
+## Lo que trae la orden #40 — `web` 83 → 85
+
+`la-miniatura-de-matrimonios-tiene-nombre-nuevo.test.ts`: el piso (las páginas
+en `dist/` y la miniatura nueva en `/matrimonios`) y que ningún HTML publicado
+nombre `og-matrimonios-` (WhatsApp guarda la vista previa por la ruta). En la
+misma rama, la API pierde `POST /sesiones/cerrar-las-otras` y gana en su lugar,
+en las mismas dos pruebas del guard, `POST /cuenta/borrar`: `api` no se mueve.
 
 ## Lo que trae la orden #37, PR 3 — `core` 134 → 140, `db` 184 → 206, `familia` 228 → 239, `api` 163 → 178
 
