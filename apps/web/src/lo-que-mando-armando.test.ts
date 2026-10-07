@@ -494,7 +494,7 @@ suite41('/matrimonios dice lo que Armando pidió el 6/10 (#41)', () => {
   const html = leer('matrimonios.html');
 
   it('EL PISO, PRIMERO: el insumo trae los tres textos y la página está en dist', () => {
-    expect(ENLACE).toMatch(/^¿Se apagó el amor en tu relación\? .+ ¡Abre esta liga para conocer más!$/);
+    expect(ENLACE).toMatch(/^¿Se apagó el amor en casa\? .+ ¡Abre esta liga para conocer más!$/);
     expect(BIO).toMatch(/^Es fundador y director del Instituto Familias Fuertes\. .+ en Youtube\.$/);
     expect(FAMILIA).toBe(FAMILIA.trim());
     expect(FAMILIA.length).toBeGreaterThan(10);
@@ -508,6 +508,8 @@ suite41('/matrimonios dice lo que Armando pidió el 6/10 (#41)', () => {
     expect(m.head.descripcionAlCompartir).toBe(ENLACE);
     expect(html).toContain(`<meta property="og:description" content="${ENLACE}">`);
     expect(html).toContain(`<meta name="twitter:description" content="${ENLACE}">`);
+    /* #43: Armando confirmó «en casa»; la variante de la maqueta no queda. */
+    expect(html).not.toContain('en tu relación');
     /* La que lee Google sigue con la fecha y Zoom. */
     expect(html).toContain(`<meta name="description" content="${m.head.description}">`);
     expect(m.head.description).toContain('Zoom');
