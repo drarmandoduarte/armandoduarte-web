@@ -161,6 +161,21 @@ describe('la web y Mi espacio (órdenes #25, #28 y #33)', () => {
     }
   });
 
+  it('Términos, «Qué es este sitio»: nombra Mi espacio solo con la bandera prendida (#42)', () => {
+    const terminos = pagina('terminos.html');
+    /* El piso: el párrafo está, con su principio y su final. */
+    expect(terminos).toContain('armandoduarte.com es un sitio informativo:');
+    expect(terminos).toContain('te da una vía para ponerte en contacto. La información que encuentras acá es orientativa'
+      .replace('. La', MI_ESPACIO_EN_LA_WEB ? '. Desde él se entra a Mi espacio, donde puedes inscribirte a los talleres. La' : '. La'));
+    if (!MI_ESPACIO_EN_LA_WEB) expect(terminos, 'la #33 esconde Mi espacio').not.toContain('Desde él se entra a Mi espacio');
+  });
+
+  it('la portada, «Qué hago»: los próximos son los dos talleres (#42)', () => {
+    const portada = pagina('index.html');
+    expect(portada).toContain('Los próximos: el taller para padres de adolescentes en Mérida y «Cómo sanar un matrimonio herido», en línea.');
+    expect(portada).not.toContain('El próximo: el taller');
+  });
+
   it('Spotify: escondido con su bandera (#33); YouTube, Facebook e Instagram siguen', () => {
     for (const { archivo, html } of paginas) {
       for (const canal of ['youtube.com/c/DrArmandoDuarte', 'facebook.com/armandoduartepantoja', 'instagram.com/dr.armandoduarte']) {
