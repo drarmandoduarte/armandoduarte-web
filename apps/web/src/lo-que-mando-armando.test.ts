@@ -334,6 +334,13 @@ const PARRAFOS_38 = HAY_DOCX ? parrafosDe(documentoDe(readFileSync(DOCX))).map(a
 const ORDEN = HAY_DOCX ? readFileSync(ORDEN_38, 'utf8') : '';
 const suite38 = HAY_DOCX ? describe : describe.skip;
 
+/* La biografía del `.docx`, que la #41 reemplazó. Está escrita acá y no leída
+   de i18n porque i18n ya no la tiene: es el párrafo que el test de abajo
+   espera encontrar en el `.docx` y no en la página. */
+const BIO_DEL_DOCX = 'Armando Duarte es un experto en familia. Casado y padre de 7 hijos. Dedica 1000 horas al año para atender '
+  + 'en sesiones de consultoría familiar a parejas que pasan por dificultades. Cuenta con estudios de Licenciatura en '
+  + 'Ciencias de la Familia, Maestría en Educación y Doctorado en Liderazgo.';
+
 suite38('/matrimonios dice lo que mandó Armando en el .docx (#38)', () => {
   const m = (web as Record<string, any>).matrimonios;
   const f = m.fortalezas;
@@ -360,7 +367,6 @@ suite38('/matrimonios dice lo que mandó Armando en el .docx (#38)', () => {
     ...(['uno', 'dos', 'tres', 'cuatro', 'cinco'] as const).map((k): [string, string] => [`fortalezas.${k}`, conDosPuntos(f[k].titulo, f[k].texto)]),
     ['frases.titulo (+ «:»)', `${m.frases.titulo}:`],
     ...(['uno', 'dos', 'tres', 'cuatro'] as const).map((k): [string, string] => [`frases.${k}`, m.frases[k]]),
-    ['facilitador.bioNombre + bio', m.facilitador.bioNombre + m.facilitador.bio],
     ['facilitador.cita', m.facilitador.cita],
     ['cierre.titulo', c.titulo],
     ['cierre.cuerpo', c.cuerpo],
@@ -373,7 +379,7 @@ suite38('/matrimonios dice lo que mandó Armando en el .docx (#38)', () => {
   it('EL PISO, PRIMERO: el .docx se leyó y trae lo que tiene que traer', () => {
     expect(PARRAFOS_38.length, `no se pudo leer ${DOCX}`).toBeGreaterThanOrEqual(40);
     expect(PARRAFOS_38).toContain('¿Están listos para luchar?');
-    expect(publicados.length, 'la lista de lo publicado').toBe(43);
+    expect(publicados.length, 'la lista de lo publicado (la biografía salió con la #41)').toBe(42);
   });
 
   it('cada texto publicado es, carácter por carácter, un párrafo del .docx', () => {
@@ -398,6 +404,7 @@ suite38('/matrimonios dice lo que mandó Armando en el .docx (#38)', () => {
       ['BOTON [ ASEGURAR MI LUGAR EN EL TALLER ]', 'una indicación de botón: es «Asegurar mi lugar en el taller»'],
       ['Sobre el Facilitador', 'el rótulo de la sección, «Sobre el facilitador»'],
       ['Todo lo que necesitas para fortalecer tu relación', 'la bajada del hero (ya está en la lista)'],
+      [BIO_DEL_DOCX, 'Armando la tachó el 6/10 y mandó otra: la #41, que se mide abajo contra su insumo'],
     ]);
     const sueltos = PARRAFOS_38.filter((p) => !publicado.has(p) && !NO_SON_TEXTO.has(p));
     expect(sueltos, 'un párrafo de Armando que la página no dice').toEqual([]);
@@ -436,7 +443,7 @@ suite38('/matrimonios dice lo que mandó Armando en el .docx (#38)', () => {
         ? valor.slice(valor.indexOf(': ') + 2)
         : valor;
       const visible = clave.endsWith('(+ «:»)') ? valor.slice(0, -1) : pieza;
-      const enHtml = clave === 'dolor.hijos + hijosFuerte' || clave === 'facilitador.bioNombre + bio' || clave.startsWith('giro.titulo')
+      const enHtml = clave === 'dolor.hijos + hijosFuerte' || clave.startsWith('giro.titulo')
         ? null
         : visible;
       if (enHtml) expect(html, `${clave} no está en la página`).toContain(enHtml);
@@ -452,5 +459,80 @@ suite38('/matrimonios dice lo que mandó Armando en el .docx (#38)', () => {
     expect(aLaCasa('Una foto (Foto) adentro')).toBe('Una foto (Foto) adentro');
     expect(parrafosDe('<w:p><w:r><w:t>Uno</w:t></w:r><w:r><w:t xml:space="preserve"> dos</w:t></w:r></w:p><w:p><w:r><w:t>&amp;</w:t></w:r></w:p>'))
       .toEqual(['Uno dos', '&']);
+  });
+});
+
+/* ═══ /matrimonios · los ajustes del 6/10 (orden #41) ═══════════════════
+   Armando mandó por WhatsApp el texto del enlace, una biografía nueva y la
+   ficha sin las edades. Dirección los transcribió, literal, en el `LEEME.md`
+   de los insumos del 6/10: ése es el insumo, y de ahí se leen —no de una
+   copia en este archivo—. Cada sección `## N.` trae su texto como cita (`> `);
+   la de las edades lo trae en la cita que empieza con «quedaría:». */
+const AJUSTES_41 = join(REPO, '..', '..', '03 Producto', 'web', 'insumos', '2026-10-06-matrimonios-ajustes', 'LEEME.md');
+const HAY_41 = existsSync(AJUSTES_41);
+const LEEME_41 = HAY_41 ? readFileSync(AJUSTES_41, 'utf8') : '';
+const suite41 = HAY_41 ? describe : describe.skip;
+
+/** La sección `## N.` del insumo, sin su título. */
+export function seccionDe(leeme: string, n: number): string {
+  return leeme.split(/^## /m).find((s) => s.startsWith(`${n}. `))?.split('\n').slice(1).join('\n') ?? '';
+}
+/** Las líneas citadas (`> `) de una sección, en un solo texto. */
+export const citaDe = (seccion: string) => seccion.split('\n')
+  .filter((l) => l.startsWith('> ')).map((l) => l.slice(2).trim()).join(' ');
+
+suite41('/matrimonios dice lo que Armando pidió el 6/10 (#41)', () => {
+  const m = (web as Record<string, any>).matrimonios;
+  const t = (web as Record<string, any>).taller;
+  const ENLACE = citaDe(seccionDe(LEEME_41, 1));
+  const BIO = citaDe(seccionDe(LEEME_41, 2));
+  const FAMILIA = /^> quedaría: (.+)$/m.exec(seccionDe(LEEME_41, 3))?.[1].trim() ?? '';
+  const leer = (archivo: string) => {
+    const ruta = join(DIST, archivo);
+    return existsSync(ruta) ? readFileSync(ruta, 'utf8') : '';
+  };
+  const html = leer('matrimonios.html');
+
+  it('EL PISO, PRIMERO: el insumo trae los tres textos y la página está en dist', () => {
+    expect(ENLACE).toMatch(/^¿Se apagó el amor en tu relación\? .+ ¡Abre esta liga para conocer más!$/);
+    expect(BIO).toMatch(/^Es fundador y director del Instituto Familias Fuertes\. .+ en Youtube\.$/);
+    expect(FAMILIA).toBe(FAMILIA.trim());
+    expect(FAMILIA.length).toBeGreaterThan(10);
+    expect(html.length, 'matrimonios.html no está en dist: corre el build antes').toBeGreaterThan(1000);
+    /* El autoexamen del lector: una cita de dos líneas es un texto. */
+    expect(citaDe('> Uno.\nnada\n> Dos.')).toBe('Uno. Dos.');
+    expect(seccionDe('## 1. A\n> x\n## 2. B\n> y', 2)).toBe('> y');
+  });
+
+  it('el texto del enlace: og:description y twitter:description, literal; la description no cambia', () => {
+    expect(m.head.descripcionAlCompartir).toBe(ENLACE);
+    expect(html).toContain(`<meta property="og:description" content="${ENLACE}">`);
+    expect(html).toContain(`<meta name="twitter:description" content="${ENLACE}">`);
+    /* La que lee Google sigue con la fecha y Zoom. */
+    expect(html).toContain(`<meta name="description" content="${m.head.description}">`);
+    expect(m.head.description).toContain('Zoom');
+    expect(m.head.description).toContain('29 de octubre');
+    /* Y las otras páginas no ganaron un twitter:description. */
+    for (const otra of ['index.html', 'merida.html']) {
+      expect(leer(otra).length, `${otra} en dist`).toBeGreaterThan(1000);
+      expect(leer(otra), otra).not.toContain('twitter:description');
+    }
+  });
+
+  it('la biografía de «Sobre el facilitador» es la nueva, entera, sin el nombre en negrita', () => {
+    expect(m.facilitador.bio).toBe(BIO);
+    expect(m.facilitador).not.toHaveProperty('bioNombre');
+    expect(html).toContain(`>${BIO}</p>`);
+    expect(html).not.toContain('es un experto en familia. Casado y padre de 7 hijos');
+  });
+
+  it('la ficha dice «Casado y padre de siete hijos.» y «23 a 7» no queda en matrimonios.html; /merida y la portada no cambian', () => {
+    expect(m.facilitador.familiaValor).toBe(FAMILIA);
+    expect(html).toContain(`<span>${FAMILIA}</span>`);
+    expect(html).not.toContain('23 a 7');
+    /* La clave compartida sigue con las edades, y las dos páginas que la usan también. */
+    expect(t.facilitador.familiaValor).toContain('de 23 a 7 años');
+    expect(leer('merida.html')).toContain('23 a 7');
+    expect(leer('index.html')).toContain('23 a 7');
   });
 });
